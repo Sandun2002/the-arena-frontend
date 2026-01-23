@@ -5,7 +5,7 @@ export interface Venue {
   name: string;
   slug: string; // URL-friendly name (e.g., "grand-arena")
   location: string;
-  sport: "Football" | "Basketball" | "Tennis" | "Badminton" | "Swimming" | "Gym";
+  sport: "Cricket" | "Badminton" | "Futsal" | "Swimming" | "Basketball" | "Tennis" | "Pickleball" | "Table Tennis" | "Squash" | "Pool";
   rating: number;
   pricePerHour: number;
   imageUrl: string;
