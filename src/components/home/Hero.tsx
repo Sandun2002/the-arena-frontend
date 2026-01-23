@@ -1,15 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { api } from "@/services/api";
 import { Venue } from "@/types";
 import HeroCarousel from "./HeroCarousel";
 import Button from "@/components/ui/Button";
-import { ArrowRight } from "lucide-react";
 import gsap from "gsap";
 
 export default function Hero() {
   const [venues, setVenues] = useState<Venue[]>([]);
+  const textRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -18,57 +19,99 @@ export default function Hero() {
     };
     loadData();
 
-    // Animate elements from bottom up
-    gsap.fromTo(".hero-animate", 
-      { y: 30, opacity: 0 }, 
-      { y: 0, opacity: 1, duration: 0.8, stagger: 0.2, ease: "power3.out", delay: 0.2 }
+    // Animate carousel
+    gsap.fromTo(".hero-carousel-container",
+      { y: 20, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.8, ease: "power3.out", delay: 0.1 }
     );
+
+    // Animate button with bounce effect
+    if (buttonRef.current) {
+      gsap.fromTo(buttonRef.current,
+        { scale: 0.8, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(2)", delay: 0.5 }
+      );
+    }
+
+    // Animate text with stagger effect
+    if (textRef.current) {
+      gsap.fromTo(textRef.current.querySelectorAll(".hero-word"),
+        { y: 30, opacity: 0, rotateX: -20 },
+        { y: 0, opacity: 1, rotateX: 0, duration: 0.6, stagger: 0.1, ease: "back.out(1.5)", delay: 0.7 }
+      );
+
+      gsap.fromTo(textRef.current.querySelector(".hero-tagline"),
+        { y: 15, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.5, ease: "power2.out", delay: 1.0 }
+      );
+    }
   }, []);
 
   return (
-    <section className="relative min-h-[85vh] w-full flex flex-col justify-start md:justify-center items-center overflow-hidden pb-12">
-      
+    <section className="relative w-full flex flex-col justify-start items-center overflow-hidden pt-4 md:pt-6 pb-6 md:pb-12">
+
       {/* Background Effects */}
       <div className="absolute inset-0 bg-black z-0 pointer-events-none">
-        <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-[120px]" />
+        <div className="absolute top-[-20%] left-[-10%] w-[400px] h-[400px] bg-emerald-500/10 rounded-full blur-[100px]" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[400px] h-[400px] bg-emerald-500/5 rounded-full blur-[100px]" />
       </div>
 
-      <div className="relative z-10 container mx-auto px-4 flex flex-col items-center w-full pt-5">
-        
-        {/* 1. CAROUSEL (Now at the top) */}
-        <div className="hero-animate w-full mb-6 md:mb-8">
+      <div className="relative z-10 container mx-auto px-4 flex flex-col items-center w-full gap-3 md:gap-5">
+
+        {/* 1. CAROUSEL (Top) */}
+        <div className="hero-carousel-container w-full">
           {venues.length > 0 ? (
             <HeroCarousel venues={venues} />
           ) : (
-            <div className="h-[300px] w-full flex items-center justify-center text-zinc-600">
+            <div className="h-[180px] md:h-[260px] w-full flex items-center justify-center text-zinc-600">
               Loading Arenas...
             </div>
           )}
         </div>
 
-        {/* 2. BUTTON (Center Stage) */}
-        <div className="hero-animate flex flex-col items-center gap-4 mb-12">
-          {/* Animated Arrow pointing to button */}
-          <div className="animate-bounce text-emerald-500">
-             <ArrowRight className="h-5 w-5 rotate-90" />
-          </div>
-          
-          <Button 
-            href="/venues" 
-            className="text-base md:text-lg px-10 py-5 bg-emerald-500 text-black font-black tracking-wide hover:bg-white hover:text-black transition-all shadow-[0_0_20px_rgba(80,200,120,0.3)] hover:shadow-[0_0_50px_rgba(255,255,255,0.5)] hover:scale-105"
+        {/* 2. PREMIUM BUTTON (Middle) */}
+        <div ref={buttonRef} className="flex flex-col items-center">
+          <Button
+            href="/venues"
+            className="
+              group relative overflow-hidden
+              text-sm sm:text-base md:text-lg 
+              px-8 sm:px-10 md:px-12 
+              py-3 sm:py-4 md:py-5
+              bg-gradient-to-r from-emerald-400 to-emerald-500 
+              text-black font-black tracking-wider uppercase
+              rounded-full
+              shadow-[0_0_30px_rgba(80,200,120,0.4)]
+              hover:shadow-[0_0_50px_rgba(80,200,120,0.6)]
+              hover:scale-105
+              transition-all duration-300 ease-out
+              before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/0 before:via-white/30 before:to-white/0
+              before:translate-x-[-200%] hover:before:translate-x-[200%] before:transition-transform before:duration-700
+            "
           >
-            BOOK NOW
+            <span className="relative z-10 flex items-center gap-2">
+              BOOK NOW
+              <svg
+                className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-1 transition-transform"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </span>
           </Button>
         </div>
 
-        {/* 3. TEXT (Bottom Footer) */}
-        <div className="hero-animate text-center max-w-2xl">
-          <h1 className="text-3xl md:text-5xl font-bold tracking-tighter text-white mb-3">
-            WHERE <span className="text-emerald-500">CHAMPIONS</span> PLAY
+        {/* 3. TEXT (Bottom) */}
+        <div ref={textRef} className="text-center max-w-2xl perspective-1000">
+          <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tighter text-white mb-1 md:mb-2 flex flex-wrap justify-center gap-x-2 md:gap-x-3">
+            <span className="hero-word inline-block">WHERE</span>
+            <span className="hero-word inline-block text-transparent bg-gradient-to-r from-emerald-400 to-emerald-500 bg-clip-text">CHAMPIONS</span>
+            <span className="hero-word inline-block">PLAY</span>
           </h1>
-          <p className="text-zinc-400 text-sm md:text-base">
-            Discover and book Sri Lanka's most premium sports venues instantly.
+          <p className="hero-tagline text-zinc-400 text-xs sm:text-sm md:text-base">
+            Discover and book Sri Lanka&apos;s most premium sports venues instantly.
           </p>
         </div>
 

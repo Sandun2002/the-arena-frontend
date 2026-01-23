@@ -72,3 +72,54 @@ body {
   background-clip: text;
   color: transparent;
 }
+
+/* Hero Carousel Pagination Styles */
+.hero-carousel .swiper-pagination {
+  bottom: 0 !important;
+}
+
+.hero-carousel .swiper-pagination-bullet {
+  width: 10px;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.3);
+  opacity: 1;
+  transition: all 0.3s ease;
+}
+
+.hero-carousel .swiper-pagination-bullet-active {
+  background: linear-gradient(135deg, #5ede4a 0%, #50C878 100%);
+  width: 28px;
+  border-radius: 5px;
+  box-shadow: 0 0 15px rgba(80, 200, 120, 0.5);
+}
+
+/* Shimmer Animation */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Card Lift Hover Animation */
+@keyframes cardLift {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    transform: translateY(-8px) scale(1.02);
+  }
+}

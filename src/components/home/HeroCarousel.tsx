@@ -2,9 +2,10 @@
 
 import { Venue } from "@/types";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { EffectCoverflow, Autoplay } from "swiper/modules";
+import { EffectCoverflow, Autoplay, Mousewheel, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/effect-coverflow";
+import "swiper/css/pagination";
 import HeroVenueCard from "./HeroVenueCard";
 import { useState, useMemo } from "react";
 
@@ -22,7 +23,12 @@ export default function HeroCarousel({ venues }: HeroCarouselProps) {
   }, [venues]);
 
   return (
-    <div className="w-full py-0 md:py-2">
+    <div className="w-full pt-4 pb-2 md:py-4 relative">
+      {/* Subtle background glow */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[250px] bg-emerald-500/10 rounded-full blur-[80px]" />
+      </div>
+
       <Swiper
         effect={"coverflow"}
         grabCursor={true}
@@ -32,26 +38,34 @@ export default function HeroCarousel({ venues }: HeroCarouselProps) {
         initialSlide={venues.length}
         coverflowEffect={{
           rotate: 0,
-          stretch: 0,
-          depth: 150,
-          modifier: 2.8,
+          stretch: 50,
+          depth: 100,
+          modifier: 1,
           slideShadows: false,
         }}
         autoplay={{
-          delay: 3000,
+          delay: 3500,
           disableOnInteraction: false,
           pauseOnMouseEnter: true
         }}
+        mousewheel={{
+          forceToAxis: true,
+          sensitivity: 1,
+          releaseOnEdges: true
+        }}
+        pagination={{
+          clickable: true,
+          dynamicBullets: true,
+        }}
+        speed={500}
         onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
-        modules={[EffectCoverflow, Autoplay]}
-        className="w-full"
+        modules={[EffectCoverflow, Autoplay, Mousewheel, Pagination]}
+        className="hero-carousel w-full !pb-8 !overflow-visible"
       >
         {loopedVenues.map((venue, index) => (
-          <SwiperSlide 
-            key={`${venue.id}-${index}`} 
-            // MOBILE: Show 5 cards on mobile (140px width)
-            // DESKTOP: Show 2-3 cards (380px width)
-            className="!w-[140px] md:!w-[380px] mx-1.5 md:mx-4"
+          <SwiperSlide
+            key={`${venue.id}-${index}`}
+            className="!w-[280px] md:!w-[400px]"
           >
             {({ isActive }) => (
               <HeroVenueCard venue={venue} isActive={isActive} />
