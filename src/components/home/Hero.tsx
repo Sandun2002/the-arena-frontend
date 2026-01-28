@@ -14,7 +14,7 @@ export default function Hero() {
 
   useEffect(() => {
     const loadData = async () => {
-      const data = await api.getTrendingVenues();
+      const data = await api.getFeaturedVenues();
       setVenues(data);
     };
     loadData();
