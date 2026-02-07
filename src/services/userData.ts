@@ -71,3 +71,128 @@ export function addBooking(booking: Omit<Booking, "id" | "status">) {
     MY_BOOKINGS = [newBooking, ...MY_BOOKINGS];
     return newBooking;
 }
+
+// Function to cancel a booking (for demo)
+export function cancelBooking(bookingId: string, reason?: string) {
+    MY_BOOKINGS = MY_BOOKINGS.map(booking =>
+        booking.id === bookingId
+            ? { ...booking, status: "cancelled" as const }
+            : booking
+    );
+    return MY_BOOKINGS.find(b => b.id === bookingId);
+}
+
+// Mock Venue Bookings Data (for Venue Dashboard)
+export interface VenueBooking {
+    id: string;
+    customerName: string;
+    customerId: string;
+    courtName: string;
+    date: string;
+    timeSlot: string;
+    amount: number;
+    status: "confirmed" | "pending" | "completed" | "cancelled";
+}
+
+export const VENUE_BOOKINGS: VenueBooking[] = [
+    {
+        id: "BK-8391",
+        customerName: "John Doe",
+        customerId: "C-001",
+        courtName: "Court A - Badminton",
+        date: "2026-02-10",
+        timeSlot: "16:00 - 18:00",
+        amount: 4500,
+        status: "confirmed"
+    },
+    {
+        id: "BK-8392",
+        customerName: "Sarah Silva",
+        customerId: "C-002",
+        courtName: "Court B - Futsal",
+        date: "2026-02-10",
+        timeSlot: "18:00 - 20:00",
+        amount: 6000,
+        status: "confirmed"
+    },
+    {
+        id: "BK-8393",
+        customerName: "Rajesh Kumar",
+        customerId: "C-003",
+        courtName: "Court C - Tennis",
+        date: "2026-02-11",
+        timeSlot: "14:00 - 15:00",
+        amount: 3500,
+        status: "pending"
+    },
+    {
+        id: "BK-8394",
+        customerName: "Emily Chen",
+        customerId: "C-004",
+        courtName: "Court A - Badminton",
+        date: "2026-02-11",
+        timeSlot: "19:00 - 21:00",
+        amount: 4500,
+        status: "confirmed"
+    },
+    {
+        id: "BK-8395",
+        customerName: "Michael Fernando",
+        customerId: "C-005",
+        courtName: "Court D - Basketball",
+        date: "2026-02-12",
+        timeSlot: "17:00 - 19:00",
+        amount: 5500,
+        status: "pending"
+    },
+    {
+        id: "BK-8396",
+        customerName: "Priya Patel",
+        customerId: "C-006",
+        courtName: "Court B - Futsal",
+        date: "2026-02-08",
+        timeSlot: "20:00 - 22:00",
+        amount: 6000,
+        status: "completed"
+    },
+    {
+        id: "BK-8397",
+        customerName: "David Lee",
+        customerId: "C-007",
+        courtName: "Court C - Tennis",
+        date: "2026-02-09",
+        timeSlot: "15:00 - 16:00",
+        amount: 3500,
+        status: "completed"
+    },
+    {
+        id: "BK-8398",
+        customerName: "Nina Perera",
+        customerId: "C-008",
+        courtName: "Court A - Badminton",
+        date: "2026-02-13",
+        timeSlot: "10:00 - 12:00",
+        amount: 4500,
+        status: "confirmed"
+    },
+    {
+        id: "BK-8399",
+        customerName: "Alex Johnson",
+        customerId: "C-009",
+        courtName: "Court D - Basketball",
+        date: "2026-02-14",
+        timeSlot: "18:00 - 20:00",
+        amount: 5500,
+        status: "pending"
+    },
+    {
+        id: "BK-8400",
+        customerName: "Lisa Wong",
+        customerId: "C-010",
+        courtName: "Court B - Futsal",
+        date: "2026-02-06",
+        timeSlot: "19:00 - 21:00",
+        amount: 6000,
+        status: "completed"
+    },
+];

@@ -3,18 +3,34 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { MY_BOOKINGS } from "@/services/userData";
+import { MY_BOOKINGS, cancelBooking, Booking } from "@/services/userData";
 import { Calendar, Clock, MapPin, ArrowRight, X } from "lucide-react";
 import gsap from "gsap";
+import CancelBookingModal from "@/components/ui/CancelBookingModal";
 
 export default function BookingsPage() {
     const [activeTab, setActiveTab] = useState<"upcoming" | "history">("upcoming");
+    const [cancelModalOpen, setCancelModalOpen] = useState(false);
+    const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
 
     // Filter data based on tab (Mock logic)
     const bookings = activeTab === "upcoming"
         ? MY_BOOKINGS.filter(b => b.status === "upcoming")
         : MY_BOOKINGS.filter(b => b.status !== "upcoming");
+
+    const handleCancelClick = (booking: Booking) => {
+        setSelectedBooking(booking);
+        setCancelModalOpen(true);
+    };
+
+    const handleConfirmCancel = (reason: string) => {
+        if (selectedBooking) {
+            cancelBooking(selectedBooking.id, reason);
+            setCancelModalOpen(false);
+            setSelectedBooking(null);
+        }
+    };
 
     useEffect(() => {
         const ctx = gsap.context(() => {
@@ -144,7 +160,10 @@ export default function BookingsPage() {
                                         <div className="flex items-center justify-end gap-3 mt-auto pt-6 border-t border-white/5">
                                             {booking.status === "upcoming" ? (
                                                 <>
-                                                    <button className="px-5 py-2.5 rounded-xl text-xs font-bold text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all flex items-center gap-2">
+                                                    <button
+                                                        onClick={() => handleCancelClick(booking)}
+                                                        className="px-5 py-2.5 rounded-xl text-xs font-bold text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all flex items-center gap-2"
+                                                    >
                                                         <X className="h-4 w-4" /> Cancel
                                                     </button>
                                                     <button className="px-6 py-2.5 rounded-xl bg-white text-black text-xs font-black uppercase tracking-wider hover:bg-emerald-400 hover:scale-105 transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)] group-hover:shadow-[0_0_20px_rgba(52,211,153,0.3)]">
@@ -177,6 +196,14 @@ export default function BookingsPage() {
                     )}
                 </div>
             </div>
+
+            {/* Cancel Booking Modal */}
+            <CancelBookingModal
+                booking={selectedBooking}
+                isOpen={cancelModalOpen}
+                onClose={() => setCancelModalOpen(false)}
+                onConfirm={handleConfirmCancel}
+            />
         </main>
     );
 }

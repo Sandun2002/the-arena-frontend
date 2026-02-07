@@ -2,11 +2,18 @@
 
 import Link from "next/link";
 import { ArrowLeft, Filter, Search, MoreHorizontal, CalendarCheck, Clock, CheckCircle } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
+import { VENUE_BOOKINGS, VenueBooking } from "@/services/userData";
+
+type StatusFilter = "all" | "pending" | "confirmed" | "completed";
 
 export default function VenueBookingsPage() {
     const containerRef = useRef<HTMLDivElement>(null);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
 
     useEffect(() => {
         const ctx = gsap.context(() => {
@@ -21,6 +28,42 @@ export default function VenueBookingsPage() {
         }, containerRef);
         return () => ctx.revert();
     }, []);
+
+    // Filter bookings based on search and status
+    const filteredBookings = VENUE_BOOKINGS.filter(booking => {
+        const matchesSearch =
+            booking.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            booking.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            booking.courtName.toLowerCase().includes(searchQuery.toLowerCase());
+
+        const matchesStatus = statusFilter === "all" || booking.status === statusFilter;
+
+        return matchesSearch && matchesStatus;
+    });
+
+    // Pagination
+    const totalPages = Math.ceil(filteredBookings.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const paginatedBookings = filteredBookings.slice(startIndex, startIndex + itemsPerPage);
+
+    // Reset to page 1 when filter changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery, statusFilter]);
+
+    const getStatusBadge = (status: VenueBooking["status"]) => {
+        const styles = {
+            confirmed: "bg-emerald-500/10 border-emerald-500/20 text-emerald-400",
+            pending: "bg-yellow-500/10 border-yellow-500/20 text-yellow-400",
+            completed: "bg-blue-500/10 border-blue-500/20 text-blue-400",
+            cancelled: "bg-red-500/10 border-red-500/20 text-red-400",
+        };
+        return styles[status];
+    };
+
+    const getInitials = (name: string) => {
+        return name.split(" ").map(n => n[0]).join("").toUpperCase();
+    };
 
     return (
         <main className="min-h-screen bg-black pt-24 pb-20 relative overflow-hidden" ref={containerRef}>
@@ -61,13 +104,30 @@ export default function VenueBookingsPage() {
                             <input
                                 type="text"
                                 placeholder="Search bookings..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
                                 className="w-full bg-black/40 border border-zinc-800 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-emerald-500/50 transition-all placeholder-zinc-600"
                             />
                         </div>
                         <div className="flex bg-zinc-950/50 p-1 rounded-lg border border-zinc-800">
-                            <button className="px-4 py-1.5 rounded-md bg-zinc-800 text-white text-xs font-bold shadow-sm">All</button>
-                            <button className="px-4 py-1.5 rounded-md text-zinc-500 hover:text-zinc-300 text-xs font-bold">Pending</button>
-                            <button className="px-4 py-1.5 rounded-md text-zinc-500 hover:text-zinc-300 text-xs font-bold">Completed</button>
+                            <button
+                                onClick={() => setStatusFilter("all")}
+                                className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${statusFilter === "all" ? "bg-zinc-800 text-white shadow-sm" : "text-zinc-500 hover:text-zinc-300"}`}
+                            >
+                                All
+                            </button>
+                            <button
+                                onClick={() => setStatusFilter("pending")}
+                                className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${statusFilter === "pending" ? "bg-zinc-800 text-white shadow-sm" : "text-zinc-500 hover:text-zinc-300"}`}
+                            >
+                                Pending
+                            </button>
+                            <button
+                                onClick={() => setStatusFilter("completed")}
+                                className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${statusFilter === "completed" ? "bg-zinc-800 text-white shadow-sm" : "text-zinc-500 hover:text-zinc-300"}`}
+                            >
+                                Completed
+                            </button>
                         </div>
                     </div>
 
@@ -86,48 +146,74 @@ export default function VenueBookingsPage() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-zinc-800">
-                                {/* Mock Rows */}
-                                {[1, 2, 3, 4, 5].map((item) => (
-                                    <tr key={item} className="group hover:bg-white/5 transition-colors">
-                                        <td className="px-6 py-4 text-sm font-mono text-zinc-500">#BK-839{item}</td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center text-[10px] font-bold text-white">
-                                                    JD
+                                {paginatedBookings.length > 0 ? (
+                                    paginatedBookings.map((booking) => (
+                                        <tr key={booking.id} className="group hover:bg-white/5 transition-colors">
+                                            <td className="px-6 py-4 text-sm font-mono text-zinc-500">#{booking.id}</td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center text-[10px] font-bold text-white">
+                                                        {getInitials(booking.customerName)}
+                                                    </div>
+                                                    <div className="text-sm font-bold text-white">{booking.customerName}</div>
                                                 </div>
-                                                <div className="text-sm font-bold text-white">John Doe</div>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 text-sm text-zinc-300">Court A - Badmintion</td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex flex-col text-xs text-zinc-400">
-                                                <span className="flex items-center gap-1.5 mb-0.5"><CalendarCheck className="h-3 w-3" /> Oct 24, 2024</span>
-                                                <span className="flex items-center gap-1.5"><Clock className="h-3 w-3" /> 16:00 - 18:00</span>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 text-center">
-                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase tracking-wide">
-                                                <CheckCircle className="h-3 w-3" /> Confirmed
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 text-sm font-bold text-white text-right">LKR 4,500</td>
-                                        <td className="px-6 py-4 text-right">
-                                            <button className="p-2 rounded-lg hover:bg-white/10 text-zinc-500 hover:text-white transition-all">
-                                                <MoreHorizontal className="h-4 w-4" />
-                                            </button>
+                                            </td>
+                                            <td className="px-6 py-4 text-sm text-zinc-300">{booking.courtName}</td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex flex-col text-xs text-zinc-400">
+                                                    <span className="flex items-center gap-1.5 mb-0.5"><CalendarCheck className="h-3 w-3" /> {booking.date}</span>
+                                                    <span className="flex items-center gap-1.5"><Clock className="h-3 w-3" /> {booking.timeSlot}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 text-center">
+                                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wide ${getStatusBadge(booking.status)}`}>
+                                                    {booking.status === "confirmed" && <CheckCircle className="h-3 w-3" />}
+                                                    {booking.status}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 text-sm font-bold text-white text-right">LKR {booking.amount.toLocaleString()}</td>
+                                            <td className="px-6 py-4 text-right">
+                                                <button className="p-2 rounded-lg hover:bg-white/10 text-zinc-500 hover:text-white transition-all">
+                                                    <MoreHorizontal className="h-4 w-4" />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan={7} className="px-6 py-16 text-center">
+                                            <p className="text-zinc-500 mb-2">No bookings found</p>
+                                            <p className="text-zinc-600 text-sm">Try adjusting your search or filters</p>
                                         </td>
                                     </tr>
-                                ))}
+                                )}
                             </tbody>
                         </table>
                     </div>
 
                     {/* Footer Pagination */}
                     <div className="p-4 border-t border-zinc-800 bg-zinc-900/30 flex justify-between items-center text-xs text-zinc-500">
-                        <span>Showing 1-5 of 12 bookings</span>
+                        <span>
+                            Showing {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filteredBookings.length)} of {filteredBookings.length} bookings
+                        </span>
                         <div className="flex gap-2">
-                            <button className="px-3 py-1.5 rounded-lg border border-zinc-800 hover:bg-zinc-800 hover:text-white transition-all disabled:opacity-50">Prev</button>
-                            <button className="px-3 py-1.5 rounded-lg border border-zinc-800 hover:bg-zinc-800 hover:text-white transition-all">Next</button>
+                            <button
+                                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                                disabled={currentPage === 1}
+                                className="px-3 py-1.5 rounded-lg border border-zinc-800 hover:bg-zinc-800 hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Prev
+                            </button>
+                            <span className="px-3 py-1.5 text-white font-bold">
+                                {currentPage} / {totalPages || 1}
+                            </span>
+                            <button
+                                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                                disabled={currentPage === totalPages || totalPages === 0}
+                                className="px-3 py-1.5 rounded-lg border border-zinc-800 hover:bg-zinc-800 hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Next
+                            </button>
                         </div>
                     </div>
 
