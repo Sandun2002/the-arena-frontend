@@ -14,7 +14,7 @@ interface HeroCarouselProps {
 }
 
 export default function HeroCarousel({ venues }: HeroCarouselProps) {
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [, setActiveIndex] = useState(0);
 
   // Duplicate data to ensure smooth infinite loop
   const loopedVenues = useMemo(() => {

@@ -5,7 +5,7 @@ import { api } from "@/services/api";
 import { Venue } from "@/types";
 import VenueCard from "@/components/ui/VenueCard";
 import CourtFinderPanel from "@/components/venues/CourtFinderPanel";
-import { Loader2, Trophy } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 export default function VenuesPage() {
     const [allVenues, setAllVenues] = useState<Venue[]>([]);

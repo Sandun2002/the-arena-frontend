@@ -9,12 +9,9 @@ import {
     Users,
     Shield,
     Calendar,
-    CreditCard,
     BarChart3,
     Clock,
-    CheckCircle2,
-    Settings,
-    Zap
+    Settings
 } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);

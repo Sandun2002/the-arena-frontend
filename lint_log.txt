@@ -1,0 +1,34 @@
+
+> the-arena-frontend@0.1.0 lint
+> eslint
+
+
+C:\Users\ASUS VIVOBOOK\Desktop\Arena Production DEV\the-arena-frontend\src\app\about\page.tsx
+  4:8   warning  'Image' is defined but never used  @typescript-eslint/no-unused-vars
+  8:31  warning  'Users' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\ASUS VIVOBOOK\Desktop\Arena Production DEV\the-arena-frontend\src\app\partner\page.tsx
+  12:5  warning  'CreditCard' is defined but never used    @typescript-eslint/no-unused-vars
+  15:5  warning  'CheckCircle2' is defined but never used  @typescript-eslint/no-unused-vars
+  17:5  warning  'Zap' is defined but never used           @typescript-eslint/no-unused-vars
+
+C:\Users\ASUS VIVOBOOK\Desktop\Arena Production DEV\the-arena-frontend\src\app\profile\page.tsx
+  10:16  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ASUS VIVOBOOK\Desktop\Arena Production DEV\the-arena-frontend\src\app\venues\[id]\page.tsx
+  141:61  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  141:66  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  141:74  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  141:79  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\ASUS VIVOBOOK\Desktop\Arena Production DEV\the-arena-frontend\src\app\venues\page.tsx
+  8:19  warning  'Trophy' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\ASUS VIVOBOOK\Desktop\Arena Production DEV\the-arena-frontend\src\components\home\HeroCarousel.tsx
+  17:10  warning  'activeIndex' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\ASUS VIVOBOOK\Desktop\Arena Production DEV\the-arena-frontend\src\components\venues\BookingWidget.tsx
+  4:10  warning  'format' is defined but never used  @typescript-eslint/no-unused-vars
+
+Γ£û 13 problems (5 errors, 8 warnings)
+
