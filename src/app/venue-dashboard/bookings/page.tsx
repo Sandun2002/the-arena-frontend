@@ -1,222 +1,141 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowLeft, Filter, Search, MoreHorizontal, CalendarCheck, Clock, CheckCircle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import {
+    Calendar, Clock, User, Phone, Check, Zap, X, MapPin,
+    MoreHorizontal, Filter, Download
+} from "lucide-react";
 import gsap from "gsap";
-import { VENUE_BOOKINGS, VenueBooking } from "@/services/userData";
+import Button from "@/components/ui/Button";
 
-type StatusFilter = "all" | "pending" | "confirmed" | "completed";
+// -- Mock Booking Data --
+const MOCK_BOOKINGS = [
+    { id: "vb1", customer: "John Doe", type: "App", date: "2026-02-14", time: "18:00 - 19:00", court: "Court A - Futsal", status: "confirmed", amount: 1800, payment: "Paid" },
+    { id: "vb2", customer: "Walk-in #42", type: "Walk-in", date: "2026-02-14", time: "20:00 - 21:00", court: "Court A - Futsal", status: "confirmed", amount: 1800, payment: "Cash" },
+    { id: "vb3", customer: "Sarah Smith", type: "App", date: "2026-02-15", time: "17:00 - 19:00", court: "Court C - Basketball", status: "pending", amount: 4400, payment: "Pending" },
+    { id: "vb4", customer: "Mike Ross", type: "App", date: "2026-02-10", time: "10:00 - 11:00", court: "Court B - Badminton", status: "cancelled", amount: 1500, payment: "Refunded" },
+];
 
 export default function VenueBookingsPage() {
     const containerRef = useRef<HTMLDivElement>(null);
-    const [searchQuery, setSearchQuery] = useState("");
-    const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 5;
+    const [filterStatus, setFilterStatus] = useState("all");
 
     useEffect(() => {
         const ctx = gsap.context(() => {
             gsap.fromTo(".page-header",
-                { y: -30, opacity: 0 },
-                { y: 0, opacity: 1, duration: 1, ease: "power3.out" }
+                { y: -20, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }
             );
-            gsap.fromTo(".bookings-table",
-                { y: 30, opacity: 0 },
-                { y: 0, opacity: 1, duration: 0.8, ease: "power3.out", delay: 0.3 }
+            gsap.fromTo(".booking-row",
+                { x: -20, opacity: 0 },
+                { x: 0, opacity: 1, duration: 0.6, stagger: 0.05, ease: "power2.out", delay: 0.2 }
             );
         }, containerRef);
         return () => ctx.revert();
     }, []);
 
-    // Filter bookings based on search and status
-    const filteredBookings = VENUE_BOOKINGS.filter(booking => {
-        const matchesSearch =
-            booking.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            booking.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            booking.courtName.toLowerCase().includes(searchQuery.toLowerCase());
-
-        const matchesStatus = statusFilter === "all" || booking.status === statusFilter;
-
-        return matchesSearch && matchesStatus;
-    });
-
-    // Pagination
-    const totalPages = Math.ceil(filteredBookings.length / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const paginatedBookings = filteredBookings.slice(startIndex, startIndex + itemsPerPage);
-
-    // Reset to page 1 when filter changes
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [searchQuery, statusFilter]);
-
-    const getStatusBadge = (status: VenueBooking["status"]) => {
-        const styles = {
-            confirmed: "bg-emerald-500/10 border-emerald-500/20 text-emerald-400",
-            pending: "bg-yellow-500/10 border-yellow-500/20 text-yellow-400",
-            completed: "bg-blue-500/10 border-blue-500/20 text-blue-400",
-            cancelled: "bg-red-500/10 border-red-500/20 text-red-400",
-        };
-        return styles[status];
-    };
-
-    const getInitials = (name: string) => {
-        return name.split(" ").map(n => n[0]).join("").toUpperCase();
-    };
+    const filteredBookings = filterStatus === 'all'
+        ? MOCK_BOOKINGS
+        : MOCK_BOOKINGS.filter(b => b.status === filterStatus);
 
     return (
         <main className="min-h-screen bg-black pt-24 pb-20 relative overflow-hidden" ref={containerRef}>
-
             {/* Background Effects */}
             <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-[100px]" />
+                <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-[150px]" />
             </div>
 
-            <div className="container mx-auto px-4 max-w-6xl relative z-10">
+            <div className="container mx-auto px-4 max-w-7xl relative z-10">
 
-                <Link href="/venue-dashboard" className="inline-flex items-center text-zinc-500 hover:text-white mb-8 transition-colors group">
-                    <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" /> Back to Dashboard
-                </Link>
-
-                <div className="page-header flex flex-col md:flex-row items-end justify-between mb-8 gap-4">
+                <div className="page-header flex flex-col md:flex-row justify-between items-end gap-6 mb-12">
                     <div>
-                        <h1 className="text-4xl font-black text-white mb-2 uppercase tracking-tight">Booking <span className="text-emerald-500">Management</span></h1>
-                        <p className="text-zinc-400">Track and manage your upcoming court reservations.</p>
+                        <h1 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tight mb-2">
+                            All <span className="text-transparent bg-gradient-to-r from-emerald-400 to-blue-600 bg-clip-text">Bookings</span>
+                        </h1>
+                        <p className="text-zinc-400">View and manage all reservations across your venue.</p>
                     </div>
                     <div className="flex gap-3">
-                        <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700 transition-all text-sm font-bold">
-                            <Filter className="h-4 w-4" /> Filter
-                        </button>
-                        <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500 text-black font-bold hover:bg-emerald-400 transition-all text-sm shadow-lg shadow-emerald-500/20">
-                            <CalendarCheck className="h-4 w-4" /> Add Booking
-                        </button>
+                        <Button variant="outline" className="border-zinc-700 text-white hover:bg-zinc-800">
+                            <Download className="mr-2 h-4 w-4" /> Export CSV
+                        </Button>
                     </div>
                 </div>
 
-                {/* Dashboard Table Container */}
-                <div className="bookings-table rounded-[2rem] border border-zinc-800 bg-zinc-900/40 overflow-hidden backdrop-blur-md">
+                {/* Filters */}
+                <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+                    {['all', 'confirmed', 'pending', 'cancelled'].map(status => (
+                        <button
+                            key={status}
+                            onClick={() => setFilterStatus(status)}
+                            className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider border transition-all ${filterStatus === status
+                                    ? "bg-white text-black border-white"
+                                    : "bg-black/40 border-zinc-800 text-zinc-500 hover:text-white hover:border-zinc-600"
+                                }`}
+                        >
+                            {status}
+                        </button>
+                    ))}
+                </div>
 
-                    {/* Toolbar */}
-                    <div className="p-6 border-b border-zinc-800 flex flex-col md:flex-row gap-4 justify-between items-center">
-                        <div className="relative w-full md:w-96">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
-                            <input
-                                type="text"
-                                placeholder="Search bookings..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full bg-black/40 border border-zinc-800 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-emerald-500/50 transition-all placeholder-zinc-600"
-                            />
-                        </div>
-                        <div className="flex bg-zinc-950/50 p-1 rounded-lg border border-zinc-800">
-                            <button
-                                onClick={() => setStatusFilter("all")}
-                                className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${statusFilter === "all" ? "bg-zinc-800 text-white shadow-sm" : "text-zinc-500 hover:text-zinc-300"}`}
-                            >
-                                All
-                            </button>
-                            <button
-                                onClick={() => setStatusFilter("pending")}
-                                className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${statusFilter === "pending" ? "bg-zinc-800 text-white shadow-sm" : "text-zinc-500 hover:text-zinc-300"}`}
-                            >
-                                Pending
-                            </button>
-                            <button
-                                onClick={() => setStatusFilter("completed")}
-                                className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${statusFilter === "completed" ? "bg-zinc-800 text-white shadow-sm" : "text-zinc-500 hover:text-zinc-300"}`}
-                            >
-                                Completed
-                            </button>
-                        </div>
+                <div className="bg-zinc-900/40 border border-zinc-800 rounded-[2rem] overflow-hidden backdrop-blur-sm min-h-[400px]">
+                    {/* Table Header */}
+                    <div className="grid grid-cols-12 gap-4 p-6 border-b border-zinc-800 text-xs font-bold text-zinc-500 uppercase tracking-wider">
+                        <div className="col-span-3">Customer</div>
+                        <div className="col-span-3">Date & Time</div>
+                        <div className="col-span-2">Court</div>
+                        <div className="col-span-2">Status</div>
+                        <div className="col-span-1">Amount</div>
+                        <div className="col-span-1 text-right"></div>
                     </div>
 
-                    {/* Table */}
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left">
-                            <thead className="bg-zinc-900/80 text-xs font-bold text-zinc-500 uppercase tracking-wider">
-                                <tr>
-                                    <th className="px-6 py-4">Booking ID</th>
-                                    <th className="px-6 py-4">Customer</th>
-                                    <th className="px-6 py-4">Court</th>
-                                    <th className="px-6 py-4">Date & Time</th>
-                                    <th className="px-6 py-4 text-center">Status</th>
-                                    <th className="px-6 py-4 text-right">Amount</th>
-                                    <th className="px-6 py-4"></th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-zinc-800">
-                                {paginatedBookings.length > 0 ? (
-                                    paginatedBookings.map((booking) => (
-                                        <tr key={booking.id} className="group hover:bg-white/5 transition-colors">
-                                            <td className="px-6 py-4 text-sm font-mono text-zinc-500">#{booking.id}</td>
-                                            <td className="px-6 py-4">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center text-[10px] font-bold text-white">
-                                                        {getInitials(booking.customerName)}
-                                                    </div>
-                                                    <div className="text-sm font-bold text-white">{booking.customerName}</div>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 text-sm text-zinc-300">{booking.courtName}</td>
-                                            <td className="px-6 py-4">
-                                                <div className="flex flex-col text-xs text-zinc-400">
-                                                    <span className="flex items-center gap-1.5 mb-0.5"><CalendarCheck className="h-3 w-3" /> {booking.date}</span>
-                                                    <span className="flex items-center gap-1.5"><Clock className="h-3 w-3" /> {booking.timeSlot}</span>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 text-center">
-                                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wide ${getStatusBadge(booking.status)}`}>
-                                                    {booking.status === "confirmed" && <CheckCircle className="h-3 w-3" />}
-                                                    {booking.status}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 text-sm font-bold text-white text-right">LKR {booking.amount.toLocaleString()}</td>
-                                            <td className="px-6 py-4 text-right">
-                                                <button className="p-2 rounded-lg hover:bg-white/10 text-zinc-500 hover:text-white transition-all">
-                                                    <MoreHorizontal className="h-4 w-4" />
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan={7} className="px-6 py-16 text-center">
-                                            <p className="text-zinc-500 mb-2">No bookings found</p>
-                                            <p className="text-zinc-600 text-sm">Try adjusting your search or filters</p>
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
+                    {/* Table Body */}
+                    <div className="divide-y divide-zinc-800/50">
+                        {filteredBookings.length > 0 ? (
+                            filteredBookings.map(booking => (
+                                <div key={booking.id} className="booking-row grid grid-cols-12 gap-4 p-6 items-center hover:bg-white/5 transition-colors group cursor-pointer">
+                                    <div className="col-span-3 flex items-center gap-3">
+                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 
+                                            ${booking.type === 'App' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-blue-500/10 text-blue-500'}`}>
+                                            {booking.type === 'App' ? <User className="h-5 w-5" /> : <Zap className="h-5 w-5" />}
+                                        </div>
+                                        <div>
+                                            <h3 className="font-bold text-white text-sm">{booking.customer}</h3>
+                                            <span className="text-[10px] text-zinc-500 uppercase font-bold">{booking.type}</span>
+                                        </div>
+                                    </div>
+                                    <div className="col-span-3">
+                                        <div className="text-zinc-300 text-sm font-medium flex items-center gap-2"><Calendar className="h-3 w-3" /> {booking.date}</div>
+                                        <div className="text-zinc-500 text-xs flex items-center gap-2 mt-1"><Clock className="h-3 w-3" /> {booking.time}</div>
+                                    </div>
+                                    <div className="col-span-2 text-sm text-zinc-400">
+                                        {booking.court}
+                                    </div>
+                                    <div className="col-span-2">
+                                        <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider
+                                            ${booking.status === 'confirmed' ? 'bg-emerald-500/20 text-emerald-500' :
+                                                booking.status === 'pending' ? 'bg-yellow-500/20 text-yellow-500' :
+                                                    'bg-red-500/20 text-red-500'}
+                                         `}>
+                                            {booking.status}
+                                        </span>
+                                    </div>
+                                    <div className="col-span-1 text-sm font-bold text-white">
+                                        LKR {booking.amount}
+                                    </div>
+                                    <div className="col-span-1 text-right opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button className="p-2 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors">
+                                            <MoreHorizontal className="h-4 w-4" />
+                                        </button>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="p-12 text-center text-zinc-500">
+                                No bookings found for this filter.
+                            </div>
+                        )}
                     </div>
-
-                    {/* Footer Pagination */}
-                    <div className="p-4 border-t border-zinc-800 bg-zinc-900/30 flex justify-between items-center text-xs text-zinc-500">
-                        <span>
-                            Showing {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filteredBookings.length)} of {filteredBookings.length} bookings
-                        </span>
-                        <div className="flex gap-2">
-                            <button
-                                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                                disabled={currentPage === 1}
-                                className="px-3 py-1.5 rounded-lg border border-zinc-800 hover:bg-zinc-800 hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                Prev
-                            </button>
-                            <span className="px-3 py-1.5 text-white font-bold">
-                                {currentPage} / {totalPages || 1}
-                            </span>
-                            <button
-                                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                                disabled={currentPage === totalPages || totalPages === 0}
-                                className="px-3 py-1.5 rounded-lg border border-zinc-800 hover:bg-zinc-800 hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                Next
-                            </button>
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </main>

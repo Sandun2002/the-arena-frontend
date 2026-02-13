@@ -1,290 +1,117 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { USER_PROFILE } from "@/services/userData";
-import { ArrowLeft, Save, User, Lock, Bell, LogOut, Upload } from "lucide-react";
+import { User, Mail, Bell, Shield, Camera, Save, LogOut } from "lucide-react";
 import gsap from "gsap";
+import Button from "@/components/ui/Button";
 
 export default function ProfileSettingsPage() {
     const containerRef = useRef<HTMLDivElement>(null);
-
-    // Form state
-    const [formData, setFormData] = useState({
-        name: USER_PROFILE.name,
-        email: USER_PROFILE.email,
-        phone: "+94 77 123 4567", // Mock data
-        avatar: USER_PROFILE.avatar,
-        bio: "Passionate about football and weekend tennis. Always chasing the next level and breaking personal records.",
-    });
-
-    // Notification preferences
-    const [notifications, setNotifications] = useState({
-        emailBookings: true,
-        smsReminders: true,
-        pushUpdates: false,
-        marketingEmails: true,
-    });
-
-    const [hasChanges, setHasChanges] = useState(false);
-    const [isSaving, setIsSaving] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [avatarPreview, setAvatarPreview] = useState("https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=2680&auto=format&fit=crop");
 
     useEffect(() => {
         const ctx = gsap.context(() => {
-            gsap.fromTo(".page-header",
-                { y: -30, opacity: 0 },
-                { y: 0, opacity: 1, duration: 1, ease: "power3.out" }
-            );
             gsap.fromTo(".settings-section",
                 { y: 20, opacity: 0 },
-                { y: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: "power2.out", delay: 0.2 }
+                { y: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: "power2.out" }
             );
         }, containerRef);
-
         return () => ctx.revert();
     }, []);
 
-    const handleInputChange = (field: string, value: string) => {
-        setFormData(prev => ({ ...prev, [field]: value }));
-        setHasChanges(true);
-    };
-
-    const handleNotificationToggle = (field: keyof typeof notifications) => {
-        setNotifications(prev => ({ ...prev, [field]: !prev[field] }));
-        setHasChanges(true);
-    };
-
-    const handleSave = async () => {
-        setIsSaving(true);
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        setIsSaving(false);
-        setHasChanges(false);
-        // In real app, would call API to update user profile
+    const handleSave = () => {
+        setSaving(true);
+        setTimeout(() => setSaving(false), 1500);
     };
 
     return (
         <main className="min-h-screen bg-black pt-24 pb-20 relative overflow-hidden" ref={containerRef}>
-
             {/* Background Effects */}
-            <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[120px]" />
-                <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-[120px]" />
-            </div>
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-500/5 rounded-full blur-[150px] pointer-events-none" />
 
             <div className="container mx-auto px-4 max-w-4xl relative z-10">
+                <h1 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tight mb-8">
+                    Account <span className="text-transparent bg-gradient-to-r from-purple-400 to-blue-500 bg-clip-text">Settings</span>
+                </h1>
 
-                {/* Back Link */}
-                <Link href="/profile" className="inline-flex items-center text-zinc-500 hover:text-white mb-8 transition-colors group">
-                    <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" /> Back to Profile
-                </Link>
+                <div className="grid gap-8">
 
-                {/* Header */}
-                <div className="page-header flex flex-col md:flex-row items-end justify-between mb-12 gap-6">
-                    <div>
-                        <h1 className="text-4xl font-black text-white mb-2 uppercase tracking-tight">
-                            Profile <span className="text-emerald-500">Settings</span>
-                        </h1>
-                        <p className="text-zinc-400">Manage your account preferences and personal information.</p>
-                    </div>
-                    <button
-                        onClick={handleSave}
-                        disabled={!hasChanges || isSaving}
-                        className="flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-500 text-black font-black uppercase tracking-wider hover:bg-emerald-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-emerald-500/20"
-                    >
-                        <Save className="h-4 w-4" /> {isSaving ? "Saving..." : "Save Changes"}
-                    </button>
-                </div>
-
-                {/* Account Section */}
-                <div className="settings-section rounded-[2rem] border border-zinc-800 bg-zinc-900/40 p-8 backdrop-blur-sm mb-8">
-                    <div className="flex items-center gap-4 mb-8">
-                        <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400">
-                            <User className="h-6 w-6" />
-                        </div>
-                        <div>
-                            <h2 className="text-xl font-bold text-white">Account Information</h2>
-                            <p className="text-sm text-zinc-500">Update your personal details and profile picture.</p>
-                        </div>
-                    </div>
-
-                    <div className="space-y-6">
-                        {/* Avatar Upload */}
-                        <div className="flex items-center gap-6">
-                            <div className="relative h-24 w-24 shrink-0">
-                                <Image
-                                    src={formData.avatar}
-                                    alt="Profile"
-                                    fill
-                                    className="rounded-full object-cover border-4 border-black ring-4 ring-emerald-500/50"
-                                />
+                    {/* 1. Availability / Profile Pic */}
+                    <div className="settings-section bg-zinc-900/40 border border-zinc-800 rounded-[2rem] p-8 backdrop-blur-sm flex flex-col md:flex-row items-center gap-8">
+                        <div className="relative group">
+                            <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-zinc-800 group-hover:border-emerald-500 transition-colors">
+                                <Image src={avatarPreview} alt="Profile" fill className="object-cover" />
                             </div>
-                            <div>
-                                <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-800 text-white hover:bg-zinc-700 transition-all text-sm font-bold">
-                                    <Upload className="h-4 w-4" /> Upload New Photo
-                                </button>
-                                <p className="text-xs text-zinc-500 mt-2">JPG, PNG or GIF. Max 2MB.</p>
+                            <button className="absolute bottom-0 right-0 p-3 bg-emerald-500 rounded-full text-black hover:bg-emerald-400 shadow-lg transition-transform hover:scale-110">
+                                <Camera className="h-5 w-5" />
+                            </button>
+                        </div>
+                        <div className="text-center md:text-left">
+                            <h3 className="text-xl font-bold text-white mb-1">Update Profile Photo</h3>
+                            <p className="text-zinc-500 text-sm mb-4">Allowed formats: JPG, PNG. Max size: 2MB.</p>
+                            <div className="flex gap-2 justify-center md:justify-start">
+                                <Button variant="outline" className="text-xs border-zinc-700">Remove</Button>
                             </div>
                         </div>
-
-                        {/* Name */}
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Full Name</label>
-                            <input
-                                type="text"
-                                value={formData.name}
-                                onChange={(e) => handleInputChange("name", e.target.value)}
-                                className="w-full bg-black/40 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
-                            />
-                        </div>
-
-                        {/* Email */}
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Email Address</label>
-                            <input
-                                type="email"
-                                value={formData.email}
-                                onChange={(e) => handleInputChange("email", e.target.value)}
-                                className="w-full bg-black/40 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
-                            />
-                        </div>
-
-                        {/* Phone */}
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Phone Number</label>
-                            <input
-                                type="tel"
-                                value={formData.phone}
-                                onChange={(e) => handleInputChange("phone", e.target.value)}
-                                className="w-full bg-black/40 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
-                            />
-                        </div>
-
-                        {/* Bio */}
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Bio</label>
-                            <textarea
-                                rows={3}
-                                value={formData.bio}
-                                onChange={(e) => handleInputChange("bio", e.target.value)}
-                                className="w-full bg-black/40 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors resize-none"
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Security Section */}
-                <div className="settings-section rounded-[2rem] border border-zinc-800 bg-zinc-900/40 p-8 backdrop-blur-sm mb-8">
-                    <div className="flex items-center gap-4 mb-8">
-                        <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400">
-                            <Lock className="h-6 w-6" />
-                        </div>
-                        <div>
-                            <h2 className="text-xl font-bold text-white">Security</h2>
-                            <p className="text-sm text-zinc-500">Manage your password and account security.</p>
-                        </div>
                     </div>
 
-                    <div className="space-y-6">
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Current Password</label>
-                            <input
-                                type="password"
-                                placeholder="••••••••"
-                                className="w-full bg-black/40 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none transition-colors"
-                            />
+                    {/* 2. Personal Information */}
+                    <div className="settings-section bg-zinc-900/40 border border-zinc-800 rounded-[2rem] p-8 backdrop-blur-sm">
+                        <div className="flex items-center gap-3 mb-6">
+                            <User className="h-5 w-5 text-zinc-500" />
+                            <h3 className="text-xl font-bold text-white">Personal Information</h3>
                         </div>
-
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">New Password</label>
-                            <input
-                                type="password"
-                                placeholder="••••••••"
-                                className="w-full bg-black/40 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none transition-colors"
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Confirm New Password</label>
-                            <input
-                                type="password"
-                                placeholder="••••••••"
-                                className="w-full bg-black/40 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none transition-colors"
-                            />
-                        </div>
-
-                        <button className="px-6 py-2.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 font-bold hover:bg-purple-500/20 transition-all text-sm">
-                            Update Password
-                        </button>
-                    </div>
-                </div>
-
-                {/* Notifications Section */}
-                <div className="settings-section rounded-[2rem] border border-zinc-800 bg-zinc-900/40 p-8 backdrop-blur-sm mb-8">
-                    <div className="flex items-center gap-4 mb-8">
-                        <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400">
-                            <Bell className="h-6 w-6" />
-                        </div>
-                        <div>
-                            <h2 className="text-xl font-bold text-white">Notifications</h2>
-                            <p className="text-sm text-zinc-500">Choose how you want to receive updates.</p>
-                        </div>
-                    </div>
-
-                    <div className="space-y-4">
-                        {[
-                            { key: "emailBookings", label: "Email Booking Confirmations", desc: "Receive confirmation emails for all bookings" },
-                            { key: "smsReminders", label: "SMS Reminders", desc: "Get text reminders 1 hour before booking" },
-                            { key: "pushUpdates", label: "Push Notifications", desc: "Real-time updates on your mobile device" },
-                            { key: "marketingEmails", label: "Marketing Emails", desc: "Receive promotional offers and updates" },
-                        ].map((item) => (
-                            <div key={item.key} className="flex items-center justify-between p-4 rounded-xl bg-black/40 border border-zinc-800 hover:border-zinc-700 transition-colors">
-                                <div>
-                                    <p className="text-white font-bold text-sm">{item.label}</p>
-                                    <p className="text-zinc-500 text-xs">{item.desc}</p>
-                                </div>
-                                <button
-                                    onClick={() => handleNotificationToggle(item.key as keyof typeof notifications)}
-                                    className={`relative w-12 h-6 rounded-full transition-colors ${notifications[item.key as keyof typeof notifications]
-                                            ? "bg-emerald-500"
-                                            : "bg-zinc-700"
-                                        }`}
-                                >
-                                    <span
-                                        className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${notifications[item.key as keyof typeof notifications]
-                                                ? "translate-x-6"
-                                                : "translate-x-0"
-                                            }`}
-                                    />
-                                </button>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-zinc-500 uppercase">First Name</label>
+                                <input type="text" defaultValue="John" className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none" />
                             </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Danger Zone */}
-                <div className="settings-section rounded-[2rem] border border-red-900/50 bg-red-900/10 p-8 backdrop-blur-sm">
-                    <div className="flex items-center gap-4 mb-6">
-                        <div className="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center text-red-400">
-                            <LogOut className="h-6 w-6" />
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-zinc-500 uppercase">Last Name</label>
+                                <input type="text" defaultValue="Doe" className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none" />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-zinc-500 uppercase">Email</label>
+                                <input type="email" defaultValue="john@example.com" disabled className="w-full bg-zinc-800/50 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-500 cursor-not-allowed" />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-zinc-500 uppercase">Phone</label>
+                                <input type="tel" defaultValue="+94 77 123 4567" className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none" />
+                            </div>
                         </div>
-                        <div>
-                            <h2 className="text-xl font-bold text-white">Danger Zone</h2>
-                            <p className="text-sm text-zinc-500">Irreversible actions - proceed with caution.</p>
+                    </div>
+
+                    {/* 3. Password Check */}
+                    <div className="settings-section bg-zinc-900/40 border border-zinc-800 rounded-[2rem] p-8 backdrop-blur-sm">
+                        <div className="flex items-center gap-3 mb-6">
+                            <Shield className="h-5 w-5 text-zinc-500" />
+                            <h3 className="text-xl font-bold text-white">Security</h3>
+                        </div>
+                        <div className="space-y-4 max-w-md">
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-zinc-500 uppercase">Current Password</label>
+                                <input type="password" placeholder="••••••••" className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none" />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-zinc-500 uppercase">New Password</label>
+                                <input type="password" placeholder="••••••••" className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none" />
+                            </div>
                         </div>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row gap-4">
-                        <button className="px-6 py-3 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 font-bold hover:bg-red-500/20 transition-all">
-                            Deactivate Account
-                        </button>
-                        <button className="px-6 py-3 rounded-xl bg-red-500 text-white font-bold hover:bg-red-400 transition-all">
-                            Delete Account Permanently
-                        </button>
+                    {/* Action Bar */}
+                    <div className="fixed bottom-0 left-0 w-full bg-black/80 backdrop-blur-lg border-t border-zinc-800 p-4 z-50 flex justify-end gap-4">
+                        <Button variant="outline" className="border-red-900/30 text-red-500 hover:bg-red-900/10">
+                            Log Out
+                        </Button>
+                        <Button onClick={handleSave} className="bg-purple-600 text-white hover:bg-purple-500 shadow-[0_0_20px_rgba(147,51,234,0.3)] w-32">
+                            {saving ? "Saving..." : "Save Changes"}
+                        </Button>
                     </div>
-                </div>
 
+                </div>
             </div>
         </main>
     );

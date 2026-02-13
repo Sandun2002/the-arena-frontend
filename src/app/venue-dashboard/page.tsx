@@ -1,150 +1,134 @@
 "use client";
 
-import Link from "next/link";
-import { useAuth } from "@/services/authContext";
-import { Building2, Calendar, Settings, BarChart3, ArrowLeft, ChevronRight } from "lucide-react";
-import Button from "@/components/ui/Button";
-import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import {
+    LayoutDashboard, Calendar, Settings, Users, ClipboardList,
+    TrendingUp, Bell, Search, Plus, MapPin, Grid, Image as ImageIcon,
+    Clock, AlertCircle, Zap
+} from "lucide-react";
 import gsap from "gsap";
+import Button from "@/components/ui/Button";
 
-export default function VenueDashboardPage() {
-    const { isLoggedIn, userType, login } = useAuth();
-    const router = useRouter();
+// -- Mock Data --
+const DASHBOARD_STATS = [
+    { label: "Today's Bookings", value: "12", trend: "+20%", color: "text-emerald-400" },
+    { label: "Today's Revenue", value: "LKR 24.5k", trend: "+15%", color: "text-blue-400" },
+    { label: "Active Courts", value: "3/4", trend: "1 Maintenance", color: "text-yellow-400" },
+];
+
+export default function VenueDashboard() {
     const containerRef = useRef<HTMLDivElement>(null);
-
-    // For demo: auto-login as venue if not logged in
-    useEffect(() => {
-        if (!isLoggedIn) {
-            // Show login prompt instead of auto-login
-        }
-    }, [isLoggedIn]);
 
     useEffect(() => {
         const ctx = gsap.context(() => {
+            // Intro Animations
             gsap.fromTo(".dashboard-header",
-                { y: 30, opacity: 0 },
-                { y: 0, opacity: 1, duration: 1, ease: "power3.out" }
+                { y: -20, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }
             );
-
-            gsap.fromTo(".dashboard-card",
-                { y: 50, opacity: 0 },
-                { y: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: "power2.out", delay: 0.3 }
+            gsap.fromTo(".stat-card",
+                { y: 20, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: "power2.out", delay: 0.2 }
             );
-
-            gsap.fromTo(".login-prompt",
-                { opacity: 0, y: 20 },
-                { opacity: 1, y: 0, duration: 0.8, delay: 0.8 }
+            gsap.fromTo(".nav-card",
+                { scale: 0.95, opacity: 0 },
+                { scale: 1, opacity: 1, duration: 0.6, stagger: 0.05, ease: "back.out(1.2)", delay: 0.4 }
             );
         }, containerRef);
 
         return () => ctx.revert();
     }, []);
 
-    const dashboardCards = [
-        {
-            title: "Manage Bookings",
-            desc: "View and manage all incoming venue reservations",
-            icon: Calendar,
-            href: "/venue-dashboard/bookings",
-            color: "emerald",
-            gradient: "from-emerald-500/20 to-emerald-900/5"
-        },
-        {
-            title: "Analytics",
-            desc: "Track your venue's performance and revenue",
-            icon: BarChart3,
-            href: "/venue-dashboard/analytics",
-            color: "blue",
-            gradient: "from-blue-500/20 to-blue-900/5"
-        },
-        {
-            title: "Venue Settings",
-            desc: "Update venue details, pricing, and availability",
-            icon: Settings,
-            href: "/venue-dashboard/settings",
-            color: "purple",
-            gradient: "from-purple-500/20 to-purple-900/5"
-        },
+    const menuItems = [
+        { title: "Calendar", icon: Calendar, href: "/venue-dashboard/calendar", desc: "Manage Schedule", color: "blue" },
+        { title: "Bookings", icon: ClipboardList, href: "/venue-dashboard/bookings", desc: "View All Reservations", color: "emerald" },
+        { title: "Courts", icon: Grid, href: "/venue-dashboard/courts", desc: "Manage Courts", color: "purple" },
+        { title: "Gallery", icon: ImageIcon, href: "/venue-dashboard/gallery", desc: "Update Photos", color: "pink" },
+        { title: "Staff", icon: Users, href: "/venue-dashboard/managers", desc: "Manage Team", color: "orange" },
+        { title: "Recurring", icon: Clock, href: "/venue-dashboard/recurring", desc: "Long-term Slots", color: "green" },
+        { title: "Closures", icon: AlertCircle, href: "/venue-dashboard/closures", desc: "Holidays/Maintenance", color: "red" },
+        { title: "Walk-in", icon: Zap, href: "/venue-dashboard/walk-in", desc: "Quick Booking", color: "cyan" },
+        { title: "Analytics", icon: TrendingUp, href: "/venue-dashboard/analytics", desc: "Performance", color: "indigo" },
+        { title: "Settings", icon: Settings, href: "/venue-dashboard/settings", desc: "Venue Profile", color: "zinc" },
     ];
 
     return (
         <main className="min-h-screen bg-black pt-24 pb-20 relative overflow-hidden" ref={containerRef}>
-
-            {/* Background Effects */}
+            {/* Background Gradients */}
             <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-[120px]" />
-                <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-emerald-500/5 rounded-full blur-[120px]" />
+                <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-[120px]" />
+                <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/5 rounded-full blur-[120px]" />
             </div>
 
-            <div className="container mx-auto px-4 max-w-6xl relative z-10">
-
-                {/* Back Link */}
-                <Link href="/" className="inline-flex items-center text-zinc-500 hover:text-white mb-8 transition-colors group">
-                    <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" /> Back to Home
-                </Link>
+            <div className="container mx-auto px-4 max-w-7xl relative z-10">
 
                 {/* Header */}
-                <div className="dashboard-header text-center mb-16">
-                    <div className="inline-flex items-center justify-center w-24 h-24 rounded-[2rem] bg-gradient-to-br from-blue-500/20 to-transparent border border-blue-500/20 mb-8 shadow-[0_0_30px_rgba(59,130,246,0.2)]">
-                        <Building2 className="h-10 w-10 text-blue-400" />
+                <div className="dashboard-header flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+                    <div>
+                        <h1 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tight mb-2">
+                            Venue <span className="text-transparent bg-gradient-to-r from-blue-400 to-indigo-600 bg-clip-text">Dashboard</span>
+                        </h1>
+                        <div className="flex items-center gap-2 text-zinc-400">
+                            <MapPin className="h-4 w-4 text-emerald-500" />
+                            <span className="font-medium">Emerald Turf Arena, Colombo 07</span>
+                        </div>
                     </div>
-                    <h1 className="text-5xl md:text-6xl font-black text-white mb-4 tracking-tight uppercase">Venue <span className="text-transparent bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text">Dashboard</span></h1>
-                    <p className="text-zinc-400 text-lg max-w-2xl mx-auto leading-relaxed">
-                        Manage your venue, track bookings, and grow your business with our premium partner tools.
-                    </p>
+
+                    <div className="flex items-center gap-4">
+                        <div className="relative">
+                            <Bell className="h-6 w-6 text-zinc-400 hover:text-white cursor-pointer transition-colors" />
+                            <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                        </div>
+                        <div className="h-10 w-10 bg-zinc-800 rounded-full flex items-center justify-center border border-zinc-700">
+                            <span className="font-bold text-white">EA</span>
+                        </div>
+                    </div>
                 </div>
 
-                {/* Dashboard Cards Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-                    {dashboardCards.map((card) => (
-                        <Link
-                            key={card.title}
-                            href={card.href}
-                            className="dashboard-card group relative overflow-hidden p-8 rounded-[2rem] bg-zinc-900/40 border border-zinc-800 hover:border-zinc-700 transition-all duration-500 hover:bg-zinc-900/60"
-                        >
-                            {/* Card Gradient Bg */}
-                            <div className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                {/* Stats Row */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                    {DASHBOARD_STATS.map((stat, idx) => (
+                        <div key={idx} className="stat-card p-6 rounded-[2rem] bg-zinc-900/40 border border-zinc-800 backdrop-blur-sm">
+                            <p className="text-zinc-500 text-xs font-bold uppercase tracking-wider mb-2">{stat.label}</p>
+                            <div className="flex items-end justify-between">
+                                <h3 className="text-3xl font-black text-white">{stat.value}</h3>
+                                <span className={`text-xs font-bold ${stat.color} bg-white/5 px-2 py-1 rounded-lg`}>{stat.trend}</span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
 
-                            <div className="relative z-10 flex flex-col h-full">
-                                <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-6 transition-transform duration-500 group-hover:scale-110 group-hover:shadow-lg ${card.color === "emerald" ? "bg-emerald-500/10 text-emerald-500 shadow-emerald-500/10" :
-                                        card.color === "blue" ? "bg-blue-500/10 text-blue-400 shadow-blue-500/10" :
-                                            "bg-purple-500/10 text-purple-400 shadow-purple-500/10"
-                                    }`}>
-                                    <card.icon className="h-8 w-8" />
+                {/* Main Navigation Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    {menuItems.map((item, idx) => (
+                        <Link key={idx} href={item.href}>
+                            <div className="nav-card group h-full p-6 rounded-[2rem] bg-zinc-900/40 border border-zinc-800 backdrop-blur-sm hover:bg-zinc-800/60 hover:border-white/10 transition-all cursor-pointer relative overflow-hidden">
+                                <div className={`
+                             w-12 h-12 rounded-xl mb-4 flex items-center justify-center transition-transform group-hover:scale-110
+                             ${item.color === 'blue' ? 'bg-blue-500/10 text-blue-500' :
+                                        item.color === 'emerald' ? 'bg-emerald-500/10 text-emerald-500' :
+                                            item.color === 'purple' ? 'bg-purple-500/10 text-purple-500' :
+                                                item.color === 'pink' ? 'bg-pink-500/10 text-pink-500' :
+                                                    item.color === 'orange' ? 'bg-orange-500/10 text-orange-500' :
+                                                        item.color === 'green' ? 'bg-green-500/10 text-green-500' :
+                                                            item.color === 'red' ? 'bg-red-500/10 text-red-500' :
+                                                                item.color === 'cyan' ? 'bg-cyan-500/10 text-cyan-500' :
+                                                                    item.color === 'indigo' ? 'bg-indigo-500/10 text-indigo-500' :
+                                                                        'bg-zinc-500/10 text-zinc-400'}
+                        `}>
+                                    <item.icon className="h-6 w-6" />
                                 </div>
+                                <h3 className="text-xl font-bold text-white mb-1 group-hover:text-blue-400 transition-colors">{item.title}</h3>
+                                <p className="text-xs text-zinc-500 font-medium group-hover:text-zinc-400">{item.desc}</p>
 
-                                <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-white transition-colors">
-                                    {card.title}
-                                </h3>
-                                <p className="text-zinc-500 text-sm leading-relaxed mb-6 group-hover:text-zinc-400 transition-colors">
-                                    {card.desc}
-                                </p>
-
-                                <div className={`mt-auto flex items-center text-sm font-bold uppercase tracking-wider transition-all duration-300 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 ${card.color === "emerald" ? "text-emerald-500" :
-                                        card.color === "blue" ? "text-blue-400" :
-                                            "text-purple-400"
-                                    }`}>
-                                    Open {card.title} <ChevronRight className="h-4 w-4 ml-1" />
-                                </div>
+                                {/* Hover Gradient */}
+                                <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                             </div>
                         </Link>
                     ))}
                 </div>
-
-                {/* Demo Login Button (if not logged in as venue) */}
-                {(!isLoggedIn || userType !== "venue") && (
-                    <div className="login-prompt text-center p-12 rounded-[2rem] bg-zinc-900/40 border border-zinc-800 backdrop-blur-sm max-w-2xl mx-auto">
-                        <h3 className="text-2xl font-bold text-white mb-2">Partner Access Demo</h3>
-                        <p className="text-zinc-400 mb-8">Not logged in as a venue owner? Simulate the experience below.</p>
-                        <Button
-                            onClick={() => login("venue")}
-                            className="bg-blue-500 hover:bg-blue-400 text-white font-bold px-10 py-4 rounded-xl shadow-[0_0_20px_rgba(59,130,246,0.3)] hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] hover:scale-105 transition-all"
-                        >
-                            Demo: Login as Venue Owner
-                        </Button>
-                    </div>
-                )}
 
             </div>
         </main>

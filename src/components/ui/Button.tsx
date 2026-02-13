@@ -1,27 +1,25 @@
-"use client";
 
 import React, { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import Link from "next/link";
-import { cn } from "@/lib/utils"; // We'll create this utility in a second
+import { cn } from "@/lib/utils";
 
-interface ButtonProps {
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
   href?: string;
-  onClick?: () => void;
   variant?: "primary" | "outline" | "ghost";
   className?: string;
 }
 
-export default function Button({ 
-  children, 
-  href, 
-  onClick, 
-  variant = "primary", 
-  className 
+export default function Button({
+  children,
+  href,
+  variant = "primary",
+  className,
+  ...props
 }: ButtonProps) {
-  const buttonRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
 
   useGSAP(() => {
@@ -56,25 +54,39 @@ export default function Button({
   }, { scope: buttonRef });
 
   // Styles based on variant
-  const baseStyles = "relative inline-flex items-center justify-center px-8 py-3 overflow-hidden font-bold transition-all duration-300 rounded-full group";
-  
+  const baseStyles = "relative inline-flex items-center justify-center px-8 py-3 overflow-hidden font-bold transition-all duration-300 rounded-full group disabled:opacity-50 disabled:cursor-not-allowed";
+
   const variants = {
-    primary: "bg-emerald-500 text-black hover:bg-emerald-400",
-    outline: "border border-zinc-700 text-white hover:border-emerald-500 hover:text-emerald-500",
-    ghost: "text-zinc-400 hover:text-white"
+    primary: "bg-emerald-500 text-black hover:bg-emerald-400 border border-transparent",
+    outline: "border border-zinc-700 text-white hover:border-emerald-500 hover:text-emerald-500 bg-transparent",
+    ghost: "text-zinc-400 hover:text-white bg-transparent border border-transparent"
   };
 
-  const content = (
-    <div ref={buttonRef} className={cn(baseStyles, variants[variant], className)}>
-      <span ref={textRef} className="relative z-10 flex items-center gap-2">
-        {children}
-      </span>
-    </div>
+  const spanContent = (
+    <span ref={textRef} className="relative z-10 flex items-center gap-2 pointer-events-none">
+      {children}
+    </span>
   );
 
   if (href) {
-    return <Link href={href}>{content}</Link>;
+    return (
+      <Link
+        href={href}
+        ref={buttonRef as React.RefObject<HTMLAnchorElement>}
+        className={cn(baseStyles, variants[variant], className)}
+      >
+        {spanContent}
+      </Link>
+    );
   }
 
-  return <button onClick={onClick}>{content}</button>;
+  return (
+    <button
+      ref={buttonRef as React.RefObject<HTMLButtonElement>}
+      className={cn(baseStyles, variants[variant], className)}
+      {...props}
+    >
+      {spanContent}
+    </button>
+  );
 }

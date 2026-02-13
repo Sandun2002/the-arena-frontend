@@ -1,209 +1,167 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { MY_BOOKINGS, cancelBooking, Booking } from "@/services/userData";
-import { Calendar, Clock, MapPin, ArrowRight, X } from "lucide-react";
+
+import {
+    Calendar, Clock, MapPin, AlertCircle, CheckCircle, XCircle
+} from "lucide-react";
 import gsap from "gsap";
-import CancelBookingModal from "@/components/ui/CancelBookingModal";
+import Button from "@/components/ui/Button";
+import CancelBookingModal from "@/components/bookings/CancelBookingModal";
 
-export default function BookingsPage() {
-    const [activeTab, setActiveTab] = useState<"upcoming" | "history">("upcoming");
-    const [cancelModalOpen, setCancelModalOpen] = useState(false);
-    const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+
+// -- Mock Booking Data --
+const MY_BOOKINGS = [
+    { id: "b1", venue: "Royal College Sports Complex", sport: "Futsal", date: "2026-02-15", time: "18:00 - 19:00", status: "upcoming", price: 1800, image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=2693&auto=format&fit=crop" },
+    { id: "b2", venue: "CR & FC Grounds", sport: "Cricket", date: "2026-02-10", time: "16:00 - 18:00", status: "completed", price: 3500, image: "https://images.unsplash.com/photo-1531415074968-0dad6d8d5477?q=80&w=2669&auto=format&fit=crop" },
+    { id: "b3", venue: "Colombo City Center", sport: "Bowling", date: "2026-01-20", time: "19:00 - 20:00", status: "cancelled", price: 2000, image: "https://images.unsplash.com/photo-1542880023-dfc37f446dbd?q=80&w=2670&auto=format&fit=crop" },
+];
+
+export default function MyBookingsPage() {
     const containerRef = useRef<HTMLDivElement>(null);
-
-    // Filter data based on tab (Mock logic)
-    const bookings = activeTab === "upcoming"
-        ? MY_BOOKINGS.filter(b => b.status === "upcoming")
-        : MY_BOOKINGS.filter(b => b.status !== "upcoming");
-
-    const handleCancelClick = (booking: Booking) => {
-        setSelectedBooking(booking);
-        setCancelModalOpen(true);
-    };
-
-    const handleConfirmCancel = (reason: string) => {
-        if (selectedBooking) {
-            cancelBooking(selectedBooking.id, reason);
-            setCancelModalOpen(false);
-            setSelectedBooking(null);
-        }
-    };
+    const [filter, setFilter] = useState("all");
+    const [selectedBooking, setSelectedBooking] = useState<any>(null);
+    const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
     useEffect(() => {
         const ctx = gsap.context(() => {
-            gsap.fromTo(".page-header",
-                { y: -30, opacity: 0 },
-                { y: 0, opacity: 1, duration: 1, ease: "power3.out" }
-            );
-
+            // Animate List
             gsap.fromTo(".booking-card",
-                { y: 50, opacity: 0 },
-                { y: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: "power2.out", delay: 0.3 }
+                { y: 20, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.5, stagger: 0.1, ease: "power2.out" }
             );
         }, containerRef);
-
         return () => ctx.revert();
-    }, [activeTab]);
+    }, [filter]); // Re-animate on filter change
+
+    const filteredBookings = filter === 'all'
+        ? MY_BOOKINGS
+        : MY_BOOKINGS.filter(b => b.status === filter);
+
+    const handleCancelClick = (booking: any) => {
+        setSelectedBooking(booking);
+        setIsCancelModalOpen(true);
+    };
 
     return (
         <main className="min-h-screen bg-black pt-24 pb-20 relative overflow-hidden" ref={containerRef}>
 
-            {/* Background Effects */}
-            <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-emerald-500/5 rounded-full blur-[120px]" />
-            </div>
+            {/* Background Glow */}
+            <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-[150px] pointer-events-none" />
 
             <div className="container mx-auto px-4 max-w-5xl relative z-10">
 
-                {/* Header */}
-                <div className="page-header flex flex-col md:flex-row items-end justify-between mb-12 gap-6 border-b border-zinc-800/50 pb-8">
+                <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
                     <div>
-                        <h1 className="text-4xl md:text-5xl font-black text-white mb-2 tracking-tight uppercase">
-                            My <span className="text-transparent bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text">Bookings</span>
+                        <h1 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tight mb-2">
+                            My <span className="text-transparent bg-gradient-to-r from-emerald-400 to-blue-600 bg-clip-text">Bookings</span>
                         </h1>
-                        <p className="text-zinc-400 text-lg">Manage your court sessions and match history.</p>
-                    </div>
-
-                    {/* Custom Tabs */}
-                    <div className="flex bg-zinc-900/50 p-1.5 rounded-2xl border border-zinc-800 backdrop-blur-md">
-                        <button
-                            onClick={() => setActiveTab("upcoming")}
-                            className={`px-6 py-2.5 rounded-xl text-sm font-bold uppercase tracking-wide transition-all duration-300 ${activeTab === "upcoming" ? "bg-emerald-500 text-black shadow-lg shadow-emerald-500/20" : "text-zinc-500 hover:text-white"
-                                }`}
-                        >
-                            Upcoming
-                        </button>
-                        <button
-                            onClick={() => setActiveTab("history")}
-                            className={`px-6 py-2.5 rounded-xl text-sm font-bold uppercase tracking-wide transition-all duration-300 ${activeTab === "history" ? "bg-white text-black shadow-lg" : "text-zinc-500 hover:text-white"
-                                }`}
-                        >
-                            History
-                        </button>
+                        <p className="text-zinc-400">View and manage all your upcoming games.</p>
                     </div>
                 </div>
 
-                {/* Bookings List */}
-                <div className="space-y-6">
-                    {bookings.length > 0 ? (
-                        bookings.map((booking) => (
-                            <div
-                                key={booking.id}
-                                className="booking-card group relative overflow-hidden rounded-3xl bg-zinc-900/40 border border-zinc-800 hover:border-emerald-500/50 transition-all duration-500 hover:bg-zinc-900/60"
-                            >
-                                <div className="flex flex-col md:flex-row h-full">
+                {/* Filter Tabs */}
+                <div className="flex gap-2 mb-8 overflow-x-auto pb-2 border-b border-zinc-800">
+                    {[
+                        { id: 'all', label: 'All Bookings' },
+                        { id: 'upcoming', label: 'Upcoming' },
+                        { id: 'completed', label: 'History' },
+                        { id: 'cancelled', label: 'Cancelled' }
+                    ].map(tab => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setFilter(tab.id)}
+                            className={`px-6 py-3 text-sm font-bold uppercase tracking-wider border-b-2 transition-all whitespace-nowrap
+                                ${filter === tab.id
+                                    ? "border-emerald-500 text-white"
+                                    : "border-transparent text-zinc-500 hover:text-zinc-300"}
+                            `}
+                        >
+                            {tab.label}
+                        </button>
+                    ))}
+                </div>
 
-                                    {/* Image Thumb with Gradient */}
-                                    <div className="relative h-48 md:h-auto md:w-72 shrink-0 overflow-hidden">
-                                        <Image
-                                            src={booking.image}
-                                            alt={booking.venueName}
-                                            fill
-                                            className="object-cover transition-transform duration-700 group-hover:scale-110"
-                                        />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent md:bg-gradient-to-r" />
-
-                                        {/* Mobile Price Badge */}
-                                        <div className="absolute top-4 right-4 md:hidden bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10">
-                                            <span className="text-emerald-400 font-bold text-sm">LKR {booking.price.toLocaleString()}</span>
-                                        </div>
+                <div className="space-y-4">
+                    {filteredBookings.length > 0 ? (
+                        filteredBookings.map(booking => (
+                            <div key={booking.id} className="booking-card group bg-zinc-900/40 border border-zinc-800 rounded-[2rem] p-4 flex flex-col md:flex-row gap-6 hover:border-emerald-500/30 transition-all backdrop-blur-sm">
+                                {/* Image Info */}
+                                <div className="relative w-full md:w-48 h-32 rounded-xl overflow-hidden shrink-0">
+                                    <Image src={booking.image} alt={booking.venue} fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
+                                    <div className="absolute top-2 left-2">
+                                        <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider backdrop-blur-md border border-white/10
+                                            ${booking.status === 'upcoming' ? 'bg-emerald-500/80 text-white' :
+                                                booking.status === 'completed' ? 'bg-blue-500/80 text-white' :
+                                                    'bg-red-500/80 text-white'}
+                                        `}>
+                                            {booking.status}
+                                        </span>
                                     </div>
+                                </div>
 
-                                    {/* Details */}
-                                    <div className="p-6 md:p-8 flex-1 flex flex-col justify-center relative">
-
-                                        <div className="flex justify-between items-start mb-4">
-                                            <div>
-                                                <h3 className="text-2xl font-black text-white group-hover:text-emerald-400 transition-colors uppercase tracking-tight mb-1">
-                                                    {booking.venueName}
-                                                </h3>
-                                                <div className="flex items-center gap-2 text-zinc-400 text-sm">
-                                                    <MapPin className="h-4 w-4 text-zinc-600" />
-                                                    <span>Sports Complex, Colombo 07</span>
-                                                </div>
-                                            </div>
-
-                                            {/* Desktop Price */}
-                                            <div className="hidden md:block text-right">
-                                                <span className="block text-2xl font-black text-white">LKR {booking.price.toLocaleString()}</span>
-                                                <span className={`inline-block px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${booking.status === "upcoming" ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" : "bg-zinc-800 text-zinc-500 border border-zinc-700"
-                                                    }`}>
-                                                    {booking.status}
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex flex-wrap gap-4 md:gap-8 mb-8">
-                                            <div className="bg-black/30 px-4 py-3 rounded-xl border border-white/5 flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                                                    <Calendar className="h-5 w-5 text-emerald-500" />
-                                                </div>
-                                                <div>
-                                                    <p className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">Date</p>
-                                                    <p className="text-white font-bold">{booking.date}</p>
-                                                </div>
-                                            </div>
-                                            <div className="bg-black/30 px-4 py-3 rounded-xl border border-white/5 flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                                                    <Clock className="h-5 w-5 text-emerald-500" />
-                                                </div>
-                                                <div>
-                                                    <p className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">Time</p>
-                                                    <p className="text-white font-bold">{booking.time}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex items-center justify-end gap-3 mt-auto pt-6 border-t border-white/5">
-                                            {booking.status === "upcoming" ? (
-                                                <>
-                                                    <button
-                                                        onClick={() => handleCancelClick(booking)}
-                                                        className="px-5 py-2.5 rounded-xl text-xs font-bold text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all flex items-center gap-2"
-                                                    >
-                                                        <X className="h-4 w-4" /> Cancel
-                                                    </button>
-                                                    <button className="px-6 py-2.5 rounded-xl bg-white text-black text-xs font-black uppercase tracking-wider hover:bg-emerald-400 hover:scale-105 transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)] group-hover:shadow-[0_0_20px_rgba(52,211,153,0.3)]">
-                                                        Get Directions
-                                                    </button>
-                                                </>
-                                            ) : (
-                                                <button className="px-6 py-2.5 rounded-xl bg-zinc-800 text-white text-xs font-black uppercase tracking-wider hover:bg-emerald-500 hover:text-black hover:scale-105 transition-all flex items-center gap-2">
-                                                    Book Again <ArrowRight className="h-4 w-4" />
-                                                </button>
-                                            )}
-                                        </div>
+                                {/* Details */}
+                                <div className="flex-1 py-2">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <h3 className="text-xl font-bold text-white group-hover:text-emerald-400 transition-colors">{booking.venue}</h3>
+                                        <p className="font-bold text-white">LKR {booking.price}</p>
                                     </div>
+                                    <p className="text-zinc-400 text-sm mb-4">{booking.sport}</p>
+
+                                    <div className="flex flex-wrap gap-4 text-xs font-bold text-zinc-500 uppercase tracking-wider">
+                                        <span className="flex items-center gap-2"><Calendar className="h-4 w-4 text-zinc-600" /> {booking.date}</span>
+                                        <span className="flex items-center gap-2"><Clock className="h-4 w-4 text-zinc-600" /> {booking.time}</span>
+                                    </div>
+                                </div>
+
+                                {/* Actions */}
+                                <div className="flex flex-row md:flex-col justify-center gap-2 border-t md:border-t-0 md:border-l border-zinc-800 pt-4 md:pt-0 md:pl-6 min-w-[140px]">
+                                    <Link href={`/bookings/${booking.id}`} className="w-full">
+                                        <Button className="w-full text-xs bg-white text-black hover:bg-zinc-200">View Ticket</Button>
+                                    </Link>
+
+                                    {booking.status === 'upcoming' && (
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => handleCancelClick(booking)}
+                                            className="w-full text-xs border-red-900/30 text-red-500 hover:bg-red-900/10 hover:border-red-900/50"
+                                        >
+                                            Cancel
+                                        </Button>
+                                    )}
+
+                                    {booking.status === 'completed' && (
+                                        <Button variant="outline" className="w-full text-xs border-zinc-700 hover:bg-zinc-800">
+                                            Rebook
+                                        </Button>
+                                    )}
                                 </div>
                             </div>
                         ))
                     ) : (
-                        <div className="flex flex-col items-center justify-center py-32 booking-card">
-                            <div className="w-24 h-24 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center mb-6">
-                                <Calendar className="h-10 w-10 text-zinc-600" />
+                        <div className="py-20 text-center border border-dashed border-zinc-800 rounded-[2rem] bg-zinc-900/20">
+                            <div className="w-16 h-16 bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4 text-zinc-500">
+                                <AlertCircle className="h-8 w-8" />
                             </div>
-                            <h3 className="text-xl font-bold text-white mb-2">No bookings found</h3>
-                            <p className="text-zinc-500 mb-8">You don&apos;t have any {activeTab} bookings.</p>
+                            <h3 className="text-xl font-bold text-white mb-2">No Bookings Found</h3>
+                            <p className="text-zinc-500 mb-6">You don't have any bookings in this category yet.</p>
                             <Link href="/venues">
-                                <button className="px-8 py-3 rounded-full bg-emerald-500 text-black font-black uppercase tracking-wider hover:bg-emerald-400 hover:scale-105 hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all">
-                                    Find a Court
-                                </button>
+                                <Button className="bg-emerald-500 text-black hover:bg-emerald-400 font-bold">Find a Court</Button>
                             </Link>
                         </div>
                     )}
                 </div>
             </div>
 
-            {/* Cancel Booking Modal */}
+            {/* Cancel Modal */}
             <CancelBookingModal
+                isOpen={isCancelModalOpen}
+                onClose={() => setIsCancelModalOpen(false)}
                 booking={selectedBooking}
-                isOpen={cancelModalOpen}
-                onClose={() => setCancelModalOpen(false)}
-                onConfirm={handleConfirmCancel}
             />
+
         </main>
     );
 }

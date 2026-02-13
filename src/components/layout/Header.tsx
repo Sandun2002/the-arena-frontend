@@ -1,191 +1,126 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import { useState } from "react";
-import { Menu, X, User, LogOut, Calendar, LayoutDashboard, ChevronDown } from "lucide-react";
-import { useAuth } from "@/services/authContext";
+import Button from "../ui/Button";
+import { Menu, X, User } from "lucide-react";
 
 export default function Header() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const { isLoggedIn, userType, user, logout } = useAuth();
+  const pathname = usePathname();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const navLinks = [
+  // Mock checking if user is logged in (replace with real auth later)
+  const isLoggedIn = true;
+  const userType = pathname?.includes("venue-dashboard") ? "venue_owner" : "player";
+
+  // Navigation Links based on Context
+  const isVenueContext = pathname?.startsWith("/venue-dashboard");
+
+  const navLinks = isVenueContext ? [
+    { name: "Dashboard", href: "/venue-dashboard" },
+    { name: "Calendar", href: "/venue-dashboard/calendar" },
+    { name: "Bookings", href: "/venue-dashboard/bookings" },
+    { name: "Settings", href: "/venue-dashboard/settings" },
+  ] : [
     { name: "Home", href: "/" },
-    { name: "Explore Venues", href: "/venues" },
-    { name: "Partner", href: "/partner" },
+    { name: "Venues", href: "/venues" },
     { name: "About", href: "/about" },
     { name: "Contact", href: "/contact" },
   ];
 
-  // Add My Bookings link for logged-in players
-  const playerLinks = [
-    { name: "My Bookings", href: "/bookings", icon: Calendar },
-    { name: "Profile", href: "/profile", icon: User },
-  ];
-
-  // Add Dashboard link for venue owners
-  const venueLinks = [
-    { name: "Dashboard", href: "/venue-dashboard", icon: LayoutDashboard },
-    { name: "Settings", href: "/venue-dashboard/settings", icon: User },
-  ];
-
-  const authLinks = userType === "venue" ? venueLinks : playerLinks;
-
-  const handleLogout = () => {
-    logout();
-    setShowDropdown(false);
-  };
-
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-zinc-800 bg-black/80 backdrop-blur-md">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
+    <header className="fixed top-0 left-0 w-full z-50 bg-black/50 backdrop-blur-lg border-b border-white/5">
+      <div className="container mx-auto px-4 h-20 flex items-center justify-between">
 
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 text-xl font-bold tracking-tighter text-white">
-          THE <span className="text-emerald-500">ARENA</span>
+        <Link href={isVenueContext ? "/venue-dashboard" : "/"} className="flex items-center gap-2 group">
+          <div className="relative w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center overflow-hidden group-hover:bg-white/20 transition-colors">
+            <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500 to-blue-500 opacity-50"></div>
+            <span className="relative font-bold text-white">A</span>
+          </div>
+          <span className="font-black text-xl text-white tracking-tight">
+            ARENA<span className="text-emerald-500">.LK</span>
+          </span>
+          {isVenueContext && <span className="ml-2 text-xs font-bold bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded border border-blue-500/30">BUSINESS</span>}
         </Link>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex gap-8">
+        {/* Desktop Nav */}
+        <nav className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
             <Link
               key={link.name}
               href={link.href}
-              className="text-sm font-medium text-zinc-400 transition-colors hover:text-emerald-400"
+              className={`text-sm font-medium transition-colors hover:text-white relative
+                ${pathname === link.href ? "text-white" : "text-zinc-400"}
+              `}
             >
               {link.name}
+              {pathname === link.href && (
+                <span className="absolute -bottom-8 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-t-full"></span>
+              )}
             </Link>
           ))}
-          {/* Show additional links for logged-in users */}
-          {isLoggedIn && (
-            <Link
-              href={userType === "venue" ? "/venue-dashboard" : "/bookings"}
-              className="text-sm font-medium text-emerald-400 transition-colors hover:text-emerald-300"
-            >
-              {userType === "venue" ? "Dashboard" : "My Bookings"}
-            </Link>
-          )}
         </nav>
 
-        {/* Desktop Actions */}
-        <div className="hidden items-center gap-4 md:flex">
+        {/* Auth Buttons */}
+        <div className="hidden md:flex items-center gap-4">
           {isLoggedIn ? (
-            // Logged-in user dropdown
-            <div className="relative">
-              <button
-                onClick={() => setShowDropdown(!showDropdown)}
-                className="flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:border-emerald-500 hover:bg-zinc-800"
-              >
-                {user?.avatar ? (
-                  <Image
-                    src={user.avatar}
-                    alt={user.name}
-                    width={28}
-                    height={28}
-                    className="rounded-full object-cover"
-                  />
-                ) : (
-                  <User className="h-5 w-5" />
-                )}
-                <span className="max-w-[100px] truncate">{user?.name || "User"}</span>
-                <ChevronDown className={`h-4 w-4 transition-transform ${showDropdown ? "rotate-180" : ""}`} />
-              </button>
-
-              {/* Dropdown Menu */}
-              {showDropdown && (
-                <div className="absolute right-0 top-full mt-2 w-48 rounded-xl border border-zinc-800 bg-zinc-900 py-2 shadow-xl animate-fade-in">
-                  {authLinks.map((link) => (
-                    <Link
-                      key={link.name}
-                      href={link.href}
-                      onClick={() => setShowDropdown(false)}
-                      className="flex items-center gap-3 px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-800 hover:text-white transition-colors"
-                    >
-                      <link.icon className="h-4 w-4" />
-                      {link.name}
-                    </Link>
-                  ))}
-                  <hr className="my-2 border-zinc-800" />
-                  <button
-                    onClick={handleLogout}
-                    className="flex w-full items-center gap-3 px-4 py-2 text-sm text-red-400 hover:bg-zinc-800 hover:text-red-300 transition-colors"
-                  >
-                    <LogOut className="h-4 w-4" />
-                    Logout
-                  </button>
-                </div>
+            <div className="flex items-center gap-4">
+              {!isVenueContext && (
+                <Link href="/venue-dashboard">
+                  <span className="text-xs font-bold text-zinc-500 hover:text-white transition-colors cursor-pointer mr-2">Manager View</span>
+                </Link>
               )}
+              <Link href={isVenueContext ? "/venue-dashboard/settings" : "/profile"}>
+                <div className="w-10 h-10 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center hover:border-emerald-500 transition-colors cursor-pointer">
+                  <User className="h-5 w-5 text-zinc-400" />
+                </div>
+              </Link>
             </div>
           ) : (
-            // Guest - Sign In button
-            <Link href="/login">
-              <button className="flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:border-emerald-500 hover:bg-zinc-800">
-                <User className="h-4 w-4" />
-                Sign In
-              </button>
-            </Link>
+            <>
+              <Link href="/login" className="text-sm font-bold text-white hover:text-emerald-400 transition-colors">
+                Log In
+              </Link>
+              <Link href="/signup">
+                <Button className="bg-white text-black hover:bg-zinc-200 font-bold">Sign Up</Button>
+              </Link>
+            </>
           )}
         </div>
 
         {/* Mobile Menu Toggle */}
         <button
-          className="text-white md:hidden"
-          onClick={() => setIsOpen(!isOpen)}
+          className="md:hidden text-white"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
-          {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          {isMobileMenuOpen ? <X /> : <Menu />}
         </button>
       </div>
 
-      {/* Mobile Navigation Dropdown */}
-      {isOpen && (
-        <div className="border-b border-zinc-800 bg-black px-4 py-4 md:hidden animate-fade-in">
-          <nav className="flex flex-col gap-4">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                className="text-sm font-medium text-zinc-400 hover:text-emerald-400"
-                onClick={() => setIsOpen(false)}
-              >
-                {link.name}
-              </Link>
-            ))}
-
-            {isLoggedIn ? (
-              <>
-                <hr className="border-zinc-800" />
-                {authLinks.map((link) => (
-                  <Link
-                    key={link.name}
-                    href={link.href}
-                    className="flex items-center gap-2 text-sm font-medium text-emerald-400 hover:text-emerald-300"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <link.icon className="h-4 w-4" />
-                    {link.name}
-                  </Link>
-                ))}
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    setIsOpen(false);
-                  }}
-                  className="flex items-center gap-2 text-sm font-medium text-red-400 hover:text-red-300"
-                >
-                  <LogOut className="h-4 w-4" />
-                  Logout
-                </button>
-              </>
-            ) : (
-              <Link href="/login" onClick={() => setIsOpen(false)}>
-                <button className="mt-2 flex w-full items-center justify-center gap-2 rounded-md bg-emerald-500 px-4 py-2 text-sm font-bold text-black hover:bg-emerald-400">
-                  <User className="h-4 w-4" /> Sign In
-                </button>
-              </Link>
-            )}
-          </nav>
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden absolute top-20 left-0 w-full bg-black border-b border-zinc-800 p-4 flex flex-col gap-4 animate-fade-in">
+          {navLinks.map((link) => (
+            <Link
+              key={link.name}
+              href={link.href}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={`text-lg font-bold ${pathname === link.href ? "text-white" : "text-zinc-500"}`}
+            >
+              {link.name}
+            </Link>
+          ))}
+          <div className="h-px bg-zinc-800 my-2"></div>
+          {isLoggedIn ? (
+            <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)} className="text-zinc-400 font-bold">My Profile</Link>
+          ) : (
+            <div className="flex flex-col gap-3">
+              <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="text-white font-bold">Log In</Link>
+              <Link href="/signup" onClick={() => setIsMobileMenuOpen(false)}><Button className="w-full">Sign Up</Button></Link>
+            </div>
+          )}
         </div>
       )}
     </header>
