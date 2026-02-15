@@ -213,12 +213,77 @@ export interface DashboardStats {
   revenue: number | null;
   active_courts: number;
   total_courts: number;
+  // New fields for charts
+  revenue_trend?: number;
+  bookings_trend?: number;
 }
 
 export interface RevenueData {
   daily: { date: string; amount: number }[];
   weekly: { date: string; amount: number }[];
   monthly: { date: string; amount: number }[];
+}
+
+export interface AnalyticsRevenue {
+  total: number;
+  trend_percentage: number;
+  breakdown: RevenueData;
+}
+
+export interface AnalyticsUtilization {
+  overall_percentage: number;
+  peak_hours: { time: string; percentage: number }[];
+  court_breakdown: { court_id: string; court_name: string; percentage: number }[];
+}
+
+export interface AnalyticsFees {
+  total_platform_fees: number;
+  net_payout: number;
+  pending_payout: number;
+}
+
+export interface AnalyticsCancellations {
+  total_cancellations: number;
+  cancellation_rate: number;
+  no_show_count: number;
+}
+
+// === Recurring Bookings ===
+export interface RecurringBooking {
+  id: string;
+  venue_id: string;
+  court_id: string;
+  court_name: string; // Hydrated
+  client_name: string;
+  client_phone?: string;
+  day_of_week: string; // "Monday", "Tuesday", etc.
+  start_time: string; // "10:00"
+  end_time: string; // "11:00"
+  start_date: string; // ISO Date
+  end_date: string; // ISO Date
+  status: "active" | "paused" | "expired" | "cancelled";
+  next_booking_date: string | null;
+  price_per_hour: number;
+  total_value?: number;
+}
+
+// === Venue Profile ===
+export interface VenueProfile extends Venue {
+  operating_schedule: {
+    day: string; // "monday"
+    open: string; // "09:00"
+    close: string; // "22:00"
+    is_closed: boolean;
+  }[];
+}
+
+export interface UpcomingBooking {
+  id: string;
+  court_name: string;
+  start_time: string;
+  end_time: string;
+  customer_name: string;
+  status: BookingStatus;
 }
 
 

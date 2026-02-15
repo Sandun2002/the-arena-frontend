@@ -1,55 +1,93 @@
+
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { Plus, Trash2, Calendar, AlertTriangle, CloudRain, Hammer } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
+import { Plus, Trash2, Calendar, AlertTriangle, CloudRain, Hammer, XCircle } from "lucide-react";
 import gsap from "gsap";
 import Button from "@/components/ui/Button";
-
-// -- Mock Data --
-const VENUE_CLOSURES = [
-    {
-        id: "cl1",
-        title: "Annual Pitch Maintenance",
-        start_date: "2026-03-10",
-        end_date: "2026-03-12",
-        courts: ["All Courts"],
-        reason: "Scheduled Maintenance",
-        type: "maintenance"
-    },
-    {
-        id: "cl2",
-        title: "Poya Day Holiday",
-        start_date: "2026-04-14",
-        end_date: "2026-04-14",
-        courts: ["Court A - Futsal", "Court B - Badminton"],
-        reason: "Public Holiday",
-        type: "holiday"
-    },
-];
+import Modal from "@/components/ui/Modal";
+import ClosureFormModal from "@/components/venue/ClosureFormModal";
+import { useAuth } from "@/services/authContext";
+import { centerService } from "@/services/centerService";
+import { Closure, Court } from "@/types";
+import { useToast } from "@/components/ui/Toast";
+import { useVenue } from "@/components/venue/VenueContext";
+import { format } from "date-fns";
 
 export default function ClosuresPage() {
+    const { user } = useAuth();
+    const { currentVenue } = useVenue();
+    const { addToast } = useToast();
     const containerRef = useRef<HTMLDivElement>(null);
 
+    const [closures, setClosures] = useState<Closure[]>([]);
+    const [courts, setCourts] = useState<Court[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     useEffect(() => {
+        if (currentVenue) {
+            loadData();
+        }
+    }, [currentVenue]);
+
+    const loadData = async () => {
+        if (!currentVenue) return;
+        setIsLoading(true);
+        try {
+            const [closuresData, courtsData] = await Promise.all([
+                centerService.getClosures(currentVenue.id),
+                centerService.getCourts(currentVenue.id)
+            ]);
+            setClosures(closuresData);
+            setCourts(courtsData);
+            animateCards();
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const animateCards = () => {
         const ctx = gsap.context(() => {
-            gsap.fromTo(".page-header",
-                { y: -20, opacity: 0 },
-                { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }
-            );
             gsap.fromTo(".closure-card",
                 { x: -20, opacity: 0 },
-                { x: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: "power2.out", delay: 0.2 }
+                { x: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: "power2.out" }
             );
         }, containerRef);
-        return () => ctx.revert();
-    }, []);
+    };
+
+    const handleDelete = async (id: string) => {
+        if (!confirm("Remove this closure?")) return;
+        try {
+            await centerService.deleteClosure(id);
+            addToast("Closure removed", "success");
+            loadData();
+        } catch (error) {
+            addToast("Failed to remove closure", "error");
+        }
+    };
 
     const getIcon = (type: string) => {
         switch (type) {
             case "maintenance": return <Hammer className="h-5 w-5 text-orange-500" />;
             case "weather": return <CloudRain className="h-5 w-5 text-blue-500" />;
+            case "holiday": return <Calendar className="h-5 w-5 text-purple-500" />;
             default: return <AlertTriangle className="h-5 w-5 text-yellow-500" />;
         }
+    }
+
+    if (!user) return null;
+
+    if (!currentVenue) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
+                <XCircle className="w-12 h-12 text-zinc-600 mb-4" />
+                <h2 className="text-xl font-bold text-white mb-2">No Venue Selected</h2>
+                <p className="text-zinc-400">Please select a venue to manage closures.</p>
+            </div>
+        );
     }
 
     return (
@@ -61,59 +99,70 @@ export default function ClosuresPage() {
 
             <div className="container mx-auto px-4 max-w-5xl relative z-10">
 
-                <div className="page-header flex justify-between items-end mb-12">
+                <div className="flex justify-between items-end mb-12">
                     <div>
                         <h1 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tight mb-2">
-                            Venue <span className="text-transparent bg-gradient-to-r from-orange-400 to-red-600 bg-clip-text">Closures</span>
+                            <span className="text-transparent bg-gradient-to-r from-orange-400 to-red-600 bg-clip-text">Closures</span>
                         </h1>
-                        <p className="text-zinc-400">Schedule maintenance, holidays, or unexpected closures.</p>
+                        <p className="text-zinc-400">Schedule maintenance, holidays, or unexpected closures for {currentVenue.name}.</p>
                     </div>
-                    <Button className="bg-red-600 text-white hover:bg-red-500 shadow-[0_0_20px_rgba(220,38,38,0.3)]">
+                    <Button onClick={() => setIsModalOpen(true)} className="bg-red-600 text-white hover:bg-red-500 shadow-[0_0_20px_rgba(220,38,38,0.3)]">
                         <Plus className="mr-2 h-4 w-4" /> Add Closure
                     </Button>
                 </div>
 
                 <div className="space-y-4">
-                    {VENUE_CLOSURES.map(closure => (
-                        <div key={closure.id} className="closure-card bg-zinc-900/40 border border-zinc-800 rounded-2xl p-6 backdrop-blur-sm flex flex-col md:flex-row items-center justify-between gap-6 group hover:border-orange-500/30 transition-all">
-                            <div className="flex items-center gap-6 w-full md:w-auto">
-                                <div className={`w-14 h-14 rounded-xl flex items-center justify-center shrink-0 
-                                    ${closure.type === 'maintenance' ? 'bg-orange-500/10' : 'bg-yellow-500/10'}`}>
-                                    {getIcon(closure.type)}
-                                </div>
-                                <div>
-                                    <h3 className="font-bold text-white text-lg mb-1">{closure.title}</h3>
-                                    <div className="flex flex-wrap gap-4 text-sm text-zinc-400">
-                                        <span className="flex items-center gap-2">
-                                            <Calendar className="h-4 w-4 text-zinc-600" />
-                                            {closure.start_date} <span className="text-zinc-600">→</span> {closure.end_date}
-                                        </span>
-                                        <span className="hidden md:inline text-zinc-700">|</span>
-                                        <span>{closure.reason}</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="flex items-center gap-6 w-full md:w-auto justify-between md:justify-end">
-                                <div className="text-right">
-                                    <p className="text-xs font-bold text-zinc-500 uppercase mb-1">Affected Courts</p>
-                                    <div className="flex flex-wrap justify-end gap-2">
-                                        {closure.courts.map((court, idx) => (
-                                            <span key={idx} className="bg-zinc-800 text-white text-xs px-2 py-1 rounded">
-                                                {court}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </div>
-                                <Button variant="outline" className="border-red-900/30 text-red-500 hover:bg-red-900/10 hover:border-red-900/50 p-3 h-auto rounded-xl">
-                                    <Trash2 className="h-4 w-4" />
-                                </Button>
-                            </div>
+                    {isLoading ? (
+                        [1, 2].map(i => <div key={i} className="h-32 bg-zinc-900/30 rounded-2xl animate-pulse" />)
+                    ) : closures.length === 0 ? (
+                        <div className="text-center py-12 bg-zinc-900/20 rounded-3xl border border-zinc-800 border-dashed">
+                            <p className="text-zinc-500">No scheduled closures found.</p>
                         </div>
-                    ))}
+                    ) : (
+                        closures.map(closure => (
+                            <div key={closure.id} className="closure-card bg-zinc-900/40 border border-zinc-800 rounded-2xl p-6 backdrop-blur-sm flex flex-col md:flex-row items-center justify-between gap-6 group hover:border-orange-500/30 transition-all">
+                                <div className="flex items-center gap-6 w-full md:w-auto">
+                                    <div className={`w-14 h-14 rounded-xl flex items-center justify-center shrink-0 bg-zinc-800/50`}>
+                                        {getIcon(closure.type)}
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-white text-lg mb-1">{closure.title}</h3>
+                                        <div className="flex flex-wrap gap-4 text-sm text-zinc-400">
+                                            <span className="flex items-center gap-2">
+                                                <Calendar className="h-4 w-4 text-zinc-600" />
+                                                {format(new Date(closure.start_date), "MMM dd")} <span className="text-zinc-600">→</span> {format(new Date(closure.end_date), "MMM dd, yyyy")}
+                                            </span>
+                                            <span className="hidden md:inline text-zinc-700">|</span>
+                                            <span>{closure.reason}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-6 w-full md:w-auto justify-between md:justify-end">
+                                    <div className="text-right">
+                                        <p className="text-xs font-bold text-zinc-500 uppercase mb-1">Affected Courts</p>
+                                        <div className="flex flex-wrap justify-end gap-2">
+                                            {closure.courts && closure.courts.length > 0 ? closure.courts.map((courtId, idx) => {
+                                                const court = courts.find(c => c.id === courtId);
+                                                return (
+                                                    <span key={idx} className="bg-zinc-800 text-white text-xs px-2 py-1 rounded">
+                                                        {court?.name || "Unknown Court"}
+                                                    </span>
+                                                );
+                                            }) : (
+                                                <span className="bg-red-500/10 text-red-500 text-xs px-2 py-1 rounded border border-red-500/20">All Venue</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <Button onClick={() => handleDelete(closure.id)} variant="outline" className="border-red-900/30 text-red-500 hover:bg-red-900/10 hover:border-red-900/50 p-3 h-auto rounded-xl">
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            </div>
+                        ))
+                    )}
                 </div>
 
-                {/* Info Box */}
                 <div className="mt-8 p-6 rounded-2xl bg-zinc-900/20 border border-dashed border-zinc-800 text-center">
                     <p className="text-sm text-zinc-500">
                         Closures will automatically block the calendar preventing any new bookings. <br />
@@ -122,6 +171,18 @@ export default function ClosuresPage() {
                 </div>
 
             </div>
+
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Schedule Closure">
+                <ClosureFormModal
+                    venueId={currentVenue.id}
+                    courts={courts}
+                    onClose={() => setIsModalOpen(false)}
+                    onSuccess={() => {
+                        loadData();
+                        setIsModalOpen(false);
+                    }}
+                />
+            </Modal>
         </main>
     );
 }

@@ -130,6 +130,30 @@ class VenueService {
         });
     }
 
+    async getUpcomingBookings(venueId: string, limit: number = 5): Promise<UpcomingBooking[]> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                const now = new Date();
+                const upcoming = MOCK_BOOKINGS
+                    .filter(b =>
+                        b.court?.venue_id === venueId &&
+                        new Date(b.start_time) > now &&
+                        b.status !== 'cancelled'
+                    )
+                    .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())
+                    .slice(0, limit)
+                    .map(b => ({
+                        id: b.id,
+                        customer_name: b.customer_name,
+                        court_name: b.court?.name || 'Unknown Court',
+                        start_time: b.start_time,
+                        status: b.status
+                    }));
+                resolve(upcoming);
+            }, 600);
+        });
+    }
+
     async updateBookingStatus(bookingId: string, status: BookingStatus): Promise<void> {
         return new Promise((resolve) => {
             setTimeout(() => {

@@ -57,11 +57,7 @@ export default function Header() {
           {/* Venue Switcher (Desktop) */}
           {showVenueSwitcher && (
             <div className="hidden md:block">
-              <VenueSwitcher
-                venues={MOCK_VENUES} // Filter by owner in real implementations
-                currentVenueId={currentVenueId}
-                onVenueChange={setCurrentVenueId}
-              />
+              <VenueSwitcher />
             </div>
           )}
         </div>

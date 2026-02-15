@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { Building2, MapPin, Loader2, Info, CheckCircle, ArrowRight, ArrowLeft } from "lucide-react";
@@ -13,21 +13,22 @@ import { useVenue } from "@/components/venue/VenueContext";
 
 type Step = "details" | "location" | "amenities";
 
-export default function CreateVenuePage() {
+export default function EditVenuePage() {
     const router = useRouter();
     const { user } = useAuth();
-    const { refreshVenues } = useVenue();
+    const { currentVenue, refreshVenues } = useVenue();
     const { addToast } = useToast();
     const [step, setStep] = useState<Step>("details");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
-    const { register, handleSubmit, formState: { errors } } = useForm({
+    const { register, handleSubmit, setValue, formState: { errors } } = useForm({
         defaultValues: {
             name: "",
             description: "",
-            operating_hours: "06:00 - 23:00",
-            contact_number: user?.phone_number || "",
-            contact_email: user?.email || "",
+            operating_hours: "",
+            contact_number: "",
+            contact_email: "",
             city: "",
             address: "",
             amenities: [] as string[]
@@ -36,28 +37,64 @@ export default function CreateVenuePage() {
 
     const amenitiesList = ["Parking", "A/C", "Showers", "Equipment Rental", "Cafe", "WiFi", "Lockers", "First Aid"];
 
+    useEffect(() => {
+        if (currentVenue) {
+            setValue("name", currentVenue.name);
+            setValue("description", currentVenue.description);
+            setValue("operating_hours", currentVenue.operating_hours);
+            setValue("contact_number", currentVenue.contact_number);
+            setValue("contact_email", user?.email || ""); // Venue object doesn't have email usually, using user's or empty
+            setValue("city", currentVenue.city);
+            setValue("address", currentVenue.address);
+            setValue("amenities", currentVenue.amenities || []);
+            setIsLoading(false);
+        } else {
+            // If accessed directly without context loaded, might need to wait or redirect
+            const timer = setTimeout(() => {
+                if (!currentVenue) setIsLoading(false); // Stop loading to show error/empty state
+            }, 2000);
+            return () => clearTimeout(timer);
+        }
+    }, [currentVenue, setValue, user]);
+
     const onSubmit = async (data: any) => {
+        if (!currentVenue) return;
         setIsSubmitting(true);
         try {
-            await venueApiService.createVenue({
+            await venueApiService.updateVenue(currentVenue.id, {
                 ...data,
-                sport: "generic", // Default for now, could be added to form
                 location: data.city, // Backward compatibility
-                owner_id: user?.id
             });
-            addToast("Venue created successfully!", "success");
+            addToast("Venue updated successfully!", "success");
 
-            // Refresh venues list in context so the new venue appears immediately
-            refreshVenues();
+            await refreshVenues();
 
             // Redirect to dashboard
             setTimeout(() => router.push("/venue-dashboard"), 1000);
         } catch (error) {
             console.error(error);
-            addToast("Failed to create venue", "error");
+            addToast("Failed to update venue", "error");
             setIsSubmitting(false);
         }
     };
+
+    if (!user) return null;
+
+    if (isLoading) {
+        return (
+            <main className="min-h-screen bg-black pt-24 pb-12 px-4 flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-zinc-500" />
+            </main>
+        );
+    }
+
+    if (!currentVenue) {
+        return (
+            <main className="min-h-screen bg-black pt-24 pb-12 px-4 flex items-center justify-center text-zinc-500">
+                Please select a venue to edit.
+            </main>
+        );
+    }
 
     return (
         <main className="min-h-screen bg-black pt-24 pb-12 px-4 flex items-center justify-center relative overflow-hidden">
@@ -69,7 +106,7 @@ export default function CreateVenuePage() {
             <div className="w-full max-w-2xl relative z-10">
 
                 <div className="mb-8 text-center">
-                    <h1 className="text-3xl font-bold text-white mb-2">Register Your Venue</h1>
+                    <h1 className="text-3xl font-bold text-white mb-2">Edit Venue Details</h1>
                     <p className="text-zinc-400">Step {step === "details" ? 1 : step === "location" ? 2 : 3} of 3</p>
 
                     {/* Progress Bar */}
@@ -132,7 +169,7 @@ export default function CreateVenuePage() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Operating Hours</label>
+                                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Operating Hours (Summary)</label>
                                     <input
                                         {...register("operating_hours")}
                                         className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
@@ -181,7 +218,7 @@ export default function CreateVenuePage() {
                                     <Info className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
                                     <div className="text-sm text-blue-200/80 leading-relaxed">
                                         <span className="font-bold text-blue-400 block mb-1">Map Coordinates</span>
-                                        Coordinates (Lat/Lng) will be automatically detected from the address or can be refined later in settings.
+                                        Coordinates (Lat/Lng) are managed automatically.
                                     </div>
                                 </div>
 
@@ -229,7 +266,7 @@ export default function CreateVenuePage() {
                                         disabled={isSubmitting}
                                         className="flex-[2] bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-12 text-lg shadow-[0_0_20px_rgba(16,185,129,0.2)]"
                                     >
-                                        {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "Complete Registration"}
+                                        {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "Save Changes"}
                                     </Button>
                                 </div>
                             </div>
