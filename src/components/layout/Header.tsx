@@ -1,21 +1,29 @@
+
 "use client";
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
 import Button from "../ui/Button";
-import { Menu, X, User } from "lucide-react";
+import { Menu, X, User, LogOut, LayoutDashboard, Calendar, Settings, Shield } from "lucide-react";
+import { useAuth } from "@/services/authContext";
+import VenueSwitcher from "@/components/venue/VenueSwitcher";
+import { MOCK_VENUES } from "@/services/mockData";
 
 export default function Header() {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
-  // Mock checking if user is logged in (replace with real auth later)
-  const isLoggedIn = true;
-  const userType = pathname?.includes("venue-dashboard") ? "venue_owner" : "player";
+  const { isLoggedIn, user, logout, isVenueOwner, isVenueManager } = useAuth();
 
-  // Navigation Links based on Context
+  // Determine Context
   const isVenueContext = pathname?.startsWith("/venue-dashboard");
+  const showVenueSwitcher = isVenueContext && (isVenueOwner || isVenueManager);
+
+  // TODO: Move venue state to a global store context eventually
+  // For now, simple mock integration
+  const [currentVenueId, setCurrentVenueId] = useState(MOCK_VENUES[0].id);
 
   const navLinks = isVenueContext ? [
     { name: "Dashboard", href: "/venue-dashboard" },
@@ -33,17 +41,30 @@ export default function Header() {
     <header className="fixed top-0 left-0 w-full z-50 bg-black/50 backdrop-blur-lg border-b border-white/5">
       <div className="container mx-auto px-4 h-20 flex items-center justify-between">
 
-        {/* Logo */}
-        <Link href={isVenueContext ? "/venue-dashboard" : "/"} className="flex items-center gap-2 group">
-          <div className="relative w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center overflow-hidden group-hover:bg-white/20 transition-colors">
-            <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500 to-blue-500 opacity-50"></div>
-            <span className="relative font-bold text-white">A</span>
-          </div>
-          <span className="font-black text-xl text-white tracking-tight">
-            ARENA<span className="text-emerald-500">.LK</span>
-          </span>
-          {isVenueContext && <span className="ml-2 text-xs font-bold bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded border border-blue-500/30">BUSINESS</span>}
-        </Link>
+        {/* Logo Area */}
+        <div className="flex items-center gap-6">
+          <Link href={isVenueContext ? "/venue-dashboard" : "/"} className="flex items-center gap-2 group">
+            <div className="relative w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center overflow-hidden group-hover:bg-white/20 transition-colors">
+              <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500 to-blue-500 opacity-50"></div>
+              <span className="relative font-bold text-white">A</span>
+            </div>
+            <span className="font-black text-xl text-white tracking-tight hidden sm:inline-block">
+              ARENA<span className="text-emerald-500">.LK</span>
+            </span>
+            {isVenueContext && <span className="ml-2 text-[10px] font-bold bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded border border-blue-500/30 uppercase tracking-wide">Business</span>}
+          </Link>
+
+          {/* Venue Switcher (Desktop) */}
+          {showVenueSwitcher && (
+            <div className="hidden md:block">
+              <VenueSwitcher
+                venues={MOCK_VENUES} // Filter by owner in real implementations
+                currentVenueId={currentVenueId}
+                onVenueChange={setCurrentVenueId}
+              />
+            </div>
+          )}
+        </div>
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-8">
@@ -67,16 +88,69 @@ export default function Header() {
         <div className="hidden md:flex items-center gap-4">
           {isLoggedIn ? (
             <div className="flex items-center gap-4">
-              {!isVenueContext && (
+
+              {/* Context Switcher Link */}
+              {!isVenueContext && (isVenueOwner || isVenueManager) && (
                 <Link href="/venue-dashboard">
-                  <span className="text-xs font-bold text-zinc-500 hover:text-white transition-colors cursor-pointer mr-2">Manager View</span>
+                  <span className="text-xs font-bold text-zinc-500 hover:text-white transition-colors cursor-pointer mr-2 uppercase tracking-wide">Manager View</span>
                 </Link>
               )}
-              <Link href={isVenueContext ? "/venue-dashboard/settings" : "/profile"}>
-                <div className="w-10 h-10 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center hover:border-emerald-500 transition-colors cursor-pointer">
-                  <User className="h-5 w-5 text-zinc-400" />
-                </div>
-              </Link>
+              {isVenueContext && (
+                <Link href="/">
+                  <span className="text-xs font-bold text-zinc-500 hover:text-white transition-colors cursor-pointer mr-2 uppercase tracking-wide">Player View</span>
+                </Link>
+              )}
+
+              {/* User Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className="flex items-center gap-3 hover:bg-white/5 pr-3 pl-2 py-1.5 rounded-full transition-colors border border-transparent hover:border-white/10"
+                >
+                  <div className="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center overflow-hidden">
+                    {user?.profile_image ? (
+                      <img src={user.profile_image} alt="Profile" className="w-full h-full object-cover" />
+                    ) : (
+                      <User className="h-4 w-4 text-zinc-400" />
+                    )}
+                  </div>
+                  <span className="text-sm font-medium text-white max-w-[100px] truncate">{user?.full_name?.split(' ')[0]}</span>
+                </button>
+
+                {isUserMenuOpen && (
+                  <>
+                    <div className="fixed inset-0 z-30" onClick={() => setIsUserMenuOpen(false)} />
+                    <div className="absolute top-full right-0 mt-2 w-56 bg-zinc-900 border border-zinc-800 rounded-xl shadow-xl z-40 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                      <div className="p-3 border-b border-zinc-800">
+                        <p className="text-sm font-bold text-white truncate">{user?.full_name}</p>
+                        <p className="text-xs text-zinc-500 truncate">{user?.email}</p>
+                      </div>
+                      <div className="p-2">
+                        <Link href="/dashboard" className="flex items-center gap-2 px-3 py-2 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors">
+                          <LayoutDashboard className="w-4 h-4" /> Dashboard
+                        </Link>
+                        <Link href="/bookings" className="flex items-center gap-2 px-3 py-2 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors">
+                          <Calendar className="w-4 h-4" /> My Bookings
+                        </Link>
+                        <Link href="/profile" className="flex items-center gap-2 px-3 py-2 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors">
+                          <Settings className="w-4 h-4" /> Profile Settings
+                        </Link>
+                        <Link href="/security" className="flex items-center gap-2 px-3 py-2 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors">
+                          <Shield className="w-4 h-4" /> Security
+                        </Link>
+                      </div>
+                      <div className="p-2 border-t border-zinc-800">
+                        <button
+                          onClick={logout}
+                          className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors"
+                        >
+                          <LogOut className="w-4 h-4" /> Log Out
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           ) : (
             <>
@@ -92,7 +166,7 @@ export default function Header() {
 
         {/* Mobile Menu Toggle */}
         <button
-          className="md:hidden text-white"
+          className="md:hidden text-white p-2"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           {isMobileMenuOpen ? <X /> : <Menu />}
@@ -101,26 +175,58 @@ export default function Header() {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden absolute top-20 left-0 w-full bg-black border-b border-zinc-800 p-4 flex flex-col gap-4 animate-fade-in">
-          {navLinks.map((link) => (
-            <Link
-              key={link.name}
-              href={link.href}
-              onClick={() => setIsMobileMenuOpen(false)}
-              className={`text-lg font-bold ${pathname === link.href ? "text-white" : "text-zinc-500"}`}
-            >
-              {link.name}
-            </Link>
-          ))}
-          <div className="h-px bg-zinc-800 my-2"></div>
-          {isLoggedIn ? (
-            <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)} className="text-zinc-400 font-bold">My Profile</Link>
-          ) : (
-            <div className="flex flex-col gap-3">
-              <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="text-white font-bold">Log In</Link>
-              <Link href="/signup" onClick={() => setIsMobileMenuOpen(false)}><Button className="w-full">Sign Up</Button></Link>
+        <div className="md:hidden fixed top-20 left-0 w-full h-[calc(100vh-80px)] bg-black/95 backdrop-blur-xl border-t border-zinc-800 p-6 flex flex-col gap-6 animate-fade-in z-40 overflow-y-auto">
+
+          {isLoggedIn && (
+            <div className="flex items-center gap-4 pb-6 border-b border-zinc-800">
+              <div className="w-12 h-12 rounded-full bg-zinc-800 border border-zinc-700 overflow-hidden">
+                {user?.profile_image ? (
+                  <img src={user.profile_image} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  <User className="h-6 w-6 text-zinc-400 m-auto mt-3" />
+                )}
+              </div>
+              <div>
+                <p className="text-lg font-bold text-white">{user?.full_name}</p>
+                <p className="text-sm text-zinc-500">{user?.email}</p>
+              </div>
             </div>
           )}
+
+          <div className="flex flex-col gap-4">
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                href={link.href}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={`text-2xl font-bold ${pathname === link.href ? "text-white" : "text-zinc-500"}`}
+              >
+                {link.name}
+              </Link>
+            ))}
+          </div>
+
+          <div className="mt-auto pt-6 border-t border-zinc-800 flex flex-col gap-3">
+            {isLoggedIn ? (
+              <>
+                <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button variant="outline" className="w-full justify-center">Profile Settings</Button>
+                </Link>
+                <Button onClick={logout} className="w-full justify-center bg-red-600 hover:bg-red-700 text-white border-none">
+                  Log Out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button variant="outline" className="w-full justify-center text-white border-zinc-700">Log In</Button>
+                </Link>
+                <Link href="/signup" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button className="w-full justify-center bg-emerald-500 text-black hover:bg-emerald-400">Sign Up</Button>
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       )}
     </header>

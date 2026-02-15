@@ -1,6 +1,6 @@
 // src/services/api.ts
 import { Venue, Sport } from "@/types";
-import { MOCK_VENUES, MOCK_SPORTS } from "./mockData";
+import { MOCK_VENUES, MOCK_SPORTS } from "@/services/mockData";
 
 // Simulate a network delay to test loading states (smooth UX)
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -21,13 +21,13 @@ export const api = {
   // Get only "Trending" venues
   getTrendingVenues: async (): Promise<Venue[]> => {
     await delay(500);
-    return MOCK_VENUES.filter((v) => v.isPopular);
+    return MOCK_VENUES.filter((v) => v.is_featured); // Using is_featured as trending for now
   },
 
   // Get "Featured" venues for Hero Carousel (paid premium slot)
   getFeaturedVenues: async (): Promise<Venue[]> => {
     await delay(500);
-    return MOCK_VENUES.filter((v) => v.isFeatured);
+    return MOCK_VENUES.filter((v) => v.is_featured);
   },
 
   // Get single venue by ID (for details page)
@@ -42,8 +42,8 @@ export const api = {
     const lowerQuery = query.toLowerCase();
     return MOCK_VENUES.filter(v =>
       v.name.toLowerCase().includes(lowerQuery) ||
-      v.location.toLowerCase().includes(lowerQuery) ||
-      v.sport.toLowerCase().includes(lowerQuery)
+      v.city.toLowerCase().includes(lowerQuery) ||
+      v.description.toLowerCase().includes(lowerQuery)
     );
   }
 };

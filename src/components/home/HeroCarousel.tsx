@@ -16,11 +16,7 @@ interface HeroCarouselProps {
 export default function HeroCarousel({ venues }: HeroCarouselProps) {
   const [, setActiveIndex] = useState(0);
 
-  // Duplicate data to ensure smooth infinite loop
-  const loopedVenues = useMemo(() => {
-    if (venues.length === 0) return [];
-    return [...venues, ...venues, ...venues, ...venues];
-  }, [venues]);
+
 
   return (
     <div className="w-full pt-4 pb-2 md:py-4 relative">
@@ -62,9 +58,9 @@ export default function HeroCarousel({ venues }: HeroCarouselProps) {
         modules={[EffectCoverflow, Autoplay, Mousewheel, Pagination]}
         className="hero-carousel w-full !pb-8 !overflow-visible"
       >
-        {loopedVenues.map((venue, index) => (
+        {venues.map((venue) => (
           <SwiperSlide
-            key={`${venue.id}-${index}`}
+            key={venue.id}
             className="!w-[280px] md:!w-[400px]"
           >
             {({ isActive }) => (

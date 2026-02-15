@@ -1,0 +1,22 @@
+
+> the-arena-frontend@0.1.0 build
+> next build
+
+Γû▓ Next.js 16.1.6 (Turbopack)
+
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 19.3s
+  Running TypeScript ...
+Failed to compile.
+
+./src/components/venue/CourtFormModal.tsx:39:36
+Type error: Property 'updateCourt' does not exist on type 'VenueService'.
+
+  37 |         try {
+  38 |             if (existingCourt) {
+> 39 |                 await venueService.updateCourt(existingCourt.id, data);
+     |                                    ^
+  40 |                 addToast("Court updated successfully", "success");
+  41 |             } else {
+  42 |                 await venueService.createCourt({ ...data, venue_id: venueId });
+Next.js build worker exited with code: 1 and signal: null

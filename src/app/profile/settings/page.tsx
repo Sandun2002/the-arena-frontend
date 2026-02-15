@@ -1,118 +1,203 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
-import { User, Mail, Bell, Shield, Camera, Save, LogOut } from "lucide-react";
-import gsap from "gsap";
+import { useState, useRef } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { ArrowLeft, Save, Loader2, Camera, Upload, X } from "lucide-react";
 import Button from "@/components/ui/Button";
+import { useAuth } from "@/services/authContext";
+import { playerService } from "@/services/playerService";
+import { useToast } from "@/components/ui/Toast";
+
+type FormData = {
+    full_name: string;
+    phone_number: string;
+    bio: string;
+};
 
 export default function ProfileSettingsPage() {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const [saving, setSaving] = useState(false);
-    const [avatarPreview, setAvatarPreview] = useState("https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=2680&auto=format&fit=crop");
+    const router = useRouter();
+    const { user, login } = useAuth();
+    const { addToast } = useToast();
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [previewImage, setPreviewImage] = useState<string | null>(user?.profile_image || null);
+    const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
-    useEffect(() => {
-        const ctx = gsap.context(() => {
-            gsap.fromTo(".settings-section",
-                { y: 20, opacity: 0 },
-                { y: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: "power2.out" }
-            );
-        }, containerRef);
-        return () => ctx.revert();
-    }, []);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const handleSave = () => {
-        setSaving(true);
-        setTimeout(() => setSaving(false), 1500);
+    const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+        defaultValues: {
+            full_name: user?.full_name || "",
+            phone_number: user?.phone_number || "",
+            bio: user?.bio || "",
+        }
+    });
+
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file || !user) return;
+
+        // Simulate upload
+        const objectUrl = URL.createObjectURL(file);
+        setPreviewImage(objectUrl); // Immediate preview
+        setUploadingAvatar(true);
+
+        try {
+            await playerService.updateAvatar(user.id, file);
+            addToast("Avatar updated successfully", "success");
+        } catch (error) {
+            addToast("Failed to update avatar", "error");
+            setPreviewImage(user.profile_image); // Revert
+        } finally {
+            setUploadingAvatar(false);
+        }
     };
 
+    const onSubmit = async (data: FormData) => {
+        if (!user) return;
+        setIsSubmitting(true);
+        try {
+            await playerService.updateProfile(user.id, data);
+            addToast("Profile updated successfully", "success");
+            router.refresh();
+            setTimeout(() => router.push("/profile"), 500);
+        } catch (error) {
+            addToast("Failed to update profile", "error");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    if (!user) return null;
+
     return (
-        <main className="min-h-screen bg-black pt-24 pb-20 relative overflow-hidden" ref={containerRef}>
-            {/* Background Effects */}
-            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-500/5 rounded-full blur-[150px] pointer-events-none" />
+        <main className="min-h-screen bg-black pt-24 pb-12 px-4 selection:bg-emerald-500/30">
+            <div className="container mx-auto max-w-2xl">
 
-            <div className="container mx-auto px-4 max-w-4xl relative z-10">
-                <h1 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tight mb-8">
-                    Account <span className="text-transparent bg-gradient-to-r from-purple-400 to-blue-500 bg-clip-text">Settings</span>
-                </h1>
+                <Link href="/profile" className="inline-flex items-center text-sm font-medium text-zinc-500 hover:text-white mb-8 transition-colors group">
+                    <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" /> Back to Profile
+                </Link>
 
-                <div className="grid gap-8">
+                <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 backdrop-blur-md shadow-2xl">
+                    <h1 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
+                        <span className="bg-emerald-500/10 p-2 rounded-xl text-emerald-500"><Edit2Icon className="w-6 h-6" /></span>
+                        Edit Profile
+                    </h1>
 
-                    {/* 1. Availability / Profile Pic */}
-                    <div className="settings-section bg-zinc-900/40 border border-zinc-800 rounded-[2rem] p-8 backdrop-blur-sm flex flex-col md:flex-row items-center gap-8">
-                        <div className="relative group">
-                            <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-zinc-800 group-hover:border-emerald-500 transition-colors">
-                                <Image src={avatarPreview} alt="Profile" fill className="object-cover" />
+                    {/* Avatar Upload */}
+                    <div className="flex items-center gap-6 mb-10 pb-10 border-b border-zinc-800/50">
+                        <div
+                            className="relative group cursor-pointer"
+                            onClick={() => fileInputRef.current?.click()}
+                        >
+                            <div className="w-24 h-24 rounded-full border-4 border-zinc-800 overflow-hidden shadow-lg transition-transform group-hover:scale-105">
+                                {previewImage ? (
+                                    <img src={previewImage} alt="Avatar" className="w-full h-full object-cover" />
+                                ) : (
+                                    <div className="w-full h-full bg-zinc-800 flex items-center justify-center text-zinc-500">
+                                        <Camera className="w-8 h-8" />
+                                    </div>
+                                )}
+                                {uploadingAvatar && (
+                                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                        <Loader2 className="w-6 h-6 text-emerald-500 animate-spin" />
+                                    </div>
+                                )}
                             </div>
-                            <button className="absolute bottom-0 right-0 p-3 bg-emerald-500 rounded-full text-black hover:bg-emerald-400 shadow-lg transition-transform hover:scale-110">
-                                <Camera className="h-5 w-5" />
-                            </button>
+                            <div className="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Upload className="w-8 h-8 text-white" />
+                            </div>
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                className="hidden"
+                                accept="image/*"
+                                onChange={handleFileChange}
+                            />
                         </div>
-                        <div className="text-center md:text-left">
-                            <h3 className="text-xl font-bold text-white mb-1">Update Profile Photo</h3>
-                            <p className="text-zinc-500 text-sm mb-4">Allowed formats: JPG, PNG. Max size: 2MB.</p>
-                            <div className="flex gap-2 justify-center md:justify-start">
-                                <Button variant="outline" className="text-xs border-zinc-700">Remove</Button>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* 2. Personal Information */}
-                    <div className="settings-section bg-zinc-900/40 border border-zinc-800 rounded-[2rem] p-8 backdrop-blur-sm">
-                        <div className="flex items-center gap-3 mb-6">
-                            <User className="h-5 w-5 text-zinc-500" />
-                            <h3 className="text-xl font-bold text-white">Personal Information</h3>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-zinc-500 uppercase">First Name</label>
-                                <input type="text" defaultValue="John" className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none" />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-zinc-500 uppercase">Last Name</label>
-                                <input type="text" defaultValue="Doe" className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none" />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-zinc-500 uppercase">Email</label>
-                                <input type="email" defaultValue="john@example.com" disabled className="w-full bg-zinc-800/50 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-500 cursor-not-allowed" />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-zinc-500 uppercase">Phone</label>
-                                <input type="tel" defaultValue="+94 77 123 4567" className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none" />
-                            </div>
+                        <div>
+                            <p className="text-white font-bold mb-1">Profile Photo</p>
+                            <p className="text-zinc-500 text-xs mb-3">Recommended 400x400px. JPG or PNG.</p>
+                            <Button size="sm" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                                Change Photo
+                            </Button>
                         </div>
                     </div>
 
-                    {/* 3. Password Check */}
-                    <div className="settings-section bg-zinc-900/40 border border-zinc-800 rounded-[2rem] p-8 backdrop-blur-sm">
-                        <div className="flex items-center gap-3 mb-6">
-                            <Shield className="h-5 w-5 text-zinc-500" />
-                            <h3 className="text-xl font-bold text-white">Security</h3>
-                        </div>
-                        <div className="space-y-4 max-w-md">
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-zinc-500 uppercase">Current Password</label>
-                                <input type="password" placeholder="••••••••" className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none" />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-zinc-500 uppercase">New Password</label>
-                                <input type="password" placeholder="••••••••" className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-purple-500 focus:outline-none" />
-                            </div>
-                        </div>
-                    </div>
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 
-                    {/* Action Bar */}
-                    <div className="fixed bottom-0 left-0 w-full bg-black/80 backdrop-blur-lg border-t border-zinc-800 p-4 z-50 flex justify-end gap-4">
-                        <Button variant="outline" className="border-red-900/30 text-red-500 hover:bg-red-900/10">
-                            Log Out
-                        </Button>
-                        <Button onClick={handleSave} className="bg-purple-600 text-white hover:bg-purple-500 shadow-[0_0_20px_rgba(147,51,234,0.3)] w-32">
-                            {saving ? "Saving..." : "Save Changes"}
-                        </Button>
-                    </div>
+                        <div className="grid md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Full Name</label>
+                                <input
+                                    {...register("full_name", { required: "Name is required" })}
+                                    className="w-full bg-black/50 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 outline-none transition-all"
+                                    placeholder="e.g. Dilshan Perera"
+                                />
+                                {errors.full_name && <p className="text-red-500 text-xs mt-1">{errors.full_name.message}</p>}
+                            </div>
 
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Phone Number</label>
+                                <input
+                                    {...register("phone_number", {
+                                        pattern: { value: /^(?:\+94|0)[0-9]{2}[0-9]{7}$/, message: "Invalid SL phone format" }
+                                    })}
+                                    className="w-full bg-black/50 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 outline-none transition-all"
+                                    placeholder="+94 7X XXX XXXX"
+                                />
+                                {errors.phone_number && <p className="text-red-500 text-xs mt-1">{errors.phone_number.message}</p>}
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Bio</label>
+                            <textarea
+                                {...register("bio")}
+                                rows={5}
+                                className="w-full bg-black/50 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 outline-none transition-all resize-none"
+                                placeholder="Tell other players about your favorite sports, skill level, and availability..."
+                            />
+                            <p className="text-xs text-zinc-600 text-right">Write a short bio to display on your profile.</p>
+                        </div>
+
+                        <div className="pt-6 flex items-center justify-end gap-4 border-t border-zinc-800/50 mt-8">
+                            <Link href="/profile">
+                                <Button type="button" variant="ghost" className="hover:bg-zinc-800 text-zinc-400 hover:text-white">Cancel</Button>
+                            </Link>
+                            <Button
+                                type="submit"
+                                disabled={isSubmitting}
+                                className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold px-8 shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] transition-all"
+                            >
+                                {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
+                                Save Changes
+                            </Button>
+                        </div>
+
+                    </form>
                 </div>
             </div>
         </main>
     );
+}
+
+function Edit2Icon(props: any) {
+    return (
+        <svg
+            {...props}
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+        </svg>
+    )
 }

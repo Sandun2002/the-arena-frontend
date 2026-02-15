@@ -1,128 +1,202 @@
+
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import {
-    Calendar, Clock, User, Phone, Check, Zap, CreditCard
-} from "lucide-react";
-import gsap from "gsap";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { format, addHours, startOfHour } from "date-fns";
+import { Loader2, Calendar, User, Clock, DollarSign } from "lucide-react";
 import Button from "@/components/ui/Button";
-
-// -- Mock Courts --
-const COURTS = ["Court A - Futsal", "Court B - Badminton", "Court C - Basketball"];
+import { useAuth } from "@/services/authContext";
+import { venueService } from "@/services/venueService";
+import { Court, Venue } from "@/types";
+import { useToast } from "@/components/ui/Toast";
 
 export default function WalkInPage() {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const [selectedCourt, setSelectedCourt] = useState(COURTS[0]);
+    const router = useRouter();
+    const { user } = useAuth();
+    const { addToast } = useToast();
+
+    const [venues, setVenues] = useState<Venue[]>([]);
+    const [selectedVenueId, setSelectedVenueId] = useState<string>("");
+    const [courts, setCourts] = useState<Court[]>([]);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Form State
+    const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
+        defaultValues: {
+            court_id: "",
+            date: format(new Date(), "yyyy-MM-dd"),
+            start_time: format(startOfHour(addHours(new Date(), 1)), "HH:mm"),
+            duration: 1,
+            customer_name: "",
+            customer_phone: "",
+            notes: ""
+        }
+    });
+
+    const selectedCourtId = watch("court_id");
+    const selectedCourt = courts.find(c => c.id === selectedCourtId);
+    const duration = watch("duration");
+    const totalPrice = selectedCourt ? selectedCourt.hourly_rate * duration : 0;
 
     useEffect(() => {
-        const ctx = gsap.context(() => {
-            gsap.fromTo(".page-header",
-                { y: -20, opacity: 0 },
-                { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }
-            );
-            gsap.fromTo(".form-card",
-                { y: 30, opacity: 0 },
-                { y: 0, opacity: 1, duration: 0.6, ease: "power2.out", delay: 0.2 }
-            );
-        }, containerRef);
-        return () => ctx.revert();
-    }, []);
+        if (user) {
+            venueService.getMyVenues(user.id).then((data) => {
+                setVenues(data);
+                if (data.length > 0) setSelectedVenueId(data[0].id);
+            });
+        }
+    }, [user]);
+
+    useEffect(() => {
+        if (selectedVenueId) {
+            venueService.getCourts(selectedVenueId).then(setCourts);
+        }
+    }, [selectedVenueId]);
+
+    const onSubmit = async (data: any) => {
+        if (!selectedVenueId) return;
+        setIsSubmitting(true);
+        try {
+            // Calculate end time
+            const startDateTime = new Date(`${data.date}T${data.start_time}`);
+            const endDateTime = addHours(startDateTime, data.duration);
+
+            await venueService.createManualBooking({
+                venue_id: selectedVenueId,
+                court_id: data.court_id,
+                start_time: startDateTime.toISOString(),
+                end_time: endDateTime.toISOString(),
+                customer_name: data.customer_name || "Walk-in Guest",
+                customer_phone: data.customer_phone,
+                notes: data.notes,
+                total_price: totalPrice
+            });
+
+            addToast("Walk-in booking recorded", "success");
+            router.push("/venue-dashboard");
+        } catch (error) {
+            addToast("Failed to record booking. Slot might be taken.", "error");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    if (!user) return null;
 
     return (
-        <main className="min-h-screen bg-black pt-24 pb-20 relative overflow-hidden" ref={containerRef}>
-            {/* Background Effects */}
-            <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-cyan-500/5 rounded-full blur-[150px]" />
-            </div>
+        <main className="min-h-screen bg-black pt-24 pb-12 px-4 flex items-center justify-center">
+            <div className="w-full max-w-lg">
 
-            <div className="container mx-auto px-4 max-w-4xl relative z-10">
-
-                <div className="page-header mb-12">
-                    <h1 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tight mb-2">
-                        Walk-in <span className="text-transparent bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text">Booking</span>
-                    </h1>
-                    <p className="text-zinc-400">Quickly record a manual booking for walk-in customers.</p>
+                <div className="mb-8 text-center">
+                    <h1 className="text-3xl font-bold text-white mb-2">Record Walk-in</h1>
+                    <p className="text-zinc-400">Manually add a booking for an offline customer.</p>
                 </div>
 
-                <div className="form-card bg-zinc-900/40 border border-zinc-800 rounded-[2rem] p-8 backdrop-blur-sm relative overflow-hidden">
-                    <div className="grid md:grid-cols-2 gap-8 relative z-10">
+                <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 backdrop-blur-sm shadow-2xl">
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 
-                        {/* Left Column: Details */}
-                        <div className="space-y-6">
-                            <div>
-                                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Select Court</label>
-                                <div className="space-y-2">
-                                    {COURTS.map(court => (
-                                        <button
-                                            key={court}
-                                            onClick={() => setSelectedCourt(court)}
-                                            className={`w-full text-left p-4 rounded-xl border transition-all flex justify-between items-center ${selectedCourt === court
-                                                    ? "bg-cyan-500/10 border-cyan-500 text-cyan-400"
-                                                    : "bg-black/20 border-zinc-800 text-zinc-400 hover:bg-zinc-800"
-                                                }`}
-                                        >
-                                            <span className="font-bold">{court}</span>
-                                            {selectedCourt === court && <Check className="h-4 w-4" />}
-                                        </button>
-                                    ))}
-                                </div>
+                        {/* Venue & Court Selection */}
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-zinc-500 uppercase">Venue</label>
+                                <select
+                                    value={selectedVenueId}
+                                    onChange={(e) => setSelectedVenueId(e.target.value)}
+                                    className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none"
+                                >
+                                    {venues.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
+                                </select>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Date</label>
-                                    <div className="relative">
-                                        <input type="date" className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-cyan-500 focus:outline-none" defaultValue={new Date().toISOString().split('T')[0]} />
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Time</label>
-                                    <div className="relative">
-                                        <input type="time" className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-cyan-500 focus:outline-none" defaultValue="18:00" />
-                                    </div>
-                                </div>
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-zinc-500 uppercase">Court</label>
+                                <select
+                                    {...register("court_id", { required: "Select a court" })}
+                                    className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none"
+                                >
+                                    <option value="">Select a court...</option>
+                                    {courts.map(c => <option key={c.id} value={c.id}>{c.name} ({c.sport_type})</option>)}
+                                </select>
+                                {errors.court_id && <p className="text-red-500 text-xs">{errors.court_id.message as string}</p>}
                             </div>
                         </div>
 
-                        {/* Right Column: Customer & Payment */}
-                        <div className="space-y-6">
-                            <div>
-                                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Customer Name</label>
-                                <div className="relative">
-                                    <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-500" />
-                                    <input type="text" placeholder="John Doe" className="w-full bg-black/40 border border-zinc-700 rounded-xl pl-12 pr-4 py-3 text-white focus:border-cyan-500 focus:outline-none placeholder:text-zinc-600" />
-                                </div>
+                        {/* Date & Time */}
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-zinc-500 uppercase">Date</label>
+                                <input
+                                    type="date"
+                                    {...register("date", { required: true })}
+                                    className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
+                                />
                             </div>
-                            <div>
-                                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Contact Number</label>
-                                <div className="relative">
-                                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-500" />
-                                    <input type="tel" placeholder="+94 77 123 4567" className="w-full bg-black/40 border border-zinc-700 rounded-xl pl-12 pr-4 py-3 text-white focus:border-cyan-500 focus:outline-none placeholder:text-zinc-600" />
-                                </div>
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-zinc-500 uppercase">Start Time</label>
+                                <input
+                                    type="time"
+                                    {...register("start_time", { required: true })}
+                                    className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold text-zinc-500 uppercase">Duration (Hours)</label>
+                            <div className="flex bg-black/50 border border-zinc-700 rounded-xl p-1">
+                                {[1, 1.5, 2, 3].map((h) => (
+                                    <button
+                                        key={h}
+                                        type="button"
+                                        onClick={() => setValue("duration", h)}
+                                        className={`flex-1 py-2 rounded-lg text-sm font-bold transition-all ${duration === h ? "bg-emerald-500 text-black shadow-lg" : "text-zinc-400 hover:text-white"}`}
+                                    >
+                                        {h}h
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Customer Info */}
+                        <div className="space-y-4 pt-4 border-t border-zinc-800">
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-zinc-500 uppercase">Customer Name (Optional)</label>
+                                <input
+                                    {...register("customer_name")}
+                                    placeholder="Guest Name"
+                                    className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-zinc-500 uppercase">Phone (Optional)</label>
+                                <input
+                                    {...register("customer_phone")}
+                                    placeholder="077..."
+                                    className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Total & Submit */}
+                        <div className="pt-4 border-t border-zinc-800">
+                            <div className="flex justify-between items-center mb-6">
+                                <span className="text-zinc-400 font-medium">Total to Collect</span>
+                                <span className="text-2xl font-bold text-white">LKR {totalPrice.toLocaleString()}</span>
                             </div>
 
-                            <div className="pt-4 border-t border-zinc-800">
-                                <div className="flex justify-between items-center mb-4">
-                                    <span className="text-zinc-400">Total Amount</span>
-                                    <span className="text-2xl font-bold text-white">LKR 1,800</span>
-                                </div>
-                                <div className="flex gap-4">
-                                    <button className="flex-1 py-3 rounded-xl border border-cyan-500 bg-cyan-500/10 text-cyan-400 font-bold flex items-center justify-center gap-2 hover:bg-cyan-500/20 transition-colors">
-                                        <Zap className="h-4 w-4" /> Cash
-                                    </button>
-                                    <button className="flex-1 py-3 rounded-xl border border-zinc-700 bg-black/20 text-zinc-400 font-bold flex items-center justify-center gap-2 hover:bg-zinc-800 hover:text-white transition-colors">
-                                        <CreditCard className="h-4 w-4" /> Card
-                                    </button>
-                                </div>
-                            </div>
-
-                            <Button className="w-full py-4 bg-cyan-500 text-black font-bold hover:bg-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.3)] mt-2">
-                                Confirm Booking
+                            <Button
+                                type="submit"
+                                disabled={isSubmitting}
+                                className="w-full py-4 bg-emerald-500 hover:bg-emerald-400 text-black font-bold"
+                            >
+                                {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "Confirm & Record Payment"}
                             </Button>
                         </div>
-                    </div>
-                </div>
 
+                    </form>
+                </div>
             </div>
         </main>
     );

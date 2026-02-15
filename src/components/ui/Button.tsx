@@ -1,3 +1,4 @@
+"use client";
 
 import React, { useRef } from "react";
 import gsap from "gsap";
@@ -9,6 +10,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
   href?: string;
   variant?: "primary" | "outline" | "ghost";
+  size?: "sm" | "md" | "lg";
   className?: string;
 }
 
@@ -16,6 +18,7 @@ export default function Button({
   children,
   href,
   variant = "primary",
+  size = "md",
   className,
   ...props
 }: ButtonProps) {
@@ -33,7 +36,7 @@ export default function Button({
     const handleMouseMove = (e: MouseEvent) => {
       const { clientX, clientY } = e;
       const { left, top, width, height } = btn.getBoundingClientRect();
-      const x = (clientX - (left + width / 2)) * 0.3; // Strength of magnet
+      const x = (clientX - (left + width / 2)) * 0.3;
       const y = (clientY - (top + height / 2)) * 0.3;
       xTo(x);
       yTo(y);
@@ -53,8 +56,16 @@ export default function Button({
     };
   }, { scope: buttonRef });
 
-  // Styles based on variant
-  const baseStyles = "relative inline-flex items-center justify-center px-8 py-3 overflow-hidden font-bold transition-all duration-300 rounded-full group disabled:opacity-50 disabled:cursor-not-allowed";
+  const sizes = {
+    sm: "px-4 py-1.5 text-xs",
+    md: "px-8 py-3 text-base",
+    lg: "px-10 py-4 text-lg"
+  };
+
+  const baseStyles = cn(
+    "relative inline-flex items-center justify-center overflow-hidden font-bold transition-all duration-300 rounded-full group disabled:opacity-50 disabled:cursor-not-allowed",
+    sizes[size]
+  );
 
   const variants = {
     primary: "bg-emerald-500 text-black hover:bg-emerald-400 border border-transparent",

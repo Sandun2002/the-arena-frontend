@@ -35,6 +35,11 @@ function CheckoutContent() {
     const [step, setStep] = useState<"summary" | "payment" | "success">("summary");
     const [isProcessing, setIsProcessing] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState<"card" | "cash">("card");
+    const [bookingId, setBookingId] = useState("");
+
+    useEffect(() => {
+        setBookingId(`BK-${Math.floor(Math.random() * 10000)}`);
+    }, []);
 
     const totalDuration = 1; // Simplify to 1 hour for now
     const subtotal = MOCK_PRICING.hourly_rate * totalDuration;
@@ -102,7 +107,7 @@ function CheckoutContent() {
                                     <div className="grid grid-cols-2 gap-4 relative z-10">
                                         <div>
                                             <p className="text-xs text-zinc-500 uppercase font-bold">Booking ID</p>
-                                            <p className="text-white font-mono">#BK-{Math.floor(Math.random() * 10000)}</p>
+                                            <p className="text-white font-mono">#BK-{bookingId}</p>
                                         </div>
                                         <div>
                                             <p className="text-xs text-zinc-500 uppercase font-bold">Date</p>

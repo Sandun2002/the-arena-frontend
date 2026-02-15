@@ -1,133 +1,199 @@
+
 "use client";
 
-import { useEffect, useRef } from "react";
-import Image from "next/image";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
-    LayoutDashboard, Calendar, Settings, Users, ClipboardList,
-    TrendingUp, Bell, Search, Plus, MapPin, Grid, Image as ImageIcon,
-    Clock, AlertCircle, Zap
+    Building2, Users, Receipt, Calendar,
+    AlertTriangle, Clock, Activity, Plus
 } from "lucide-react";
-import gsap from "gsap";
 import Button from "@/components/ui/Button";
+import { useAuth } from "@/services/authContext";
+import { venueService } from "@/services/venueService";
+import { DashboardStats, Venue } from "@/types";
+import VenueSwitcher from "@/components/venue/VenueSwitcher";
 
-// -- Mock Data --
-const DASHBOARD_STATS = [
-    { label: "Today's Bookings", value: "12", trend: "+20%", color: "text-emerald-400" },
-    { label: "Today's Revenue", value: "LKR 24.5k", trend: "+15%", color: "text-blue-400" },
-    { label: "Active Courts", value: "3/4", trend: "1 Maintenance", color: "text-yellow-400" },
-];
-
-export default function VenueDashboard() {
-    const containerRef = useRef<HTMLDivElement>(null);
+export default function VenueDashboardPage() {
+    const { user, isVenueOwner, isVenueManager } = useAuth();
+    const [venues, setVenues] = useState<Venue[]>([]);
+    const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
+    const [stats, setStats] = useState<DashboardStats | null>(null);
 
     useEffect(() => {
-        const ctx = gsap.context(() => {
-            // Intro Animations
-            gsap.fromTo(".dashboard-header",
-                { y: -20, opacity: 0 },
-                { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }
-            );
-            gsap.fromTo(".stat-card",
-                { y: 20, opacity: 0 },
-                { y: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: "power2.out", delay: 0.2 }
-            );
-            gsap.fromTo(".nav-card",
-                { scale: 0.95, opacity: 0 },
-                { scale: 1, opacity: 1, duration: 0.6, stagger: 0.05, ease: "back.out(1.2)", delay: 0.4 }
-            );
-        }, containerRef);
+        if (user && (isVenueOwner || isVenueManager)) {
+            venueService.getMyVenues(user.id).then((data) => {
+                setVenues(data);
+                if (data.length > 0) {
+                    // Default to first venue for now
+                    setSelectedVenue(data[0]);
+                }
+            });
+        }
+    }, [user]);
 
-        return () => ctx.revert();
-    }, []);
+    useEffect(() => {
+        if (selectedVenue) {
 
-    const menuItems = [
-        { title: "Calendar", icon: Calendar, href: "/venue-dashboard/calendar", desc: "Manage Schedule", color: "blue" },
-        { title: "Bookings", icon: ClipboardList, href: "/venue-dashboard/bookings", desc: "View All Reservations", color: "emerald" },
-        { title: "Courts", icon: Grid, href: "/venue-dashboard/courts", desc: "Manage Courts", color: "purple" },
-        { title: "Gallery", icon: ImageIcon, href: "/venue-dashboard/gallery", desc: "Update Photos", color: "pink" },
-        { title: "Staff", icon: Users, href: "/venue-dashboard/managers", desc: "Manage Team", color: "orange" },
-        { title: "Recurring", icon: Clock, href: "/venue-dashboard/recurring", desc: "Long-term Slots", color: "green" },
-        { title: "Closures", icon: AlertCircle, href: "/venue-dashboard/closures", desc: "Holidays/Maintenance", color: "red" },
-        { title: "Walk-in", icon: Zap, href: "/venue-dashboard/walk-in", desc: "Quick Booking", color: "cyan" },
-        { title: "Analytics", icon: TrendingUp, href: "/venue-dashboard/analytics", desc: "Performance", color: "indigo" },
-        { title: "Settings", icon: Settings, href: "/venue-dashboard/settings", desc: "Venue Profile", color: "zinc" },
-    ];
+            venueService.getDashboardStats(selectedVenue.id, isVenueOwner).then(setStats);
+        }
+    }, [selectedVenue, isVenueOwner]);
+
+    if (!user || (!isVenueOwner && !isVenueManager)) return null;
 
     return (
-        <main className="min-h-screen bg-black pt-24 pb-20 relative overflow-hidden" ref={containerRef}>
-            {/* Background Gradients */}
-            <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-[120px]" />
-                <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/5 rounded-full blur-[120px]" />
-            </div>
-
-            <div className="container mx-auto px-4 max-w-7xl relative z-10">
+        <main className="min-h-screen bg-black pt-24 pb-12 px-4">
+            <div className="container mx-auto max-w-6xl">
 
                 {/* Header */}
-                <div className="dashboard-header flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                     <div>
-                        <h1 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tight mb-2">
-                            Venue <span className="text-transparent bg-gradient-to-r from-blue-400 to-indigo-600 bg-clip-text">Dashboard</span>
-                        </h1>
-                        <div className="flex items-center gap-2 text-zinc-400">
-                            <MapPin className="h-4 w-4 text-emerald-500" />
-                            <span className="font-medium">Emerald Turf Arena, Colombo 07</span>
-                        </div>
+                        <h1 className="text-3xl font-bold text-white mb-2">Venue Dashboard</h1>
+                        <p className="text-zinc-400">Manage your facility, bookings, and staff.</p>
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <div className="relative">
-                            <Bell className="h-6 w-6 text-zinc-400 hover:text-white cursor-pointer transition-colors" />
-                            <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                        </div>
-                        <div className="h-10 w-10 bg-zinc-800 rounded-full flex items-center justify-center border border-zinc-700">
-                            <span className="font-bold text-white">EA</span>
-                        </div>
+                        {venues.length > 0 && selectedVenue && (
+                            <div className="md:hidden">
+                                {/* Mobile helper: VenueSwitcher is in Header, but we might want explicit control here too if needed */}
+                            </div>
+                        )}
+                        {isVenueOwner && (
+                            <Link href="/venue-dashboard/create">
+                                <Button className="bg-blue-600 hover:bg-blue-500 text-white font-bold h-10">
+                                    <Plus className="w-4 h-4 mr-2" /> Add Venue
+                                </Button>
+                            </Link>
+                        )}
                     </div>
                 </div>
 
-                {/* Stats Row */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                    {DASHBOARD_STATS.map((stat, idx) => (
-                        <div key={idx} className="stat-card p-6 rounded-[2rem] bg-zinc-900/40 border border-zinc-800 backdrop-blur-sm">
-                            <p className="text-zinc-500 text-xs font-bold uppercase tracking-wider mb-2">{stat.label}</p>
-                            <div className="flex items-end justify-between">
-                                <h3 className="text-3xl font-black text-white">{stat.value}</h3>
-                                <span className={`text-xs font-bold ${stat.color} bg-white/5 px-2 py-1 rounded-lg`}>{stat.trend}</span>
-                            </div>
+                {/* Pending Banner */}
+                {selectedVenue?.status === "pending" && (
+                    <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4 flex items-center gap-4 mb-8">
+                        <div className="p-2 bg-yellow-500/20 rounded-lg">
+                            <Clock className="w-6 h-6 text-yellow-500" />
                         </div>
-                    ))}
+                        <div className="flex-grow">
+                            <h3 className="text-lg font-bold text-white mb-1">Verification Pending</h3>
+                            <p className="text-yellow-200/70 text-sm">
+                                Your venue is currently under review. Bookings will be enabled once an admin approves your listing.
+                            </p>
+                        </div>
+                        <span className="bg-yellow-500 text-black text-xs font-bold px-3 py-1 rounded-full uppercase">Pending</span>
+                    </div>
+                )}
+
+                {/* Suspended/Blocked Banner */}
+                {(selectedVenue?.status === "suspended" || selectedVenue?.status === "blocked") && (
+                    <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex items-center gap-4 mb-8">
+                        <AlertTriangle className="w-6 h-6 text-red-500" />
+                        <div>
+                            <h3 className="text-lg font-bold text-white mb-1">Venue {selectedVenue?.status === "suspended" ? "Suspended" : "Blocked"}</h3>
+                            <p className="text-red-200/70 text-sm">
+                                Please contact support to resolve this issue.
+                            </p>
+                        </div>
+                    </div>
+                )}
+
+                {/* Stats Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
+                        <div className="flex justify-between mb-4">
+                            <div className="p-2 bg-blue-500/10 rounded-lg"><Calendar className="w-5 h-5 text-blue-500" /></div>
+                        </div>
+                        <p className="text-3xl font-bold text-white">{stats?.today_bookings || 0}</p>
+                        <p className="text-sm text-zinc-500">Bookings Today</p>
+                    </div>
+
+                    <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
+                        <div className="flex justify-between mb-4">
+                            <div className="p-2 bg-emerald-500/10 rounded-lg"><Receipt className="w-5 h-5 text-emerald-500" /></div>
+                        </div>
+                        <p className="text-3xl font-bold text-white">
+                            {stats?.revenue !== null ? `LKR ${stats?.revenue?.toLocaleString()}` : "—"}
+                        </p>
+                        <p className="text-sm text-zinc-500">Total Revenue</p>
+                        {stats?.revenue === null && <p className="text-[10px] text-zinc-600 mt-1">(Owner Access Only)</p>}
+                    </div>
+
+                    <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
+                        <div className="flex justify-between mb-4">
+                            <div className="p-2 bg-purple-500/10 rounded-lg"><Building2 className="w-5 h-5 text-purple-500" /></div>
+                        </div>
+                        <p className="text-3xl font-bold text-white">{stats?.active_courts || 0}</p>
+                        <p className="text-sm text-zinc-500">Active Courts</p>
+                    </div>
+
+                    <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
+                        <div className="flex justify-between mb-4">
+                            <div className="p-2 bg-orange-500/10 rounded-lg"><Users className="w-5 h-5 text-orange-500" /></div>
+                        </div>
+                        <p className="text-3xl font-bold text-white">{stats?.total_bookings || 0}</p>
+                        <p className="text-sm text-zinc-500">All-time Bookings</p>
+                    </div>
                 </div>
 
-                {/* Main Navigation Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {menuItems.map((item, idx) => (
-                        <Link key={idx} href={item.href}>
-                            <div className="nav-card group h-full p-6 rounded-[2rem] bg-zinc-900/40 border border-zinc-800 backdrop-blur-sm hover:bg-zinc-800/60 hover:border-white/10 transition-all cursor-pointer relative overflow-hidden">
-                                <div className={`
-                             w-12 h-12 rounded-xl mb-4 flex items-center justify-center transition-transform group-hover:scale-110
-                             ${item.color === 'blue' ? 'bg-blue-500/10 text-blue-500' :
-                                        item.color === 'emerald' ? 'bg-emerald-500/10 text-emerald-500' :
-                                            item.color === 'purple' ? 'bg-purple-500/10 text-purple-500' :
-                                                item.color === 'pink' ? 'bg-pink-500/10 text-pink-500' :
-                                                    item.color === 'orange' ? 'bg-orange-500/10 text-orange-500' :
-                                                        item.color === 'green' ? 'bg-green-500/10 text-green-500' :
-                                                            item.color === 'red' ? 'bg-red-500/10 text-red-500' :
-                                                                item.color === 'cyan' ? 'bg-cyan-500/10 text-cyan-500' :
-                                                                    item.color === 'indigo' ? 'bg-indigo-500/10 text-indigo-500' :
-                                                                        'bg-zinc-500/10 text-zinc-400'}
-                        `}>
-                                    <item.icon className="h-6 w-6" />
-                                </div>
-                                <h3 className="text-xl font-bold text-white mb-1 group-hover:text-blue-400 transition-colors">{item.title}</h3>
-                                <p className="text-xs text-zinc-500 font-medium group-hover:text-zinc-400">{item.desc}</p>
+                {/* Quick Actions */}
+                <div className="grid md:grid-cols-2 gap-8">
+                    <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
+                        <h2 className="text-xl font-bold text-white mb-4">Quick Actions</h2>
+                        <div className="grid grid-cols-2 gap-4">
+                            <Link href="/venue-dashboard/walk-in">
+                                <Button variant="outline" className="w-full h-24 flex-col gap-2 border-zinc-700 hover:bg-zinc-800">
+                                    <Plus className="w-6 h-6 text-emerald-500" />
+                                    Record Walk-in
+                                </Button>
+                            </Link>
+                            <Link href="/venue-dashboard/calendar">
+                                <Button variant="outline" className="w-full h-24 flex-col gap-2 border-zinc-700 hover:bg-zinc-800">
+                                    <Calendar className="w-6 h-6 text-blue-500" />
+                                    View Calendar
+                                </Button>
+                            </Link>
+                            <Link href="/venue-dashboard/courts">
+                                <Button variant="outline" className="w-full h-24 flex-col gap-2 border-zinc-700 hover:bg-zinc-800">
+                                    <Building2 className="w-6 h-6 text-purple-500" />
+                                    Manage Courts
+                                </Button>
+                            </Link>
+                            {isVenueOwner && (
+                                <Link href="/venue-dashboard/managers">
+                                    <Button variant="outline" className="w-full h-24 flex-col gap-2 border-zinc-700 hover:bg-zinc-800">
+                                        <Users className="w-6 h-6 text-orange-500" />
+                                        Manage Staff
+                                    </Button>
+                                </Link>
+                            )}
+                        </div>
+                    </div>
 
-                                {/* Hover Gradient */}
-                                <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                    <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
+                        <h2 className="text-xl font-bold text-white mb-4">Recent Activity</h2>
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition-colors">
+                                <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                                <div>
+                                    <p className="text-sm text-white font-medium">New booking for Futsal Pitch</p>
+                                    <p className="text-xs text-zinc-500">2 minutes ago • KAMAL P.</p>
+                                </div>
                             </div>
-                        </Link>
-                    ))}
+                            <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition-colors">
+                                <div className="w-2 h-2 rounded-full bg-blue-500" />
+                                <div>
+                                    <p className="text-sm text-white font-medium">Review received (5 Stars)</p>
+                                    <p className="text-xs text-zinc-500">1 hour ago • John Doe</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition-colors">
+                                <div className="w-2 h-2 rounded-full bg-yellow-500" />
+                                <div>
+                                    <p className="text-sm text-white font-medium">Court B Marked as Maintenance</p>
+                                    <p className="text-xs text-zinc-500">3 hours ago • Manager</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
             </div>

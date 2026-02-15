@@ -1,53 +1,106 @@
+
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
-import { USER_PROFILE } from "./userData";
-
-type UserType = "player" | "venue" | null;
+import { createContext, useContext, useEffect, useState, FunctionComponent } from "react";
+import { User, UserRole } from "@/types";
+import { authService } from "./authService";
+import { useRouter } from "next/navigation";
 
 interface AuthContextType {
     isLoggedIn: boolean;
-    userType: UserType;
-    user: typeof USER_PROFILE | null;
-    login: (type: UserType) => void;
+    user: User | null;
+    loading: boolean;
+    login: (email: string, password: string) => Promise<void>;
     logout: () => void;
+    // Role Helpers
+    hasRole: (role: UserRole) => boolean;
+    isCustomer: boolean;
+    isVenueOwner: boolean;
+    isVenueManager: boolean;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [userType, setUserType] = useState<UserType>(null);
+// Provider Component
+export const AuthProvider: FunctionComponent<{ children: React.ReactNode }> = ({
+    children,
+}) => {
+    const [user, setUser] = useState<User | null>(null);
+    const [loading, setLoading] = useState(true);
+    const router = useRouter();
 
-    const login = (type: UserType) => {
-        setIsLoggedIn(true);
-        setUserType(type);
+    // Load user from stored token on mount
+    useEffect(() => {
+        const initAuth = async () => {
+            const { accessToken } = authService.getTokens();
+            if (accessToken) {
+                try {
+                    const userData = await authService.getMe(accessToken);
+                    setUser(userData);
+                } catch (error) {
+                    console.error("Session expired or invalid token", error);
+                    authService.logout();
+                    setUser(null);
+                }
+            }
+            setLoading(false);
+        };
+
+        initAuth();
+    }, []);
+
+    const login = async (email: string, password: string) => {
+        try {
+            // 1. Get Tokens
+            const tokenResponse = await authService.login(email, password);
+
+            // 2. Get User Profile
+            const userData = await authService.getMe(tokenResponse.access_token);
+
+            setUser(userData);
+
+            // 3. Create Refresh Timer (Mock implementation)
+            // In real app: setup an interceptor or timeout based on tokenResponse.expires_in
+
+        } catch (error) {
+            console.error("Login Failed", error);
+            throw error; // Let UI handle the error (toast)
+        }
     };
 
     const logout = () => {
-        setIsLoggedIn(false);
-        setUserType(null);
+        authService.logout();
+        setUser(null);
+        router.push("/login");
     };
+
+    // Role Helpers
+    const hasRole = (roleSlug: UserRole): boolean => {
+        return user?.roles.some(r => r.slug === roleSlug) ?? false;
+    };
+
+    const isCustomer = hasRole("customer");
+    const isVenueOwner = hasRole("venue_owner");
+    const isVenueManager = hasRole("venue_manager");
 
     return (
         <AuthContext.Provider
             value={{
-                isLoggedIn,
-                userType,
-                user: isLoggedIn ? USER_PROFILE : null,
+                isLoggedIn: !!user,
+                user,
+                loading,
                 login,
                 logout,
+                hasRole,
+                isCustomer,
+                isVenueOwner,
+                isVenueManager
             }}
         >
             {children}
         </AuthContext.Provider>
     );
-}
+};
 
-export function useAuth() {
-    const context = useContext(AuthContext);
-    if (context === undefined) {
-        throw new Error("useAuth must be used within an AuthProvider");
-    }
-    return context;
-}
+// Hook
+export const useAuth = () => useContext(AuthContext);

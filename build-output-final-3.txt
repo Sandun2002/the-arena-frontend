@@ -1,0 +1,22 @@
+
+> the-arena-frontend@0.1.0 build
+> next build
+
+Γû▓ Next.js 16.1.6 (Turbopack)
+
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 70s
+  Running TypeScript ...
+Failed to compile.
+
+./src/services/mockData.ts:365:3
+Type error: Property 'name' is missing in type '{ id: string; user_id: string; full_name: string; email: string; avatar: string | null; role: string; invitation_status: "accepted"; joined_at: string; }' but required in type 'VenueManager'.
+
+  363 |
+  364 | export const MOCK_MANAGERS: VenueManager[] = [
+> 365 |   {
+      |   ^
+  366 |     id: "mgr-001",
+  367 |     user_id: "user-manager-789",
+  368 |     full_name: "Kamal De Silva",
+Next.js build worker exited with code: 1 and signal: null

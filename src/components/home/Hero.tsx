@@ -48,7 +48,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="relative w-full flex flex-col justify-start items-center overflow-hidden pt-4 md:pt-6 pb-6 md:pb-12">
+    <section className="relative w-full flex flex-col justify-start items-center overflow-hidden pt-24 md:pt-32 pb-6 md:pb-12">
 
       {/* Background Effects */}
       <div className="absolute inset-0 bg-black z-0 pointer-events-none">

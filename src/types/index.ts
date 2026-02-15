@@ -1,32 +1,244 @@
-// src/types/index.ts
+// === Auth ===
+export type UserRole = "customer" | "venue_owner" | "venue_manager" | "admin";
+
+export interface Sport {
+  id: string;
+  name: string;
+  icon: string;
+  imageUrl: string; // Backward compatibility
+  isActive: boolean;
+}
+
+export interface RoleResponse {
+  id: number;
+  name: string;
+  slug: UserRole;
+  description: string | null;
+}
+
+export interface LoginResponse {
+  access_token: string;
+  refresh_token: string;
+  token_type: "bearer";
+  expires_in: number;
+}
+
+export interface User {
+  id: string;
+  email: string;
+  full_name: string;
+  phone_number: string;
+  profile_image: string | null;
+  bio: string | null;
+  is_active: boolean;
+  roles: RoleResponse[];
+  email_verified: boolean;
+  phone_verified: boolean;
+  verification_status: "unverified" | "pending" | "verified";
+  is_mfa_enabled: boolean;
+  xp: number;
+  level: number;
+  next_level_xp: number;
+  xp_progress_percent: number;
+  created_at: string;
+  updated_at: string | null;
+}
+
+export interface Session {
+  jti: string;
+  user_agent: string;
+  created_at: string;
+  expires_at: string;
+  is_current: boolean;
+}
+
+// === Venue ===
+export type VenueStatus = "pending" | "approved" | "active" | "blocked" | "suspended" | "deleted";
 
 export interface Venue {
   id: string;
   name: string;
-  slug: string; // URL-friendly name (e.g., "grand-arena")
-  location: string;
-  sport: string; // Made dynamic - no longer hardcoded union
-  rating: number;
-  pricePerHour: number;
-  imageUrl: string;
-  isPopular?: boolean; // For "Trending" section
-  isPremium?: boolean; // For "Premium Collection"
-  isFeatured?: boolean; // For Hero Carousel (paid premium slot)
-  amenities: string[];
+  slug: string;
   description: string;
+  sport: string; // Backward compatibility
+  city: string;
+  location: string; // Backward compatibility
+  address: string;
+  lat: number;
+  lng: number;
+  operating_hours: string;
+  contact_number: string;
+  pricePerHour: number; // Backward compatibility
+  amenities: string[];
+  rating: number;
+  is_active: boolean;
+  is_verified: boolean;
+  is_featured: boolean;
+  status: VenueStatus;
+  owner_id: string;
+  image: string; // For backward compatibility
+  imageUrl: string; // For backward compatibility
+  images: string[];
+  suspended_at: string | null;
+  deleted_at: string | null;
 }
 
-export interface FilterOptions {
-  sport?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  date?: string;
-}
-
-// Sport type for dynamic sport management (admin can add/remove)
-export interface Sport {
+export interface Court {
   id: string;
+  venue_id: string;
   name: string;
-  imageUrl: string; // Sport image URL - admin can upload any image
-  isActive: boolean; // Can be toggled from admin panel
+  sport_type: string;
+  surface_type: string;
+  is_indoor: boolean;
+  hourly_rate: number;
+  capacity: number;
+  images: string[];
+  description: string;
+  is_active: boolean;
+  status: "available" | "maintenance" | "closed";
+}
+
+export interface GalleryImage {
+  id: string;
+  url: string;
+  is_cover: boolean;
+}
+
+export interface Closure {
+  id: string;
+  title: string;
+  start_date: string;
+  end_date: string;
+  courts: string[]; // IDs
+  reason: string;
+  type: string;
+}
+
+export type InvitationStatus = "pending" | "accepted" | "declined" | "expired" | "cancelled";
+
+export interface VenueManager {
+  id: string;
+  user_id: string;
+  name: string;
+  email: string;
+  avatar: string | null;
+  role: string;
+  invitation_status: InvitationStatus;
+  joined_at?: string;
+}
+
+export interface ManagerInvitation {
+  id: string;
+  email: string;
+  venue_id: string;
+  status: InvitationStatus;
+  created_at: string;
+}
+
+// === Booking ===
+export type BookingStatus = "payment_pending" | "confirmed" | "completed" | "cancelled" | "rejected";
+export type PaymentStatus = "pending" | "paid" | "refunded" | "failed";
+export type PaymentMethod = "card" | "cash" | "bank_transfer";
+
+export interface Booking {
+  id: string;
+  booking_reference: string;
+  user_id: string | null;
+  court_id: string;
+  sport: string;
+  hourly_rate: number;
+  total_price: number;
+  platform_fee: number;
+  venue_payout: number;
+  status: BookingStatus;
+  payment_status: PaymentStatus;
+  payment_method: PaymentMethod;
+  is_manual: boolean;
+  is_paid: boolean;
+  is_no_show: boolean;
+  customer_name: string | null;
+  customer_phone: string | null;
+  start_time: string;
+  end_time: string;
+  duration_hours: number;
+  created_at: string;
+  cancelled_at: string | null;
+  cancellation_reason: string | null;
+  paid_at: string | null;
+  notes?: string;
+  court?: {
+    id: string;
+    name: string;
+    venue_name: string;
+    venue_id: string;
+    image: string | null;
+  } | null;
+  user?: {
+    full_name: string;
+    phone_number: string;
+  } | null;
+}
+
+export interface SlotAvailability {
+  start: string;
+  end: string;
+  status: "available" | "booked" | "held";
+  price?: number;
+}
+
+// === Review ===
+export interface Review {
+  id: string;
+  venue_id: string;
+  venue_name: string;
+  venue_image: string;
+  user_id: string;
+  user_name: string;
+  user_avatar: string | null;
+  rating: number;
+  comment: string;
+  created_at: string;
+}
+
+export interface ReviewStats {
+  average: number;
+  total: number;
+  breakdown: Record<number, number>;
+}
+
+// === Dashboard ===
+export interface DashboardStats {
+  total_bookings: number;
+  today_bookings: number;
+  revenue: number | null;
+  active_courts: number;
+  total_courts: number;
+}
+
+export interface RevenueData {
+  daily: { date: string; amount: number }[];
+  weekly: { date: string; amount: number }[];
+  monthly: { date: string; amount: number }[];
+}
+
+
+// === Gamification ===
+export interface Challenge {
+  id: string;
+  title: string;
+  description: string;
+  xp_reward: number;
+  icon: string;
+  type: "booking" | "review" | "scout" | "social";
+  target_count: number;
+}
+
+export interface UserAchievement {
+  id: string;
+  user_id: string;
+  challenge_id: string;
+  progress: number;
+  is_completed: boolean;
+  completed_at: string | null;
+  challenge?: Challenge; // For hydration
 }

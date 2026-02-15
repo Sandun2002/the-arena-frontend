@@ -1,193 +1,262 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import Image from "next/image";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { USER_PROFILE } from "@/services/userData";
-import { Trophy, Clock, Activity, Sun, Moon, Heart, Star, Settings, LogOut } from "lucide-react";
-import gsap from "gsap";
-
-// Helper to render icons dynamically
-const IconMap: Record<string, React.ElementType> = { Sun, Moon, Heart, Trophy };
+import {
+    User as UserIcon, Trophy, Calendar, MapPin, Edit2, Shield,
+    Activity, TrendingUp, Mail, ChevronRight, Star, Lock, CreditCard, LogOut
+} from "lucide-react";
+import Button from "@/components/ui/Button";
+import { useAuth } from "@/services/authContext";
+import { playerService } from "@/services/playerService";
+import { format } from "date-fns";
+import { Booking, Challenge, UserAchievement } from "@/types";
 
 export default function ProfilePage() {
-    const containerRef = useRef<HTMLDivElement>(null);
+    const { user, logout } = useAuth();
+    const [stats, setStats] = useState<any>(null);
+    const [bookings, setBookings] = useState<Booking[]>([]);
+    const [gamification, setGamification] = useState<{ challenges: Challenge[], achievements: UserAchievement[] } | null>(null);
 
     useEffect(() => {
-        const ctx = gsap.context(() => {
-            gsap.fromTo(".profile-header",
-                { y: 30, opacity: 0 },
-                { y: 0, opacity: 1, duration: 1, ease: "power3.out" }
-            );
+        if (user) {
+            playerService.getStats(user.id).then(setStats);
+            playerService.getBookings(user.id).then(d => setBookings(d.slice(0, 3))); // Top 3 recent
+            playerService.getChallenges(user.id).then(setGamification);
+        }
+    }, [user]);
 
-            gsap.fromTo(".stat-card",
-                { y: 20, opacity: 0 },
-                { y: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: "back.out(1.5)", delay: 0.3 }
-            );
+    if (!user) return null;
 
-            gsap.fromTo(".achievement-card",
-                { x: -20, opacity: 0 },
-                { x: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: "power2.out", delay: 0.6 }
-            );
-            gsap.fromTo(".cta-card",
-                { scale: 0.9, opacity: 0 },
-                { scale: 1, opacity: 1, duration: 0.8, ease: "elastic.out(1, 0.75)", delay: 0.8 }
-            );
-        }, containerRef);
-
-        return () => ctx.revert();
-    }, []);
+    const completedChallengesCount = gamification?.achievements.filter(a => a.is_completed).length || 0;
+    const totalChallengesCount = gamification?.challenges.length || 0;
 
     return (
-        <main className="min-h-screen bg-black pt-24 pb-20 relative overflow-hidden" ref={containerRef}>
+        <main className="min-h-screen bg-black pt-24 pb-12 px-4 selection:bg-emerald-500/30">
+            <div className="container mx-auto max-w-5xl">
 
-            {/* Background Effects */}
-            <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[120px]" />
-                <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-[120px]" />
-            </div>
+                {/* Header / Cover */}
+                <div className="relative h-48 md:h-64 rounded-3xl overflow-hidden mb-20 bg-gradient-to-r from-zinc-900 to-zinc-800 border border-zinc-800 group">
+                    <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=2669&auto=format&fit=crop')] bg-cover bg-center opacity-30 group-hover:scale-105 transition-transform duration-700"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+                </div>
 
-            <div className="container mx-auto px-4 max-w-5xl relative z-10">
+                {/* Profile Header (Overlapping) */}
+                <div className="relative -mt-32 px-4 md:px-8 mb-12">
+                    <div className="flex flex-col md:flex-row items-end md:items-center gap-6">
 
-                {/* 1. Profile Header Card */}
-                <div className="profile-header relative mb-12 overflow-hidden rounded-[2rem] border border-zinc-800 bg-zinc-900/40 p-8 md:p-12 backdrop-blur-xl group hover:border-emerald-500/30 transition-all duration-500">
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-                    {/* Glow behind avatar */}
-                    <div className="absolute left-8 md:left-12 top-1/2 -translate-y-1/2 w-32 h-32 bg-emerald-500/20 rounded-full blur-2xl group-hover:bg-emerald-500/30 transition-colors" />
-
-                    <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 md:gap-12">
-                        {/* Avatar */}
-                        <div className="relative h-32 w-32 md:h-40 md:w-40 shrink-0">
-                            <Image
-                                src={USER_PROFILE.avatar}
-                                alt={USER_PROFILE.name}
-                                fill
-                                className="rounded-full object-cover border-4 border-black ring-4 ring-emerald-500/50 shadow-2xl"
-                            />
-                            <div className="absolute -bottom-2 -right-2 flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500 text-black shadow-lg animate-bounce-slow">
-                                <Star className="h-5 w-5 fill-black" />
+                        {/* Avatar & Level */}
+                        <div className="relative">
+                            <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-black bg-zinc-800 overflow-hidden shadow-2xl relative z-10">
+                                {user.profile_image ? (
+                                    <img src={user.profile_image} alt={user.full_name} className="w-full h-full object-cover" />
+                                ) : (
+                                    <UserIcon className="w-16 h-16 text-zinc-500 m-auto mt-8 md:mt-10" />
+                                )}
+                            </div>
+                            <div className="absolute -bottom-2 -right-2 md:bottom-2 md:right-0 z-20 bg-black rounded-full p-1.5">
+                                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 border-2 border-zinc-800 text-black font-extrabold text-sm shadow-[0_0_15px_rgba(16,185,129,0.4)]">
+                                    {user.level}
+                                </div>
                             </div>
                         </div>
 
                         {/* Info */}
-                        <div className="text-center md:text-left flex-1">
-                            <h1 className="text-4xl md:text-5xl font-black text-white mb-3 tracking-tight uppercase flex flex-col md:block">
-                                <span className="text-transparent bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text">
-                                    {USER_PROFILE.name.split(" ")[0]}
-                                </span>{" "}
-                                {USER_PROFILE.name.split(" ").slice(1).join(" ")}
-                            </h1>
-                            <div className="flex flex-wrap justify-center md:justify-start gap-3 mb-6">
-                                <span className="rounded-full bg-emerald-500/10 px-4 py-1.5 text-xs font-bold text-emerald-400 border border-emerald-500/20 uppercase tracking-wider">
-                                    {USER_PROFILE.tier}
+                        <div className="flex-1 pb-2 w-full text-center md:text-left">
+                            <h1 className="text-3xl md:text-5xl font-bold text-white mb-2 tracking-tight">{user.full_name}</h1>
+                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-zinc-400 text-sm mb-6">
+                                <span className="flex items-center gap-1.5 bg-zinc-900/50 px-3 py-1 rounded-full border border-zinc-800">
+                                    <Mail className="w-3.5 h-3.5" /> {user.email}
                                 </span>
-                                <span className="rounded-full bg-zinc-800/50 px-4 py-1.5 text-xs text-zinc-400 border border-zinc-700">
-                                    Member since {USER_PROFILE.memberSince}
+                                <span className="flex items-center gap-1.5 bg-zinc-900/50 px-3 py-1 rounded-full border border-zinc-800">
+                                    <Calendar className="w-3.5 h-3.5" /> Joined {format(new Date(user.created_at), "MMM yyyy")}
+                                </span>
+                                <span className={`flex items-center gap-1.5 px-3 py-1 rounded-full border ${statusColors[user.verification_status]}`}>
+                                    {user.verification_status === "verified" && <Shield className="w-3.5 h-3.5" />}
+                                    <span className="capitalize">{user.verification_status}</span>
                                 </span>
                             </div>
-                            <p className="text-zinc-400 text-base max-w-lg leading-relaxed">
-                                Passionate about football and weekend tennis. Always chasing the next level and breaking personal records.
-                            </p>
+
+                            {/* XP Progress */}
+                            <div className="max-w-md mx-auto md:mx-0">
+                                <div className="flex justify-between text-xs font-bold uppercase text-zinc-500 mb-2 tracking-wider">
+                                    <span>Level {user.level}</span>
+                                    <span>{user.xp} / {user.next_level_xp} XP</span>
+                                </div>
+                                <div className="h-3 bg-zinc-800 rounded-full overflow-hidden p-0.5 border border-zinc-700/50">
+                                    <div
+                                        className="h-full bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.3)] transition-all duration-1000 ease-out"
+                                        style={{ width: `${user.xp_progress_percent}%` }}
+                                    ></div>
+                                </div>
+                                <p className="text-xs text-zinc-500 mt-2 text-right">
+                                    {user.next_level_xp - user.xp} XP to next level
+                                </p>
+                            </div>
                         </div>
 
-                        {/* Actions */}
-                        <div className="flex gap-4">
+                        {/* Quick Edit (Mobile hidden, Desktop visible) */}
+                        <div className="hidden md:block">
                             <Link href="/profile/settings">
-                                <button className="group p-4 rounded-2xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white hover:border-emerald-500 hover:bg-zinc-800 transition-all duration-300">
-                                    <Settings className="h-6 w-6 group-hover:rotate-90 transition-transform duration-500" />
-                                </button>
+                                <Button variant="outline" className="border-zinc-700 hover:bg-zinc-800">
+                                    <Edit2 className="w-4 h-4 mr-2" /> Edit Profile
+                                </Button>
                             </Link>
-                            <button className="group p-4 rounded-2xl bg-zinc-900 border border-zinc-800 text-red-400 hover:text-red-300 hover:border-red-900/50 hover:bg-red-900/10 transition-all duration-300">
-                                <LogOut className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                    {/* Left Column: Stats & Actions */}
+                    <div className="space-y-6">
+                        {/* Stats Grid */}
+                        <div className="grid grid-cols-2 gap-3">
+                            <StatsCard
+                                icon={<Trophy className="w-5 h-5 text-yellow-500" />}
+                                label="Challenges"
+                                value={`${completedChallengesCount}/${totalChallengesCount}`}
+                                subtext="Completed"
+                            />
+                            <StatsCard
+                                icon={<Activity className="w-5 h-5 text-emerald-500" />}
+                                label="Activity"
+                                value={stats?.bookings_completed || 0}
+                                subtext="Bookings"
+                            />
+                            <StatsCard
+                                icon={<TrendingUp className="w-5 h-5 text-purple-500" />}
+                                label="Savings"
+                                value={`LKR ${stats?.money_saved || 0}`}
+                                subtext="Loyalty"
+                                fullWidth
+                            />
+                        </div>
+
+                        {/* Menu */}
+                        <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-2 backdrop-blur-sm">
+                            <MenuLink href="/profile/settings" icon={<Edit2 className="w-4 h-4" />} label="Edit Profile" />
+                            <MenuLink href="/settings/sessions" icon={<Shield className="w-4 h-4" />} label="Security & Sessions" />
+                            <MenuLink href="/profile/password" icon={<Lock className="w-4 h-4" />} label="Change Password" />
+                            <MenuLink href="/bookings" icon={<CreditCard className="w-4 h-4" />} label="Payment Methods" />
+                            <MenuLink href="/reviews" icon={<Star className="w-4 h-4" />} label="My Reviews" />
+                            <button
+                                onClick={logout}
+                                className="w-full flex items-center justify-between p-4 rounded-2xl text-red-500 hover:bg-red-500/10 transition-colors"
+                            >
+                                <span className="flex items-center gap-3 font-medium">
+                                    <LogOut className="w-4 h-4" /> Log Out
+                                </span>
                             </button>
                         </div>
                     </div>
-                </div>
 
-                {/* 2. Stats Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-12">
-                    {[
-                        { label: "Matches Played", value: USER_PROFILE.stats.matchesPlayed, icon: Activity },
-                        { label: "Hours Booked", value: USER_PROFILE.stats.hoursBooked, icon: Clock },
-                        { label: "Favorite Sport", value: USER_PROFILE.stats.favoriteSport, icon: Star },
-                        { label: "Reliability", value: USER_PROFILE.stats.reliabilityScore, icon: Trophy },
-                    ].map((stat, i) => (
-                        <div key={i} className="stat-card group p-6 rounded-3xl bg-zinc-900/40 border border-zinc-800 hover:border-emerald-500/30 hover:bg-zinc-900/60 transition-all duration-300 backdrop-blur-sm">
-                            <stat.icon className="h-8 w-8 text-zinc-600 group-hover:text-emerald-500 mb-4 transition-colors duration-300" />
-                            <p className="text-3xl md:text-4xl font-black text-white mb-1 group-hover:translate-x-1 transition-transform">{stat.value}</p>
-                            <p className="text-xs text-zinc-500 uppercase tracking-widest font-bold group-hover:text-emerald-400/70 transition-colors">{stat.label}</p>
-                        </div>
-                    ))}
-                </div>
+                    {/* Right Column: Bio & Recent Activity */}
+                    <div className="lg:col-span-2 space-y-6">
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12">
-
-                    {/* 3. Achievements Section */}
-                    <div className="lg:col-span-2">
-                        <div className="flex items-center justify-between mb-8">
-                            <h2 className="text-2xl font-bold text-white tracking-tight flex items-center gap-3">
-                                <span className="text-emerald-500">🏆</span> Achievements
-                            </h2>
-                            <span className="text-emerald-500 text-sm font-bold bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
-                                3/4 Unlocked
-                            </span>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {USER_PROFILE.achievements.map((badge) => {
-                                const Icon = IconMap[badge.icon];
-                                return (
-                                    <div
-                                        key={badge.id}
-                                        className={`achievement-card relative overflow-hidden flex items-center gap-5 p-5 rounded-2xl border transition-all duration-300 group
-                      ${badge.unlocked
-                                                ? "bg-zinc-900/60 border-zinc-800 hover:border-emerald-500/50"
-                                                : "bg-black/40 border-zinc-900 opacity-60 grayscale"
-                                            }
-                    `}
-                                    >
-                                        <div className={`
-                      h-14 w-14 rounded-2xl flex items-center justify-center shrink-0 border transition-all
-                      ${badge.unlocked
-                                                ? "bg-gradient-to-br from-emerald-500/20 to-transparent border-emerald-500/30 text-emerald-400 group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(16,185,129,0.2)]"
-                                                : "bg-zinc-900 border-zinc-800 text-zinc-600"}
-                    `}>
-                                            <Icon className="h-7 w-7" />
-                                        </div>
-                                        <div>
-                                            <h4 className="text-white font-bold text-lg mb-0.5 group-hover:text-emerald-400 transition-colors">{badge.name}</h4>
-                                            <p className="text-xs text-zinc-500 font-medium">{badge.desc}</p>
-                                        </div>
+                        {/* Gamification Teaser */}
+                        <Link href="/challenges">
+                            <div className="bg-gradient-to-br from-zinc-900 to-black border border-zinc-800 rounded-3xl p-6 relative overflow-hidden group hover:border-emerald-500/50 transition-colors cursor-pointer">
+                                <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    <Trophy className="w-32 h-32 text-emerald-500" />
+                                </div>
+                                <div className="relative z-10">
+                                    <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
+                                        <Trophy className="w-5 h-5 text-emerald-500" />
+                                        Achievements & Challenges
+                                    </h3>
+                                    <p className="text-zinc-400 mb-4 max-w-md">
+                                        Complete daily challenges to earn XP, unlock badges, and get exclusive discounts on your bookings.
+                                    </p>
+                                    <div className="flex items-center gap-4 text-sm font-bold text-emerald-500 group-hover:translate-x-1 transition-transform">
+                                        View All Challenges <ChevronRight className="w-4 h-4" />
                                     </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-
-                    {/* 4. Quick Link to Bookings - CTA Style */}
-                    <div className="cta-card relative overflow-hidden rounded-[2rem] bg-zinc-900 border border-zinc-800 p-8 flex flex-col justify-center text-center group">
-                        {/* Gradient Background */}
-                        <div className="absolute inset-0 bg-gradient-to-tr from-emerald-900/20 to-transparent opacity-50 group-hover:opacity-100 transition-opacity" />
-
-                        <div className="relative z-10">
-                            <div className="w-16 h-16 bg-emerald-500 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                                <Clock className="h-8 w-8 text-black" />
+                                </div>
                             </div>
-                            <h3 className="text-2xl font-black text-white mb-2 uppercase tracking-tight">Your Schedule</h3>
-                            <p className="text-zinc-400 text-sm mb-8 leading-relaxed">
-                                Ready for your next match? Check your upcoming sessions and court details.
+                        </Link>
+
+                        {/* Recent Activity */}
+                        <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-6 backdrop-blur-sm">
+                            <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                                <Calendar className="w-5 h-5 text-zinc-400" /> Recent Activity
+                            </h3>
+
+                            <div className="space-y-4">
+                                {bookings.length > 0 ? (
+                                    bookings.map((booking) => (
+                                        <Link href={`/bookings/${booking.id}`} key={booking.id}>
+                                            <div className="flex items-center gap-4 p-4 rounded-2xl bg-black/40 border border-zinc-800 hover:bg-zinc-800/50 transition-colors group">
+                                                <div className="w-12 h-12 rounded-xl bg-zinc-800 flex items-center justify-center shrink-0 group-hover:bg-zinc-700 transition-colors">
+                                                    <Activity className="w-6 h-6 text-zinc-500 group-hover:text-emerald-500 transition-colors" />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <h4 className="text-white font-medium truncate group-hover:text-emerald-400 transition-colors">{booking.court?.venue_name || "Unknown Venue"}</h4>
+                                                    <p className="text-sm text-zinc-500 truncate">{booking.court?.name} • {booking.sport}</p>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="text-white font-bold text-sm">LKR {booking.total_price}</p>
+                                                    <p className="text-xs text-zinc-500">{format(new Date(booking.start_time), "MMM d")}</p>
+                                                </div>
+                                            </div>
+                                        </Link>
+                                    ))
+                                ) : (
+                                    <div className="text-center py-8 text-zinc-500">
+                                        <p>No recent bookings found.</p>
+                                        <Link href="/venues">
+                                            <Button variant="outline" className="mt-4">Book Now</Button>
+                                        </Link>
+                                    </div>
+                                )}
+                            </div>
+                            {bookings.length > 0 && (
+                                <Link href="/bookings" className="block mt-6 text-center text-sm font-bold text-zinc-400 hover:text-white transition-colors">
+                                    View All Bookings
+                                </Link>
+                            )}
+                        </div>
+
+                        {/* Bio */}
+                        <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-6 backdrop-blur-sm">
+                            <h3 className="text-lg font-bold text-white mb-4">About Me</h3>
+                            <p className="text-zinc-400 leading-relaxed">
+                                {user.bio || "No bio added yet."}
                             </p>
-                            <Link href="/bookings">
-                                <button className="w-full py-4 rounded-xl bg-white text-black font-black uppercase tracking-wider hover:bg-emerald-400 hover:scale-105 hover:shadow-[0_0_20px_rgba(52,211,153,0.4)] transition-all duration-300">
-                                    View Bookings
-                                </button>
-                            </Link>
                         </div>
                     </div>
-
                 </div>
             </div>
         </main>
     );
 }
+
+function StatsCard({ icon, label, value, subtext, fullWidth }: any) {
+    return (
+        <div className={`bg-zinc-900/50 border border-zinc-800 rounded-2xl p-5 hover:bg-zinc-800/50 transition-colors ${fullWidth ? 'col-span-2' : ''}`}>
+            <div className="flex items-start justify-between mb-3">
+                <div className="p-2 bg-white/5 rounded-lg">{icon}</div>
+            </div>
+            <p className="text-2xl font-bold text-white mb-0.5">{value}</p>
+            <p className="text-xs font-bold text-white mb-0.5 opacity-80">{label}</p>
+            <p className="text-xs text-zinc-500 uppercase tracking-wide">{subtext}</p>
+        </div>
+    )
+}
+
+function MenuLink({ href, icon, label }: any) {
+    return (
+        <Link href={href} className="flex items-center justify-between p-4 rounded-2xl hover:bg-white/5 text-zinc-400 hover:text-white transition-colors group">
+            <span className="flex items-center gap-3 font-medium">
+                <span className="group-hover:text-emerald-500 transition-colors">{icon}</span>
+                {label}
+            </span>
+            <ChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
+        </Link>
+    )
+}
+
+const statusColors: any = {
+    verified: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
+    pending: "bg-yellow-500/10 text-yellow-500 border-yellow-500/20",
+    unverified: "bg-zinc-500/10 text-zinc-500 border-zinc-500/20",
+};

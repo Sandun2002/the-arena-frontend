@@ -250,7 +250,7 @@ export default function VenueDetailsPage() {
                 </div>
                 <h4 className="font-bold text-white mb-2">Verified Venue</h4>
                 <p className="text-xs text-zinc-500">
-                  This venue meets Arena's standards for quality and safety.
+                  This venue meets Arena&apos;s standards for quality and safety.
                 </p>
               </div>
             </div>

@@ -77,7 +77,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
   };
 
   const handleDemoLogin = () => {
-    login("player");
+    login("player@arena.lk", "password123");
     setShowLoginPrompt(false);
   };
 
@@ -213,8 +213,8 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
         <Button
           onClick={handleBooking}
           className={`w-full py-4 text-sm font-bold transition-all border ${selectedSlots.length > 0
-              ? "bg-emerald-500 hover:bg-emerald-400 text-black border-emerald-500"
-              : "bg-zinc-800 hover:bg-zinc-700 text-white border-zinc-700"
+            ? "bg-emerald-500 hover:bg-emerald-400 text-black border-emerald-500"
+            : "bg-zinc-800 hover:bg-zinc-700 text-white border-zinc-700"
             }`}
         >
           {selectedSlots.length > 0 ? "Proceed to Pay" : "Select Slots"}

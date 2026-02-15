@@ -1,0 +1,22 @@
+
+> the-arena-frontend@0.1.0 build
+> next build
+
+Γû▓ Next.js 16.1.6 (Turbopack)
+
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 46s
+  Running TypeScript ...
+Failed to compile.
+
+./src/components/venue/CourtFormModal.tsx:42:36
+Type error: Expected 2 arguments, but got 1.
+
+  40 |                 addToast("Court updated successfully", "success");
+  41 |             } else {
+> 42 |                 await venueService.createCourt({ ...data, venue_id: venueId });
+     |                                    ^
+  43 |                 addToast("Court created successfully", "success");
+  44 |             }
+  45 |             onSuccess();
+Next.js build worker exited with code: 1 and signal: null
