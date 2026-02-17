@@ -1,7 +1,7 @@
 import {
     Venue, Court, Booking, DashboardStats,
     RevenueData, VenueManager, Closure, GalleryImage,
-    BookingStatus, ManagerInvitation
+    BookingStatus, ManagerInvitation, UpcomingBooking
 } from "@/types";
 import { MOCK_VENUES, MOCK_COURTS, MOCK_BOOKINGS, MOCK_MANAGERS } from "./mockData";
 import { addDays, format, subDays } from "date-fns";
@@ -144,9 +144,10 @@ class VenueService {
                     .slice(0, limit)
                     .map(b => ({
                         id: b.id,
-                        customer_name: b.customer_name,
+                        customer_name: b.customer_name || 'Unknown Customer',
                         court_name: b.court?.name || 'Unknown Court',
                         start_time: b.start_time,
+                        end_time: b.end_time,
                         status: b.status
                     }));
                 resolve(upcoming);
