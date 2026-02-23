@@ -66,19 +66,19 @@ export default function CancelBookingModal({ booking, isOpen, onClose, onConfirm
 
                 {/* Booking Details */}
                 <div className="mb-8 p-6 rounded-xl bg-black/40 border border-zinc-800">
-                    <h3 className="text-lg font-bold text-white mb-4">{(booking as any).venueName || booking.court?.venue_name || 'Arena Venue'}</h3>
+                    <h3 className="text-lg font-bold text-white mb-4">{booking.court?.venue_name || 'Arena Venue'}</h3>
                     <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                             <span className="text-zinc-500">Date</span>
-                            <span className="text-white font-bold">{(booking as any).date || new Date(booking.start_time).toLocaleDateString()}</span>
+                            <span className="text-white font-bold">{new Date(booking.start_time).toLocaleDateString()}</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="text-zinc-500">Time</span>
-                            <span className="text-white font-bold">{(booking as any).time || `${new Date(booking.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${new Date(booking.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}</span>
+                            <span className="text-white font-bold">{`${new Date(booking.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${new Date(booking.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="text-zinc-500">Amount</span>
-                            <span className="text-emerald-400 font-bold">LKR {((booking as any).price || booking.total_price || 0).toLocaleString()}</span>
+                            <span className="text-emerald-400 font-bold">LKR {(booking.total_price || 0).toLocaleString()}</span>
                         </div>
                     </div>
                 </div>

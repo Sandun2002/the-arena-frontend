@@ -101,9 +101,7 @@ export const centerService = {
         await apiClient.delete(`/center/gallery/${imageId}`);
     },
 
-    setCoverImage: async (imageId: string) => {
-        await apiClient.put(`/center/gallery/${imageId}/cover`);
-    },
+    // setCoverImage logic was removed because there is no PUT /gallery/{imageId}/cover on the server
 
     // === Recurring ===
     getRecurringBookings: async (venueId?: string) => {

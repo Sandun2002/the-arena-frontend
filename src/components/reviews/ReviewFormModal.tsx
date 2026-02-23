@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import { useState, useEffect } from "react";
@@ -47,7 +46,6 @@ export default function ReviewFormModal({ venueId, onClose, onSuccess }: ReviewF
         setIsSubmitting(true);
         try {
             await playerService.createReview({
-                userId: user.id,
                 venueId,
                 rating,
                 comment

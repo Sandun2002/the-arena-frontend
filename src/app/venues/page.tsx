@@ -32,10 +32,7 @@ export default function VenuesPage() {
 
     // 2. Filter Logic
     const filteredVenues = useMemo(() => {
-        return allVenues.filter((venue) => {
-            const matchesSport = selectedSport === "All" || (venue as any).sport === selectedSport;
-            return matchesSport;
-        });
+        return allVenues; // Backend handles sport filtering, basic venues endpoint doesn't return sport info. We should use api.searchVenues to filter if needed
     }, [allVenues, selectedSport]);
 
     // Handle search

@@ -14,7 +14,7 @@ export default function VenueCard({ venue }: VenueCardProps) {
       {/* Image Section */}
       <div className="relative h-64 w-full overflow-hidden">
         <Image
-          src={(venue as any).image || venue.cover_image || "/images/placeholder.jpg"}
+          src={venue.cover_image || "/images/placeholder.jpg"}
           alt={venue.name}
           fill
           className="object-cover transition-transform duration-700 group-hover:scale-110"

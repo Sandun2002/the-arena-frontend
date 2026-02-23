@@ -45,9 +45,9 @@ class AuthService {
 
     async logout() {
         try {
-            const token = this.getTokens().accessToken;
-            if (token) {
-                await apiClient.post('/auth/logout');
+            const { refreshToken } = this.getTokens();
+            if (refreshToken) {
+                await apiClient.post('/auth/logout', { refresh_token: refreshToken });
             }
         } catch (e) {
             console.error("Logout API call failed", e);
@@ -92,12 +92,12 @@ class AuthService {
     }
 
     async verifyMfa(code: string): Promise<boolean> {
-        await apiClient.post('/auth/mfa/verify', { code });
+        await apiClient.post('/auth/mfa/confirm', { code });
         return true;
     }
 
-    async disableMfa() {
-        await apiClient.post('/auth/mfa/disable');
+    async disableMfa(password: string) {
+        await apiClient.post('/auth/mfa/disable', { password });
     }
 
     // === Sessions ===

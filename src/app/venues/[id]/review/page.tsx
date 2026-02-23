@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import { useEffect, useState } from "react";
@@ -42,7 +41,7 @@ export default function ReviewPage() {
 
         setSubmitting(true);
         try {
-            await playerService.submitReview(user.id, venueId, rating, comment);
+            await playerService.createReview({ venueId, rating, comment });
             addToast("Review submitted successfully!", "success");
             setTimeout(() => router.push(`/venues/${venueId}`), 1000);
         } catch (error) {

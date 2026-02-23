@@ -71,26 +71,28 @@ export default function BookingPage() {
         if (step === 2 && selectedCourt && selectedDate) {
             setLoadingSlots(true);
             const dateStr = format(selectedDate, "yyyy-MM-dd");
-            // Call bookingService to get availability
-            // But verify method signature - it was getAvailability(courtId, date)
-            // Wait, bookingService implementation matches? Let's assume yes from previous step.
-            // Actually, bookingService was defined as: async getAvailability(courtId: string, date: string)
-            // casting strictly to avoid TS error if inference is slow
-            (bookingService as any).getAvailability(selectedCourt, dateStr)
-                .then((slots: SlotAvailability[]) => setAvailability(slots))
+            // Call api to get venue slots
+            api.getVenueSlots(venueId, dateStr, selectedSport)
+                .then((res: any) => {
+                    const courtData = res.venue_slots?.find((cs: any) => cs.court.id === selectedCourt);
+                    setAvailability(courtData ? courtData.slots : []);
+                })
                 .catch(() => setAvailability([]))
                 .finally(() => setLoadingSlots(false));
         }
-    }, [step, selectedCourt, selectedDate]);
+    }, [step, selectedCourt, selectedDate, venueId, selectedSport]);
 
     // Calculate price when slot is selected
     useEffect(() => {
-        if (selectedCourt && selectedSlot) {
-            bookingService.calculatePrice(selectedCourt, selectedSlot.start, selectedSlot.end)
+        if (selectedCourt && selectedSlot && selectedDate) {
+            const dateStr = format(selectedDate, "yyyy-MM-dd");
+            const timeSlotFormatted = format(parseISO(selectedSlot.start), "HH:mm");
+
+            bookingService.calculatePrice(selectedCourt, dateStr, [timeSlotFormatted])
                 .then(setPricing)
                 .catch(console.error);
         }
-    }, [selectedCourt, selectedSlot]);
+    }, [selectedCourt, selectedSlot, selectedDate]);
 
     const handleNextStep = () => setStep(prev => prev + 1);
     const handlePrevStep = () => setStep(prev => prev - 1);

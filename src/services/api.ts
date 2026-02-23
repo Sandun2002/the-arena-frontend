@@ -37,8 +37,8 @@ export const api = {
     return response.data;
   },
 
-  getVenueSlots: async (venueId: string, date: string): Promise<any> => {
-    const response = await apiClient.get(`/venues/${venueId}/slots`, { params: { date } });
+  getVenueSlots: async (venueId: string, date: string, sport?: string): Promise<any> => {
+    const response = await apiClient.get(`/venues/${venueId}/slots`, { params: { target_date: date, sport } });
     return response.data;
   },
 

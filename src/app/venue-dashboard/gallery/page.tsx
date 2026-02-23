@@ -88,17 +88,6 @@ export default function GalleryPage() {
         }
     };
 
-    const handleSetCover = async (imageId: string) => {
-        try {
-            await centerService.setCoverImage(imageId);
-            addToast("Cover image updated", "success");
-            // Optimistic update
-            setImages(prev => prev.map(img => ({ ...img, is_cover: img.id === imageId })));
-        } catch (error) {
-            addToast("Failed to set cover", "error");
-        }
-    };
-
     if (!user) return null;
 
     if (!currentVenue) {
@@ -187,17 +176,10 @@ export default function GalleryPage() {
                                 </div>
 
                                 <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 translate-y-2 group-hover:translate-y-0">
-                                    {img.is_cover ? (
+                                    {img.is_cover && (
                                         <span className="bg-emerald-500 text-black text-[10px] font-bold px-2 py-1 rounded-md flex items-center gap-1 shadow-lg shadow-emerald-500/20">
                                             <Star className="h-3 w-3 fill-black" /> Cover
                                         </span>
-                                    ) : (
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); handleSetCover(img.id); }}
-                                            className="text-white text-xs font-bold hover:text-emerald-400 transition-colors bg-black/50 px-2 py-1 rounded backdrop-blur-sm"
-                                        >
-                                            Set as Cover
-                                        </button>
                                     )}
                                 </div>
                             </div>

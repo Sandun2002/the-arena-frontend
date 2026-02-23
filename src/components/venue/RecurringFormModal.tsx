@@ -88,7 +88,7 @@ export default function RecurringFormModal({ venueId, courts, existingBooking, o
                         className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none"
                     >
                         <option value="">Select Court...</option>
-                        {courts.map(c => <option key={c.id} value={c.id}>{c.name} ({(c as any).sport_type?.name || (c as any).sport_type})</option>)}
+                        {courts.map(c => <option key={c.id} value={c.id}>{c.name} ({c.sport_type?.name})</option>)}
                     </select>
                     <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-500">
                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>

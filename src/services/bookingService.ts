@@ -19,20 +19,11 @@ export interface CreateBookingRequest {
 }
 
 class BookingService {
-    async getAvailability(courtId: string, date: string): Promise<SlotAvailability[]> {
-        const response = await apiClient.get<SlotAvailability[]>(`/bookings/court/${courtId}/availability`, {
-            params: { date }
-        });
-        return response.data;
-    }
-
-    async calculatePrice(courtId: string, startTime: string, endTime: string): Promise<PriceCalculation> {
-        const response = await apiClient.get<PriceCalculation>('/pricing/calculate', {
-            params: {
-                court_id: courtId,
-                start_time: startTime,
-                end_time: endTime
-            }
+    async calculatePrice(courtId: string, date: string, timeSlots: string[]): Promise<PriceCalculation> {
+        const response = await apiClient.post<PriceCalculation>('/pricing/calculate', {
+            court_id: courtId,
+            date: date,
+            time_slots: timeSlots
         });
         return response.data;
     }
@@ -59,11 +50,6 @@ class BookingService {
 
     async getBookingById(id: string): Promise<Booking> {
         const response = await apiClient.get<Booking>(`/bookings/${id}`);
-        return response.data;
-    }
-
-    async markPaid(bookingId: string): Promise<Booking> {
-        const response = await apiClient.post<Booking>(`/bookings/${bookingId}/mark-paid`);
         return response.data;
     }
 }

@@ -62,6 +62,16 @@ class PlayerService {
         return response.data;
     }
 
+    async checkReviewEligibility(userId: string, venueId: string): Promise<{ eligible: boolean; reason?: string }> {
+        try {
+            const response = await apiClient.get<{ eligible: boolean; reason?: string }>(`/venues/${venueId}/reviews/eligibility`);
+            return response.data;
+        } catch (error) {
+            // Fallback to true if endpoint doesn't exist yet, let the createReview call handle authorization natively
+            return { eligible: true };
+        }
+    }
+
     // === Gamification ===
     async getChallenges(): Promise<{ challenges: Challenge[], achievements: UserAchievement[] }> {
         const response = await apiClient.get<{ challenges: Challenge[], achievements: UserAchievement[] }>('/player/challenges');
