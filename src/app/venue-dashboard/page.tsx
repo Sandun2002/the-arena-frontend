@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
-    Building2, Users, Receipt, Calendar,
+    Building2, Users, Receipt, Calendar, CalendarCheck,
     AlertTriangle, Clock, Plus, ArrowUpRight, ArrowDownRight
 } from "lucide-react";
 import Button from "@/components/ui/Button";
@@ -168,25 +168,25 @@ export default function VenueDashboardPage() {
                 <div className="lg:col-span-2 bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 backdrop-blur-sm">
                     <h2 className="text-xl font-bold text-white mb-6">Quick Actions</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <Link href="/venue-dashboard/walk-in">
+                        <Link href="/venue-dashboard/booking-manager">
                             <div className="group h-full p-6 bg-black/40 border border-zinc-800 rounded-2xl hover:border-emerald-500/50 hover:bg-emerald-500/5 transition-all cursor-pointer flex items-center gap-4">
                                 <div className="p-3 bg-emerald-500/10 rounded-xl group-hover:scale-110 transition-transform duration-300">
-                                    <Plus className="w-6 h-6 text-emerald-500" />
+                                    <Calendar className="w-6 h-6 text-emerald-500" />
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-white mb-1">New Walk-in</h3>
-                                    <p className="text-xs text-zinc-400">Record a manual booking</p>
+                                    <h3 className="font-bold text-white mb-1">Booking Manager</h3>
+                                    <p className="text-xs text-zinc-400">Schedule & Walk-ins</p>
                                 </div>
                             </div>
                         </Link>
-                        <Link href="/venue-dashboard/calendar">
+                        <Link href="/venue-dashboard/bookings">
                             <div className="group h-full p-6 bg-black/40 border border-zinc-800 rounded-2xl hover:border-blue-500/50 hover:bg-blue-500/5 transition-all cursor-pointer flex items-center gap-4">
                                 <div className="p-3 bg-blue-500/10 rounded-xl group-hover:scale-110 transition-transform duration-300">
-                                    <Calendar className="w-6 h-6 text-blue-500" />
+                                    <CalendarCheck className="w-6 h-6 text-blue-500" />
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-white mb-1">View Schedule</h3>
-                                    <p className="text-xs text-zinc-400">Check availability</p>
+                                    <h3 className="font-bold text-white mb-1">All Bookings</h3>
+                                    <p className="text-xs text-zinc-400">View transactions</p>
                                 </div>
                             </div>
                         </Link>
@@ -221,7 +221,7 @@ export default function VenueDashboardPage() {
                 <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 backdrop-blur-sm flex flex-col">
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-xl font-bold text-white">Upcoming</h2>
-                        <Link href="/venue-dashboard/calendar" className="text-xs font-bold text-emerald-500 hover:text-emerald-400 uppercase tracking-wider">
+                        <Link href="/venue-dashboard/booking-manager" className="text-xs font-bold text-emerald-500 hover:text-emerald-400 uppercase tracking-wider">
                             View All
                         </Link>
                     </div>
@@ -238,7 +238,7 @@ export default function VenueDashboardPage() {
                             upcoming.map((booking) => (
                                 <div key={booking.id} className="flex items-center gap-3 p-3 rounded-xl bg-black/40 border border-zinc-800/50 hover:border-zinc-700 transition-colors">
                                     <div className={`w-2 h-full min-h-[40px] rounded-full ${booking.status === 'confirmed' ? 'bg-emerald-500' :
-                                            booking.status === 'payment_pending' ? 'bg-yellow-500' : 'bg-zinc-600'
+                                        booking.status === 'payment_pending' ? 'bg-yellow-500' : 'bg-zinc-600'
                                         }`} />
                                     <div className="flex-1 min-w-0">
                                         <p className="text-sm font-bold text-white truncate">{booking.customer_name}</p>

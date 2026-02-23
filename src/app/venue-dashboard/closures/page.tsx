@@ -154,8 +154,9 @@ export default function ClosuresPage() {
                                             )}
                                         </div>
                                     </div>
-                                    <Button onClick={() => handleDelete(closure.id)} variant="outline" className="border-red-900/30 text-red-500 hover:bg-red-900/10 hover:border-red-900/50 p-3 h-auto rounded-xl">
+                                    <Button onClick={() => handleDelete(closure.id)} variant="outline" className="border-red-900/30 text-red-500 hover:bg-red-900/10 hover:border-red-900/50 px-4 py-2 h-auto rounded-xl flex items-center gap-2">
                                         <Trash2 className="h-4 w-4" />
+                                        <span className="text-sm font-bold">Cancel Closure</span>
                                     </Button>
                                 </div>
                             </div>

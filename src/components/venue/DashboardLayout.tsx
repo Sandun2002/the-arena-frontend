@@ -52,9 +52,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
     const routes = [
         { name: "Dashboard", path: "/venue-dashboard", icon: LayoutDashboard },
-        { name: "Calendar", path: "/venue-dashboard/calendar", icon: Calendar },
+        { name: "Booking Manager", path: "/venue-dashboard/booking-manager", icon: Calendar },
         { name: "Bookings", path: "/venue-dashboard/bookings", icon: CalendarCheck },
-        { name: "Walk-in", path: "/venue-dashboard/walk-in", icon: Users },
         { name: "Courts", path: "/venue-dashboard/courts", icon: Building2 },
         { name: "Gallery", path: "/venue-dashboard/gallery", icon: ImageIcon },
         { name: "Recurring", path: "/venue-dashboard/recurring", icon: Repeat },

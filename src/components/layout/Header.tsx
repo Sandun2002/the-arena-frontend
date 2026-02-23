@@ -27,7 +27,7 @@ export default function Header() {
 
   const navLinks = isVenueContext ? [
     { name: "Dashboard", href: "/venue-dashboard" },
-    { name: "Calendar", href: "/venue-dashboard/calendar" },
+    { name: "Booking Manager", href: "/venue-dashboard/booking-manager" },
     { name: "Bookings", href: "/venue-dashboard/bookings" },
     { name: "Settings", href: "/venue-dashboard/settings" },
   ] : [

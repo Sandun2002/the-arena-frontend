@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
-import { Search, Filter, CheckCircle, XCircle, DollarSign, UserX, AlertCircle } from "lucide-react";
+import { Search, Filter, CheckCircle, XCircle, DollarSign, UserX, AlertCircle, Calendar as CalendarIcon } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
 import { centerService } from "@/services/centerService";
@@ -19,6 +19,7 @@ export default function BookingsPage() {
     const [isLoading, setIsLoading] = useState(false);
 
     // Filters
+    const [selectedDate, setSelectedDate] = useState<Date>(new Date());
     const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "confirmed" | "cancelled">("all");
     const [searchQuery, setSearchQuery] = useState("");
 
@@ -30,6 +31,7 @@ export default function BookingsPage() {
             // In a real app, we'd pass pagination params too
             const result = await centerService.getBookingsList({
                 venue_id: currentVenue.id,
+                date: format(selectedDate, 'yyyy-MM-dd'),
                 status: statusFilter !== "all" ? statusFilter : undefined,
                 search: searchQuery || undefined
             });
@@ -46,7 +48,7 @@ export default function BookingsPage() {
     // Reload when filters change or venue changes
     useEffect(() => {
         loadBookings();
-    }, [currentVenue, statusFilter]);
+    }, [currentVenue, statusFilter, selectedDate]);
 
     // Debounce search
     useEffect(() => {
@@ -93,6 +95,25 @@ export default function BookingsPage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                    <div className="relative overflow-hidden group hover:bg-zinc-800 bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2 flex items-center justify-center gap-2 transition-colors">
+                        <CalendarIcon className="w-4 h-4 text-emerald-500" />
+                        <span className="text-white text-sm font-medium">{format(selectedDate, "MMM dd, yyyy")}</span>
+                        <input
+                            type="date"
+                            title="Filter by date"
+                            value={format(selectedDate, "yyyy-MM-dd")}
+                            onChange={(e) => {
+                                if (e.target.value) {
+                                    const parts = e.target.value.split('-');
+                                    if (parts.length === 3) {
+                                        setSelectedDate(new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
+                                    }
+                                }
+                            }}
+                            className="absolute inset-0 opacity-0 cursor-pointer"
+                        />
+                    </div>
+
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
                         <input

@@ -151,13 +151,6 @@ export default function CourtsPage() {
                                         </span>
                                         <span className="text-white font-bold bg-zinc-800/50 px-2 py-1 rounded-lg">LKR {court.hourly_rate.toLocaleString()}</span>
                                     </div>
-                                    <div className="flex justify-between items-center text-sm">
-                                        <span className="text-zinc-500 font-medium flex items-center gap-2">
-                                            <div className="p-1 bg-blue-500/10 rounded"><User className="w-3 h-3 text-blue-500" /></div>
-                                            Capacity
-                                        </span>
-                                        <span className="text-white font-bold bg-zinc-800/50 px-2 py-1 rounded-lg">{court.capacity || "N/A"} players</span>
-                                    </div>
                                 </div>
                             </div>
                         </div>

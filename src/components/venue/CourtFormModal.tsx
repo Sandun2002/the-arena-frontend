@@ -3,9 +3,10 @@
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Loader2 } from "lucide-react";
+import { Loader2, Image as ImageIcon } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { venueApiService } from "@/services/venueApiService";
+import { centerService } from "@/services/centerService";
 import { Court } from "@/types";
 import { useToast } from "@/components/ui/Toast";
 
@@ -29,18 +30,33 @@ export default function CourtFormModal({ venueId, existingCourt, onClose, onSucc
             is_indoor: existingCourt?.is_indoor || false,
             hourly_rate: existingCourt?.hourly_rate || 1500,
             capacity: existingCourt?.capacity || 10,
+            imageFile: undefined as unknown as FileList
         }
     });
 
     const onSubmit = async (data: any) => {
         setIsSubmitting(true);
         try {
+            const { imageFile, ...payload } = data;
+            let courtId = existingCourt?.id;
+
             if (existingCourt) {
-                await venueApiService.updateCourt(venueId, existingCourt.id, data);
+                await venueApiService.updateCourt(venueId, existingCourt.id, payload);
                 addToast("Court updated successfully", "success");
             } else {
-                await venueApiService.addCourt(venueId, data);
+                const newCourt = await venueApiService.addCourt(venueId, payload);
+                courtId = newCourt?.id || (newCourt as any)?.data?.id || (newCourt as any)?._id;
                 addToast("Court created successfully", "success");
+            }
+
+            if (imageFile && imageFile.length > 0 && courtId) {
+                try {
+                    await centerService.uploadCourtImage(courtId, imageFile[0]);
+                    addToast("Court image uploaded successfully", "success");
+                } catch (imgErr) {
+                    console.error(imgErr);
+                    addToast("Court saved but image upload failed", "error");
+                }
             }
             onSuccess();
         } catch (error) {
@@ -82,23 +98,7 @@ export default function CourtFormModal({ venueId, existingCourt, onClose, onSucc
                         </div>
                     </div>
                 </div>
-                <div className="space-y-2">
-                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Surface</label>
-                    <div className="relative">
-                        <select
-                            {...register("surface_type")}
-                            className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none"
-                        >
-                            {surfaces.map(s => <option key={s} value={s}>{s}</option>)}
-                        </select>
-                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-500">
-                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Hourly Rate (LKR)</label>
                     <input
@@ -107,15 +107,20 @@ export default function CourtFormModal({ venueId, existingCourt, onClose, onSucc
                         className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
                     />
                 </div>
-                <div className="space-y-2">
-                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Capacity</label>
+            </div>
+
+            <div className="space-y-2">
+                <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Cover Image</label>
+                <div className="relative group">
                     <input
-                        type="number"
-                        {...register("capacity", { required: true, min: 1 })}
-                        className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
+                        type="file"
+                        accept="image/*"
+                        {...register("imageFile")}
+                        className="w-full bg-black/40 border border-zinc-700 border-dashed hover:border-emerald-500/50 rounded-xl px-4 py-6 text-white text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-500/10 file:text-emerald-500 hover:file:bg-emerald-500/20 cursor-pointer transition-colors"
                     />
                 </div>
             </div>
+
 
             <div className="space-y-2">
                 <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Description</label>

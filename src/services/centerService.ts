@@ -37,7 +37,7 @@ export const centerService = {
         return response.data;
     },
 
-    getBookingsList: async (params: { venue_id?: string, search?: string, status?: string, skip?: number, limit?: number }) => {
+    getBookingsList: async (params: { venue_id?: string, date?: string, search?: string, status?: string, skip?: number, limit?: number }) => {
         const response = await apiClient.get<{ data: Booking[], total: number }>('/center/bookings/list', { params });
         return response.data;
     },
