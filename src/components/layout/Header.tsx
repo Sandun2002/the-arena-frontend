@@ -8,7 +8,6 @@ import Button from "../ui/Button";
 import { Menu, X, User, LogOut, LayoutDashboard, Calendar, Settings, Shield } from "lucide-react";
 import { useAuth } from "@/services/authContext";
 import VenueSwitcher from "@/components/venue/VenueSwitcher";
-import { MOCK_VENUES } from "@/services/mockData";
 
 export default function Header() {
   const pathname = usePathname();
@@ -21,9 +20,6 @@ export default function Header() {
   const isVenueContext = pathname?.startsWith("/venue-dashboard");
   const showVenueSwitcher = isVenueContext && (isVenueOwner || isVenueManager);
 
-  // TODO: Move venue state to a global store context eventually
-  // For now, simple mock integration
-  const [currentVenueId, setCurrentVenueId] = useState(MOCK_VENUES[0].id);
 
   const navLinks = isVenueContext ? [
     { name: "Dashboard", href: "/venue-dashboard" },

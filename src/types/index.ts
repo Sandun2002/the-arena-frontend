@@ -60,25 +60,21 @@ export interface Venue {
   name: string;
   slug: string;
   description: string;
-  sport: string; // Backward compatibility
   city: string;
-  location: string; // Backward compatibility
   address: string;
   lat: number;
   lng: number;
   operating_hours: string;
   contact_number: string;
-  pricePerHour: number; // Backward compatibility
-  amenities: string[];
+  amenities: { id: string; name: string }[];
   rating: number;
   is_active: boolean;
   is_verified: boolean;
   is_featured: boolean;
   status: VenueStatus;
   owner_id: string;
-  image: string; // For backward compatibility
-  imageUrl: string; // For backward compatibility
-  images: string[];
+  cover_image: string | null;
+  gallery_images: { id: string; url: string; is_cover: boolean; display_order: number }[];
   suspended_at: string | null;
   deleted_at: string | null;
 }
@@ -87,15 +83,13 @@ export interface Court {
   id: string;
   venue_id: string;
   name: string;
-  sport_type: string;
-  surface_type: string;
+  sport_type: { id: string; name: string };
   is_indoor: boolean;
   hourly_rate: number;
-  capacity: number;
-  images: string[];
+  peak_hourly_rate: number | null;
+  cover_image: string | null;
   description: string;
   is_active: boolean;
-  status: "available" | "maintenance" | "closed";
 }
 
 export interface GalleryImage {
@@ -106,12 +100,9 @@ export interface GalleryImage {
 
 export interface Closure {
   id: string;
-  title: string;
-  start_date: string;
-  end_date: string;
-  courts: string[]; // IDs
-  reason: string;
-  type: string;
+  venue_id: string;
+  closure_date: string;
+  reason: string | null;
 }
 
 export type InvitationStatus = "pending" | "accepted" | "declined" | "expired" | "cancelled";
@@ -145,10 +136,11 @@ export interface Booking {
   booking_reference: string;
   user_id: string | null;
   court_id: string;
-  sport: string;
   hourly_rate: number;
+  subtotal: number;
   total_price: number;
   platform_fee: number;
+  venue_commission: number;
   venue_payout: number;
   status: BookingStatus;
   payment_status: PaymentStatus;
@@ -161,6 +153,7 @@ export interface Booking {
   start_time: string;
   end_time: string;
   duration_hours: number;
+  hold_expires_at: string | null;
   created_at: string;
   cancelled_at: string | null;
   cancellation_reason: string | null;
@@ -171,7 +164,8 @@ export interface Booking {
     name: string;
     venue_name: string;
     venue_id: string;
-    image: string | null;
+    sport_type: { id: string; name: string };
+    cover_image: string | null;
   } | null;
   user?: {
     full_name: string;
@@ -183,7 +177,33 @@ export interface SlotAvailability {
   start: string;
   end: string;
   status: "available" | "booked" | "held";
-  price?: number;
+  is_peak: boolean;
+  price: number;
+}
+
+export interface SearchParams {
+  city?: string;
+  sport_type_id?: string;
+  date?: string;
+  start_time?: string;
+  end_time?: string;
+  lat?: number;
+  lng?: number;
+  page?: number;
+  page_size?: number;
+}
+
+export interface PaginatedResponse<T> {
+  items: T[];
+  total: number;
+  page: number;
+  per_page: number;
+}
+
+export interface City {
+  id: string;
+  name: string;
+  is_active: boolean;
 }
 
 // === Review ===
@@ -192,12 +212,14 @@ export interface Review {
   venue_id: string;
   venue_name: string;
   venue_image: string;
+  booking_id: string | null;
   user_id: string;
   user_name: string;
   user_avatar: string | null;
   rating: number;
   comment: string;
   created_at: string;
+  updated_at: string | null;
 }
 
 export interface ReviewStats {

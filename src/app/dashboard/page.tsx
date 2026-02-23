@@ -22,10 +22,10 @@ export default function DashboardPage() {
     useEffect(() => {
         if (user) {
             // 1. Get Stats
-            playerService.getStats(user.id).then(setStats);
+            playerService.getStats().then(setStats);
 
             // 2. Get Bookings
-            playerService.getBookings(user.id).then((allBookings) => {
+            playerService.getBookings().then((allBookings) => {
                 const sorted = allBookings.sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
 
                 const upcoming = sorted.filter(b =>
@@ -130,7 +130,7 @@ export default function DashboardPage() {
                                             {format(new Date(booking.start_time), "MMM dd")}
                                         </div>
                                         <div>
-                                            <p className="text-white font-bold text-sm">{booking.sport}</p>
+                                            <p className="text-white font-bold text-sm">{booking.court?.sport_type?.name || 'Sport'}</p>
                                             <p className="text-zinc-500 text-xs">{booking.court?.venue_name}</p>
                                         </div>
                                         <div className="ml-auto text-emerald-500 font-bold text-sm">
@@ -191,7 +191,7 @@ function BookingCard({ booking }: { booking: Booking }) {
 
                 <div className="flex-grow">
                     <h3 className="text-white font-bold group-hover:text-emerald-400 transition-colors">
-                        {booking.sport}
+                        {booking.court?.sport_type?.name || 'Sport'}
                     </h3>
                     <p className="text-zinc-500 text-xs flex items-center gap-2 mb-1">
                         <MapPin className="w-3 h-3" /> {booking.court?.venue_name}

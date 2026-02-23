@@ -33,7 +33,7 @@ export default function ChangePasswordPage() {
         if (!user) return;
         setIsSubmitting(true);
         try {
-            await playerService.changePassword(user.id, data.current_password, data.new_password);
+            await playerService.changePassword(data.current_password, data.new_password);
             addToast("Password changed successfully", "success");
             reset();
             setTimeout(() => router.push("/profile"), 1500);

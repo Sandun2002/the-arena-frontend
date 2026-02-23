@@ -24,7 +24,7 @@ export default function HeroVenueCard({ venue, isActive }: HeroVenueCardProps) {
     >
       {/* Image */}
       <Image
-        src={venue.imageUrl}
+        src={(venue as any).imageUrl || venue.cover_image || "/images/placeholder.jpg"}
         alt={venue.name}
         fill
         className={`
@@ -64,7 +64,7 @@ export default function HeroVenueCard({ venue, isActive }: HeroVenueCardProps) {
               px-2.5 py-1 rounded-md
             "
           >
-            {venue.sport}
+            {(venue as any).sport || "Sports Venue"}
           </span>
         </div>
 
@@ -76,7 +76,7 @@ export default function HeroVenueCard({ venue, isActive }: HeroVenueCardProps) {
         {/* Location */}
         <div className="flex items-center gap-1.5 text-zinc-400 text-xs md:text-sm mt-1.5">
           <MapPin className="w-3 h-3 md:w-3.5 md:h-3.5 text-emerald-400 flex-shrink-0" />
-          <span className="truncate">{venue.location}</span>
+          <span className="truncate">{venue.city || (venue as any).location}</span>
         </div>
       </div>
     </div>

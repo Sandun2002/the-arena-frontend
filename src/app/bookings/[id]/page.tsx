@@ -63,7 +63,7 @@ export default function BookingDetailPage() {
                                         {isCancelled && <span className="text-xs font-bold text-red-500 bg-red-500/10 px-2 py-0.5 rounded">CANCELLED</span>}
                                     </div>
                                     <h1 className="text-3xl font-bold text-white mb-1">
-                                        {booking.sport} at {booking.court?.venue_name}
+                                        {booking.court?.sport_type?.name || 'Sport'} at {booking.court?.venue_name}
                                     </h1>
                                     <p className="text-zinc-400 font-medium">
                                         {booking.court?.name}

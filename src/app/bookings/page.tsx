@@ -18,7 +18,7 @@ export default function BookingsPage() {
 
     useEffect(() => {
         if (user) {
-            playerService.getBookings(user.id).then((data) => {
+            playerService.getBookings().then((data) => {
                 setBookings(data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()));
                 setIsLoading(false);
             });
@@ -123,7 +123,7 @@ function BookingCard({ booking }: { booking: Booking }) {
                     </div>
 
                     <h3 className="text-lg font-bold text-white mb-1 group-hover:text-emerald-400 transition-colors">
-                        {booking.sport} at {booking.court?.venue_name || "Venue"}
+                        {booking.court?.sport_type?.name || 'Sport'} at {booking.court?.venue_name || "Venue"}
                     </h3>
 
                     <div className="flex flex-wrap gap-4 text-xs font-medium text-zinc-400">

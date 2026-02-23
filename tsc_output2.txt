@@ -1,0 +1,2 @@
+src/app/venues/[id]/page.tsx(80,25): error TS1351: An identifier or keyword cannot immediately follow a numeric literal.
+src/app/venues/[id]/page.tsx(80,41): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?

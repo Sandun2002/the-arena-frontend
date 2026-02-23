@@ -3,7 +3,7 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 import { Venue } from "@/types";
-import { venueService } from "@/services/venueService";
+import { centerService } from "@/services/centerService";
 import { useAuth } from "@/services/authContext";
 
 interface VenueContextType {
@@ -42,8 +42,10 @@ export function VenueProvider({ children }: { children: React.ReactNode }) {
         try {
             setIsLoading(true);
             setError(null);
-            // Pass user.id to getMyVenues
-            const data = await venueService.getMyVenues(user?.id || "");
+
+            const profile = await centerService.getProfile();
+            const data = profile ? [profile] : []; // Wrap in array to maintain `venues` contract
+
             setVenues(data);
 
             // Restore selection or default to first

@@ -40,13 +40,24 @@ const clearTokens = () => {
     }
 };
 
-// Request Interceptor: Attach Token
+// Request Interceptor: Attach Token and Request ID
 apiClient.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
         const token = getAccessToken();
         if (token && config.headers) {
             config.headers.Authorization = `Bearer ${token}`;
         }
+
+        // Add unique request ID
+        if (config.headers) {
+            config.headers['X-Request-ID'] = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15);
+        }
+
+        // Remove Content-Type for FormData so browser can set boundary
+        if (config.data instanceof FormData && config.headers) {
+            delete config.headers['Content-Type'];
+        }
+
         return config;
     },
     (error) => Promise.reject(error)

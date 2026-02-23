@@ -1,49 +1,54 @@
-// src/services/api.ts
-import { Venue, Sport } from "@/types";
-import { MOCK_VENUES, MOCK_SPORTS } from "@/services/mockData";
-
-// Simulate a network delay to test loading states (smooth UX)
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+import { Venue, Sport, City, SearchParams, PaginatedResponse } from "@/types";
+import apiClient from "./apiClient";
 
 export const api = {
-  // Get all active sports (for dynamic sport selection)
+  getCities: async (): Promise<City[]> => {
+    const response = await apiClient.get<City[]>('/search/cities');
+    return response.data;
+  },
+
   getSports: async (): Promise<Sport[]> => {
-    await delay(300);
-    return MOCK_SPORTS.filter(s => s.isActive);
+    // Attempt to get from a potential backend endpoint, or return empty if missing
+    return apiClient.get<Sport[]>('/search/sports').then(res => res.data).catch(() => []);
   },
 
-  // Get all venues
   getVenues: async (): Promise<Venue[]> => {
-    await delay(500); // Fake 0.5s loading time
-    return MOCK_VENUES;
+    const response = await apiClient.get<Venue[]>('/venues');
+    return response.data;
   },
 
-  // Get only "Trending" venues
   getTrendingVenues: async (): Promise<Venue[]> => {
-    await delay(500);
-    return MOCK_VENUES.filter((v) => v.is_featured); // Using is_featured as trending for now
+    const response = await apiClient.get<Venue[]>('/venues/featured');
+    return response.data;
   },
 
-  // Get "Featured" venues for Hero Carousel (paid premium slot)
   getFeaturedVenues: async (): Promise<Venue[]> => {
-    await delay(500);
-    return MOCK_VENUES.filter((v) => v.is_featured);
+    const response = await apiClient.get<Venue[]>('/venues/featured');
+    return response.data;
   },
 
-  // Get single venue by ID (for details page)
-  getVenueById: async (id: string): Promise<Venue | undefined> => {
-    await delay(300);
-    return MOCK_VENUES.find((v) => v.id === id);
+  getVenueById: async (id: string): Promise<Venue> => {
+    const response = await apiClient.get<Venue>(`/venues/${id}`);
+    return response.data;
   },
 
-  // Placeholder for future Python API Search
-  searchVenues: async (query: string): Promise<Venue[]> => {
-    await delay(500);
-    const lowerQuery = query.toLowerCase();
-    return MOCK_VENUES.filter(v =>
-      v.name.toLowerCase().includes(lowerQuery) ||
-      v.city.toLowerCase().includes(lowerQuery) ||
-      v.description.toLowerCase().includes(lowerQuery)
-    );
+  searchVenues: async (params: SearchParams): Promise<PaginatedResponse<Venue>> => {
+    const response = await apiClient.get<PaginatedResponse<Venue>>('/search/venues', { params });
+    return response.data;
+  },
+
+  getVenueSlots: async (venueId: string, date: string): Promise<any> => {
+    const response = await apiClient.get(`/venues/${venueId}/slots`, { params: { date } });
+    return response.data;
+  },
+
+  getVenueReviews: async (venueId: string): Promise<any> => {
+    const response = await apiClient.get(`/venues/${venueId}/reviews`);
+    return response.data;
+  },
+
+  getVenueReviewStats: async (venueId: string): Promise<any> => {
+    const response = await apiClient.get(`/venues/${venueId}/reviews/stats`);
+    return response.data;
   }
 };

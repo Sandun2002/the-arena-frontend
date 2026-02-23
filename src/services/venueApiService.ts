@@ -23,9 +23,11 @@ export const venueApiService = {
         return response.data;
     },
 
-    getMyVenues: async () => {
-        // Fetch venues owned/managed by current user
-        const response = await apiClient.get<Venue[]>('/venues/mine');
+    // === Registration Documents ===
+    uploadBRDocument: async (venueId: string, file: File) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        const response = await apiClient.post(`/venues/${venueId}/upload-br-document`, formData);
         return response.data;
     },
 

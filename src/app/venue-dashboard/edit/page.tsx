@@ -46,7 +46,7 @@ export default function EditVenuePage() {
             setValue("contact_email", user?.email || ""); // Venue object doesn't have email usually, using user's or empty
             setValue("city", currentVenue.city);
             setValue("address", currentVenue.address);
-            setValue("amenities", currentVenue.amenities || []);
+            setValue("amenities", (currentVenue.amenities?.map(a => a.name) as string[]) || []);
             setIsLoading(false);
         } else {
             // If accessed directly without context loaded, might need to wait or redirect

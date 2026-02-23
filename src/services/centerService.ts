@@ -16,7 +16,7 @@ export const centerService = {
 
     getUpcoming: async (venueId?: string, limit = 5) => {
         const params = venueId ? { venue_id: venueId, limit } : { limit };
-        const response = await apiClient.get<UpcomingBooking[]>('/center/schedule/upcoming', { params });
+        const response = await apiClient.get<UpcomingBooking[]>('/center/schedule', { params });
         return response.data;
     },
 
@@ -43,20 +43,20 @@ export const centerService = {
     },
 
     createManualBooking: async (data: any) => {
-        const response = await apiClient.post<Booking>('/center/bookings/manual', data);
+        const response = await apiClient.post<Booking>('/center/manual-booking', data);
         return response.data;
     },
 
     confirmBooking: async (id: string) => {
-        await apiClient.post(`/center/bookings/${id}/confirm`);
+        await apiClient.post(`/center/manual-booking/${id}/confirm`);
     },
 
     cancelBooking: async (id: string, reason?: string) => {
-        await apiClient.post(`/center/bookings/${id}/cancel`, { reason });
+        await apiClient.post(`/center/manual-booking/${id}/cancel`, { reason });
     },
 
     markBookingPaid: async (id: string) => {
-        await apiClient.post(`/center/bookings/${id}/pay`);
+        await apiClient.post(`/center/manual-booking/${id}/confirm`, { payment_method: 'cash' });
     },
 
     toggleNoShow: async (id: string) => {
@@ -153,7 +153,7 @@ export const centerService = {
     // === Analytics ===
     getRevenueAnalytics: async (period: 'daily' | 'weekly' | 'monthly', venueId?: string) => {
         const params = { period, ...(venueId ? { venue_id: venueId } : {}) };
-        const response = await apiClient.get<AnalyticsRevenue>('/center/analytics/revenue', { params });
+        const response = await apiClient.get<AnalyticsRevenue>('/center/revenue', { params });
         return response.data;
     },
 

@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
-import { venueService } from "@/services/venueService";
+import { centerService as venueService } from "@/services/centerService";
 import { DashboardStats, UpcomingBooking } from "@/types";
 import { useVenue } from "@/components/venue/VenueContext";
 import { format } from "date-fns";
@@ -31,8 +31,8 @@ export default function VenueDashboardPage() {
         setLoadingStats(true);
         try {
             const [statsData, upcomingData] = await Promise.all([
-                venueService.getDashboardStats(venueId, isVenueOwner),
-                venueService.getUpcomingBookings(venueId)
+                venueService.getStats(venueId),
+                venueService.getUpcoming(venueId)
             ]);
             setStats(statsData);
             setUpcoming(upcomingData);

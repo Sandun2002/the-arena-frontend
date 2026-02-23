@@ -1,59 +1,32 @@
 
 import { LoginResponse, User, Session, UserRole } from "@/types";
 import apiClient from "./apiClient";
-import { MOCK_USERS } from "./mockData";
 
 // Local storage key for tokens
 const ACCESS_TOKEN_KEY = "arena_access_token";
 const REFRESH_TOKEN_KEY = "arena_refresh_token";
 
 class AuthService {
-    // 1. Login
     async login(email: string, password: string): Promise<LoginResponse> {
         try {
             const formData = new FormData();
             formData.append('username', email); // OAuth2 password flow standard
             formData.append('password', password);
 
-            const response = await apiClient.post<LoginResponse>('/auth/login', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            });
+            const response = await apiClient.post<LoginResponse>('/auth/login', formData);
 
             if (response.data) {
                 this.setTokens(response.data);
             }
             return response.data;
         } catch (error) {
-            // Mock Fallback
-            console.warn("API Login failed, attempting mock login...", error);
-            const mockUser = MOCK_USERS.find(u => u.email === email);
-
-            // Simple mock password check (in real world, never do this, but for mock dev it's fine)
-            // interacting with "mockdata" implies we likely just want access.
-            if (mockUser) {
-                const mockResponse: LoginResponse = {
-                    access_token: `mock-token-${mockUser.id}`,
-                    refresh_token: `mock-refresh-${mockUser.id}`,
-                    token_type: "bearer",
-                    expires_in: 3600
-                };
-                this.setTokens(mockResponse);
-                return mockResponse;
-            }
-
+            console.error("API Login failed:", error);
             throw error;
         }
     }
 
     // 2. Initializing User Session
     async getMe(token?: string): Promise<User> {
-        // Mock Token Check
-        if (token?.startsWith("mock-token-")) {
-            const userId = token.replace("mock-token-", "");
-            const mockUser = MOCK_USERS.find(u => u.id === userId);
-            if (mockUser) return Promise.resolve(mockUser);
-        }
-
         const response = await apiClient.get<User>('/auth/me');
         return response.data;
     }
@@ -66,19 +39,14 @@ class AuthService {
         password: string;
         role: "customer" | "venue_owner";
     }): Promise<User> {
-        try {
-            const response = await apiClient.post<User>('/auth/signup', data);
-            return response.data;
-        } catch (error) {
-            console.warn("API Signup failed, returning mock user if possible (Mock signup not fully implemented but falling back safely)", error);
-            throw error;
-        }
+        const response = await apiClient.post<User>('/auth/signup', data);
+        return response.data;
     }
 
     async logout() {
         try {
             const token = this.getTokens().accessToken;
-            if (token && !token.startsWith("mock-token-")) {
+            if (token) {
                 await apiClient.post('/auth/logout');
             }
         } catch (e) {
@@ -108,23 +76,13 @@ class AuthService {
 
     // === Password Reset ===
     async requestPasswordReset(email: string): Promise<boolean> {
-        try {
-            await apiClient.post('/auth/password/forgot', { email });
-            return true;
-        } catch (error) {
-            if (MOCK_USERS.find(u => u.email === email)) return true; // Mock success
-            throw error;
-        }
+        await apiClient.post('/auth/forgot-password', { email });
+        return true;
     }
 
     async resetPassword(token: string, data: any): Promise<boolean> {
-        try {
-            await apiClient.post('/auth/password/reset', { token, ...data });
-            return true;
-        } catch (error) {
-            console.log("Mock password reset success");
-            return true;
-        }
+        await apiClient.post('/auth/reset-password', { token, ...data });
+        return true;
     }
 
     // === MFA ===
@@ -144,20 +102,12 @@ class AuthService {
 
     // === Sessions ===
     async getSessions(): Promise<Session[]> {
-        try {
-            const response = await apiClient.get<Session[]>('/auth/sessions');
-            return response.data;
-        } catch (error) {
-            return []; // Return empty for mock
-        }
+        const response = await apiClient.get<Session[]>('/auth/sessions');
+        return response.data;
     }
 
     async revokeSession(jti: string): Promise<void> {
-        try {
-            await apiClient.delete(`/auth/sessions/${jti}`);
-        } catch (error) {
-            console.log("Mock session revoke");
-        }
+        await apiClient.delete(`/auth/sessions/${jti}`);
     }
 }
 

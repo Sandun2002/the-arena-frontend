@@ -33,7 +33,7 @@ export default function VenuesPage() {
     // 2. Filter Logic
     const filteredVenues = useMemo(() => {
         return allVenues.filter((venue) => {
-            const matchesSport = selectedSport === "All" || venue.sport === selectedSport;
+            const matchesSport = selectedSport === "All" || (venue as any).sport === selectedSport;
             return matchesSport;
         });
     }, [allVenues, selectedSport]);

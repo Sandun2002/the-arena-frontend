@@ -6,7 +6,7 @@ import { Venue } from "@/types";
 import Button from "@/components/ui/Button";
 import { Calendar, Check, LogIn } from "lucide-react";
 import { useAuth } from "@/services/authContext";
-import { addBooking } from "@/services/userData";
+
 
 interface BookingWidgetProps {
   venue: Venue;
@@ -46,7 +46,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
     }
   };
 
-  const totalPrice = selectedSlots.length * venue.pricePerHour;
+  const totalPrice = selectedSlots.length * ((venue as any).pricePerHour || 1500);
 
   const handleBooking = () => {
     if (selectedSlots.length === 0) return;
@@ -56,18 +56,9 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
       return;
     }
 
-    // Add booking to user data
     const timeRange = selectedSlots.length > 1
       ? `${selectedSlots[0]} - ${parseInt(selectedSlots[selectedSlots.length - 1]) + 1}:00`
       : `${selectedSlots[0]} - ${parseInt(selectedSlots[0]) + 1}:00`;
-
-    addBooking({
-      venueName: venue.name,
-      date: date,
-      time: timeRange,
-      price: totalPrice,
-      image: venue.imageUrl,
-    });
 
     // Show success and redirect
     setShowSuccess(true);

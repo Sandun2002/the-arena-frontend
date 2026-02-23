@@ -20,9 +20,9 @@ export default function ProfilePage() {
 
     useEffect(() => {
         if (user) {
-            playerService.getStats(user.id).then(setStats);
-            playerService.getBookings(user.id).then(d => setBookings(d.slice(0, 3))); // Top 3 recent
-            playerService.getChallenges(user.id).then(setGamification);
+            playerService.getStats().then(setStats);
+            playerService.getBookings().then(d => setBookings(d.slice(0, 3))); // Top 3 recent
+            playerService.getChallenges().then(setGamification);
         }
     }, [user]);
 
@@ -191,7 +191,7 @@ export default function ProfilePage() {
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <h4 className="text-white font-medium truncate group-hover:text-emerald-400 transition-colors">{booking.court?.venue_name || "Unknown Venue"}</h4>
-                                                    <p className="text-sm text-zinc-500 truncate">{booking.court?.name} • {booking.sport}</p>
+                                                    <p className="text-sm text-zinc-500 truncate">{booking.court?.name} • {booking.court?.sport_type?.name || 'Sport'}</p>
                                                 </div>
                                                 <div className="text-right">
                                                     <p className="text-white font-bold text-sm">LKR {booking.total_price}</p>

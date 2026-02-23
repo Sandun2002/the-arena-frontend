@@ -1,0 +1,68 @@
+
+> the-arena-frontend@0.1.0 build
+> next build
+
+Γû▓ Next.js 16.1.6 (Turbopack)
+
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 68s
+  Running TypeScript ...
+  Collecting page data using 11 workers ...
+  Generating static pages using 11 workers (0/42) ...
+  Generating static pages using 11 workers (10/42) 
+  Generating static pages using 11 workers (20/42) 
+  Generating static pages using 11 workers (31/42) 
+Γ£ô Generating static pages using 11 workers (42/42) in 4.6s
+  Finalizing page optimization ...
+
+Route (app)
+Γöî Γùï /
+Γö£ Γùï /_not-found
+Γö£ Γùï /about
+Γö£ ╞Æ /book/[venueId]
+Γö£ Γùï /bookings
+Γö£ ╞Æ /bookings/[id]
+Γö£ ╞Æ /bookings/[id]/confirm
+Γö£ Γùï /challenges
+Γö£ Γùï /checkout
+Γö£ Γùï /contact
+Γö£ Γùï /dashboard
+Γö£ Γùï /forgot-password
+Γö£ Γùï /login
+Γö£ Γùï /partner
+Γö£ Γùï /profile
+Γö£ Γùï /profile/password
+Γö£ Γùï /profile/settings
+Γö£ Γùï /reset-password
+Γö£ Γùï /reviews
+Γö£ Γùï /search
+Γö£ Γùï /security
+Γö£ Γùï /settings/mfa
+Γö£ Γùï /settings/sessions
+Γö£ Γùï /signup
+Γö£ Γùï /signup/player
+Γö£ Γùï /signup/venue
+Γö£ Γùï /venue-dashboard
+Γö£ Γùï /venue-dashboard/analytics
+Γö£ Γùï /venue-dashboard/analytics/cancellations
+Γö£ Γùï /venue-dashboard/analytics/fees
+Γö£ Γùï /venue-dashboard/analytics/revenue
+Γö£ Γùï /venue-dashboard/analytics/utilization
+Γö£ Γùï /venue-dashboard/booking-manager
+Γö£ Γùï /venue-dashboard/bookings
+Γö£ Γùï /venue-dashboard/closures
+Γö£ Γùï /venue-dashboard/courts
+Γö£ Γùï /venue-dashboard/create
+Γö£ Γùï /venue-dashboard/edit
+Γö£ Γùï /venue-dashboard/gallery
+Γö£ Γùï /venue-dashboard/managers
+Γö£ Γùï /venue-dashboard/recurring
+Γö£ Γùï /venue-dashboard/settings
+Γö£ Γùï /venues
+Γö£ ╞Æ /venues/[id]
+Γöö ╞Æ /venues/[id]/review
+
+
+Γùï  (Static)   prerendered as static content
+╞Æ  (Dynamic)  server-rendered on demand
+

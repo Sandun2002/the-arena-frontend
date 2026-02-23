@@ -19,7 +19,7 @@ export default function MyReviewsPage() {
 
     useEffect(() => {
         if (user) {
-            playerService.getMyReviews(user.id).then((data) => {
+            playerService.getMyReviews().then((data) => {
                 setReviews(data);
                 setIsLoading(false);
             });

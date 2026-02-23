@@ -11,7 +11,7 @@ import { api } from "@/services/api";
 import { bookingService } from "@/services/bookingService";
 import { Venue, Court, SlotAvailability } from "@/types";
 import { useToast } from "@/components/ui/Toast";
-import { MOCK_COURTS } from "@/services/mockData"; // Direct import for mock courts for now
+import { centerService } from "@/services/centerService";
 
 export default function BookingPage() {
     const params = useParams();
@@ -41,14 +41,21 @@ export default function BookingPage() {
                 const v = await api.getVenueById(venueId);
                 setVenue(v || null);
                 if (v) {
-                    // Set default sport if available
-                    // For mock, we'll try to parse the sport string or just pick the first one
-                    const sports = v.sport.split(" / ");
-                    setSelectedSport(sports[0]);
-
                     // Load courts for this venue
-                    const venueCourts = MOCK_COURTS.filter(c => c.venue_id === v.id);
+                    let venueCourts: Court[] = [];
+                    try {
+                        venueCourts = await centerService.getCourts(v.id);
+                    } catch (e) {
+                        console.error("Failed to load courts", e);
+                    }
                     setCourts(venueCourts);
+
+                    // Set default sport based on courts
+                    if (venueCourts.length > 0 && venueCourts[0].sport_type) {
+                        setSelectedSport((venueCourts[0] as any).sport_type?.name || (venueCourts[0] as any).sport_type);
+                    } else {
+                        setSelectedSport("Futsal");
+                    }
                 }
             } catch (error) {
                 console.error("Failed to load venue");
@@ -95,10 +102,8 @@ export default function BookingPage() {
             const booking = await bookingService.createBooking({
                 venue_id: venueId,
                 court_id: selectedCourt,
-                user_id: user.id,
                 start_time: selectedSlot.start,
                 end_time: selectedSlot.end,
-                sport: selectedSport,
                 payment_method: "card"
             });
             addToast("Booking Confirmed!", "success");
@@ -150,8 +155,7 @@ export default function BookingPage() {
                                 <div>
                                     <label className="block text-xs font-bold text-zinc-500 uppercase mb-3">Sport</label>
                                     <div className="grid grid-cols-2 gap-3">
-                                        {venue.sport.split("/").map((s) => {
-                                            const sportName = s.trim();
+                                        {Array.from(new Set(courts.map(c => c.sport_type?.name || 'Futsal'))).map((sportName) => {
                                             return (
                                                 <button
                                                     key={sportName}
@@ -205,7 +209,7 @@ export default function BookingPage() {
                         <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
                             {courts.length > 0 ? (
                                 courts
-                                    .filter(c => c.sport_type === selectedSport || !selectedSport) // Filter by sport if mock data allows
+                                    .filter(c => c.sport_type?.name === selectedSport || !selectedSport) // Filter by sport if mock data allows
                                     .map((court) => (
                                         <button
                                             key={court.id}
@@ -213,7 +217,7 @@ export default function BookingPage() {
                                             className={`flex-shrink-0 min-w-[200px] p-4 rounded-2xl border text-left transition-all ${selectedCourt === court.id ? 'bg-emerald-500/10 border-emerald-500 ring-1 ring-emerald-500/50' : 'bg-zinc-900/50 border-zinc-800 hover:border-zinc-700'}`}
                                         >
                                             <h3 className={`font-bold ${selectedCourt === court.id ? 'text-emerald-500' : 'text-white'}`}>{court.name}</h3>
-                                            <p className="text-xs text-zinc-500 mt-1">{court.surface_type} • {court.is_indoor ? 'Indoor' : 'Outdoor'}</p>
+                                            <p className="text-xs text-zinc-500 mt-1">{court.is_indoor ? 'Indoor' : 'Outdoor'}</p>
                                             <p className="text-sm font-bold text-white mt-3">LKR {court.hourly_rate}/hr</p>
                                         </button>
                                     ))

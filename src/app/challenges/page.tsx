@@ -15,7 +15,7 @@ export default function ChallengesPage() {
 
     useEffect(() => {
         if (user) {
-            playerService.getChallenges(user.id).then(data => {
+            playerService.getChallenges().then(data => {
                 setGamification(data);
             });
         }

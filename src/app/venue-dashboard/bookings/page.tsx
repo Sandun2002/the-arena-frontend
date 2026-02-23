@@ -179,8 +179,7 @@ export default function BookingsPage() {
                                             </div>
                                         </td>
                                         <td className="p-5">
-                                            <span className="block text-white text-sm font-medium">{booking.court?.name || "Unknown Court"}</span>
-                                            <span className="text-zinc-500 text-xs capitalize">{booking.sport}</span>
+                                            <span className="text-zinc-500 text-xs capitalize">{booking.court?.sport_type?.name || 'Sport'}</span>
                                         </td>
                                         <td className="p-5">
                                             <StatusBadge status={booking.status} />

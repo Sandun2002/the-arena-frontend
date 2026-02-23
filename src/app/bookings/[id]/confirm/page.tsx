@@ -20,7 +20,7 @@ export default function BookingConfirmationPage() {
 
     useEffect(() => {
         if (user && params.id) {
-            playerService.getBookings(user.id).then(bookings => {
+            playerService.getBookings().then(bookings => {
                 const found = bookings.find(b => b.id === params.id);
                 if (found) {
                     setBooking(found);

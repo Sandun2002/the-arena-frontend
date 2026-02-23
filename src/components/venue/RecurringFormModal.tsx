@@ -38,7 +38,7 @@ export default function RecurringFormModal({ venueId, courts, existingBooking, o
         setIsSubmitting(true);
         try {
             const payload = { ...data, venue_id: venueId };
-            
+
             if (existingBooking) {
                 await centerService.updateRecurringBooking(existingBooking.id, payload);
                 addToast("Recurring booking updated", "success");
@@ -59,19 +59,19 @@ export default function RecurringFormModal({ venueId, courts, existingBooking, o
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            
+
             <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                     <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Client Name</label>
+                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Client Name</label>
                     <input
                         {...register("client_name", { required: "Client name is required" })}
                         className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
                         placeholder="Academy or Company Name"
                     />
-                     {errors.client_name && <p className="text-red-500 text-xs font-bold">{errors.client_name.message as string}</p>}
+                    {errors.client_name && <p className="text-red-500 text-xs font-bold">{errors.client_name.message as string}</p>}
                 </div>
                 <div className="space-y-2">
-                     <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Contact Phone</label>
+                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Contact Phone</label>
                     <input
                         {...register("client_phone")}
                         className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
@@ -82,23 +82,23 @@ export default function RecurringFormModal({ venueId, courts, existingBooking, o
 
             <div className="space-y-2">
                 <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Court</label>
-                 <div className="relative">
+                <div className="relative">
                     <select
                         {...register("court_id", { required: "Select a court" })}
                         className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none"
                     >
                         <option value="">Select Court...</option>
-                        {courts.map(c => <option key={c.id} value={c.id}>{c.name} ({c.sport_type})</option>)}
+                        {courts.map(c => <option key={c.id} value={c.id}>{c.name} ({(c as any).sport_type?.name || (c as any).sport_type})</option>)}
                     </select>
-                     <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-500">
-                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-500">
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
                     </div>
                 </div>
-                 {errors.court_id && <p className="text-red-500 text-xs font-bold">{errors.court_id.message as string}</p>}
+                {errors.court_id && <p className="text-red-500 text-xs font-bold">{errors.court_id.message as string}</p>}
             </div>
 
             <div className="grid grid-cols-3 gap-4">
-                 <div className="space-y-2 col-span-1">
+                <div className="space-y-2 col-span-1">
                     <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Day</label>
                     <select
                         {...register("day_of_week")}

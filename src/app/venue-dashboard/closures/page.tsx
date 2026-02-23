@@ -9,10 +9,12 @@ import Modal from "@/components/ui/Modal";
 import ClosureFormModal from "@/components/venue/ClosureFormModal";
 import { useAuth } from "@/services/authContext";
 import { centerService } from "@/services/centerService";
-import { Closure, Court } from "@/types";
+import { Court } from "@/types";
 import { useToast } from "@/components/ui/Toast";
 import { useVenue } from "@/components/venue/VenueContext";
 import { format } from "date-fns";
+
+type Closure = any;
 
 export default function ClosuresPage() {
     const { user } = useAuth();
@@ -142,7 +144,7 @@ export default function ClosuresPage() {
                                     <div className="text-right">
                                         <p className="text-xs font-bold text-zinc-500 uppercase mb-1">Affected Courts</p>
                                         <div className="flex flex-wrap justify-end gap-2">
-                                            {closure.courts && closure.courts.length > 0 ? closure.courts.map((courtId, idx) => {
+                                            {closure.courts && closure.courts.length > 0 ? (closure.courts as any[]).map((courtId: string, idx: number) => {
                                                 const court = courts.find(c => c.id === courtId);
                                                 return (
                                                     <span key={idx} className="bg-zinc-800 text-white text-xs px-2 py-1 rounded">

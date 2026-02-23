@@ -26,10 +26,10 @@ export default function CourtFormModal({ venueId, existingCourt, onClose, onSucc
             name: existingCourt?.name || "",
             description: existingCourt?.description || "",
             sport_type: existingCourt?.sport_type || "Futsal",
-            surface_type: existingCourt?.surface_type || "Turf",
+            surface_type: (existingCourt as any)?.surface_type || "Turf",
             is_indoor: existingCourt?.is_indoor || false,
             hourly_rate: existingCourt?.hourly_rate || 1500,
-            capacity: existingCourt?.capacity || 10,
+            capacity: (existingCourt as any)?.capacity || 10,
             imageFile: undefined as unknown as FileList
         }
     });

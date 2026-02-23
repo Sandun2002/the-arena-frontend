@@ -64,7 +64,7 @@ export default function VenueDetailsPage() {
             <div className="flex items-center gap-6 text-sm text-zinc-400 font-medium">
               <div className="flex items-center gap-2">
                 <MapPin className="h-5 w-5 text-emerald-500" />
-                {venue.location}
+                {venue.city}
               </div>
               <div className="flex items-center gap-2">
                 <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
@@ -77,7 +77,7 @@ export default function VenueDetailsPage() {
           <div className="text-right">
             <p className="text-xs text-zinc-500 font-bold uppercase tracking-wider mb-1">Starting from</p>
             <p className="text-3xl font-black text-white flex items-baseline gap-1 justify-end">
-              LKR {venue.pricePerHour.toLocaleString()} <span className="text-sm font-bold text-zinc-500">/hr</span>
+              LKR 2,500 <span className="text-sm font-bold text-zinc-500">/hr</span>
             </p>
           </div>
         </div>
@@ -87,8 +87,8 @@ export default function VenueDetailsPage() {
       <div className="container mx-auto px-4 mb-12 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 h-[400px] md:h-[500px]">
           {/* Main Large Image */}
-          <div className="md:col-span-3 relative rounded-[2rem] overflow-hidden border border-zinc-800 group cursor-pointer">
-            <Image src={venue.imageUrl} alt={venue.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" priority />
+          <div className="md:col-span-3 relative rounded-[2rem] overflow-hidden border border-zinc-800 group cursor-pointer bg-zinc-900">
+            {venue.cover_image && <Image src={venue.cover_image} alt={venue.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" priority />}
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
 
@@ -121,7 +121,7 @@ export default function VenueDetailsPage() {
               </h3>
               <div className="bg-zinc-900/40 p-8 rounded-[2rem] border border-zinc-800 backdrop-blur-sm">
                 <p className="text-zinc-400 leading-relaxed text-lg">
-                  {venue.description} The facility is equipped with state-of-the-art lighting and turf, ensuring a professional experience for every game. Ideal for tournaments, corporate events, and daily practice sessions.
+                  {venue.description || "The facility is equipped with state-of-the-art lighting and turf, ensuring a professional experience for every game. Ideal for tournaments, corporate events, and daily practice sessions."}
                 </p>
               </div>
             </section>

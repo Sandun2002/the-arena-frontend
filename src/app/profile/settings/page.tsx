@@ -44,7 +44,7 @@ export default function ProfileSettingsPage() {
         setUploadingAvatar(true);
 
         try {
-            await playerService.updateAvatar(user.id, file);
+            await playerService.updateAvatar(file);
             addToast("Avatar updated successfully", "success");
         } catch (error) {
             addToast("Failed to update avatar", "error");
@@ -58,7 +58,7 @@ export default function ProfileSettingsPage() {
         if (!user) return;
         setIsSubmitting(true);
         try {
-            await playerService.updateProfile(user.id, data);
+            await playerService.updateProfile(data);
             addToast("Profile updated successfully", "success");
             router.refresh();
             setTimeout(() => router.push("/profile"), 500);
