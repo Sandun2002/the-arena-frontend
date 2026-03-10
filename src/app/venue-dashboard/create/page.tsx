@@ -11,7 +11,7 @@ import { useToast } from "@/components/ui/Toast";
 import { useAuth } from "@/services/authContext";
 import { useVenue } from "@/components/venue/VenueContext";
 
-type Step = "details" | "location" | "amenities";
+type Step = "details" | "location" | "amenities" | "document";
 
 export default function CreateVenuePage() {
     const router = useRouter();
@@ -20,6 +20,7 @@ export default function CreateVenuePage() {
     const { addToast } = useToast();
     const [step, setStep] = useState<Step>("details");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [brDocument, setBrDocument] = useState<File | null>(null);
 
     const { register, handleSubmit, formState: { errors } } = useForm({
         defaultValues: {
@@ -37,15 +38,26 @@ export default function CreateVenuePage() {
     const amenitiesList = ["Parking", "A/C", "Showers", "Equipment Rental", "Cafe", "WiFi", "Lockers", "First Aid"];
 
     const onSubmit = async (data: any) => {
+        if (!brDocument) {
+            addToast("Business Registration document is required.", "error");
+            return;
+        }
+
         setIsSubmitting(true);
         try {
+            // 1. Upload the BR document first
+            const uploadRes = await venueApiService.uploadBRDocument(brDocument);
+            const brDocumentUrl = uploadRes.url;
+
+            // 2. Create the venue with the returned document URL
             await venueApiService.createVenue({
                 ...data,
                 sport: "generic", // Default for now, could be added to form
                 location: data.city, // Backward compatibility
-                owner_id: user?.id
+                owner_id: user?.id,
+                br_document_url: brDocumentUrl
             });
-            addToast("Venue created successfully!", "success");
+            addToast("Venue created successfully! Waiting for admin verification.", "success");
 
             // Refresh venues list in context so the new venue appears immediately
             refreshVenues();
@@ -70,13 +82,14 @@ export default function CreateVenuePage() {
 
                 <div className="mb-8 text-center">
                     <h1 className="text-3xl font-bold text-white mb-2">Register Your Venue</h1>
-                    <p className="text-zinc-400">Step {step === "details" ? 1 : step === "location" ? 2 : 3} of 3</p>
+                    <p className="text-zinc-400">Step {step === "details" ? 1 : step === "location" ? 2 : step === "amenities" ? 3 : 4} of 4</p>
 
                     {/* Progress Bar */}
                     <div className="flex gap-2 mt-6 justify-center">
-                        <div className={`h-1.5 w-16 rounded-full transition-colors duration-300 ${step === "details" || step === "location" || step === "amenities" ? "bg-emerald-500" : "bg-zinc-800"}`} />
-                        <div className={`h-1.5 w-16 rounded-full transition-colors duration-300 ${step === "location" || step === "amenities" ? "bg-emerald-500" : "bg-zinc-800"}`} />
-                        <div className={`h-1.5 w-16 rounded-full transition-colors duration-300 ${step === "amenities" ? "bg-emerald-500" : "bg-zinc-800"}`} />
+                        <div className={`h-1.5 w-16 rounded-full transition-colors duration-300 ${step === "details" || step === "location" || step === "amenities" || step === "document" ? "bg-emerald-500" : "bg-zinc-800"}`} />
+                        <div className={`h-1.5 w-16 rounded-full transition-colors duration-300 ${step === "location" || step === "amenities" || step === "document" ? "bg-emerald-500" : "bg-zinc-800"}`} />
+                        <div className={`h-1.5 w-16 rounded-full transition-colors duration-300 ${step === "amenities" || step === "document" ? "bg-emerald-500" : "bg-zinc-800"}`} />
+                        <div className={`h-1.5 w-16 rounded-full transition-colors duration-300 ${step === "document" ? "bg-emerald-500" : "bg-zinc-800"}`} />
                     </div>
                 </div>
 
@@ -224,10 +237,56 @@ export default function CreateVenuePage() {
                                     <Button type="button" variant="ghost" onClick={() => setStep("location")} className="flex-1 h-12 text-zinc-400 hover:text-white">
                                         <ArrowLeft className="w-5 h-5 mr-2" /> Back
                                     </Button>
+                                    <Button type="button" onClick={() => setStep("document")} className="flex-[2] bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-12 text-lg shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+                                        Next: Verification <ArrowRight className="w-5 h-5 ml-2" />
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Step 4: Document Upload & Submit */}
+                        {step === "document" && (
+                            <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300">
+                                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-zinc-800">
+                                    <div className="p-2 bg-purple-500/10 rounded-lg">
+                                        <Info className="w-6 h-6 text-purple-500" />
+                                    </div>
+                                    <h2 className="text-xl font-bold text-white">Verification</h2>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <label className="text-sm font-bold text-white block">Business Registration Document (PDF)</label>
+                                    <p className="text-xs text-zinc-400">Please upload your official business registration. Only PDF format up to 5MB is allowed. This is strictly required to verify your venue ownership.</p>
+
+                                    <div className="relative group mt-2">
+                                        <input
+                                            type="file"
+                                            accept="application/pdf"
+                                            onChange={(e) => {
+                                                if (e.target.files && e.target.files.length > 0) {
+                                                    setBrDocument(e.target.files[0]);
+                                                }
+                                            }}
+                                            className="w-full text-sm text-zinc-400 file:mr-4 file:py-3 file:px-6 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-500/10 file:text-emerald-500 hover:file:bg-emerald-500/20 cursor-pointer"
+                                        />
+                                    </div>
+
+                                    {brDocument && (
+                                        <div className="bg-emerald-500/10 text-emerald-500 text-sm px-4 py-2 rounded-xl inline-flex items-center border border-emerald-500/20">
+                                            <CheckCircle className="w-4 h-4 mr-2" />
+                                            "{brDocument.name}" ready to upload
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="flex gap-3 pt-6 border-t border-zinc-800 mt-6">
+                                    <Button type="button" variant="ghost" onClick={() => setStep("amenities")} className="flex-1 h-12 text-zinc-400 hover:text-white">
+                                        <ArrowLeft className="w-5 h-5 mr-2" /> Back
+                                    </Button>
                                     <Button
                                         type="submit"
-                                        disabled={isSubmitting}
-                                        className="flex-[2] bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-12 text-lg shadow-[0_0_20px_rgba(16,185,129,0.2)]"
+                                        disabled={isSubmitting || !brDocument}
+                                        className="flex-[2] bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-12 text-lg shadow-[0_0_20px_rgba(16,185,129,0.2)] disabled:opacity-50 disabled:shadow-none"
                                     >
                                         {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "Complete Registration"}
                                     </Button>

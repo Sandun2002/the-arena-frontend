@@ -14,7 +14,6 @@ import { useToast } from "@/components/ui/Toast";
 
 const venueSignupSchema = z.object({
   fullName: z.string().min(2, "Owner name is required"),
-  venueName: z.string().min(2, "Venue name is required"), // Not strictly used in auth signup, but good for context
   email: z.string().email("Invalid email address"),
   phone: z.string().regex(/^(?:\+94|0)[0-9]{2}[0-9]{7}$/, "Invalid Sri Lankan phone number"),
   password: z.string()
@@ -59,7 +58,7 @@ export default function VenueSignupPage() {
     } catch (error: any) {
       console.error("Signup error details:", error);
       let errorMessage = "Failed to create account.";
-      
+
       if (error.response) {
         const errorData = error.response.data?.error;
         if (errorData?.details && errorData.details.length > 0) {
@@ -105,15 +104,7 @@ export default function VenueSignupPage() {
               {errors.fullName && <p className="text-red-500 text-xs">{errors.fullName.message}</p>}
             </div>
 
-            <div className="space-y-2">
-              <label className="block text-xs font-bold text-zinc-500 uppercase">Venue Name (Primary)</label>
-              <input
-                {...register("venueName")}
-                className="w-full rounded-xl border border-zinc-700 bg-black/50 p-3 text-white focus:border-blue-500 focus:outline-none transition-colors"
-                placeholder="City Sports Complex"
-              />
-              {errors.venueName && <p className="text-red-500 text-xs">{errors.venueName.message}</p>}
-            </div>
+
 
             <div className="space-y-2">
               <label className="block text-xs font-bold text-zinc-500 uppercase">Business Email</label>

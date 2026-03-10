@@ -24,10 +24,10 @@ export const venueApiService = {
     },
 
     // === Registration Documents ===
-    uploadBRDocument: async (venueId: string, file: File) => {
+    uploadBRDocument: async (file: File) => {
         const formData = new FormData();
         formData.append('file', file);
-        const response = await apiClient.post(`/venues/${venueId}/upload-br-document`, formData);
+        const response = await apiClient.post(`/venues/upload-br-document`, formData);
         return response.data;
     },
 
