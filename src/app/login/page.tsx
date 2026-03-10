@@ -44,17 +44,14 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       // In real backend: POST /auth/login (form-data)
-      await login(email, password);
-
-      // Checking local storage role or just rely on global redirect logic
-      // For now, let's hard check the mock logic for redirect
-      // In real app, we'd check user role from context after login
+      const userData = await login(email, password);
 
       addToast("Welcome back!", "success");
 
-      // Simple redirect logic based on email for demo purposes
-      // In production, useAuth().user would direct this
-      if (email.includes("owner")) {
+      // Redirect logic based on actual user roles
+      const isOwnerOrManager = userData.roles.some((r) => r.slug === "venue_owner" || r.slug === "venue_manager");
+
+      if (isOwnerOrManager) {
         router.push("/venue-dashboard");
       } else {
         router.push("/dashboard");

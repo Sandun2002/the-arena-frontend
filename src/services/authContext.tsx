@@ -10,7 +10,7 @@ interface AuthContextType {
     isLoggedIn: boolean;
     user: User | null;
     loading: boolean;
-    login: (email: string, password: string) => Promise<void>;
+    login: (email: string, password: string) => Promise<User>;
     logout: () => void;
     // Role Helpers
     hasRole: (role: UserRole) => boolean;
@@ -49,7 +49,7 @@ export const AuthProvider: FunctionComponent<{ children: React.ReactNode }> = ({
         initAuth();
     }, []);
 
-    const login = async (email: string, password: string) => {
+    const login = async (email: string, password: string): Promise<User> => {
         try {
             // 1. Get Tokens
             const tokenResponse = await authService.login(email, password);
@@ -61,6 +61,7 @@ export const AuthProvider: FunctionComponent<{ children: React.ReactNode }> = ({
 
             // 3. Create Refresh Timer (Mock implementation)
             // In real app: setup an interceptor or timeout based on tokenResponse.expires_in
+            return userData;
 
         } catch (error) {
             console.error("Login Failed", error);
