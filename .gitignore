@@ -39,3 +39,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# IDEs
+.idea/
+.vscode/
+
+# Build and lint logs
+*.log
+build_output.txt
+build_output2.txt
+build-output*.txt
+tsc_output*.txt
+lint_output.txt
+lint_log.txt
