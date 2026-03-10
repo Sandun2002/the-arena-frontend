@@ -17,7 +17,12 @@ const venueSignupSchema = z.object({
   venueName: z.string().min(2, "Venue name is required"), // Not strictly used in auth signup, but good for context
   email: z.string().email("Invalid email address"),
   phone: z.string().regex(/^(?:\+94|0)[0-9]{2}[0-9]{7}$/, "Invalid Sri Lankan phone number"),
-  password: z.string().min(8, "Password must be at least 8 characters").regex(/[0-9]/, "Must contain a number"),
+  password: z.string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Z]/, "Must contain an uppercase letter")
+    .regex(/[a-z]/, "Must contain a lowercase letter")
+    .regex(/[0-9]/, "Must contain a number")
+    .regex(/[!@#$%^&*(),.?":{}|<>_\-+=\[\]\\/~`]/, "Must contain a special character"),
   confirmPassword: z.string()
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords do not match",
@@ -51,8 +56,23 @@ export default function VenueSignupPage() {
 
       addToast("Owner account created! Please log in to setup your venue.", "success");
       router.push("/login?email=" + encodeURIComponent(data.email));
-    } catch (error) {
-      addToast("Failed to create account.", "error");
+    } catch (error: any) {
+      console.error("Signup error details:", error);
+      let errorMessage = "Failed to create account.";
+      
+      if (error.response) {
+        const errorData = error.response.data?.error;
+        if (errorData?.details && errorData.details.length > 0) {
+          errorMessage = errorData.details[0].message;
+        } else {
+          errorMessage = errorData?.message || error.response.data?.detail || `Server Error (${error.response.status})`;
+        }
+      } else if (error.request) {
+        errorMessage = "No response from server. Check your connection or backend status.";
+      } else {
+        errorMessage = error.message;
+      }
+      addToast(errorMessage, "error");
     } finally {
       setIsSubmitting(false);
     }

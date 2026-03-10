@@ -4,6 +4,7 @@ import { LoginResponse } from '@/types';
 
 // Configuration
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+
 const ACCESS_TOKEN_KEY = "arena_access_token";
 const REFRESH_TOKEN_KEY = "arena_refresh_token";
 
