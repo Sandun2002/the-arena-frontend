@@ -58,9 +58,6 @@ export const AuthProvider: FunctionComponent<{ children: React.ReactNode }> = ({
             const userData = await authService.getMe(tokenResponse.access_token);
 
             setUser(userData);
-
-            // 3. Create Refresh Timer (Mock implementation)
-            // In real app: setup an interceptor or timeout based on tokenResponse.expires_in
             return userData;
 
         } catch (error) {

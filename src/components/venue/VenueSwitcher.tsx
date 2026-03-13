@@ -6,14 +6,16 @@ import { ChevronDown, Check, Building2, Plus } from "lucide-react";
 import { useVenue } from "./VenueContext";
 import Link from "next/link";
 
-export default function VenueSwitcher() {
+export default function VenueSwitcher({ hideCreateAction = false }: { hideCreateAction?: boolean }) {
     const { venues, currentVenue, selectVenue, isLoading } = useVenue();
     const [isOpen, setIsOpen] = useState(false);
 
     if (isLoading) return <div className="h-10 w-full bg-zinc-800/50 animate-pulse rounded-lg" />;
 
-    // If no venues found (new user), show add button
+    // If no venues found (new user), show add button (unless hidden)
     if (!venues || venues.length === 0) {
+        if (hideCreateAction) return null;
+
         return (
             <Link href="/venue-dashboard/create" className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-zinc-800 transition-colors border border-zinc-800 bg-zinc-900/50 w-full group">
                 <div className="w-8 h-8 rounded bg-emerald-500/10 flex items-center justify-center text-emerald-500 group-hover:bg-emerald-500 group-hover:text-black transition-colors">
@@ -58,8 +60,8 @@ export default function VenueSwitcher() {
                                         setIsOpen(false);
                                     }}
                                     className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${currentVenue?.id === venue.id
-                                            ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
-                                            : "text-zinc-400 hover:text-white hover:bg-zinc-800 border border-transparent"
+                                        ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
+                                        : "text-zinc-400 hover:text-white hover:bg-zinc-800 border border-transparent"
                                         }`}
                                 >
                                     <span className="truncate">{venue.name}</span>
@@ -67,15 +69,17 @@ export default function VenueSwitcher() {
                                 </button>
                             ))}
                         </div>
-                        <div className="border-t border-zinc-800 p-2 bg-zinc-900/50">
-                            <Link
-                                href="/venue-dashboard/create"
-                                onClick={() => setIsOpen(false)}
-                                className="flex items-center justify-center gap-2 w-full text-center text-xs font-bold text-zinc-400 hover:text-white hover:bg-zinc-800 py-2 rounded-lg transition-colors"
-                            >
-                                <Plus className="w-3 h-3" /> Add New Venue
-                            </Link>
-                        </div>
+                        {!hideCreateAction && (
+                            <div className="border-t border-zinc-800 p-2 bg-zinc-900/50">
+                                <Link
+                                    href="/venue-dashboard/create"
+                                    onClick={() => setIsOpen(false)}
+                                    className="flex items-center justify-center gap-2 w-full text-center text-xs font-bold text-zinc-400 hover:text-white hover:bg-zinc-800 py-2 rounded-lg transition-colors"
+                                >
+                                    <Plus className="w-3 h-3" /> Add New Venue
+                                </Link>
+                            </div>
+                        )}
                     </div>
                 </>
             )}

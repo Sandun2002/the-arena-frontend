@@ -40,7 +40,7 @@ export default function VenueCard({ venue }: VenueCardProps) {
           </h3>
           <div className="flex items-center gap-1 text-yellow-400">
             <Star className="h-4 w-4 fill-yellow-400" />
-            <span className="text-sm font-bold text-white">{venue.rating}</span>
+            <span className="text-sm font-bold text-white">{venue.rating.toFixed(1)}</span>
           </div>
         </div>
 
@@ -51,7 +51,9 @@ export default function VenueCard({ venue }: VenueCardProps) {
 
         <div className="flex items-center justify-between border-t border-zinc-800 pt-4">
           <div>
-            <span className="text-lg font-bold text-white">LKR {venue.contact_number ? "Contact for Price" : "Book Now"}</span>
+            <span className="text-lg font-bold text-white">
+              {venue.min_hourly_rate ? `From LKR ${venue.min_hourly_rate.toLocaleString()}/hr` : "View availability"}
+            </span>
           </div>
 
           <Link

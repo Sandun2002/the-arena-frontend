@@ -12,34 +12,39 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/services/authContext";
 import VenueSwitcher from "./VenueSwitcher";
+import FullScreenSpinner from "../ui/FullScreenSpinner";
+import { useRouter } from "next/navigation";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
-    const { user, logout, isVenueManager } = useAuth();
+    const router = useRouter();
+    const { user, logout, isVenueManager, isLoggedIn, loading } = useAuth();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
+
+    // Auth Guard
+    useEffect(() => {
+        if (!loading && !isLoggedIn) {
+            router.replace("/login");
+        }
+    }, [loading, isLoggedIn, router]);
 
     const sidebarRef = useRef(null);
     const contentRef = useRef(null);
 
-    // GSAP Entry Animations
+    // GSAP Entry Animations - apply ONLY to content to avoid CSS conflict w/ sidebar translate-x
     useGSAP(() => {
+        if (!contentRef.current) return;
         const tl = gsap.timeline();
 
-        tl.from(sidebarRef.current, {
-            x: -50,
+        tl.from(contentRef.current, {
+            y: 20,
             opacity: 0,
-            duration: 0.8,
+            duration: 0.6,
             ease: "power3.out"
-        })
-            .from(contentRef.current, {
-                y: 20,
-                opacity: 0,
-                duration: 0.6,
-                ease: "power3.out"
-            }, "-=0.4");
+        });
 
     }, []);
 
@@ -71,8 +76,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
+    if (loading || !isLoggedIn) {
+        return <FullScreenSpinner />;
+    }
+
     return (
-        <div className="min-h-screen bg-black text-zinc-100 flex selection:bg-emerald-500/30 overflow-hidden pt-20">
+        <div className="min-h-screen bg-black text-zinc-100 flex selection:bg-emerald-500/30 overflow-hidden lg:pt-20 pt-0">
 
             {/* Global Ambient Background */}
             <div className="fixed inset-0 pointer-events-none z-0">
@@ -83,7 +92,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {/* Mobile Overlay */}
             {isSidebarOpen && (
                 <div
-                    className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 lg:hidden"
+                    className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[55] lg:hidden cursor-pointer"
                     onClick={() => setIsSidebarOpen(false)}
                 />
             )}
@@ -92,21 +101,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <aside
                 ref={sidebarRef}
                 className={`
-                    fixed top-20 left-0 z-50 h-[calc(100vh-5rem)] w-72 
+                    fixed lg:top-20 top-0 left-0 z-[60] lg:z-40 lg:h-[calc(100vh-5rem)] h-[100dvh] w-72 
                     bg-zinc-900/60 border-r border-zinc-800/60 backdrop-blur-xl
-                    transform transition-transform duration-300 ease-in-out
+                    transition-transform duration-300 ease-in-out
+                    flex flex-col
                     ${isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
                 `}
             >
                 <div className="flex flex-col h-full">
                     {/* Header */}
-                    <div className="p-6 border-b border-zinc-800/60">
-                        <Link href="/" className="block mb-6">
-                            <span className="font-black text-2xl text-white tracking-tight">
-                                ARENA<span className="text-emerald-500">.LK</span>
-                            </span>
-                        </Link>
-                        <VenueSwitcher />
+                    <div className="p-6 border-b border-zinc-800/60 flex items-center justify-between gap-4">
+                        <div className="flex-1">
+                            <VenueSwitcher hideCreateAction={true} />
+                        </div>
+                        <button className="lg:hidden p-2 text-zinc-400 hover:text-white bg-black/40 rounded-xl" onClick={() => setIsSidebarOpen(false)}>
+                            <X className="w-5 h-5" />
+                        </button>
                     </div>
 
                     {/* Nav Links */}
@@ -181,6 +191,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                 </Link>
                             </div>
                         )}
+
+                        <div className="pt-4 pb-2 mt-4 border-t border-zinc-800/60">
+                            <Link
+                                href="/"
+                                className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden text-zinc-400 hover:bg-zinc-800/40 hover:text-white"
+                            >
+                                <LayoutDashboard className="w-5 h-5 relative z-10 text-zinc-500 group-hover:text-white transition-colors" />
+                                <span className="relative z-10 font-medium tracking-wide text-sm">Return to Player View</span>
+                            </Link>
+                        </div>
                     </nav>
 
                     {/* Footer */}
@@ -206,17 +226,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
             {/* Main Content */}
             <div className="flex-1 flex flex-col min-h-screen w-full relative z-10 lg:pl-72">
-                {/* Mobile Header */}
-                <header className={`lg:hidden sticky top-0 z-30 px-4 py-3 flex items-center justify-between transition-all duration-300 ${scrolled ? "bg-black/60 backdrop-blur-md border-b border-zinc-800/50" : "bg-transparent"}`}>
-                    <Link href="/" className="block">
-                        <span className="font-black text-xl text-white tracking-tight">
-                            ARENA<span className="text-emerald-500">.LK</span>
-                        </span>
-                    </Link>
-                    <button onClick={toggleSidebar} className="p-2 text-white bg-zinc-800/50 border border-zinc-700/50 rounded-lg backdrop-blur-sm">
-                        {isSidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-                    </button>
-                </header>
+                {/* Floating Action Button for Mobile Sidebar */}
+                <button
+                    onClick={toggleSidebar}
+                    className={`
+                        lg:hidden fixed bottom-6 right-6 z-40 w-14 h-14 
+                        bg-emerald-500 rounded-full flex items-center justify-center 
+                        text-black shadow-[0_0_20px_rgba(16,185,129,0.4)]
+                        hover:bg-emerald-400 hover:scale-105 transition-all duration-300
+                        ${isSidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}
+                    `}
+                >
+                    <Menu className="w-6 h-6" />
+                </button>
 
                 <main ref={contentRef} className="flex-1 w-full max-w-7xl mx-auto p-4 md:p-8 lg:p-10">
                     {children}

@@ -66,8 +66,8 @@ export default function DashboardPage() {
                     <StatsCard
                         icon={<Trophy className="w-5 h-5 text-yellow-500" />}
                         label="Current Level"
-                        value={user.level}
-                        subtext={`${user.next_level_xp - user.xp} XP to next`}
+                        value={user.level ?? 1}
+                        subtext={`${Math.max((user.next_level_xp ?? 0) - (user.xp ?? 0), 0)} XP to next`}
                     />
                     <StatsCard
                         icon={<Calendar className="w-5 h-5 text-blue-500" />}
@@ -145,19 +145,6 @@ export default function DashboardPage() {
                                 <p className="text-zinc-400 text-sm">No recent activity</p>
                             </div>
                         )}
-
-                        {/* Quick Challenge (Mock) */}
-                        <div className="bg-gradient-to-br from-indigo-900/20 to-purple-900/20 border border-indigo-500/20 rounded-2xl p-6 relative overflow-hidden">
-                            <div className="absolute top-0 right-0 p-4 opacity-10">
-                                <Trophy className="w-24 h-24 text-indigo-500 transform rotate-12" />
-                            </div>
-                            <h3 className="text-lg font-bold text-white mb-1 relative z-10">Weekly Challenge</h3>
-                            <p className="text-indigo-200 text-sm mb-4 relative z-10">Play 3 badminton matches this week to earn 500 XP!</p>
-                            <div className="w-full bg-zinc-800/50 rounded-full h-2 mb-2 relative z-10">
-                                <div className="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full w-1/3"></div>
-                            </div>
-                            <p className="text-xs text-indigo-300 font-bold relative z-10">1 / 3 Matches Completed</p>
-                        </div>
                     </div>
 
                 </div>

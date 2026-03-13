@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Venue, Court } from "@/types";
+import { Venue } from "@/types";
 import Button from "@/components/ui/Button";
 import { Calendar, Check, LogIn, Loader2 } from "lucide-react";
 import { useAuth } from "@/services/authContext";
@@ -38,7 +38,17 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
     setLoadingSlots(true);
     api.getVenueSlots(venue.id, date)
       .then((res: any) => {
-        const data = res.venue_slots || [];
+        const data = (res.courts || []).map((court: any) => ({
+          court: {
+            id: court.court_id,
+            name: court.court_name,
+          },
+          slots: court.slots.map((slot: any) => ({
+            start: `${slot.date}T${slot.start}`,
+            end: `${slot.date}T${slot.end}`,
+            status: slot.status,
+          })),
+        }));
         setCourtsData(data);
         if (data.length > 0 && !selectedCourtId) {
           setSelectedCourtId(data[0].court.id);
@@ -53,7 +63,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
     if (selectedCourtId && selectedSlots.length > 0) {
       // Sort slots by start time to ensure contiguous sequence 
       const sortedSlots = [...selectedSlots].sort((a, b) => a.start.localeCompare(b.start));
-      const timeSlotsFormatted = sortedSlots.map(s => format(parseISO(s.start), "HH:mm"));
+      const timeSlotsFormatted = sortedSlots.map(s => s.start.slice(11, 16));
 
       bookingService.calculatePrice(selectedCourtId, date, timeSlotsFormatted)
         .then(setPricing)
@@ -89,7 +99,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
       const startTime = sortedSlots[0].start;
       const endTime = sortedSlots[sortedSlots.length - 1].end;
 
-      const booking = await bookingService.createBooking({
+      await bookingService.createBooking({
         venue_id: venue.id,
         court_id: selectedCourtId,
         start_time: startTime,
@@ -105,11 +115,6 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
       addToast("Failed to create booking", "error");
       setSubmitting(false);
     }
-  };
-
-  const handleDemoLogin = () => {
-    login("player@arena.lk", "password123");
-    setShowLoginPrompt(false);
   };
 
   // Success overlay
@@ -137,12 +142,6 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
         <p className="text-zinc-400 text-sm mb-6">Please sign in to complete your booking.</p>
 
         <div className="space-y-3">
-          <Button
-            onClick={handleDemoLogin}
-            className="w-full py-3 bg-emerald-500 text-black hover:bg-emerald-400 font-bold"
-          >
-            Demo: Login as Player
-          </Button>
           <button
             onClick={() => router.push("/login")}
             className="w-full py-3 text-sm text-zinc-400 hover:text-white transition-colors"

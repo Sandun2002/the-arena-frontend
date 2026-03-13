@@ -9,11 +9,12 @@ import { useToast } from "@/components/ui/Toast";
 
 interface ReviewFormModalProps {
     venueId: string;
+    bookingId?: string;
     onClose: () => void;
     onSuccess: () => void;
 }
 
-export default function ReviewFormModal({ venueId, onClose, onSuccess }: ReviewFormModalProps) {
+export default function ReviewFormModal({ venueId, bookingId, onClose, onSuccess }: ReviewFormModalProps) {
     const { user } = useAuth();
     const { addToast } = useToast();
 
@@ -42,11 +43,16 @@ export default function ReviewFormModal({ venueId, onClose, onSuccess }: ReviewF
             return;
         }
         if (!user) return;
+        if (!bookingId) {
+            addToast("Reviews require a completed booking", "error");
+            return;
+        }
 
         setIsSubmitting(true);
         try {
             await playerService.createReview({
                 venueId,
+                bookingId,
                 rating,
                 comment
             });
@@ -71,6 +77,17 @@ export default function ReviewFormModal({ venueId, onClose, onSuccess }: ReviewF
                 <p className="text-red-400 font-bold mb-1">Cannot Submit Review</p>
                 <p className="text-red-200/70 text-sm mb-4">{error}</p>
                 <Button variant="ghost" onClick={onClose} className="w-full text-red-400 hover:bg-red-500/10 hover:text-red-300">Close</Button>
+            </div>
+        );
+    }
+
+    if (!bookingId) {
+        return (
+            <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl text-center">
+                <AlertTriangle className="w-8 h-8 text-amber-400 mx-auto mb-2" />
+                <p className="text-amber-200 font-bold mb-1">Booking Required</p>
+                <p className="text-amber-100/70 text-sm mb-4">Reviews can only be submitted for completed bookings.</p>
+                <Button variant="ghost" onClick={onClose} className="w-full text-amber-200 hover:bg-amber-500/10 hover:text-amber-100">Close</Button>
             </div>
         );
     }

@@ -10,6 +10,7 @@ import { venueApiService } from "@/services/venueApiService";
 import { useToast } from "@/components/ui/Toast";
 import { useAuth } from "@/services/authContext";
 import { useVenue } from "@/components/venue/VenueContext";
+import { Venue } from "@/types";
 
 type Step = "details" | "location" | "amenities";
 
@@ -26,7 +27,7 @@ export default function EditVenuePage() {
         defaultValues: {
             name: "",
             description: "",
-            operating_hours: "",
+            operating_hours_summary: "",
             contact_number: "",
             contact_email: "",
             city: "",
@@ -37,15 +38,26 @@ export default function EditVenuePage() {
 
     const amenitiesList = ["Parking", "A/C", "Showers", "Equipment Rental", "Cafe", "WiFi", "Lockers", "First Aid"];
 
+    const formatOperatingHoursSummary = (operatingHours: Venue["operating_hours"]) => {
+        const openDays = operatingHours.filter((entry) => !entry.is_closed && entry.open_time && entry.close_time);
+
+        if (openDays.length === 0) {
+            return "Schedule not available";
+        }
+
+        const uniqueRanges = Array.from(new Set(openDays.map((entry) => `${entry.open_time} - ${entry.close_time}`)));
+        return uniqueRanges.join(", ");
+    };
+
     useEffect(() => {
         if (currentVenue) {
             setValue("name", currentVenue.name);
-            setValue("description", currentVenue.description);
-            setValue("operating_hours", currentVenue.operating_hours);
-            setValue("contact_number", currentVenue.contact_number);
+            setValue("description", currentVenue.description ?? "");
+            setValue("operating_hours_summary", formatOperatingHoursSummary(currentVenue.operating_hours));
+            setValue("contact_number", currentVenue.contact_number ?? "");
             setValue("contact_email", user?.email || ""); // Venue object doesn't have email usually, using user's or empty
             setValue("city", currentVenue.city);
-            setValue("address", currentVenue.address);
+            setValue("address", currentVenue.address ?? "");
             setValue("amenities", (currentVenue.amenities?.map(a => a.name) as string[]) || []);
             setIsLoading(false);
         } else {
@@ -61,8 +73,9 @@ export default function EditVenuePage() {
         if (!currentVenue) return;
         setIsSubmitting(true);
         try {
+            const { operating_hours_summary, ...venueData } = data;
             await venueApiService.updateVenue(currentVenue.id, {
-                ...data,
+                ...venueData,
                 location: data.city, // Backward compatibility
             });
             addToast("Venue updated successfully!", "success");
@@ -171,9 +184,10 @@ export default function EditVenuePage() {
                                 <div className="space-y-2">
                                     <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Operating Hours (Summary)</label>
                                     <input
-                                        {...register("operating_hours")}
+                                        {...register("operating_hours_summary")}
                                         className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
                                         placeholder="Ex: 06:00 - 23:00"
+                                        readOnly
                                     />
                                 </div>
 

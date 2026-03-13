@@ -10,7 +10,7 @@ import { venueApiService } from "@/services/venueApiService";
 import { centerService } from "@/services/centerService";
 import { useToast } from "@/components/ui/Toast";
 import { useVenue } from "@/components/venue/VenueContext";
-import { VenueProfile } from "@/types";
+import { Venue, VenueProfile } from "@/types";
 
 export default function VenueSettingsPage() {
     const { user } = useAuth();
@@ -27,7 +27,7 @@ export default function VenueSettingsPage() {
             name: "",
             description: "",
             contact_number: "",
-            operating_hours: "", // Summary string
+            operating_hours_summary: "", // Summary string
             address: "",
             city: "",
             schedule: [
@@ -47,14 +47,25 @@ export default function VenueSettingsPage() {
         name: "schedule"
     });
 
+    const formatOperatingHoursSummary = (operatingHours: Venue["operating_hours"]) => {
+        const openDays = operatingHours.filter((entry) => !entry.is_closed && entry.open_time && entry.close_time);
+
+        if (openDays.length === 0) {
+            return "Schedule not available";
+        }
+
+        const uniqueRanges = Array.from(new Set(openDays.map((entry) => `${entry.open_time} - ${entry.close_time}`)));
+        return uniqueRanges.join(", ");
+    };
+
     useEffect(() => {
         if (currentVenue) {
             // Set basic info from context
             setValue("name", currentVenue.name);
-            setValue("description", currentVenue.description);
-            setValue("contact_number", currentVenue.contact_number);
-            setValue("operating_hours", currentVenue.operating_hours);
-            setValue("address", currentVenue.address);
+            setValue("description", currentVenue.description ?? "");
+            setValue("contact_number", currentVenue.contact_number ?? "");
+            setValue("operating_hours_summary", formatOperatingHoursSummary(currentVenue.operating_hours));
+            setValue("address", currentVenue.address ?? "");
             setValue("city", currentVenue.city);
 
             // Fetch detailed profile for schedule
@@ -87,7 +98,6 @@ export default function VenueSettingsPage() {
                 name: data.name,
                 description: data.description,
                 contact_number: data.contact_number,
-                operating_hours: data.operating_hours,
                 address: data.address,
                 city: data.city
             });
@@ -193,9 +203,10 @@ export default function VenueSettingsPage() {
                                         <Clock className="w-3 h-3" /> Operating Hours (Summary)
                                     </label>
                                     <input
-                                        {...register("operating_hours")}
+                                        {...register("operating_hours_summary")}
                                         className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
                                         placeholder="e.g. 6:00 AM - 10:00 PM"
+                                        readOnly
                                     />
                                 </div>
                             </div>

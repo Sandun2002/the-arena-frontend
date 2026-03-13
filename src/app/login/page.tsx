@@ -5,7 +5,7 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import gsap from "gsap";
-import { ArrowRight, Lock, Mail, Shield, User, Smartphone, AlertCircle } from "lucide-react";
+import { ArrowRight, Lock, Mail, Shield } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
 import { useToast } from "@/components/ui/Toast";
@@ -19,10 +19,6 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
-  // MFA State (Mock)
-  const [showMfa, setShowMfa] = useState(false);
-  const [mfaCode, setMfaCode] = useState(["", "", "", "", "", ""]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -62,16 +58,6 @@ export default function LoginPage() {
     }
   };
 
-  const handleDemoLogin = (type: "player" | "owner") => {
-    if (type === "player") {
-      setEmail("player@arena.lk");
-      setPassword("password123"); // Mock
-    } else {
-      setEmail("owner@arena.lk");
-      setPassword("password123");
-    }
-  };
-
   return (
     <main className="min-h-screen bg-black flex items-center justify-center p-4 relative overflow-hidden" ref={containerRef}>
       {/* Background Elements */}
@@ -93,30 +79,6 @@ export default function LoginPage() {
         </div>
 
         <div className="bg-zinc-900/50 backdrop-blur-xl border border-zinc-800 rounded-3xl p-8 shadow-2xl">
-
-          {/* Demo Login Buttons */}
-          <div className="grid grid-cols-2 gap-3 mb-6">
-            <button
-              onClick={() => handleDemoLogin("player")}
-              className="flex items-center justify-center gap-2 py-2 px-4 rounded-xl bg-zinc-800 hover:bg-zinc-700 transition-colors border border-zinc-700 hover:border-emerald-500/50 group"
-            >
-              <User className="w-4 h-4 text-emerald-500 group-hover:scale-110 transition-transform" />
-              <span className="text-xs font-bold text-white">Player Demo</span>
-            </button>
-            <button
-              onClick={() => handleDemoLogin("owner")}
-              className="flex items-center justify-center gap-2 py-2 px-4 rounded-xl bg-zinc-800 hover:bg-zinc-700 transition-colors border border-zinc-700 hover:border-blue-500/50 group"
-            >
-              <Shield className="w-4 h-4 text-blue-500 group-hover:scale-110 transition-transform" />
-              <span className="text-xs font-bold text-white">Owner Demo</span>
-            </button>
-          </div>
-
-          <div className="relative flex py-2 items-center mb-6">
-            <div className="flex-grow border-t border-zinc-800"></div>
-            <span className="flex-shrink-0 mx-4 text-zinc-600 text-xs font-bold uppercase">Or continue with</span>
-            <div className="flex-grow border-t border-zinc-800"></div>
-          </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">

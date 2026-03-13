@@ -1,10 +1,9 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { format } from "date-fns";
-import { Star, Trash2, Edit2, MessageSquare } from "lucide-react";
+import { Star, Trash2, MessageSquare } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
 import { playerService } from "@/services/playerService";
@@ -22,15 +21,21 @@ export default function MyReviewsPage() {
             playerService.getMyReviews().then((data) => {
                 setReviews(data);
                 setIsLoading(false);
+            }).catch(() => {
+                setReviews([]);
+                setIsLoading(false);
             });
         }
     }, [user]);
 
     const handleDelete = async (reviewId: string) => {
-        // Mock delete logic
-        setReviews(prev => prev.filter(r => r.id !== reviewId));
-        addToast("Review deleted", "success");
-        // In real app, call playerService.deleteReview(reviewId)
+        try {
+            await playerService.deleteReview(reviewId);
+            setReviews(prev => prev.filter(r => r.id !== reviewId));
+            addToast("Review deleted", "success");
+        } catch {
+            addToast("Failed to delete review", "error");
+        }
     };
 
     if (!user) return null;
@@ -67,9 +72,6 @@ export default function MyReviewsPage() {
                                     </div>
 
                                     <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <Button size="sm" variant="ghost" className="text-zinc-400 hover:text-white">
-                                            <Edit2 className="w-4 h-4" />
-                                        </Button>
                                         <Button size="sm" variant="ghost" className="text-zinc-400 hover:text-red-400" onClick={() => handleDelete(review.id)}>
                                             <Trash2 className="w-4 h-4" />
                                         </Button>

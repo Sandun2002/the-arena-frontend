@@ -28,7 +28,6 @@ export default function BookingsPage() {
 
         setIsLoading(true);
         try {
-            // In a real app, we'd pass pagination params too
             const result = await centerService.getBookingsList({
                 venue_id: currentVenue.id,
                 date: format(selectedDate, 'yyyy-MM-dd'),
@@ -38,7 +37,6 @@ export default function BookingsPage() {
             setBookings(result.data);
         } catch (error) {
             console.error(error);
-            // Fallback for demo if API fails or returns void
             setBookings([]);
         } finally {
             setIsLoading(false);

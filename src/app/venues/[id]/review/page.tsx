@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Star, Send, Loader2 } from "lucide-react";
 import Button from "@/components/ui/Button";
@@ -14,9 +14,11 @@ import { Venue } from "@/types";
 export default function ReviewPage() {
     const params = useParams();
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { user } = useAuth();
     const { addToast } = useToast();
     const venueId = params.id as string;
+    const bookingId = searchParams.get("bookingId");
 
     const [venue, setVenue] = useState<Venue | null>(null);
     const [rating, setRating] = useState(0);
@@ -38,10 +40,14 @@ export default function ReviewPage() {
             addToast("Please select a rating", "error");
             return;
         }
+        if (!bookingId) {
+            addToast("Reviews can only be submitted for completed bookings", "error");
+            return;
+        }
 
         setSubmitting(true);
         try {
-            await playerService.createReview({ venueId, rating, comment });
+            await playerService.createReview({ venueId, bookingId, rating, comment });
             addToast("Review submitted successfully!", "success");
             setTimeout(() => router.push(`/venues/${venueId}`), 1000);
         } catch (error) {
@@ -63,8 +69,14 @@ export default function ReviewPage() {
                 <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 backdrop-blur-md shadow-2xl">
                     <div className="text-center mb-8">
                         <h1 className="text-2xl font-bold text-white mb-2">Review {venue.name}</h1>
-                        <p className="text-zinc-500">Share your experience with other players.</p>
+                        <p className="text-zinc-500">Share your experience from a completed booking.</p>
                     </div>
+
+                    {!bookingId && (
+                        <div className="mb-6 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+                            A completed booking is required to submit a review. Open this page from your booking history once a booking is eligible.
+                        </div>
+                    )}
 
                     <form onSubmit={handleSubmit} className="space-y-8">
 
@@ -113,7 +125,7 @@ export default function ReviewPage() {
 
                         <Button
                             type="submit"
-                            disabled={submitting || rating === 0}
+                            disabled={submitting || rating === 0 || !bookingId}
                             className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold py-4 text-lg shadow-[0_0_20px_rgba(16,185,129,0.2)]"
                         >
                             {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Monitor, Smartphone, Laptop, Clock, Trash2 } from "lucide-react";
+import { ArrowLeft, Monitor, Smartphone, Laptop, Clock } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
 import { authService } from "@/services/authService";
@@ -28,11 +28,14 @@ export default function SessionsPage() {
         if (user) loadSessions();
     }, [user]);
 
-    const handleRevokeSession = async (jti: string) => {
-        // Call mock service
-        await authService.revokeSession(jti).catch(() => { }); // Mock method if exists, or just simulate
-        setSessions(prev => prev.filter(s => s.jti !== jti));
-        addToast("Session revoked successfully", "success");
+    const handleLogoutEverywhere = async () => {
+        try {
+            await authService.logoutAllDevices();
+            setSessions([]);
+            addToast("Signed out from all devices", "success");
+        } catch {
+            addToast("Failed to sign out from other devices", "error");
+        }
     };
 
     if (!user) return null;
@@ -56,41 +59,40 @@ export default function SessionsPage() {
                         </div>
                     </div>
 
+                    {sessions.length > 0 && (
+                        <div className="mb-6">
+                            <Button variant="outline" onClick={handleLogoutEverywhere} className="border-zinc-700 text-zinc-300 hover:text-white">
+                                Sign Out All Devices
+                            </Button>
+                        </div>
+                    )}
+
                     <div className="space-y-4">
                         {sessions.length > 0 ? (
                             sessions.map((session) => (
-                                <div key={session.jti} className="flex flex-col md:flex-row md:items-center justify-between p-5 bg-black/40 border border-zinc-800 rounded-2xl hover:bg-zinc-800/30 transition-colors">
+                                <div key={session.id} className="flex flex-col md:flex-row md:items-center justify-between p-5 bg-black/40 border border-zinc-800 rounded-2xl hover:bg-zinc-800/30 transition-colors">
                                     <div className="flex items-center gap-4 mb-4 md:mb-0">
                                         <div className="w-12 h-12 bg-zinc-800 rounded-xl flex items-center justify-center shrink-0">
                                             {session.user_agent.toLowerCase().includes("mobile") ? <Smartphone className="w-6 h-6 text-zinc-400" /> : <Laptop className="w-6 h-6 text-zinc-400" />}
                                         </div>
                                         <div>
                                             <p className="text-white font-bold flex items-center gap-2">
-                                                {session.user_agent.split(")")[0] + ")"}
+                                                {session.user_agent}
                                                 {session.is_current && <span className="bg-emerald-500 text-black text-[10px] font-bold px-2 py-0.5 rounded-full">THIS DEVICE</span>}
                                             </p>
                                             <div className="flex items-center gap-4 mt-1">
                                                 <span className="text-xs text-zinc-500 flex items-center gap-1.5 align-middle">
                                                     <Clock className="w-3.5 h-3.5" /> Active {formatDistanceToNow(new Date(session.created_at))} ago
                                                 </span>
+                                                <span className="text-xs text-zinc-600">Token {session.token_hint}</span>
                                             </div>
                                         </div>
                                     </div>
-                                    {!session.is_current && (
-                                        <Button
-                                            size="sm"
-                                            variant="outline"
-                                            className="text-zinc-400 border-zinc-700 hover:text-red-400 hover:border-red-400 hover:bg-red-400/10 w-full md:w-auto"
-                                            onClick={() => handleRevokeSession(session.jti)}
-                                        >
-                                            <Trash2 className="w-4 h-4 mr-2" /> Revoke
-                                        </Button>
-                                    )}
                                 </div>
                             ))
                         ) : (
                             <div className="text-center py-12 text-zinc-500">
-                                <p>No active sessions found (Mock).</p>
+                                <p>No active sessions found.</p>
                             </div>
                         )}
                     </div>

@@ -211,7 +211,7 @@ export default function BookingPage() {
                         <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
                             {courts.length > 0 ? (
                                 courts
-                                    .filter(c => c.sport_type?.name === selectedSport || !selectedSport) // Filter by sport if mock data allows
+                                    .filter(c => c.sport_type?.name === selectedSport || !selectedSport)
                                     .map((court) => (
                                         <button
                                             key={court.id}

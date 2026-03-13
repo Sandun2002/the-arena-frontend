@@ -24,12 +24,6 @@ export default function BookingConfirmationPage() {
                 const found = bookings.find(b => b.id === params.id);
                 if (found) {
                     setBooking(found);
-                    // Trigger confetti if it was a new booking (mock check: created within last minute)
-                    const created = new Date(found.created_at);
-                    const now = new Date();
-                    if (now.getTime() - created.getTime() < 60000) {
-                        // Confetti logic would go here
-                    }
                 } else {
                     // Handle not found
                     // router.push("/bookings");

@@ -4,8 +4,8 @@ export type UserRole = "customer" | "venue_owner" | "venue_manager" | "admin";
 export interface Sport {
   id: string;
   name: string;
-  icon: string;
-  imageUrl: string; // Backward compatibility
+  icon?: string;
+  imageUrl: string;
   isActive: boolean;
 }
 
@@ -29,26 +29,26 @@ export interface User {
   full_name: string;
   phone_number: string;
   profile_image: string | null;
-  bio: string | null;
+  bio?: string | null;
   is_active: boolean;
   roles: RoleResponse[];
-  email_verified: boolean;
-  phone_verified: boolean;
-  verification_status: "unverified" | "pending" | "verified";
-  is_mfa_enabled: boolean;
-  xp: number;
-  level: number;
-  next_level_xp: number;
-  xp_progress_percent: number;
+  email_verified?: boolean;
+  phone_verified?: boolean;
+  verification_status?: "unverified" | "pending" | "verified";
+  is_mfa_enabled?: boolean;
+  xp?: number;
+  level?: number;
+  next_level_xp?: number;
+  xp_progress_percent?: number;
   created_at: string;
   updated_at: string | null;
 }
 
 export interface Session {
-  jti: string;
+  id: string;
   user_agent: string;
   created_at: string;
-  expires_at: string;
+  token_hint: string;
   is_current: boolean;
 }
 
@@ -57,26 +57,40 @@ export type VenueStatus = "pending" | "approved" | "active" | "blocked" | "suspe
 
 export interface Venue {
   id: string;
+  owner_id: string;
   name: string;
-  slug: string;
-  description: string;
+  slug: string | null;
+  description: string | null;
   city: string;
   address: string;
-  lat: number;
-  lng: number;
-  operating_hours: string;
-  contact_number: string;
+  lat: number | null;
+  lng: number | null;
+  opening_time?: string | null;
+  closing_time?: string | null;
+  contact_number: string | null;
   amenities: { id: string; name: string }[];
   rating: number;
+  review_count: number;
+  total_reviews?: number;
   is_active: boolean;
   is_verified: boolean;
   is_featured: boolean;
   status: VenueStatus;
-  owner_id: string;
   cover_image: string | null;
   gallery_images: { id: string; url: string; is_cover: boolean; display_order: number }[];
+  courts: Court[];
+  operating_hours: {
+    day_of_week: number;
+    open_time: string | null;
+    close_time: string | null;
+    is_closed: boolean;
+  }[];
+  available_sports?: string[];
+  min_hourly_rate?: number | null;
   suspended_at: string | null;
   deleted_at: string | null;
+  created_at?: string;
+  updated_at?: string | null;
 }
 
 export interface Court {
@@ -88,7 +102,7 @@ export interface Court {
   hourly_rate: number;
   peak_hourly_rate: number | null;
   cover_image: string | null;
-  description: string;
+  description: string | null;
   is_active: boolean;
 }
 
@@ -114,7 +128,7 @@ export interface VenueManager {
   email: string;
   avatar: string | null;
   role: string;
-  invitation_status: InvitationStatus;
+  invitation_status?: InvitationStatus;
   joined_at?: string;
 }
 
@@ -183,6 +197,7 @@ export interface SlotAvailability {
 
 export interface SearchParams {
   city?: string;
+  sport?: string;
   sport_type_id?: string;
   date?: string;
   start_time?: string;
@@ -198,12 +213,64 @@ export interface PaginatedResponse<T> {
   total: number;
   page: number;
   per_page: number;
+  has_more?: boolean;
 }
 
 export interface City {
-  id: string;
   name: string;
-  is_active: boolean;
+}
+
+export interface VenueSearchResult {
+  venue_id: string;
+  venue_name: string;
+  venue_slug: string | null;
+  city: string;
+  address: string;
+  distance_km: number | null;
+  available_courts_count: number;
+  total_courts_count: number;
+  hourly_rate: number;
+  cover_image: string | null;
+  rating: number | null;
+  review_count: number;
+  amenities: string[];
+  opening_time: string | null;
+  closing_time: string | null;
+}
+
+export interface VenueSearchResponse {
+  results: VenueSearchResult[];
+  total: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
+  has_more: boolean;
+  search_metadata: Record<string, unknown>;
+}
+
+export interface VenueSlotsResponse {
+  venue_id: string;
+  venue_name: string;
+  date: string;
+  is_closed: boolean;
+  operating_hours: {
+    open: string | null;
+    close: string | null;
+  } | null;
+  courts: Array<{
+    court_id: string;
+    court_name: string;
+    sport_type: string;
+    hourly_rate: number;
+    is_indoor: boolean;
+    description: string | null;
+    slots: Array<{
+      start: string;
+      end: string;
+      date: string;
+      status: "available" | "booked" | "held" | "closed";
+    }>;
+  }>;
 }
 
 // === Review ===
@@ -211,13 +278,15 @@ export interface Review {
   id: string;
   venue_id: string;
   venue_name: string;
-  venue_image: string;
+  venue_image: string | null;
   booking_id: string | null;
   user_id: string;
   user_name: string;
   user_avatar: string | null;
   rating: number;
+  title?: string | null;
   comment: string;
+  is_verified?: boolean;
   created_at: string;
   updated_at: string | null;
 }
@@ -235,9 +304,10 @@ export interface DashboardStats {
   revenue: number | null;
   active_courts: number;
   total_courts: number;
-  // New fields for charts
-  revenue_trend?: number;
   bookings_trend?: number;
+  revenue_trend?: number;
+  pending_payments?: number;
+  new_customers?: number;
 }
 
 export interface RevenueData {
@@ -262,12 +332,16 @@ export interface AnalyticsFees {
   total_platform_fees: number;
   net_payout: number;
   pending_payout: number;
+  venue_commission?: number;
+  total_revenue?: number;
 }
 
 export interface AnalyticsCancellations {
   total_cancellations: number;
   cancellation_rate: number;
   no_show_count: number;
+  total_bookings?: number;
+  lost_revenue?: number;
 }
 
 // === Recurring Bookings ===

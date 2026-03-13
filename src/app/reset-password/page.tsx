@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Lock, Loader2, CheckCircle } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { authService } from "@/services/authService";
@@ -10,11 +10,13 @@ import { useToast } from "@/components/ui/Toast";
 
 export default function ResetPasswordPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { addToast } = useToast();
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
+    const token = searchParams.get("token");
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -26,11 +28,14 @@ export default function ResetPasswordPage() {
             addToast("Password must be at least 8 characters", "error");
             return;
         }
+        if (!token) {
+            addToast("Reset link is invalid or expired", "error");
+            return;
+        }
 
         setIsSubmitting(true);
         try {
-            // Mock token usage
-            await authService.resetPassword("mock-token", password);
+            await authService.resetPassword(token, password);
             setIsSuccess(true);
             addToast("Password reset successfully", "success");
 
@@ -53,6 +58,12 @@ export default function ResetPasswordPage() {
                         <>
                             <h1 className="text-2xl font-bold text-white mb-2">Set New Password</h1>
                             <p className="text-zinc-400 mb-6">Your new password must be different from previously used passwords.</p>
+
+                            {!token && (
+                                <div className="mb-4 rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-300">
+                                    This reset link is missing a valid token. Request a new password reset email.
+                                </div>
+                            )}
 
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div className="space-y-2">
@@ -88,7 +99,7 @@ export default function ResetPasswordPage() {
 
                                 <Button
                                     type="submit"
-                                    disabled={isSubmitting}
+                                    disabled={isSubmitting || !token}
                                     className="w-full py-4 bg-emerald-500 hover:bg-emerald-400 text-black font-bold mt-4"
                                 >
                                     {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "Reset Password"}

@@ -65,7 +65,7 @@ export default function ChallengesPage() {
                     </Link>
                     <div className="bg-zinc-900 border border-zinc-800 px-4 py-1.5 rounded-full flex items-center gap-2">
                         <span className="text-zinc-400 text-xs font-bold uppercase tracking-wider">Total XP</span>
-                        <span className="text-emerald-500 font-bold">{user.xp}</span>
+                        <span className="text-emerald-500 font-bold">{user.xp ?? 0}</span>
                     </div>
                 </div>
 

@@ -1,11 +1,12 @@
 import { User, Booking, Review, Challenge, UserAchievement } from "@/types";
 import apiClient from "./apiClient";
+import { normalizeBooking, normalizeReview, normalizeUser } from "./normalizers";
 
 class PlayerService {
     // === Profile ===
     async getProfile(): Promise<User> {
         const response = await apiClient.get<User>('/player/profile');
-        return response.data;
+        return normalizeUser(response.data);
     }
 
     async updateProfile(data: Partial<User>): Promise<User> {
@@ -14,7 +15,7 @@ class PlayerService {
             phone_number: data.phone_number,
             bio: data.bio
         });
-        return response.data;
+        return normalizeUser(response.data);
     }
 
     async updateAvatar(file: File): Promise<string> {
@@ -34,13 +35,13 @@ class PlayerService {
 
     // === Bookings ===
     async getBookings(): Promise<Booking[]> {
-        const response = await apiClient.get<Booking[]>('/bookings/me');
-        return response.data;
+        const response = await apiClient.get<any[]>('/bookings/me');
+        return response.data.map(normalizeBooking);
     }
 
     async getBookingById(bookingId: string): Promise<Booking> {
-        const response = await apiClient.get<Booking>(`/bookings/${bookingId}`);
-        return response.data;
+        const response = await apiClient.get<any>(`/bookings/${bookingId}`);
+        return normalizeBooking(response.data);
     }
 
     async cancelBooking(bookingId: string, reason: string): Promise<boolean> {
@@ -50,26 +51,26 @@ class PlayerService {
 
     // === Reviews ===
     async getMyReviews(): Promise<Review[]> {
-        const response = await apiClient.get<Review[]>('/me/reviews');
-        return response.data;
+        const response = await apiClient.get<any>('/me/reviews');
+        return (response.data.reviews || []).map((review: any) => normalizeReview(review));
     }
 
-    async createReview(data: { venueId: string; rating: number; comment: string }): Promise<Review> {
+    async createReview(data: { venueId: string; bookingId: string; rating: number; comment: string; title?: string }): Promise<Review> {
         const response = await apiClient.post<Review>(`/venues/${data.venueId}/reviews`, {
+            booking_id: data.bookingId,
             rating: data.rating,
+            title: data.title,
             comment: data.comment
         });
-        return response.data;
+        return normalizeReview(response.data);
     }
 
     async checkReviewEligibility(userId: string, venueId: string): Promise<{ eligible: boolean; reason?: string }> {
-        try {
-            const response = await apiClient.get<{ eligible: boolean; reason?: string }>(`/venues/${venueId}/reviews/eligibility`);
-            return response.data;
-        } catch (error) {
-            // Fallback to true if endpoint doesn't exist yet, let the createReview call handle authorization natively
-            return { eligible: true };
-        }
+        return { eligible: true };
+    }
+
+    async deleteReview(reviewId: string): Promise<void> {
+        await apiClient.delete(`/reviews/${reviewId}`);
     }
 
     // === Gamification ===

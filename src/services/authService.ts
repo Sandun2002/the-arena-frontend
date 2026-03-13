@@ -1,6 +1,7 @@
 
-import { LoginResponse, User, Session, UserRole } from "@/types";
+import { LoginResponse, Session, User } from "@/types";
 import apiClient from "./apiClient";
+import { normalizeSession, normalizeUser } from "./normalizers";
 
 // Local storage key for tokens
 const ACCESS_TOKEN_KEY = "arena_access_token";
@@ -28,7 +29,7 @@ class AuthService {
     // 2. Initializing User Session
     async getMe(token?: string): Promise<User> {
         const response = await apiClient.get<User>('/auth/me');
-        return response.data;
+        return normalizeUser(response.data);
     }
 
     // 3. Signup
@@ -40,7 +41,7 @@ class AuthService {
         role: "customer" | "venue_owner";
     }): Promise<User> {
         const response = await apiClient.post<User>('/auth/signup', data);
-        return response.data;
+        return normalizeUser(response.data);
     }
 
     async logout() {
@@ -80,34 +81,40 @@ class AuthService {
         return true;
     }
 
-    async resetPassword(token: string, data: any): Promise<boolean> {
-        await apiClient.post('/auth/reset-password', { token, ...data });
+    async resetPassword(token: string, newPassword: string): Promise<boolean> {
+        await apiClient.post('/auth/reset-password', { token, new_password: newPassword });
         return true;
     }
 
     // === MFA ===
     async setupMfa() {
-        const response = await apiClient.post<{ secret: string, qr_code_uri: string }>('/auth/mfa/setup');
+        const response = await apiClient.post<{ secret: string; qr_code: string; provisioning_uri: string }>('/auth/mfa/setup');
         return response.data;
     }
 
-    async verifyMfa(code: string): Promise<boolean> {
-        await apiClient.post('/auth/mfa/confirm', { code });
-        return true;
+    async getMfaStatus() {
+        const response = await apiClient.get<{ is_enabled: boolean; enabled_at: string | null; recovery_codes_remaining: number }>('/auth/mfa/status');
+        return response.data;
+    }
+
+    async verifyMfa(code: string) {
+        const response = await apiClient.post<{ message: string; recovery_codes: string[]; recovery_codes_count: number }>('/auth/mfa/confirm', { code });
+        return response.data;
     }
 
     async disableMfa(password: string) {
-        await apiClient.post('/auth/mfa/disable', { password });
+        const response = await apiClient.post<{ message: string; sessions_revoked: number }>('/auth/mfa/disable', { password });
+        return response.data;
     }
 
     // === Sessions ===
     async getSessions(): Promise<Session[]> {
-        const response = await apiClient.get<Session[]>('/auth/sessions');
-        return response.data;
+        const response = await apiClient.get<{ sessions: any[] }>('/auth/sessions');
+        return (response.data.sessions || []).map(normalizeSession);
     }
 
-    async revokeSession(jti: string): Promise<void> {
-        await apiClient.delete(`/auth/sessions/${jti}`);
+    async logoutAllDevices(): Promise<void> {
+        await apiClient.post('/auth/logout', { all_devices: true });
     }
 }
 

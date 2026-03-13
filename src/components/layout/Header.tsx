@@ -21,16 +21,11 @@ export default function Header() {
   const showVenueSwitcher = isVenueContext && (isVenueOwner || isVenueManager);
 
 
-  const navLinks = isVenueContext ? [
-    { name: "Dashboard", href: "/venue-dashboard" },
-    { name: "Booking Manager", href: "/venue-dashboard/booking-manager" },
-    { name: "Bookings", href: "/venue-dashboard/bookings" },
-    { name: "Settings", href: "/venue-dashboard/settings" },
-  ] : [
-    { name: "Home", href: "/" },
-    { name: "Venues", href: "/venues" },
-    { name: "About", href: "/about" },
-    { name: "Contact", href: "/contact" },
+  const navLinks = [
+    { name: "Home", path: "/" },
+    { name: "Venues", path: "/venues" },
+    { name: "About", path: "/about" },
+    { name: "Contact", path: "/contact" },
   ];
 
   return (
@@ -59,17 +54,17 @@ export default function Header() {
         </div>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className={`hidden ${isVenueContext ? 'xl:flex' : 'md:flex'} items-center gap-6 lg:gap-8`}>
           {navLinks.map((link) => (
             <Link
               key={link.name}
-              href={link.href}
+              href={link.path}
               className={`text-sm font-medium transition-colors hover:text-white relative
-                ${pathname === link.href ? "text-white" : "text-zinc-400"}
+                ${pathname === link.path ? "text-white" : "text-zinc-400"}
               `}
             >
               {link.name}
-              {pathname === link.href && (
+              {pathname === link.path && (
                 <span className="absolute -bottom-8 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-t-full"></span>
               )}
             </Link>
@@ -185,17 +180,29 @@ export default function Header() {
             </div>
           )}
 
+          {/* Nav Links */}
           <div className="flex flex-col gap-4">
+            {/* Global Navigation Links ALWAYS */}
             {navLinks.map((link) => (
               <Link
-                key={link.name}
-                href={link.href}
+                key={link.path}
+                href={link.path}
+                className={`text-2xl font-black uppercase tracking-tight transition-colors ${pathname === link.path ? "text-emerald-500" : "text-zinc-400 hover:text-white"
+                  }`}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className={`text-2xl font-bold ${pathname === link.href ? "text-white" : "text-zinc-500"}`}
               >
                 {link.name}
               </Link>
             ))}
+
+            {/* Explicit message to use floating button for venue dashboard mobile menu to avoid confusion */}
+            {isVenueContext && (
+              <div className="mt-8 border-t border-zinc-800 pt-6">
+                <p className="text-zinc-500 text-sm font-bold leading-relaxed">
+                  Navigate venue settings using the green floating menu button at the bottom right.
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="mt-auto pt-6 border-t border-zinc-800 flex flex-col gap-3">

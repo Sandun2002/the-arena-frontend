@@ -30,6 +30,11 @@ export default function ProfilePage() {
 
     const completedChallengesCount = gamification?.achievements.filter(a => a.is_completed).length || 0;
     const totalChallengesCount = gamification?.challenges.length || 0;
+    const verificationStatus = user.verification_status ?? "unverified";
+    const level = user.level ?? 1;
+    const xp = user.xp ?? 0;
+    const nextLevelXp = user.next_level_xp ?? 0;
+    const xpProgressPercent = user.xp_progress_percent ?? 0;
 
     return (
         <main className="min-h-screen bg-black pt-24 pb-12 px-4 selection:bg-emerald-500/30">
@@ -56,7 +61,7 @@ export default function ProfilePage() {
                             </div>
                             <div className="absolute -bottom-2 -right-2 md:bottom-2 md:right-0 z-20 bg-black rounded-full p-1.5">
                                 <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 border-2 border-zinc-800 text-black font-extrabold text-sm shadow-[0_0_15px_rgba(16,185,129,0.4)]">
-                                    {user.level}
+                                    {level}
                                 </div>
                             </div>
                         </div>
@@ -71,26 +76,26 @@ export default function ProfilePage() {
                                 <span className="flex items-center gap-1.5 bg-zinc-900/50 px-3 py-1 rounded-full border border-zinc-800">
                                     <Calendar className="w-3.5 h-3.5" /> Joined {format(new Date(user.created_at), "MMM yyyy")}
                                 </span>
-                                <span className={`flex items-center gap-1.5 px-3 py-1 rounded-full border ${statusColors[user.verification_status]}`}>
-                                    {user.verification_status === "verified" && <Shield className="w-3.5 h-3.5" />}
-                                    <span className="capitalize">{user.verification_status}</span>
+                                <span className={`flex items-center gap-1.5 px-3 py-1 rounded-full border ${statusColors[verificationStatus]}`}>
+                                    {verificationStatus === "verified" && <Shield className="w-3.5 h-3.5" />}
+                                    <span className="capitalize">{verificationStatus}</span>
                                 </span>
                             </div>
 
                             {/* XP Progress */}
                             <div className="max-w-md mx-auto md:mx-0">
                                 <div className="flex justify-between text-xs font-bold uppercase text-zinc-500 mb-2 tracking-wider">
-                                    <span>Level {user.level}</span>
-                                    <span>{user.xp} / {user.next_level_xp} XP</span>
+                                    <span>Level {level}</span>
+                                    <span>{xp} / {nextLevelXp} XP</span>
                                 </div>
                                 <div className="h-3 bg-zinc-800 rounded-full overflow-hidden p-0.5 border border-zinc-700/50">
                                     <div
                                         className="h-full bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.3)] transition-all duration-1000 ease-out"
-                                        style={{ width: `${user.xp_progress_percent}%` }}
+                                        style={{ width: `${xpProgressPercent}%` }}
                                     ></div>
                                 </div>
                                 <p className="text-xs text-zinc-500 mt-2 text-right">
-                                    {user.next_level_xp - user.xp} XP to next level
+                                    {Math.max(nextLevelXp - xp, 0)} XP to next level
                                 </p>
                             </div>
                         </div>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, Shield, Smartphone, QrCode, CheckCircle, XCircle } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
@@ -13,13 +14,21 @@ export default function MfaPage() {
     const { addToast } = useToast();
     const [isSetupOpen, setIsSetupOpen] = useState(false);
     const [qrCode, setQrCode] = useState<string | null>(null);
+    const [secret, setSecret] = useState<string | null>(null);
     const [verificationCode, setVerificationCode] = useState("");
+    const [disablePassword, setDisablePassword] = useState("");
+    const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
 
     const handleSetupMfa = async () => {
-        setIsSetupOpen(true);
-        // Mock call
-        const data: any = await authService.setupMfa().catch(() => ({ qr_code_uri: "otpauth://totp/Arena:test?secret=JBSWY3DPEHPK3PXP&issuer=Arena" }));
-        setQrCode(data.qr_code_uri || "MOCK-QR-CODE");
+        try {
+            const data = await authService.setupMfa();
+            setQrCode(`data:image/png;base64,${data.qr_code}`);
+            setSecret(data.secret);
+            setRecoveryCodes([]);
+            setIsSetupOpen(true);
+        } catch {
+            addToast("Failed to start MFA setup", "error");
+        }
     };
 
     const handleVerify = async () => {
@@ -27,15 +36,26 @@ export default function MfaPage() {
             addToast("Please enter a 6-digit code", "error");
             return;
         }
-        // Mock verification
-        addToast("2FA Enabled Successfully", "success");
-        setIsSetupOpen(false);
-        // In real app, reload user to update is_mfa_enabled
+        try {
+            const result = await authService.verifyMfa(verificationCode);
+            setRecoveryCodes(result.recovery_codes || []);
+            addToast("2FA enabled successfully", "success");
+        } catch {
+            addToast("Invalid authentication code", "error");
+        }
     };
 
     const handleDisable = async () => {
-        if (confirm("Are you sure you want to disable 2FA?")) {
-            addToast("2FA Disabled (Mock)", "success");
+        if (!disablePassword) {
+            addToast("Enter your password to disable 2FA", "error");
+            return;
+        }
+        try {
+            await authService.disableMfa(disablePassword);
+            addToast("2FA disabled. You were signed out from other devices.", "success");
+            setDisablePassword("");
+        } catch {
+            addToast("Failed to disable 2FA", "error");
         }
     };
 
@@ -94,10 +114,7 @@ export default function MfaPage() {
                                     </h3>
                                     <div className="flex flex-col md:flex-row gap-8 items-center">
                                         <div className="p-4 bg-white rounded-xl">
-                                            {/* Disclaimer: In real app use library like 'qrcode.react' */}
-                                            <div className="w-40 h-40 bg-zinc-200 flex items-center justify-center text-xs text-center text-black font-mono break-all p-2 overflow-hidden">
-                                                [QR: {qrCode?.substring(0, 20)}...]
-                                            </div>
+                                            {qrCode && <Image src={qrCode} alt="MFA QR code" width={160} height={160} className="h-40 w-40" unoptimized />}
                                         </div>
                                         <div className="flex-1 w-full">
                                             <ol className="list-decimal list-inside text-zinc-400 text-sm space-y-2 mb-6 ml-2">
@@ -117,14 +134,32 @@ export default function MfaPage() {
                                                 <Button className="flex-1 bg-emerald-500 hover:bg-emerald-400 text-black font-bold" onClick={handleVerify}>Verify</Button>
                                                 <Button variant="outline" className="flex-1 border-zinc-700 text-zinc-400 hover:text-white" onClick={() => setIsSetupOpen(false)}>Cancel</Button>
                                             </div>
+                                            {secret && (
+                                                <p className="mt-4 text-xs text-zinc-500 break-all">Backup code seed: {secret}</p>
+                                            )}
                                         </div>
                                     </div>
+                                    {recoveryCodes.length > 0 && (
+                                        <div className="mt-6 rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4">
+                                            <p className="mb-3 text-sm font-bold text-white">Recovery Codes</p>
+                                            <div className="grid grid-cols-2 gap-2 text-sm font-mono text-emerald-300">
+                                                {recoveryCodes.map((code) => <span key={code}>{code}</span>)}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             )
                         ) : (
                             <div className="p-6 bg-red-500/5 border border-red-500/20 rounded-2xl">
                                 <h3 className="text-red-500 font-bold mb-2">Danger Zone</h3>
                                 <p className="text-zinc-500 text-sm mb-4">Disabling 2FA makes your account less secure.</p>
+                                <input
+                                    type="password"
+                                    value={disablePassword}
+                                    onChange={(e) => setDisablePassword(e.target.value)}
+                                    placeholder="Enter your password"
+                                    className="mb-4 w-full rounded-xl border border-zinc-700 bg-black/40 px-4 py-3 text-white focus:border-red-500 focus:outline-none"
+                                />
                                 <Button variant="outline" onClick={handleDisable} className="w-full border-red-900/50 text-red-500 hover:bg-red-500/10">
                                     Disable 2FA
                                 </Button>
