@@ -40,6 +40,14 @@ export const createSport = (name: string): Sport => ({
   isActive: true,
 });
 
+export const normalizeGalleryImage = (raw: any) => ({
+  id: String(raw.id),
+  url: raw.image_url ?? raw.url,
+  image_url: raw.image_url ?? raw.url, // Keep both for safety
+  is_cover: Boolean(raw.is_cover),
+  display_order: Number(raw.display_order ?? 0),
+});
+
 export const normalizeCourt = (raw: any): Court => ({
   id: String(raw.id),
   venue_id: String(raw.venue_id),
@@ -87,12 +95,7 @@ export const normalizeVenue = (raw: any): Venue => {
     status: raw.status ?? (raw.is_active ? "active" : "pending"),
     cover_image: raw.cover_image ?? null,
     gallery_images: Array.isArray(raw.gallery_images)
-      ? raw.gallery_images.map((image: any) => ({
-          id: String(image.id),
-          url: image.image_url ?? image.url,
-          is_cover: Boolean(image.is_cover),
-          display_order: Number(image.display_order ?? 0),
-        }))
+      ? raw.gallery_images.map(normalizeGalleryImage)
       : [],
     courts,
     operating_hours: Array.isArray(raw.operating_hours)

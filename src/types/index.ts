@@ -108,7 +108,8 @@ export interface Court {
 
 export interface GalleryImage {
   id: string;
-  url: string;
+  url: string; // Keep for backward compatibility if any
+  image_url: string; // Matches backend VenueImageResponse
   is_cover: boolean;
 }
 

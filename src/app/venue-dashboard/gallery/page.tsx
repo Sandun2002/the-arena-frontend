@@ -154,7 +154,7 @@ export default function GalleryPage() {
                         images.map((img) => (
                             <div key={img.id} className="gallery-item group relative aspect-square rounded-3xl overflow-hidden bg-zinc-900 border border-zinc-800">
                                 <Image
-                                    src={img.url}
+                                    src={img.image_url || img.url}
                                     alt="Gallery Image"
                                     fill
                                     className="object-cover transition-transform duration-700 group-hover:scale-110"
