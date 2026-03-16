@@ -68,5 +68,11 @@ export const venueApiService = {
 
     revokeInvitation: async (venueId: string, invitationId: string) => {
         return;
+    },
+
+    // === Sports ===
+    getSports: async () => {
+        const response = await apiClient.get<any[]>('/sports');
+        return response.data;
     }
 };

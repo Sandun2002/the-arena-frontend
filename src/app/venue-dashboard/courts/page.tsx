@@ -105,8 +105,8 @@ export default function CourtsPage() {
                         <div key={court.id} className="bg-zinc-900/50 border border-zinc-800 rounded-3xl overflow-hidden group hover:border-zinc-700 hover:shadow-2xl hover:shadow-black/50 transition-all duration-300 backdrop-blur-sm flex flex-col">
                             {/* Image Placeholder */}
                             <div className="h-48 bg-black/50 relative overflow-hidden">
-                                {(court as any).images && (court as any).images.length > 0 ? (
-                                    <img src={(court as any).images[0]} alt={court.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                {court.cover_image ? (
+                                    <img src={court.cover_image} alt={court.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                                 ) : (
                                     <div className="w-full h-full flex flex-col items-center justify-center text-zinc-700 bg-zinc-900/50 pattern-grid-lg">
                                         <Layers className="w-12 h-12 mb-2 opacity-50" />

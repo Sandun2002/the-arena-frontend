@@ -5,7 +5,7 @@ import {
     UpcomingBooking, Court, Closure, GalleryImage,
     AnalyticsRevenue, AnalyticsUtilization, AnalyticsFees, AnalyticsCancellations
 } from "@/types";
-import { normalizeBooking, normalizeVenue } from "./normalizers";
+import { normalizeBooking, normalizeVenue, normalizeCourt } from "./normalizers";
 
 export const centerService = {
     // === Dashboard ===
@@ -100,13 +100,13 @@ export const centerService = {
     // === Courts (Read Only / Center View) ===
     getCourts: async (venueId?: string) => {
         const params = venueId ? { venue_id: venueId } : {};
-        const response = await apiClient.get<Court[]>('/center/courts', { params });
-        return response.data;
+        const response = await apiClient.get<any[]>('/center/courts', { params });
+        return (response.data || []).map(normalizeCourt);
     },
 
     uploadCourtImage: async (courtId: string, file: File) => {
         const formData = new FormData();
-        formData.append('image', file);
+        formData.append('file', file);
         const response = await apiClient.post(`/center/courts/${courtId}/image`, formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         });

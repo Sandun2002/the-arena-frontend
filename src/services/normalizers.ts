@@ -40,7 +40,7 @@ export const createSport = (name: string): Sport => ({
   isActive: true,
 });
 
-const normalizeCourt = (raw: any): Court => ({
+export const normalizeCourt = (raw: any): Court => ({
   id: String(raw.id),
   venue_id: String(raw.venue_id),
   name: raw.name,

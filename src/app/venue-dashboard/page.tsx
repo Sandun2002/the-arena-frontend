@@ -13,6 +13,7 @@ import { centerService as venueService } from "@/services/centerService";
 import { DashboardStats, UpcomingBooking } from "@/types";
 import { useVenue } from "@/components/venue/VenueContext";
 import { format } from "date-fns";
+import VenuePendingVerification from "@/components/venue/VenuePendingVerification";
 
 export default function VenueDashboardPage() {
     const { user, isVenueOwner, isVenueManager } = useAuth();
@@ -22,7 +23,7 @@ export default function VenueDashboardPage() {
     const [loadingStats, setLoadingStats] = useState(false);
 
     useEffect(() => {
-        if (currentVenue) {
+        if (currentVenue && currentVenue.is_verified) {
             loadDashboardData(currentVenue.id);
         }
     }, [currentVenue]);
@@ -60,6 +61,11 @@ export default function VenueDashboardPage() {
                 )}
             </div>
         );
+    }
+
+    // Verification Guard
+    if (currentVenue && !currentVenue.is_verified) {
+        return <VenuePendingVerification venue={currentVenue} />;
     }
 
     return (

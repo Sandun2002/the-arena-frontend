@@ -1,14 +1,21 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Loader2, Image as ImageIcon } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { venueApiService } from "@/services/venueApiService";
 import { centerService } from "@/services/centerService";
 import { Court } from "@/types";
 import { useToast } from "@/components/ui/Toast";
+
+interface SportOption {
+    id: string;
+    name: string;
+    display_name: string;
+    icon?: string | null;
+}
 
 interface CourtFormModalProps {
     venueId: string;
@@ -20,17 +27,36 @@ interface CourtFormModalProps {
 export default function CourtFormModal({ venueId, existingCourt, onClose, onSuccess }: CourtFormModalProps) {
     const { addToast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [sports, setSports] = useState<SportOption[]>([]);
+    const [loadingSports, setLoadingSports] = useState(true);
 
     const { register, handleSubmit, formState: { errors } } = useForm({
         defaultValues: {
             name: existingCourt?.name || "",
             description: existingCourt?.description || "",
-            sport_type: existingCourt?.sport_type?.name || "Futsal",
+            sport_type_id: existingCourt?.sport_type_id || "",
             is_indoor: existingCourt?.is_indoor || false,
             hourly_rate: existingCourt?.hourly_rate || 1500,
             imageFile: undefined as unknown as FileList
         }
     });
+
+    // Fetch sports from backend on mount
+    useEffect(() => {
+        const fetchSports = async () => {
+            try {
+                const data = await venueApiService.getSports();
+                setSports(data);
+                // If editing and no sport_type_id, default to first sport
+            } catch (err) {
+                console.error("Failed to load sports:", err);
+                addToast("Failed to load sports list. Please refresh.", "error");
+            } finally {
+                setLoadingSports(false);
+            }
+        };
+        fetchSports();
+    }, []);
 
     const onSubmit = async (data: any) => {
         setIsSubmitting(true);
@@ -65,9 +91,6 @@ export default function CourtFormModal({ venueId, existingCourt, onClose, onSucc
         }
     };
 
-    const sports = ["Futsal", "Swimming", "Badminton", "Basketball", "Tennis", "Cricket", "Squash", "Table Tennis"];
-    const surfaces = ["Turf", "Synthetic", "Wood", "Concrete", "Clay", "Grass", "Mat", "Parquet", "Sand", "Carpet"];
-
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
 
@@ -85,16 +108,34 @@ export default function CourtFormModal({ venueId, existingCourt, onClose, onSucc
                 <div className="space-y-2">
                     <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Sport</label>
                     <div className="relative">
-                        <select
-                            {...register("sport_type")}
-                            className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none"
-                        >
-                            {sports.map(s => <option key={s} value={s}>{s}</option>)}
-                        </select>
-                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-500">
-                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
-                        </div>
+                        {loadingSports ? (
+                            <div className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-zinc-500 flex items-center gap-2">
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                <span className="text-sm">Loading sports...</span>
+                            </div>
+                        ) : (
+                            <select
+                                {...register("sport_type_id", { required: "Sport is required" })}
+                                className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none"
+                            >
+                                <option value="">Select a sport...</option>
+                                {sports.map(s => (
+                                    <option key={s.id} value={s.id}>
+                                        {s.icon ? `${s.icon} ` : ""}{s.display_name}
+                                    </option>
+                                ))}
+                            </select>
+                        )}
+                        {!loadingSports && (
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-500">
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                            </div>
+                        )}
                     </div>
+                    {errors.sport_type_id && <p className="text-red-500 text-xs font-bold">{errors.sport_type_id.message as string}</p>}
+                    {!loadingSports && sports.length === 0 && (
+                        <p className="text-yellow-500 text-xs">No sports available. Ask admin to add sports.</p>
+                    )}
                 </div>
 
                 <div className="space-y-2">
@@ -160,7 +201,7 @@ export default function CourtFormModal({ venueId, existingCourt, onClose, onSucc
 
             <Button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || loadingSports}
                 className="w-full py-3.5 bg-emerald-500 hover:bg-emerald-400 text-black font-bold rounded-xl mt-4"
             >
                 {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : (existingCourt ? "Update Court" : "Create Court")}
