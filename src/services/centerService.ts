@@ -165,13 +165,17 @@ export const centerService = {
         return response.data.items || [];
     },
 
-    createRecurringBooking: async (data: any) => {
-        const response = await apiClient.post<RecurringBooking>('/center/recurring-bookings', data);
+    createRecurringBooking: async (data: any, venueId?: string) => {
+        const response = await apiClient.post<RecurringBooking>('/center/recurring-bookings', data, {
+            params: venueId ? { venue_id: venueId } : {}
+        });
         return response.data;
     },
 
-    updateRecurringBooking: async (id: string, data: any) => {
-        const response = await apiClient.put<RecurringBooking>(`/center/recurring-bookings/${id}`, data);
+    updateRecurringBooking: async (id: string, data: any, venueId?: string) => {
+        const response = await apiClient.put<RecurringBooking>(`/center/recurring-bookings/${id}`, data, {
+            params: venueId ? { venue_id: venueId } : {}
+        });
         return response.data;
     },
 

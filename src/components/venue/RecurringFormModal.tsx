@@ -37,13 +37,32 @@ export default function RecurringFormModal({ venueId, courts, existingBooking, o
     const onSubmit = async (data: any) => {
         setIsSubmitting(true);
         try {
-            const payload = { ...data, venue_id: venueId };
+            const dayMap: Record<string, number> = {
+                "Monday": 0, "Tuesday": 1, "Wednesday": 2, "Thursday": 3, "Friday": 4, "Saturday": 5, "Sunday": 6
+            };
 
             if (existingBooking) {
-                await centerService.updateRecurringBooking(existingBooking.id, payload);
+                // For update, backend only needs end_date, customer_name, customer_phone
+                const updatePayload = {
+                    end_date: data.end_date,
+                    customer_name: data.client_name,
+                    customer_phone: data.client_phone || null
+                };
+                await centerService.updateRecurringBooking(existingBooking.id, updatePayload, venueId);
                 addToast("Recurring booking updated", "success");
             } else {
-                await centerService.createRecurringBooking(payload);
+                // For create, backend needs all fields with correct types
+                const createPayload = {
+                    court_id: data.court_id,
+                    day_of_week: dayMap[data.day_of_week] !== undefined ? dayMap[data.day_of_week] : 0,
+                    start_time: data.start_time,
+                    end_time: data.end_time,
+                    start_date: data.start_date,
+                    end_date: data.end_date,
+                    customer_name: data.client_name,
+                    customer_phone: data.client_phone || null
+                };
+                await centerService.createRecurringBooking(createPayload, venueId);
                 addToast("Recurring booking created", "success");
             }
             onSuccess();
