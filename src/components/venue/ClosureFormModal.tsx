@@ -21,6 +21,7 @@ export default function ClosureFormModal({ venueId, courts, onClose, onSuccess }
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [closureLevel, setClosureLevel] = useState<"venue" | "court">("venue");
     const [selectedSlots, setSelectedSlots] = useState<number[]>([]);
+    const today = format(new Date(), "yyyy-MM-dd");
 
     const { register, handleSubmit, formState: { errors }, watch } = useForm({
         defaultValues: {
@@ -46,14 +47,10 @@ export default function ClosureFormModal({ venueId, courts, onClose, onSuccess }
         try {
             if (closureLevel === "venue") {
                 await centerService.createClosure({
-                    venue_id: venueId,
-                    title: data.title || "Venue Closure",
-                    start_date: data.start_date,
-                    end_date: data.end_date,
-                    reason: data.reason,
-                    type: "maintenance",
-                    courts: [] // Empty means all venue
-                });
+                    closure_date: data.start_date,
+                    ...(data.end_date ? { end_date: data.end_date } : {}),
+                    reason: data.reason || "Venue Closed",
+                }, venueId);
             } else {
                 if (selectedSlots.length === 0) {
                     addToast("Please select at least one time slot", "error");
@@ -61,28 +58,45 @@ export default function ClosureFormModal({ venueId, courts, onClose, onSuccess }
                     return;
                 }
 
-                // For each selected slot create a closure block
-                const promises = selectedSlots.map(hour => {
+                if (data.date < today) {
+                    addToast("Court closure date cannot be in the past", "error");
+                    setIsSubmitting(false);
+                    return;
+                }
+
+                const existingClosures = await centerService.getClosures(venueId);
+                const hasVenueClosure = existingClosures.some((closure: any) => {
+                    const closureDate = String(closure?.closure_date || "").slice(0, 10);
+                    return closureDate === data.date;
+                });
+                if (hasVenueClosure) {
+                    addToast("Venue is already closed on this date. Pick another date or remove the venue closure.", "error");
+                    setIsSubmitting(false);
+                    return;
+                }
+
+                // Create blocks sequentially to surface the first exact slot failure.
+                for (const hour of selectedSlots) {
                     const start = new Date(`${data.date}T${hour.toString().padStart(2, '0')}:00:00`);
                     const end = new Date(start);
                     end.setHours(start.getHours() + 1);
-                    return centerService.createClosure({
-                        venue_id: venueId,
-                        title: "Court Closure",
-                        start_date: start.toISOString(),
-                        end_date: end.toISOString(),
-                        reason: data.reason,
-                        type: "maintenance",
-                        courts: [data.court_id]
-                    });
-                });
-                await Promise.all(promises);
+
+                    await centerService.createManualBooking({
+                        court_id: data.court_id,
+                        start_time: start.toISOString(),
+                        end_time: end.toISOString(),
+                        is_blocked: true,
+                        block_reason: data.reason || "Court Maintenance",
+                        payment_method: "cash"
+                    }, venueId);
+                }
             }
             addToast("Closure scheduled successfully", "success");
             onSuccess();
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            addToast("Failed to schedule closure", "error");
+            const detail = error?.response?.data?.detail;
+            addToast(detail || "Failed to schedule closure", "error");
         } finally {
             setIsSubmitting(false);
         }
@@ -117,11 +131,10 @@ export default function ClosureFormModal({ venueId, courts, onClose, onSuccess }
                         <div className="space-y-2">
                             <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Closure Title</label>
                             <input
-                                {...register("title", { required: "Title is required" })}
+                                {...register("title")}
                                 className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
                                 placeholder="Ex: Pitch Maintenance"
                             />
-                            {errors.title && <p className="text-red-500 text-xs font-bold">{errors.title.message as string}</p>}
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
@@ -130,6 +143,7 @@ export default function ClosureFormModal({ venueId, courts, onClose, onSuccess }
                                 <input
                                     type="date"
                                     {...register("start_date", { required: "Start date is required" })}
+                                    min={today}
                                     className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
                                 />
                             </div>
@@ -137,7 +151,8 @@ export default function ClosureFormModal({ venueId, courts, onClose, onSuccess }
                                 <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">End Date</label>
                                 <input
                                     type="date"
-                                    {...register("end_date", { required: "End date is required" })}
+                                    {...register("end_date")}
+                                    min={watch("start_date") || today}
                                     className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
                                 />
                             </div>
@@ -162,6 +177,7 @@ export default function ClosureFormModal({ venueId, courts, onClose, onSuccess }
                                 <input
                                     type="date"
                                     {...register("date", { required: "Date is required" })}
+                                    min={today}
                                     className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
                                 />
                             </div>
@@ -174,14 +190,21 @@ export default function ClosureFormModal({ venueId, courts, onClose, onSuccess }
                             </label>
                             <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 max-h-48 overflow-y-auto custom-scrollbar p-1">
                                 {hours.map(hour => {
+                                    const now = new Date();
+                                    const isTodaySelected = watch("date") === today;
+                                    const isPastHour = isTodaySelected && hour <= now.getHours();
                                     const isSelected = selectedSlots.includes(hour);
                                     const timeStr = format(new Date().setHours(hour, 0, 0, 0), "h a");
                                     return (
                                         <button
                                             key={hour}
                                             type="button"
+                                            disabled={isPastHour}
                                             onClick={() => toggleSlot(hour)}
                                             className={`py-2 rounded-lg text-xs font-bold transition-all border
+                                                ${isPastHour
+                                                    ? 'bg-zinc-900/40 text-zinc-700 border-zinc-900 cursor-not-allowed'
+                                                    : ''}
                                                 ${isSelected
                                                     ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/50'
                                                     : 'bg-black/40 text-zinc-400 border-zinc-800 hover:border-zinc-700'}

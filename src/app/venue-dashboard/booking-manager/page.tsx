@@ -98,7 +98,6 @@ export default function BookingManagerPage() {
             endDateTime.setHours(startDateTime.getHours() + data.duration);
 
             await centerService.createManualBooking({
-                venue_id: currentVenue.id,
                 court_id: activeCourtId,
                 start_time: startDateTime.toISOString(),
                 end_time: endDateTime.toISOString(),
@@ -108,7 +107,7 @@ export default function BookingManagerPage() {
                 is_manual: true,
                 payment_status: data.payment_method === "card" ? "paid" : "pending",
                 payment_method: data.payment_method
-            });
+            }, currentVenue.id);
 
             addToast("Walk-in booking recorded successfully", "success");
             setIsModalOpen(false);

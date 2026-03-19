@@ -17,7 +17,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
   }, [pathname]);
 
   return (
-    <div className="page-transition">
+    <div className="page-transition" suppressHydrationWarning>
       {children}
     </div>
   );

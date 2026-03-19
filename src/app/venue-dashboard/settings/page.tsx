@@ -97,10 +97,10 @@ export default function VenueSettingsPage() {
             const basicUpdatePromise = venueApiService.updateVenue(currentVenue.id, {
                 name: data.name,
                 description: data.description,
-                contact_number: data.contact_number,
+                phone_contact: data.contact_number,
                 address: data.address,
                 city: data.city
-            });
+            } as any);
 
             // Update Schedule
             const scheduleUpdatePromise = centerService.updateSchedule(currentVenue.id, data.schedule);

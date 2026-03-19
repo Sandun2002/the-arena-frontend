@@ -37,11 +37,29 @@ export default function ClosuresPage() {
         if (!currentVenue) return;
         setIsLoading(true);
         try {
-            const [closuresData, courtsData] = await Promise.all([
+            const [closuresData, blockedData, courtsData] = await Promise.all([
                 centerService.getClosures(currentVenue.id),
+                centerService.getBlockedBookings(currentVenue.id),
                 centerService.getCourts(currentVenue.id)
             ]);
-            setClosures(closuresData);
+
+            // Normalise venue closures
+            const venueClosures = closuresData.map((c: any) => ({
+                ...c,
+                _type: "venue",
+                displayDate: c.closure_date,
+                displayTitle: c.reason || "Venue Closure",
+            }));
+
+            // Normalise blocked bookings (court closures)
+            const courtBlocks = blockedData.map((b: any) => ({
+                ...b,
+                _type: "court",
+                displayDate: b.start_time,
+                displayTitle: b.reason || "Court Maintenance",
+            }));
+
+            setClosures([...venueClosures, ...courtBlocks]);
             setCourts(courtsData);
             animateCards();
         } catch (error) {
@@ -60,10 +78,14 @@ export default function ClosuresPage() {
         }, containerRef);
     };
 
-    const handleDelete = async (id: string) => {
+    const handleDelete = async (closure: any) => {
         if (!confirm("Remove this closure?")) return;
         try {
-            await centerService.deleteClosure(id);
+            if (closure._type === "court") {
+                await centerService.cancelBlockedBooking(closure.id);
+            } else {
+                await centerService.deleteClosure(closure.id, currentVenue!.id);
+            }
             addToast("Closure removed", "success");
             loadData();
         } catch (error) {
@@ -128,14 +150,17 @@ export default function ClosuresPage() {
                                         {getIcon(closure.type)}
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-white text-lg mb-1">{closure.title}</h3>
+                                        <h3 className="font-bold text-white text-lg mb-1">{closure.displayTitle}</h3>
                                         <div className="flex flex-wrap gap-4 text-sm text-zinc-400">
                                             <span className="flex items-center gap-2">
                                                 <Calendar className="h-4 w-4 text-zinc-600" />
-                                                {format(new Date(closure.start_date), "MMM dd")} <span className="text-zinc-600">→</span> {format(new Date(closure.end_date), "MMM dd, yyyy")}
+                                                {closure._type === "court"
+                                                    ? `${format(new Date(closure.start_time), "MMM dd, yyyy h:mm a")} – ${format(new Date(closure.end_time), "h:mm a")}`
+                                                    : (closure.closure_date ? format(new Date(closure.closure_date), "MMM dd, yyyy") : "Unknown Date")
+                                                }
                                             </span>
                                             <span className="hidden md:inline text-zinc-700">|</span>
-                                            <span>{closure.reason}</span>
+                                            <span>{closure.reason || "Scheduled Closure"}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -144,19 +169,16 @@ export default function ClosuresPage() {
                                     <div className="text-right">
                                         <p className="text-xs font-bold text-zinc-500 uppercase mb-1">Affected Courts</p>
                                         <div className="flex flex-wrap justify-end gap-2">
-                                            {closure.courts && closure.courts.length > 0 ? (closure.courts as any[]).map((courtId: string, idx: number) => {
-                                                const court = courts.find(c => c.id === courtId);
-                                                return (
-                                                    <span key={idx} className="bg-zinc-800 text-white text-xs px-2 py-1 rounded">
-                                                        {court?.name || "Unknown Court"}
-                                                    </span>
-                                                );
-                                            }) : (
+                                            {closure._type === "court" ? (
+                                                <span className="bg-orange-500/10 text-orange-400 text-xs px-2 py-1 rounded border border-orange-500/20">
+                                                    {closure.court_name || "Court"}
+                                                </span>
+                                            ) : (
                                                 <span className="bg-red-500/10 text-red-500 text-xs px-2 py-1 rounded border border-red-500/20">All Venue</span>
                                             )}
                                         </div>
                                     </div>
-                                    <Button onClick={() => handleDelete(closure.id)} variant="outline" className="border-red-900/30 text-red-500 hover:bg-red-900/10 hover:border-red-900/50 px-4 py-2 h-auto rounded-xl flex items-center gap-2">
+                                    <Button onClick={() => handleDelete(closure)} variant="outline" className="border-red-900/30 text-red-500 hover:bg-red-900/10 hover:border-red-900/50 px-4 py-2 h-auto rounded-xl flex items-center gap-2">
                                         <Trash2 className="h-4 w-4" />
                                         <span className="text-sm font-bold">Cancel Closure</span>
                                     </Button>

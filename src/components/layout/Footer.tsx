@@ -55,7 +55,7 @@ export default function Footer() {
         </div>
         
         <div className="mt-12 border-t border-zinc-800 pt-8 text-center text-xs">
-          © {new Date().getFullYear()} The Arena. All rights reserved.
+          © <span suppressHydrationWarning>{new Date().getFullYear()}</span> The Arena. All rights reserved.
         </div>
       </div>
     </footer>

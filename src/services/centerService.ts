@@ -39,8 +39,8 @@ export const centerService = {
             operating_schedule: Array.isArray(response.data.operating_hours)
                 ? response.data.operating_hours.map((hour: any) => ({
                     day: String(hour.day_of_week),
-                    open: hour.open_time ?? "",
-                    close: hour.close_time ?? "",
+                    open: hour.opening_time ?? "",
+                    close: hour.closing_time ?? "",
                     is_closed: Boolean(hour.is_closed),
                 }))
                 : [],
@@ -48,7 +48,24 @@ export const centerService = {
     },
 
     updateSchedule: async (venueId: string, hours: VenueProfile['operating_schedule']) => {
-        await apiClient.put('/center/schedule', { operating_schedule: hours }, { params: { venue_id: venueId } });
+        const dayMap: Record<string, number> = {
+            monday: 0, tuesday: 1, wednesday: 2, thursday: 3, friday: 4, saturday: 5, sunday: 6
+        };
+        const formattedHours = hours.map((h) => {
+            let dayOfWeek = 0;
+            if (!isNaN(Number(h.day))) {
+                dayOfWeek = Number(h.day);
+            } else {
+                dayOfWeek = dayMap[h.day.toLowerCase()] ?? 0;
+            }
+            return {
+                day_of_week: dayOfWeek,
+                opening_time: h.is_closed ? null : (h.open ? (h.open.length === 5 ? `${h.open}:00` : h.open) : null),
+                closing_time: h.is_closed ? null : (h.close ? (h.close.length === 5 ? `${h.close}:00` : h.close) : null),
+                is_closed: h.is_closed,
+            };
+        });
+        await apiClient.put('/center/operating-hours', { hours: formattedHours }, { params: { venue_id: venueId } });
     },
 
     // === Bookings ===
@@ -76,8 +93,12 @@ export const centerService = {
         };
     },
 
-    createManualBooking: async (data: any) => {
-        const response = await apiClient.post<any>('/center/bookings/manual', data);
+    createManualBooking: async (data: any, venueId?: string) => {
+        const response = await apiClient.post<any>(
+            '/center/bookings/manual',
+            data,
+            { params: venueId ? { venue_id: venueId } : {} }
+        );
         return normalizeBooking(response.data);
     },
 
@@ -138,10 +159,10 @@ export const centerService = {
     // setCoverImage logic was removed because there is no PUT /gallery/{imageId}/cover on the server
 
     // === Recurring ===
-    getRecurringBookings: async (venueId?: string) => {
-        const params = venueId ? { venue_id: venueId } : {};
-        const response = await apiClient.get<RecurringBooking[]>('/center/recurring-bookings', { params });
-        return response.data;
+    getRecurringBookings: async (venue_id?: string) => {
+        const params = venue_id ? { venue_id } : {};
+        const response = await apiClient.get<{ items: RecurringBooking[] }>('/center/recurring-bookings', { params });
+        return response.data.items || [];
     },
 
     createRecurringBooking: async (data: any) => {
@@ -173,13 +194,26 @@ export const centerService = {
         return response.data.items || [];
     },
 
-    createClosure: async (data: any) => {
-        const response = await apiClient.post<Closure>('/center/closures', data);
+    createClosure: async (data: any, venueId?: string) => {
+        const response = await apiClient.post<Closure>('/center/closures', data, {
+            params: venueId ? { venue_id: venueId } : {}
+        });
         return response.data;
     },
 
-    deleteClosure: async (id: string) => {
-        await apiClient.delete(`/center/closures/${id}`);
+    deleteClosure: async (id: string, venueId?: string) => {
+        const params = venueId ? { venue_id: venueId } : {};
+        await apiClient.delete(`/center/closures/${id}`, { params });
+    },
+
+    getBlockedBookings: async (venueId?: string, upcomingOnly = true) => {
+        const params = { ...(venueId ? { venue_id: venueId } : {}), upcoming_only: upcomingOnly };
+        const response = await apiClient.get<{ items: any[] }>('/center/bookings/blocked', { params });
+        return response.data.items || [];
+    },
+
+    cancelBlockedBooking: async (id: string) => {
+        await apiClient.post(`/center/bookings/${id}/cancel`);
     },
 
     // === Analytics ===
