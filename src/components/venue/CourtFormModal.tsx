@@ -34,7 +34,7 @@ export default function CourtFormModal({ venueId, existingCourt, onClose, onSucc
         defaultValues: {
             name: existingCourt?.name || "",
             description: existingCourt?.description || "",
-            sport_type_id: existingCourt?.sport_type_id || "",
+            sport_type_id: existingCourt?.sport_type?.id || "",
             is_indoor: existingCourt?.is_indoor || false,
             hourly_rate: existingCourt?.hourly_rate || 1500,
             imageFile: undefined as unknown as FileList

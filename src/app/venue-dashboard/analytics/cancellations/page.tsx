@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { XCircle, ArrowLeft, Loader2, AlertTriangle, UserX } from "lucide-react";
+import { ArrowLeft, Loader2, XCircle, UserX, AlertTriangle, Ban, AlertCircle } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
 import { centerService } from "@/services/centerService";
@@ -86,43 +86,87 @@ export default function CancellationsAnalyticsPage() {
                         <Loader2 className="w-8 h-8 animate-spin text-zinc-500" />
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 
-                        {/* Cancellation Count */}
-                        <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-8 backdrop-blur-sm">
-                            <div className="flex items-start justify-between mb-4">
-                                <div className="p-3 bg-red-500/10 rounded-xl">
-                                    <XCircle className="w-6 h-6 text-red-500" />
+                            {/* Cancellation Count */}
+                            <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-8 backdrop-blur-sm">
+                                <div className="flex items-start justify-between mb-4">
+                                    <div className="p-3 bg-red-500/10 rounded-xl">
+                                        <XCircle className="w-6 h-6 text-red-500" />
+                                    </div>
                                 </div>
+                                <h3 className="text-4xl font-bold text-white mb-1">{data?.total_cancellations || 0}</h3>
+                                <p className="text-zinc-500 text-sm">Total Cancellations ({period})</p>
                             </div>
-                            <h3 className="text-4xl font-bold text-white mb-1">{data?.total_cancellations || 0}</h3>
-                            <p className="text-zinc-500 text-sm">Total Cancellations ({period})</p>
+
+                            {/* Cancellation Rate */}
+                            <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-8 backdrop-blur-sm">
+                                <div className="flex items-start justify-between mb-4">
+                                    <div className="p-3 bg-orange-500/10 rounded-xl">
+                                        <AlertTriangle className="w-6 h-6 text-orange-500" />
+                                    </div>
+                                </div>
+                                <h3 className="text-4xl font-bold text-white mb-1">{data?.cancellation_rate || 0}%</h3>
+                                <p className="text-zinc-500 text-sm">Cancellation Rate</p>
+                                <p className="text-xs text-zinc-600 mt-2">Percentage of total bookings cancelled.</p>
+                            </div>
+
+                            {/* No Shows */}
+                            <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-8 backdrop-blur-sm">
+                                <div className="flex items-start justify-between mb-4">
+                                    <div className="p-3 bg-zinc-800 rounded-xl">
+                                        <UserX className="w-6 h-6 text-zinc-400" />
+                                    </div>
+                                </div>
+                                <h3 className="text-4xl font-bold text-white mb-1">{data?.no_show_count || 0}</h3>
+                                <p className="text-zinc-500 text-sm">No-Shows ({period})</p>
+                                <p className="text-xs text-zinc-600 mt-2">Bookings where customer didn't arrive.</p>
+                            </div>
+
+                            {/* Rejected */}
+                            <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-8 backdrop-blur-sm">
+                                <div className="flex items-start justify-between mb-4">
+                                    <div className="p-3 bg-yellow-500/10 rounded-xl">
+                                        <Ban className="w-6 h-6 text-yellow-500" />
+                                    </div>
+                                </div>
+                                <h3 className="text-4xl font-bold text-white mb-1">{data?.rejected_bookings || 0}</h3>
+                                <p className="text-zinc-500 text-sm">Rejected Bookings</p>
+                                <p className="text-xs text-zinc-600 mt-2">Unpaid holds that expired automatically.</p>
+                            </div>
+
                         </div>
 
-                        {/* Cancellation Rate */}
-                        <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-8 backdrop-blur-sm">
-                            <div className="flex items-start justify-between mb-4">
-                                <div className="p-3 bg-orange-500/10 rounded-xl">
-                                    <AlertTriangle className="w-6 h-6 text-orange-500" />
+                        {/* Reasons Breakdown */}
+                        {data?.cancellation_reasons && Object.keys(data.cancellation_reasons).length > 0 && (
+                            <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-8 backdrop-blur-sm">
+                                <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                                    <AlertCircle className="w-5 h-5 text-zinc-500" /> Cancellation Reasons
+                                </h3>
+                                <div className="space-y-4">
+                                    {Object.entries(data.cancellation_reasons).map(([reason, count], i) => {
+                                        const percentage = data.total_cancellations > 0 
+                                            ? Math.round((count / data.total_cancellations) * 100) 
+                                            : 0;
+                                        return (
+                                            <div key={i}>
+                                                <div className="flex justify-between text-sm mb-2 text-zinc-300">
+                                                    <span className="capitalize">{reason.replace(/_/g, " ")}</span>
+                                                    <span className="font-bold text-white">{count} ({percentage}%)</span>
+                                                </div>
+                                                <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
+                                                    <div
+                                                        className="h-full rounded-full bg-red-500"
+                                                        style={{ width: `${percentage}%` }}
+                                                    ></div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </div>
-                            <h3 className="text-4xl font-bold text-white mb-1">{data?.cancellation_rate || 0}%</h3>
-                            <p className="text-zinc-500 text-sm">Cancellation Rate</p>
-                            <p className="text-xs text-zinc-600 mt-2">Percentage of total bookings cancelled.</p>
-                        </div>
-
-                        {/* No Shows */}
-                        <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-8 backdrop-blur-sm">
-                            <div className="flex items-start justify-between mb-4">
-                                <div className="p-3 bg-zinc-800 rounded-xl">
-                                    <UserX className="w-6 h-6 text-zinc-400" />
-                                </div>
-                            </div>
-                            <h3 className="text-4xl font-bold text-white mb-1">{data?.no_show_count || 0}</h3>
-                            <p className="text-zinc-500 text-sm">No-Shows ({period})</p>
-                            <p className="text-xs text-zinc-600 mt-2">Bookings where customer didn't arrive.</p>
-                        </div>
-
+                        )}
                     </div>
                 )}
             </div>

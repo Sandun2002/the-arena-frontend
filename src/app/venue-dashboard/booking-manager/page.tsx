@@ -97,9 +97,14 @@ export default function BookingManagerPage() {
             const endDateTime = new Date(startDateTime);
             endDateTime.setHours(startDateTime.getHours() + data.duration);
 
+            // If start time is in the past, adjust it to "now" + 1 min buffer to satisfy backend validation 
+            // (server might have strict "must be in future" check)
+            const now = new Date();
+            const finalStartDateTime = startDateTime < now ? new Date(now.getTime() + 60000) : startDateTime;
+
             await centerService.createManualBooking({
                 court_id: activeCourtId,
-                start_time: startDateTime.toISOString(),
+                start_time: finalStartDateTime.toISOString(),
                 end_time: endDateTime.toISOString(),
                 customer_name: data.customer_name || "Walk-in Guest",
                 customer_phone: data.customer_phone,
@@ -145,12 +150,18 @@ export default function BookingManagerPage() {
     const hours = Array.from({ length: 24 }, (_, i) => i);
 
     const getBookingForSlot = (courtId: string, hour: number) => {
+        const slotStart = new Date(selectedDate);
+        slotStart.setHours(hour, 0, 0, 0);
+        const slotEnd = new Date(slotStart);
+        slotEnd.setHours(hour + 1);
+
         return bookings.find(b => {
-            // Basic timezone-agnostic check per standard ISO strings (assuming UTC format is matching server or local correctly in previous implementation)
-            const bookingStart = new Date(b.start_time);
+            const bStart = new Date(b.start_time);
+            const bEnd = new Date(b.end_time);
             return (
                 b.court_id === courtId &&
-                bookingStart.getHours() === hour &&
+                bStart < slotEnd &&
+                bEnd > slotStart &&
                 (b.status === "confirmed" || b.status === "payment_pending" || b.status === "completed")
             );
         });
@@ -254,7 +265,7 @@ export default function BookingManagerPage() {
                             slotEnd.setHours(hour + 1);
 
                             const booking = getBookingForSlot(activeCourtId, hour);
-                            const isPast = slotEnd < new Date();
+                            const isPast = slotStart < new Date();
 
                             return (
                                 <div key={hour} className={`flex gap-4 ${isPast && !booking ? 'opacity-50' : ''}`}>

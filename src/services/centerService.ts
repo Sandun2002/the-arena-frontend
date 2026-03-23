@@ -159,36 +159,37 @@ export const centerService = {
     // setCoverImage logic was removed because there is no PUT /gallery/{imageId}/cover on the server
 
     // === Recurring ===
-    getRecurringBookings: async (venue_id?: string) => {
-        const params = venue_id ? { venue_id } : {};
+    getRecurringBookings: async (venueId?: string) => {
+        const params = venueId ? { venue_id: venueId } : {};
         const response = await apiClient.get<{ items: RecurringBooking[] }>('/center/recurring-bookings', { params });
         return response.data.items || [];
     },
 
     createRecurringBooking: async (data: any, venueId?: string) => {
-        const response = await apiClient.post<RecurringBooking>('/center/recurring-bookings', data, {
-            params: venueId ? { venue_id: venueId } : {}
-        });
+        const params = venueId ? { venue_id: venueId } : {};
+        const response = await apiClient.post<RecurringBooking>('/center/recurring-bookings', data, { params });
         return response.data;
     },
 
     updateRecurringBooking: async (id: string, data: any, venueId?: string) => {
-        const response = await apiClient.put<RecurringBooking>(`/center/recurring-bookings/${id}`, data, {
-            params: venueId ? { venue_id: venueId } : {}
-        });
+        const params = venueId ? { venue_id: venueId } : {};
+        const response = await apiClient.put<RecurringBooking>(`/center/recurring-bookings/${id}`, data, { params });
         return response.data;
     },
 
-    pauseRecurringBooking: async (id: string) => {
-        await apiClient.post(`/center/recurring-bookings/${id}/pause`);
+    pauseRecurringBooking: async (id: string, venueId?: string) => {
+        const params = venueId ? { venue_id: venueId } : {};
+        await apiClient.post(`/center/recurring-bookings/${id}/pause`, null, { params });
     },
 
-    resumeRecurringBooking: async (id: string) => {
-        await apiClient.post(`/center/recurring-bookings/${id}/resume`);
+    resumeRecurringBooking: async (id: string, venueId?: string) => {
+        const params = venueId ? { venue_id: venueId } : {};
+        await apiClient.post(`/center/recurring-bookings/${id}/resume`, null, { params });
     },
 
-    deleteRecurringBooking: async (id: string) => {
-        await apiClient.delete(`/center/recurring-bookings/${id}`);
+    deleteRecurringBooking: async (id: string, venueId?: string) => {
+        const params = venueId ? { venue_id: venueId } : {};
+        await apiClient.delete(`/center/recurring-bookings/${id}`, { params });
     },
 
     // === Closures ===
@@ -243,11 +244,26 @@ export const centerService = {
     getUtilizationAnalytics: async (period: 'daily' | 'weekly' | 'monthly', venueId?: string) => {
         const params = { period, ...(venueId ? { venue_id: venueId } : {}) };
         const response = await apiClient.get<any>('/center/analytics/utilization', { params });
+        
+        const total_booked = Number(response.data.total_booked_hours ?? 0);
+        const confirmed_hours = Number(response.data.breakdown?.confirmed_hours ?? 0);
+        const pending_hours = Number(response.data.breakdown?.payment_pending_hours ?? 0);
+        
         return {
             overall_percentage: Number(response.data.utilization_percentage ?? 0),
-            peak_hours: [
-                { time: 'Confirmed', percentage: Number(response.data.breakdown?.confirmed_hours ?? 0) },
-                { time: 'Pending', percentage: Number(response.data.breakdown?.payment_pending_hours ?? 0) },
+            total_booked_hours: total_booked,
+            total_available_hours: Number(response.data.total_available_hours ?? 0),
+            status_breakdown: [
+                { 
+                    label: 'Confirmed', 
+                    hours: confirmed_hours, 
+                    percentage: total_booked > 0 ? Math.round((confirmed_hours / total_booked) * 100) : 0 
+                },
+                { 
+                    label: 'Pending', 
+                    hours: pending_hours, 
+                    percentage: total_booked > 0 ? Math.round((pending_hours / total_booked) * 100) : 0 
+                },
             ],
             court_breakdown: response.data.court_name
                 ? [{ court_id: String(response.data.court_id ?? 'all'), court_name: response.data.court_name, percentage: Number(response.data.utilization_percentage ?? 0) }]
@@ -264,12 +280,22 @@ export const centerService = {
             pending_payout: 0,
             venue_commission: Number(response.data.venue_commission ?? 0),
             total_revenue: Number(response.data.total_revenue ?? 0),
+            breakdown: response.data.breakdown || undefined,
         } satisfies AnalyticsFees;
     },
 
     getCancellationAnalytics: async (period: 'daily' | 'weekly' | 'monthly', venueId?: string) => {
         const params = { period, ...(venueId ? { venue_id: venueId } : {}) };
-        const response = await apiClient.get<AnalyticsCancellations>('/center/analytics/cancellations', { params });
-        return response.data;
+        const response = await apiClient.get<any>('/center/analytics/cancellations', { params });
+        return {
+            total_cancellations: Number(response.data.cancelled_bookings ?? 0),
+            cancellation_rate: Number(response.data.cancellation_rate ?? 0),
+            no_show_count: Number(response.data.no_shows ?? 0),
+            total_bookings: Number(response.data.total_bookings ?? 0),
+            lost_revenue: Number(response.data.lost_revenue ?? 0),
+            rejected_bookings: Number(response.data.rejected_bookings ?? 0),
+            no_show_rate: Number(response.data.no_show_rate ?? 0),
+            cancellation_reasons: response.data.cancellation_reasons ?? {},
+        } satisfies AnalyticsCancellations;
     },
 };

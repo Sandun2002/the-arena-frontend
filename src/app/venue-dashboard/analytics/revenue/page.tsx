@@ -10,7 +10,7 @@ import { AnalyticsRevenue } from "@/types";
 import { useToast } from "@/components/ui/Toast";
 import { useVenue } from "@/components/venue/VenueContext";
 import { useRouter } from "next/navigation";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, isValid } from "date-fns";
 
 export default function RevenueAnalyticsPage() {
     const { user, isVenueOwner } = useAuth();
@@ -135,10 +135,18 @@ export default function RevenueAnalyticsPage() {
                                                 <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-zinc-900 border border-zinc-700 text-white text-xs px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none whitespace-nowrap shadow-xl">
                                                     <span className="font-bold">LKR {point.amount.toLocaleString()}</span>
                                                     <br />
-                                                    <span className="text-zinc-400 text-[10px]">{format(parseISO(point.date), "MMM dd, yyyy")}</span>
+                                                    <span className="text-zinc-400 text-[10px]">
+                                                        {(() => {
+                                                            const d = parseISO(point.date);
+                                                            return isValid(d) ? format(d, "MMM dd, yyyy") : point.date;
+                                                        })()}
+                                                    </span>
                                                 </div>
                                                 <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-zinc-500 text-xs whitespace-nowrap">
-                                                    {format(parseISO(point.date), "MMM dd")}
+                                                    {(() => {
+                                                        const d = parseISO(point.date);
+                                                        return isValid(d) ? format(d, "MMM dd") : point.date;
+                                                    })()}
                                                 </div>
                                             </div>
                                         );

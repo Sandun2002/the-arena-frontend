@@ -139,17 +139,37 @@ export default function FeesAnalyticsPage() {
 
                         {/* Info Card */}
                         <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-8 backdrop-blur-sm flex flex-col justify-center">
-                            <h4 className="text-white font-bold mb-2">Fee Structure</h4>
-                            <ul className="text-sm text-zinc-400 space-y-2">
-                                <li className="flex justify-between">
-                                    <span>Platform Commission</span>
-                                    <span className="text-white">10%</span>
-                                </li>
-                                <li className="flex justify-between">
-                                    <span>Processing Fee</span>
-                                    <span className="text-white">2.5%</span>
-                                </li>
-                            </ul>
+                            <h4 className="text-white font-bold mb-4 flex items-center gap-2">
+                                <Receipt className="w-5 h-5 text-zinc-500" /> Platform Fee Rules
+                            </h4>
+                            <div className="space-y-4">
+                                <div className="bg-black/30 p-4 rounded-2xl border border-zinc-800/50">
+                                    <div className="flex justify-between items-center mb-1">
+                                        <span className="text-sm font-medium text-white">Platform Bookings</span>
+                                        <span className="text-xs font-bold text-emerald-500">
+                                            {data?.breakdown?.platform_bookings?.count || 0} Bookings
+                                        </span>
+                                    </div>
+                                    <p className="text-xs text-zinc-500 mb-2">Booked via customer app/website</p>
+                                    <div className="flex justify-between text-xs text-zinc-400">
+                                        <span>Platform Fee: LKR {(data?.breakdown?.platform_bookings?.platform_fees || 0).toLocaleString()}</span>
+                                        <span>Payout: LKR {(data?.breakdown?.platform_bookings?.venue_payout || 0).toLocaleString()}</span>
+                                    </div>
+                                </div>
+                                <div className="bg-black/30 p-4 rounded-2xl border border-zinc-800/50">
+                                    <div className="flex justify-between items-center mb-1">
+                                        <span className="text-sm font-medium text-white">Manual Bookings</span>
+                                        <span className="text-xs font-bold text-blue-500">
+                                            {data?.breakdown?.manual_bookings?.count || 0} Bookings
+                                        </span>
+                                    </div>
+                                    <p className="text-xs text-zinc-500 mb-2">Walk-ins added by venue admins</p>
+                                    <div className="flex justify-between text-xs text-zinc-400">
+                                        <span>Platform Fee: LKR {(data?.breakdown?.manual_bookings?.platform_fees || 0).toLocaleString()}</span>
+                                        <span>Payout: LKR {(data?.breakdown?.manual_bookings?.venue_payout || 0).toLocaleString()}</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                     </div>

@@ -59,12 +59,13 @@ export default function RecurringPage() {
     };
 
     const handleTogglePause = async (booking: RecurringBooking) => {
+        if (!currentVenue) return;
         try {
             if (booking.status === 'paused') {
-                await centerService.resumeRecurringBooking(booking.id);
+                await centerService.resumeRecurringBooking(booking.id, currentVenue.id);
                 addToast("Booking resumed", "success");
             } else {
-                await centerService.pauseRecurringBooking(booking.id);
+                await centerService.pauseRecurringBooking(booking.id, currentVenue.id);
                 addToast("Booking paused", "success");
             }
             loadData();
@@ -74,9 +75,9 @@ export default function RecurringPage() {
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm("Permanently delete this recurring booking?")) return;
+        if (!currentVenue || !confirm("Permanently delete this recurring booking?")) return;
         try {
-            await centerService.deleteRecurringBooking(id);
+            await centerService.deleteRecurringBooking(id, currentVenue.id);
             addToast("Booking deleted", "success");
             loadData();
         } catch (error) {
@@ -95,6 +96,8 @@ export default function RecurringPage() {
             </div>
         );
     }
+
+    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
     return (
         <main className="min-h-screen bg-black pt-24 pb-20 relative overflow-hidden" ref={containerRef}>
@@ -131,14 +134,14 @@ export default function RecurringPage() {
                         bookings.map(booking => (
                             <div key={booking.id} className={`recurring-card bg-zinc-900/40 border ${booking.status === 'paused' ? 'border-amber-500/20 bg-amber-500/5' : 'border-zinc-800'} rounded-[2rem] p-8 backdrop-blur-sm group hover:border-emerald-500/30 transition-all relative`}>
 
-                                <div className="absolute top-6 right-6 flex gap-2 opacity-15 group-hover:opacity-100 transition-opacity">
-                                    <button onClick={() => handleTogglePause(booking)} className="p-2 rounded-full hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors" title={booking.status === 'paused' ? "Resume" : "Pause"}>
+                                <div className="absolute top-6 right-6 flex gap-2 transition-opacity">
+                                    <button onClick={() => handleTogglePause(booking)} className="p-2 rounded-full bg-zinc-800/50 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors" title={booking.status === 'paused' ? "Resume" : "Pause"}>
                                         {booking.status === 'paused' ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
                                     </button>
-                                    <button onClick={() => handleEdit(booking)} className="p-2 rounded-full hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors" title="Edit">
+                                    <button onClick={() => handleEdit(booking)} className="p-2 rounded-full bg-zinc-800/50 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors" title="Edit">
                                         <Edit2 className="h-4 w-4" />
                                     </button>
-                                    <button onClick={() => handleDelete(booking.id)} className="p-2 rounded-full hover:bg-red-500/20 text-zinc-400 hover:text-red-500 transition-colors" title="Delete">
+                                    <button onClick={() => handleDelete(booking.id)} className="p-2 rounded-full bg-zinc-800/50 hover:bg-red-500/20 text-zinc-400 hover:text-red-500 transition-colors" title="Delete">
                                         <Trash2 className="h-4 w-4" />
                                     </button>
                                 </div>
@@ -161,7 +164,9 @@ export default function RecurringPage() {
                                 <div className="space-y-4 mb-6">
                                     <div className="flex justify-between py-2 border-b border-zinc-800/50">
                                         <span className="text-zinc-500 text-sm flex items-center gap-2"><Calendar className="h-4 w-4" /> Frequency</span>
-                                        <span className="text-white font-medium text-sm">{booking.day_of_week}s</span>
+                                        <span className="text-white font-medium text-sm">
+                                            Every {typeof booking.day_of_week === 'number' ? days[booking.day_of_week] : booking.day_of_week}
+                                        </span>
                                     </div>
                                     <div className="flex justify-between py-2 border-b border-zinc-800/50">
                                         <span className="text-zinc-500 text-sm flex items-center gap-2"><Clock className="h-4 w-4" /> Time</span>

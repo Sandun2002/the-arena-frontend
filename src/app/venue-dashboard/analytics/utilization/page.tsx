@@ -108,22 +108,22 @@ export default function UtilizationAnalyticsPage() {
                         </div>
 
                         <div className="grid md:grid-cols-2 gap-8">
-                            {/* Peak Hours */}
+                            {/* Booking Status Breakdown */}
                             <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-8 backdrop-blur-sm">
                                 <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
-                                    <Clock className="w-5 h-5 text-zinc-500" /> Peak Hours
+                                    <BarChart2 className="w-5 h-5 text-zinc-500" /> Booking Status
                                 </h3>
                                 <div className="space-y-4">
-                                    {data?.peak_hours && data.peak_hours.length > 0 ? (
-                                        data.peak_hours.slice(0, 5).map((slot, i) => (
+                                    {data?.status_breakdown && data.status_breakdown.length > 0 ? (
+                                        data.status_breakdown.map((slot, i) => (
                                             <div key={i}>
                                                 <div className="flex justify-between text-xs text-zinc-400 mb-1">
-                                                    <span>{slot.time}</span>
-                                                    <span>{slot.percentage}% Utilization</span>
+                                                    <span className="font-medium text-white">{slot.label}</span>
+                                                    <span>{slot.percentage}% ({slot.hours} hours)</span>
                                                 </div>
                                                 <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
                                                     <div
-                                                        className={`h-full rounded-full ${i < 2 ? "bg-red-500" : "bg-blue-500"}`}
+                                                        className={`h-full rounded-full ${i < 1 ? "bg-emerald-500" : "bg-yellow-500"}`}
                                                         style={{ width: `${slot.percentage}%` }}
                                                     ></div>
                                                 </div>
@@ -131,9 +131,19 @@ export default function UtilizationAnalyticsPage() {
                                         ))
                                     ) : (
                                         <div className="h-40 flex items-center justify-center text-zinc-500 text-sm italic">
-                                            No utilization data available
+                                            No breakdown data available
                                         </div>
                                     )}
+                                </div>
+                                <div className="mt-8 pt-6 border-t border-zinc-800/50">
+                                    <div className="flex justify-between text-sm mb-2">
+                                        <span className="text-zinc-400">Total Booked Hours</span>
+                                        <span className="text-white font-bold">{data?.total_booked_hours || 0}</span>
+                                    </div>
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-zinc-400">Total Available Hours</span>
+                                        <span className="text-white font-bold">{data?.total_available_hours || 0}</span>
+                                    </div>
                                 </div>
                             </div>
 

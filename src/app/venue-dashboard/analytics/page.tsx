@@ -11,7 +11,7 @@ import { centerService } from "@/services/centerService";
 import { DashboardStats, AnalyticsRevenue, AnalyticsUtilization } from "@/types";
 import { useToast } from "@/components/ui/Toast";
 import { useVenue } from "@/components/venue/VenueContext";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, isValid } from "date-fns";
 import Link from "next/link";
 
 export default function AnalyticsPage() {
@@ -184,8 +184,8 @@ export default function AnalyticsPage() {
                                         <TrendingUp className="w-3 h-3" /> --
                                     </span>
                                 </div>
-                                <p className="text-3xl font-bold text-white mb-1">{stats?.total_bookings || 0}</p>
-                                <p className="text-zinc-500 text-sm">Total Bookings (All Time)</p>
+                                <p className="text-3xl font-bold text-white mb-1">{stats?.today_bookings || 0}</p>
+                                <p className="text-zinc-500 text-sm">Bookings Today</p>
                             </div>
 
                             <div className="bg-zinc-900/40 border border-zinc-800 rounded-2xl p-6 backdrop-blur-sm">
@@ -218,7 +218,10 @@ export default function AnalyticsPage() {
                                                             LKR {point.amount.toLocaleString()}
                                                         </div>
                                                         <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-zinc-500 text-[10px] whitespace-nowrap">
-                                                            {format(parseISO(point.date), "MMM dd")}
+                                                            {(() => {
+                                                                const d = parseISO(point.date);
+                                                                return isValid(d) ? format(d, "MMM dd") : point.date;
+                                                            })()}
                                                         </div>
                                                     </div>
                                                 );
@@ -238,19 +241,19 @@ export default function AnalyticsPage() {
 
                             <div className="bg-zinc-900/40 border border-zinc-800 rounded-2xl p-6 backdrop-blur-sm">
                                 <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
-                                    <Clock className="w-5 h-5 text-zinc-500" /> Peak Hours
+                                    <BarChart2 className="w-5 h-5 text-zinc-500" /> Booking Status
                                 </h3>
                                 <div className="space-y-4">
-                                    {utilizationData?.peak_hours && utilizationData.peak_hours.length > 0 ? (
-                                        utilizationData.peak_hours.slice(0, 5).map((slot, i) => (
+                                    {utilizationData?.status_breakdown && utilizationData.status_breakdown.length > 0 ? (
+                                        utilizationData.status_breakdown.map((slot, i) => (
                                             <div key={i}>
                                                 <div className="flex justify-between text-xs text-zinc-400 mb-1">
-                                                    <span>{slot.time}</span>
-                                                    <span>{slot.percentage}% Utilization</span>
+                                                    <span>{slot.label}</span>
+                                                    <span>{slot.percentage}% ({slot.hours} hours)</span>
                                                 </div>
                                                 <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
                                                     <div
-                                                        className={`h-full rounded-full ${i < 2 ? "bg-red-500" : "bg-blue-500"}`}
+                                                        className={`h-full rounded-full ${i < 1 ? "bg-emerald-500" : "bg-yellow-500"}`}
                                                         style={{ width: `${slot.percentage}%` }}
                                                     ></div>
                                                 </div>

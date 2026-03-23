@@ -325,7 +325,9 @@ export interface AnalyticsRevenue {
 
 export interface AnalyticsUtilization {
   overall_percentage: number;
-  peak_hours: { time: string; percentage: number }[];
+  total_booked_hours: number;
+  total_available_hours: number;
+  status_breakdown: { label: string; hours: number; percentage: number }[];
   court_breakdown: { court_id: string; court_name: string; percentage: number }[];
 }
 
@@ -333,16 +335,23 @@ export interface AnalyticsFees {
   total_platform_fees: number;
   net_payout: number;
   pending_payout: number;
-  venue_commission?: number;
-  total_revenue?: number;
+  venue_commission: number;
+  total_revenue: number;
+  breakdown?: {
+    platform_bookings: { count: number; revenue: number; platform_fees: number; venue_commission: number; venue_payout: number };
+    manual_bookings: { count: number; revenue: number; platform_fees: number; venue_commission: number; venue_payout: number };
+  };
 }
 
 export interface AnalyticsCancellations {
   total_cancellations: number;
   cancellation_rate: number;
   no_show_count: number;
-  total_bookings?: number;
-  lost_revenue?: number;
+  total_bookings: number;
+  lost_revenue: number;
+  rejected_bookings: number;
+  no_show_rate: number;
+  cancellation_reasons: Record<string, number>;
 }
 
 // === Recurring Bookings ===
