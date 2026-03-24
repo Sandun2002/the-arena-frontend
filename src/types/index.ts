@@ -4,6 +4,7 @@ export type UserRole = "customer" | "venue_owner" | "venue_manager" | "admin";
 export interface Sport {
   id: string;
   name: string;
+  slug?: string; // Backend identifier
   icon?: string;
   imageUrl: string;
   isActive: boolean;
@@ -63,11 +64,11 @@ export interface Venue {
   description: string | null;
   city: string;
   address: string;
-  lat: number | null;
-  lng: number | null;
+  geo_lat: number | null;
+  geo_lng: number | null;
+  phone_contact: string | null;
   opening_time?: string | null;
   closing_time?: string | null;
-  contact_number: string | null;
   amenities: { id: string; name: string }[];
   rating: number;
   review_count: number;

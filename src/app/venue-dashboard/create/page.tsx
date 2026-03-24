@@ -10,6 +10,8 @@ import { venueApiService } from "@/services/venueApiService";
 import { useToast } from "@/components/ui/Toast";
 import { useAuth } from "@/services/authContext";
 import { useVenue } from "@/components/venue/VenueContext";
+import Script from "next/script";
+import { useRef, useEffect } from "react";
 
 type Step = "details" | "location" | "amenities" | "document";
 
@@ -21,8 +23,12 @@ export default function CreateVenuePage() {
     const [step, setStep] = useState<Step>("details");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [brDocument, setBrDocument] = useState<File | null>(null);
+    const [geoLat, setGeoLat] = useState<number | null>(null);
+    const [geoLng, setGeoLng] = useState<number | null>(null);
+    const [mapLoaded, setMapLoaded] = useState(false);
+    const searchInputRef = useRef<HTMLInputElement | null>(null);
 
-    const { register, handleSubmit, formState: { errors } } = useForm({
+    const { register, handleSubmit, setValue, formState: { errors } } = useForm({
         defaultValues: {
             name: "",
             description: "",
@@ -36,6 +42,37 @@ export default function CreateVenuePage() {
     });
 
     const amenitiesList = ["Parking", "A/C", "Showers", "Equipment Rental", "Cafe", "WiFi", "Lockers", "First Aid"];
+
+    const initAutocomplete = () => {
+        if (!(window as any).google || !searchInputRef.current) return;
+
+        const autocomplete = new (window as any).google.maps.places.Autocomplete(searchInputRef.current, {
+            types: ['address'],
+            componentRestrictions: { country: 'lk' }
+        });
+
+        autocomplete.addListener('place_changed', () => {
+            const place = autocomplete.getPlace();
+            if (!place.geometry || !place.geometry.location) return;
+
+            setGeoLat(place.geometry.location.lat());
+            setGeoLng(place.geometry.location.lng());
+            setValue("address", place.formatted_address || "");
+
+            const cityComp = place.address_components?.find((c: any) => 
+                c.types.includes('locality') || c.types.includes('administrative_area_level_2')
+            );
+            if (cityComp) {
+                setValue("city", cityComp.long_name);
+            }
+        });
+    };
+
+    useEffect(() => {
+        if (mapLoaded && step === "location" && searchInputRef.current) {
+            initAutocomplete();
+        }
+    }, [mapLoaded, step]);
 
     const onSubmit = async (data: any) => {
         if (!brDocument) {
@@ -55,7 +92,9 @@ export default function CreateVenuePage() {
                 sport: "generic", // Default for now, could be added to form
                 location: data.city, // Backward compatibility
                 owner_id: user?.id,
-                br_document_url: brDocumentUrl
+                br_document_url: brDocumentUrl,
+                geo_lat: geoLat,
+                geo_lng: geoLng
             });
             addToast("Venue created successfully! Waiting for admin verification.", "success");
 
@@ -170,20 +209,37 @@ export default function CreateVenuePage() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">City</label>
+                                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Search on Google Maps</label>
                                     <input
-                                        {...register("city", { required: "City is required" })}
+                                        ref={searchInputRef}
                                         className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
-                                        placeholder="Ex: Colombo"
+                                        placeholder="Search for address..."
                                     />
-                                    {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city.message as string}</p>}
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">City</label>
+                                        <input
+                                            {...register("city", { required: "City is required" })}
+                                            className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
+                                            placeholder="Ex: Colombo"
+                                        />
+                                        {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city.message as string}</p>}
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Coordinates</label>
+                                        <div className="h-12 bg-black/30 border border-zinc-800 rounded-xl px-4 flex items-center text-xs text-zinc-500 italic">
+                                            {geoLat ? `${geoLat.toFixed(4)}, ${geoLng?.toFixed(4)}` : "Auto-detected from search"}
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div className="space-y-2">
                                     <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Full Address</label>
                                     <textarea
                                         {...register("address", { required: "Address is required" })}
-                                        rows={3}
+                                        rows={1}
                                         className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors resize-none"
                                         placeholder="Street, Area, etc."
                                     />
@@ -193,10 +249,15 @@ export default function CreateVenuePage() {
                                 <div className="bg-blue-500/10 p-4 rounded-xl flex gap-3 items-start border border-blue-500/20">
                                     <Info className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
                                     <div className="text-sm text-blue-200/80 leading-relaxed">
-                                        <span className="font-bold text-blue-400 block mb-1">Map Coordinates</span>
-                                        Coordinates (Lat/Lng) will be automatically detected from the address or can be refined later in settings.
+                                        <span className="font-bold text-blue-400 block mb-1">Interactive Setup</span>
+                                        Find your venue on the map above to automatically sync coordinates. This ensures better visibility in "Near Me" searches.
                                     </div>
                                 </div>
+
+                                <Script 
+                                    src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
+                                    onLoad={() => setMapLoaded(true)}
+                                />
 
                                 <div className="flex gap-3 pt-4">
                                     <Button type="button" variant="ghost" onClick={() => setStep("details")} className="flex-1 h-12 text-zinc-400 hover:text-white">

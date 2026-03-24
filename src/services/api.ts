@@ -1,6 +1,6 @@
 import { City, SearchParams, Sport, Venue, VenueSearchResponse, VenueSlotsResponse } from "@/types";
 import apiClient from "./apiClient";
-import { createSport, normalizeCities, normalizeReview, normalizeReviewStats, normalizeVenue } from "./normalizers";
+import { createSport, normalizeCities, normalizeReview, normalizeReviewStats, normalizeVenue, getSportImage } from "./normalizers";
 
 interface VenueListApiResponse {
   venues: any[];
@@ -14,6 +14,13 @@ interface CitiesApiResponse {
   cities: string[];
 }
 
+interface SportTypePublicResponse {
+  id: string;
+  name: string;
+  display_name: string;
+  icon?: string;
+}
+
 export const api = {
   getCities: async (): Promise<City[]> => {
     const response = await apiClient.get<CitiesApiResponse>('/search/cities');
@@ -21,11 +28,24 @@ export const api = {
   },
 
   getSports: async (): Promise<Sport[]> => {
-    const venues = await api.getVenues();
-    const sportNames = Array.from(
-      new Set(venues.flatMap((venue) => venue.available_sports || venue.courts.map((court) => court.sport_type.name)))
-    );
-    return sportNames.map(createSport);
+    try {
+      const response = await apiClient.get<SportTypePublicResponse[]>('/sports');
+      return (response.data || []).map(sport => ({
+        id: sport.id,
+        name: sport.display_name, // Display name for UI
+        slug: sport.name,         // Slug name for API filtering
+        imageUrl: getSportImage(sport.name),
+        isActive: true,
+      }));
+    } catch (error) {
+      console.error("Failed to fetch sports from API, falling back to venue-derived list", error);
+      // Fallback to old "dumb" logic if /sports fails
+      const venues = await api.getVenues();
+      const sportNames = Array.from(
+        new Set(venues.flatMap((venue) => venue.available_sports || venue.courts.map((court) => court.sport_type.name)))
+      );
+      return sportNames.map(createSport);
+    }
   },
 
   getVenues: async (): Promise<Venue[]> => {

@@ -36,6 +36,7 @@ export const getSportImage = (name: string) => {
 export const createSport = (name: string): Sport => ({
   id: name.trim().toLowerCase().replace(/\s+/g, "-"),
   name: toTitleCase(name),
+  slug: name.trim().toLowerCase().replace(/\s+/g, "-"),
   imageUrl: getSportImage(name),
   isActive: true,
 });
@@ -78,11 +79,11 @@ export const normalizeVenue = (raw: any): Venue => {
     description: raw.description ?? null,
     city: raw.city,
     address: raw.address,
-    lat: raw.geo_lat ?? raw.lat ?? null,
-    lng: raw.geo_lng ?? raw.lng ?? null,
+    geo_lat: raw.geo_lat ?? raw.lat ?? null,
+    geo_lng: raw.geo_lng ?? raw.lng ?? null,
     opening_time: raw.opening_time ?? null,
     closing_time: raw.closing_time ?? null,
-    contact_number: raw.phone_contact ?? raw.contact_number ?? null,
+    phone_contact: raw.phone_contact ?? raw.contact_number ?? null,
     amenities: Array.isArray(raw.amenities)
       ? raw.amenities.map((amenity: any) => ({ id: String(amenity.id ?? amenity.name), name: amenity.name }))
       : [],

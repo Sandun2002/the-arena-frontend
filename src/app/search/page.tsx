@@ -33,23 +33,39 @@ function SearchContent() {
     }, [results]);
 
     const loadFilters = async () => {
-        const [citiesData, sportsData] = await Promise.all([api.getCities(), api.getSports()]);
-        setCities(citiesData);
-        setSports(sportsData);
+        try {
+            const [citiesData, sportsData] = await Promise.all([api.getCities(), api.getSports()]);
+            setCities(citiesData);
+            setSports(sportsData);
+            
+            // Auto-select first sport if none selected or if "All" is active (to avoid 422 errors)
+            if (sportsData.length > 0 && (selectedSport === "All" || !selectedSport)) {
+                setSelectedSport(sportsData[0].name);
+            }
+        } catch (error) {
+            console.error("Failed to load filters", error);
+        }
     };
 
     const loadResults = async () => {
         setSubmitting(true);
         try {
+            // Find the selected sport object to get its backend slug
+            const sportObj = sports.find(s => s.name === selectedSport);
+            const sportValue = sportObj?.slug || (selectedSport === "All" ? undefined : selectedSport.toLowerCase());
+
             const response = await api.searchVenues({
                 city: selectedCity === "All" ? undefined : selectedCity,
-                sport: selectedSport === "All" ? undefined : selectedSport,
+                sport: sportValue,
                 date: selectedDate,
                 start_time: startTime,
                 end_time: endTime,
                 page_size: 20,
             });
             setResults(response.results);
+        } catch (error) {
+            console.error("Search failed", error);
+            setResults([]);
         } finally {
             setSubmitting(false);
             setLoading(false);

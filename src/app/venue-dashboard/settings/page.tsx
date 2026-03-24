@@ -1,9 +1,10 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
-import { Save, Loader2, MapPin, Phone, Clock, FileText, Calendar } from "lucide-react";
+import { Save, Loader2, MapPin, Phone, Clock, FileText, Calendar, Globe, AlertCircle, CheckCircle2, Search } from "lucide-react";
+import Script from "next/script";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
 import { venueApiService } from "@/services/venueApiService";
@@ -18,15 +19,18 @@ export default function VenueSettingsPage() {
     const { addToast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoadingProfile, setIsLoadingProfile] = useState(false);
+    const [geoLat, setGeoLat] = useState<number | null>(null);
+    const [geoLng, setGeoLng] = useState<number | null>(null);
+    const [mapLoaded, setMapLoaded] = useState(false);
+    const searchInputRef = useRef<HTMLInputElement | null>(null);
 
     // Detailed profile state for schedule
     const [profile, setProfile] = useState<VenueProfile | null>(null);
-
     const { register, handleSubmit, setValue, control, formState: { errors } } = useForm({
         defaultValues: {
             name: "",
             description: "",
-            contact_number: "",
+            phone_contact: "",
             operating_hours_summary: "", // Summary string
             address: "",
             city: "",
@@ -63,15 +67,55 @@ export default function VenueSettingsPage() {
             // Set basic info from context
             setValue("name", currentVenue.name);
             setValue("description", currentVenue.description ?? "");
-            setValue("contact_number", currentVenue.contact_number ?? "");
+            setValue("phone_contact", currentVenue.phone_contact ?? "");
             setValue("operating_hours_summary", formatOperatingHoursSummary(currentVenue.operating_hours));
             setValue("address", currentVenue.address ?? "");
             setValue("city", currentVenue.city);
+            
+            setGeoLat(currentVenue.geo_lat);
+            setGeoLng(currentVenue.geo_lng);
 
             // Fetch detailed profile for schedule
             loadProfile();
         }
     }, [currentVenue, setValue]);
+
+    const initAutocomplete = () => {
+        if (!(window as any).google || !searchInputRef.current) return;
+
+        const autocomplete = new (window as any).google.maps.places.Autocomplete(searchInputRef.current, {
+            types: ['address'],
+            componentRestrictions: { country: 'lk' } // Restrict to Sri Lanka
+        });
+
+        autocomplete.addListener('place_changed', () => {
+            const place = autocomplete.getPlace();
+            if (!place.geometry || !place.geometry.location) return;
+
+            const lat = place.geometry.location.lat();
+            const lng = place.geometry.location.lng();
+
+            setGeoLat(lat);
+            setGeoLng(lng);
+            setValue("address", place.formatted_address || "");
+
+            // Extract city if possible
+            const cityComp = place.address_components?.find((c: any) => 
+                c.types.includes('locality') || c.types.includes('administrative_area_level_2')
+            );
+            if (cityComp) {
+                setValue("city", cityComp.long_name);
+            }
+
+            addToast("Location updated from map search", "success");
+        });
+    };
+
+    useEffect(() => {
+        if (mapLoaded && searchInputRef.current) {
+            initAutocomplete();
+        }
+    }, [mapLoaded]);
 
     const loadProfile = async () => {
         if (!currentVenue) return;
@@ -97,9 +141,11 @@ export default function VenueSettingsPage() {
             const basicUpdatePromise = venueApiService.updateVenue(currentVenue.id, {
                 name: data.name,
                 description: data.description,
-                phone_contact: data.contact_number,
+                phone_contact: data.phone_contact,
                 address: data.address,
-                city: data.city
+                city: data.city,
+                geo_lat: geoLat,
+                geo_lng: geoLng
             } as any);
 
             // Update Schedule
@@ -144,6 +190,53 @@ export default function VenueSettingsPage() {
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
 
                     <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-8 backdrop-blur-sm">
+                        {/* Visibility Status */}
+                        <div className="mb-10 pb-8 border-b border-zinc-800">
+                            <h2 className="text-lg font-bold text-white flex items-center gap-2 mb-4">
+                                <Globe className="w-5 h-5 text-emerald-500" /> Search Visibility
+                            </h2>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className={`p-4 rounded-2xl flex gap-3 items-start border ${currentVenue.is_verified ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-amber-500/10 border-amber-500/20'}`}>
+                                    {currentVenue.is_verified ? (
+                                        <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
+                                    ) : (
+                                        <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                                    )}
+                                    <div>
+                                        <p className="font-bold text-white text-sm">Verification Status</p>
+                                        <p className="text-xs text-zinc-400 mt-1">
+                                            {currentVenue.is_verified 
+                                                ? 'Your venue is verified and eligible for public search.' 
+                                                : 'Verification pending. Your venue is currently hidden from public search results.'}
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div className={`p-4 rounded-2xl flex gap-3 items-start border ${(geoLat && geoLng) ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-amber-500/10 border-amber-500/20'}`}>
+                                    {(geoLat && geoLng) ? (
+                                        <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
+                                    ) : (
+                                        <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                                    )}
+                                    <div>
+                                        <p className="font-bold text-white text-sm">Location Data</p>
+                                        <p className="text-xs text-zinc-400 mt-1">
+                                            {(geoLat && geoLng) 
+                                                ? 'GPS coordinates are set. Your venue will appear in "Near Me" searches.' 
+                                                : 'Missing GPS coordinates. Your venue may be hidden from location-based searches.'}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {!currentVenue.is_verified && (
+                                <p className="mt-4 text-xs text-zinc-500 italic flex items-center gap-2">
+                                    <AlertCircle className="w-3 h-3" /> Note: Even with GPS set, venues must be verified to appear in the public search.
+                                </p>
+                            )}
+                        </div>
+
                         {/* Basic Info */}
                         <div className="space-y-4 mb-8">
                             <h2 className="text-lg font-bold text-white flex items-center gap-2 border-b border-zinc-800 pb-2">
@@ -193,7 +286,7 @@ export default function VenueSettingsPage() {
                                         <Phone className="w-3 h-3" /> Contact Number
                                     </label>
                                     <input
-                                        {...register("contact_number", { required: "Contact number is required" })}
+                                        {...register("phone_contact", { required: "Contact number is required" })}
                                         className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
                                         placeholder="+94 77..."
                                     />
@@ -211,17 +304,73 @@ export default function VenueSettingsPage() {
                                 </div>
                             </div>
 
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Address</label>
-                                <textarea
-                                    {...register("address", { required: "Address is required" })}
-                                    rows={2}
-                                    className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors resize-none"
-                                    placeholder="Full street address..."
-                                />
+                            <div className="space-y-4">
+                                <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center justify-between">
+                                    <span>Search Location (Google Maps)</span>
+                                    <span className="text-[10px] text-zinc-600">Syncs address & Coordinates</span>
+                                </label>
+                                <div className="relative group">
+                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500 group-focus-within:text-emerald-500 transition-colors" />
+                                    <input
+                                        ref={searchInputRef}
+                                        type="text"
+                                        placeholder="Search for your venue on Google Maps..."
+                                        className="w-full bg-black/60 border border-zinc-700 focus:border-emerald-500 rounded-2xl pl-12 pr-4 py-4 text-white placeholder:text-zinc-600 transition-all outline-none shadow-xl"
+                                    />
+                                    {!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY && (
+                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] bg-red-500/20 text-red-400 px-2 py-1 rounded-full border border-red-500/30">
+                                            API Key Missing
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Address</label>
+                                    <textarea
+                                        {...register("address", { required: "Address is required" })}
+                                        rows={1}
+                                        className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors resize-none"
+                                        placeholder="Full street address..."
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center justify-between">
+                                        <span>GPS Coordinates</span>
+                                        <button 
+                                            type="button"
+                                            onClick={() => {
+                                                if (navigator.geolocation) {
+                                                    navigator.geolocation.getCurrentPosition((pos) => {
+                                                        setGeoLat(pos.coords.latitude);
+                                                        setGeoLng(pos.coords.longitude);
+                                                        addToast("Current GPS captured!", "success");
+                                                    });
+                                                }
+                                            }}
+                                            className="text-[10px] text-emerald-500 hover:text-emerald-400 font-bold underline"
+                                        >
+                                            Use Current GPS
+                                        </button>
+                                    </label>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div className="bg-black/80 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-400 text-xs truncate">
+                                            LAT: {geoLat?.toFixed(6) || 'None'}
+                                        </div>
+                                        <div className="bg-black/80 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-400 text-xs truncate">
+                                            LNG: {geoLng?.toFixed(6) || 'None'}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
+
+                    <Script 
+                        src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
+                        onLoad={() => setMapLoaded(true)}
+                    />
 
                     {/* Weekly Schedule */}
                     <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-8 backdrop-blur-sm">
