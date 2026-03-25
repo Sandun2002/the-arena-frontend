@@ -4,7 +4,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { Building2, MapPin, Loader2, Info, CheckCircle, ArrowRight, ArrowLeft } from "lucide-react";
+import { Building2, MapPin, Loader2, Info, ArrowRight, ArrowLeft } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { venueApiService } from "@/services/venueApiService";
 import { useToast } from "@/components/ui/Toast";
@@ -12,7 +12,7 @@ import { useAuth } from "@/services/authContext";
 import { useVenue } from "@/components/venue/VenueContext";
 import { Venue } from "@/types";
 
-type Step = "details" | "location" | "amenities";
+type Step = "details" | "location";
 
 export default function EditVenuePage() {
     const router = useRouter();
@@ -32,19 +32,12 @@ export default function EditVenuePage() {
             contact_email: "",
             city: "",
             address: "",
-            amenities: [] as string[]
         }
     });
 
-    const amenitiesList = ["Parking", "A/C", "Showers", "Equipment Rental", "Cafe", "WiFi", "Lockers", "First Aid"];
-
     const formatOperatingHoursSummary = (operatingHours: Venue["operating_hours"]) => {
         const openDays = operatingHours.filter((entry) => !entry.is_closed && entry.open_time && entry.close_time);
-
-        if (openDays.length === 0) {
-            return "Schedule not available";
-        }
-
+        if (openDays.length === 0) return "Schedule not available";
         const uniqueRanges = Array.from(new Set(openDays.map((entry) => `${entry.open_time} - ${entry.close_time}`)));
         return uniqueRanges.join(", ");
     };
@@ -55,16 +48,12 @@ export default function EditVenuePage() {
             setValue("description", currentVenue.description ?? "");
             setValue("operating_hours_summary", formatOperatingHoursSummary(currentVenue.operating_hours));
             setValue("contact_number", currentVenue.phone_contact ?? "");
-            setValue("contact_email", user?.email || ""); // Venue object doesn't have email usually, using user's or empty
+            setValue("contact_email", user?.email || "");
             setValue("city", currentVenue.city);
             setValue("address", currentVenue.address ?? "");
-            setValue("amenities", (currentVenue.amenities?.map(a => a.name) as string[]) || []);
             setIsLoading(false);
         } else {
-            // If accessed directly without context loaded, might need to wait or redirect
-            const timer = setTimeout(() => {
-                if (!currentVenue) setIsLoading(false); // Stop loading to show error/empty state
-            }, 2000);
+            const timer = setTimeout(() => { if (!currentVenue) setIsLoading(false); }, 2000);
             return () => clearTimeout(timer);
         }
     }, [currentVenue, setValue, user]);
@@ -73,16 +62,13 @@ export default function EditVenuePage() {
         if (!currentVenue) return;
         setIsSubmitting(true);
         try {
-            const { operating_hours_summary, ...venueData } = data;
+            const { operating_hours_summary, contact_email, ...venueData } = data;
             await venueApiService.updateVenue(currentVenue.id, {
                 ...venueData,
-                location: data.city, // Backward compatibility
+                phone_contact: venueData.contact_number,
             });
             addToast("Venue updated successfully!", "success");
-
             await refreshVenues();
-
-            // Redirect to dashboard
             setTimeout(() => router.push("/venue-dashboard"), 1000);
         } catch (error) {
             console.error(error);
@@ -111,7 +97,6 @@ export default function EditVenuePage() {
 
     return (
         <main className="min-h-screen bg-black pt-24 pb-12 px-4 flex items-center justify-center relative overflow-hidden">
-            {/* Background Effects */}
             <div className="absolute inset-0 pointer-events-none">
                 <div className="absolute top-20 right-1/4 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-[150px]" />
             </div>
@@ -120,18 +105,16 @@ export default function EditVenuePage() {
 
                 <div className="mb-8 text-center">
                     <h1 className="text-3xl font-bold text-white mb-2">Edit Venue Details</h1>
-                    <p className="text-zinc-400">Step {step === "details" ? 1 : step === "location" ? 2 : 3} of 3</p>
+                    <p className="text-zinc-400">Step {step === "details" ? 1 : 2} of 2</p>
 
-                    {/* Progress Bar */}
+                    {/* Progress Bar (2 steps) */}
                     <div className="flex gap-2 mt-6 justify-center">
-                        <div className={`h-1.5 w-16 rounded-full transition-colors duration-300 ${step === "details" || step === "location" || step === "amenities" ? "bg-emerald-500" : "bg-zinc-800"}`} />
-                        <div className={`h-1.5 w-16 rounded-full transition-colors duration-300 ${step === "location" || step === "amenities" ? "bg-emerald-500" : "bg-zinc-800"}`} />
-                        <div className={`h-1.5 w-16 rounded-full transition-colors duration-300 ${step === "amenities" ? "bg-emerald-500" : "bg-zinc-800"}`} />
+                        <div className={`h-1.5 w-24 rounded-full transition-colors duration-300 ${step === "details" || step === "location" ? "bg-emerald-500" : "bg-zinc-800"}`} />
+                        <div className={`h-1.5 w-24 rounded-full transition-colors duration-300 ${step === "location" ? "bg-emerald-500" : "bg-zinc-800"}`} />
                     </div>
                 </div>
 
                 <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-8 backdrop-blur-sm shadow-2xl">
-
                     <form onSubmit={handleSubmit(onSubmit)}>
 
                         {/* Step 1: Basic Details */}
@@ -175,7 +158,7 @@ export default function EditVenuePage() {
                                     <div className="space-y-2">
                                         <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Contact Email</label>
                                         <input
-                                            {...register("contact_email", { required: true })}
+                                            {...register("contact_email")}
                                             className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
                                         />
                                     </div>
@@ -185,10 +168,11 @@ export default function EditVenuePage() {
                                     <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Operating Hours (Summary)</label>
                                     <input
                                         {...register("operating_hours_summary")}
-                                        className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
+                                        className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors opacity-60"
                                         placeholder="Ex: 06:00 - 23:00"
                                         readOnly
                                     />
+                                    <p className="text-zinc-600 text-xs">Manage schedule in Settings → Schedule</p>
                                 </div>
 
                                 <Button type="button" onClick={() => setStep("location")} className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-12 text-lg shadow-[0_0_20px_rgba(16,185,129,0.2)]">
@@ -197,7 +181,7 @@ export default function EditVenuePage() {
                             </div>
                         )}
 
-                        {/* Step 2: Location */}
+                        {/* Step 2: Location & Save */}
                         {step === "location" && (
                             <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300">
                                 <div className="flex items-center gap-3 mb-6 pb-4 border-b border-zinc-800">
@@ -240,41 +224,6 @@ export default function EditVenuePage() {
                                     <Button type="button" variant="ghost" onClick={() => setStep("details")} className="flex-1 h-12 text-zinc-400 hover:text-white">
                                         <ArrowLeft className="w-5 h-5 mr-2" /> Back
                                     </Button>
-                                    <Button type="button" onClick={() => setStep("amenities")} className="flex-[2] bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-12 text-lg shadow-[0_0_20px_rgba(16,185,129,0.2)]">
-                                        Next: Amenities <ArrowRight className="w-5 h-5 ml-2" />
-                                    </Button>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Step 3: Amenities & Submit */}
-                        {step === "amenities" && (
-                            <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300">
-                                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-zinc-800">
-                                    <div className="p-2 bg-purple-500/10 rounded-lg">
-                                        <CheckCircle className="w-6 h-6 text-purple-500" />
-                                    </div>
-                                    <h2 className="text-xl font-bold text-white">Facilities</h2>
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-3">
-                                    {amenitiesList.map((amenity) => (
-                                        <label key={amenity} className="flex items-center gap-3 p-3 rounded-xl border border-zinc-800 bg-black/40 cursor-pointer hover:border-emerald-500/50 hover:bg-zinc-900 transition-all group">
-                                            <input
-                                                type="checkbox"
-                                                value={amenity}
-                                                {...register("amenities")}
-                                                className="w-4 h-4 rounded border-zinc-600 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-black accent-emerald-500"
-                                            />
-                                            <span className="text-sm font-medium text-zinc-300 group-hover:text-white transition-colors">{amenity}</span>
-                                        </label>
-                                    ))}
-                                </div>
-
-                                <div className="flex gap-3 pt-6 border-t border-zinc-800 mt-6">
-                                    <Button type="button" variant="ghost" onClick={() => setStep("location")} className="flex-1 h-12 text-zinc-400 hover:text-white">
-                                        <ArrowLeft className="w-5 h-5 mr-2" /> Back
-                                    </Button>
                                     <Button
                                         type="submit"
                                         disabled={isSubmitting}
@@ -287,7 +236,6 @@ export default function EditVenuePage() {
                         )}
 
                     </form>
-
                 </div>
             </div>
         </main>

@@ -62,7 +62,7 @@ function InviteManagerForm({ venueId, onClose, onSuccess }: { venueId: string, o
 }
 
 export default function ManagersPage() {
-    const { user } = useAuth();
+    const { user, isVenueOwner } = useAuth();
     const { currentVenue } = useVenue();
     const { addToast } = useToast();
 
@@ -103,7 +103,9 @@ export default function ManagersPage() {
         }
     };
 
-    if (!user) return null;
+    // Only owners can access this page — hide it entirely for managers
+    if (!user || !isVenueOwner) return null;
+
 
     if (!currentVenue) {
         return (

@@ -43,14 +43,8 @@ export default function RevenueAnalyticsPage() {
     };
 
     if (!user) return null;
-    // RBAC: Only owners can view revenue
-    if (!isVenueOwner) {
-        return (
-            <main className="min-h-screen bg-black pt-24 px-4 flex items-center justify-center">
-                <div className="text-zinc-500">Access Denied: Only venue owners can view revenue analytics.</div>
-            </main>
-        );
-    }
+    // RBAC: Only owners can view revenue — silently hide for managers
+    if (!isVenueOwner) return null;
 
     if (!currentVenue) return null;
 

@@ -14,7 +14,7 @@ import { useVenue } from "@/components/venue/VenueContext";
 import { useToast } from "@/components/ui/Toast";
 
 export default function RecurringPage() {
-    const { user } = useAuth();
+    const { user, isVenueOwner } = useAuth();
     const { currentVenue } = useVenue();
     const { addToast } = useToast();
     const containerRef = useRef<HTMLDivElement>(null);
@@ -141,9 +141,11 @@ export default function RecurringPage() {
                                     <button onClick={() => handleEdit(booking)} className="p-2 rounded-full bg-zinc-800/50 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors" title="Edit">
                                         <Edit2 className="h-4 w-4" />
                                     </button>
-                                    <button onClick={() => handleDelete(booking.id)} className="p-2 rounded-full bg-zinc-800/50 hover:bg-red-500/20 text-zinc-400 hover:text-red-500 transition-colors" title="Delete">
-                                        <Trash2 className="h-4 w-4" />
-                                    </button>
+                                    {isVenueOwner && (
+                                        <button onClick={() => handleDelete(booking.id)} className="p-2 rounded-full bg-zinc-800/50 hover:bg-red-500/20 text-zinc-400 hover:text-red-500 transition-colors" title="Delete">
+                                            <Trash2 className="h-4 w-4" />
+                                        </button>
+                                    )}
                                 </div>
 
                                 <div className="flex items-center gap-4 mb-6">

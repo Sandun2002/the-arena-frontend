@@ -42,14 +42,8 @@ export default function FeesAnalyticsPage() {
     };
 
     if (!user) return null;
-    // RBAC: Only owners can view fee structure
-    if (!isVenueOwner) {
-        return (
-            <main className="min-h-screen bg-black pt-24 px-4 flex items-center justify-center">
-                <div className="text-zinc-500">Access Denied: Only venue owners can view fee analytics.</div>
-            </main>
-        );
-    }
+    // RBAC: Only owners can view fees — silently hide for managers
+    if (!isVenueOwner) return null;
 
     if (!currentVenue) return null;
 
@@ -109,7 +103,7 @@ export default function FeesAnalyticsPage() {
                                     <h2 className="text-5xl font-bold text-white mb-2">LKR {(data?.net_payout || 0).toLocaleString()}</h2>
                                     <p className="text-zinc-500 text-sm">Earnings after platform fees this {period}.</p>
                                 </div>
-                                <Button className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold">
+                                <Button disabled className="bg-zinc-800 text-zinc-500 font-bold cursor-not-allowed border border-zinc-700" title="Payout requests coming soon">
                                     Request Payout
                                 </Button>
                             </div>

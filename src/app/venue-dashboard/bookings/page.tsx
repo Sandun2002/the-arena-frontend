@@ -1,9 +1,9 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
-import { format } from "date-fns";
-import { Search, Filter, CheckCircle, XCircle, DollarSign, UserX, AlertCircle, Calendar as CalendarIcon } from "lucide-react";
+import { useEffect, useState, useCallback } from "react";
+import { format, isSameDay, isValid } from "date-fns";
+import { Search, CheckCircle, XCircle, DollarSign, UserX, AlertCircle, Calendar as CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
 import { centerService } from "@/services/centerService";
@@ -11,60 +11,85 @@ import { Booking } from "@/types";
 import { useToast } from "@/components/ui/Toast";
 import { useVenue } from "@/components/venue/VenueContext";
 
+const PAGE_SIZE = 20;
+
 export default function BookingsPage() {
     const { user } = useAuth();
     const { currentVenue } = useVenue();
     const { addToast } = useToast();
-    const [bookings, setBookings] = useState<Booking[]>([]);
+
+    // All loaded bookings from current page (possibly filtered client-side by date)
+    const [allBookings, setAllBookings] = useState<Booking[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
+    // Pagination state — driven by backend total
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalCount, setTotalCount] = useState(0);
+
     // Filters
-    const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+    const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "confirmed" | "cancelled">("all");
     const [searchQuery, setSearchQuery] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
 
-    const loadBookings = async () => {
+    const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+
+    // Debounce search input
+    useEffect(() => {
+        const timer = setTimeout(() => setDebouncedSearch(searchQuery), 500);
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+
+    // Reset to page 1 when filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [statusFilter, debouncedSearch, selectedDate, currentVenue]);
+
+    const loadBookings = useCallback(async () => {
         if (!currentVenue) return;
-
         setIsLoading(true);
         try {
             const result = await centerService.getBookingsList({
                 venue_id: currentVenue.id,
-                date: format(selectedDate, 'yyyy-MM-dd'),
                 status: statusFilter !== "all" ? statusFilter : undefined,
-                search: searchQuery || undefined
+                search: debouncedSearch || undefined,
+                skip: (currentPage - 1) * PAGE_SIZE,
+                limit: PAGE_SIZE,
             });
-            setBookings(result.data);
+            setAllBookings(result.data);
+            setTotalCount(result.total);
         } catch (error) {
             console.error(error);
-            setBookings([]);
+            setAllBookings([]);
+            setTotalCount(0);
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [currentVenue, statusFilter, debouncedSearch, currentPage]);
 
-    // Reload when filters change or venue changes
     useEffect(() => {
         loadBookings();
-    }, [currentVenue, statusFilter, selectedDate]);
+    }, [loadBookings]);
 
-    // Debounce search
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            if (currentVenue) loadBookings();
-        }, 500);
-        return () => clearTimeout(timer);
-    }, [searchQuery]);
+    // Client-side date filtering (backend doesn't support a date param)
+    const bookings = selectedDate
+        ? allBookings.filter((b) => {
+              try {
+                  const startDate = new Date(b.start_time);
+                  return isValid(startDate) && isSameDay(startDate, selectedDate);
+              } catch {
+                  return false;
+              }
+          })
+        : allBookings;
 
     const handleAction = async (action: string, id: string) => {
         if (!confirm(`Are you sure you want to ${action} this booking?`)) return;
-
         try {
             if (action === "confirm") await centerService.confirmBooking(id);
             if (action === "cancel") await centerService.cancelBooking(id, "Cancelled by venue");
             if (action === "pay") await centerService.markBookingPaid(id);
             if (action === "noshow") await centerService.toggleNoShow(id);
-
             addToast("Status updated successfully", "success");
             loadBookings();
         } catch (error) {
@@ -84,6 +109,9 @@ export default function BookingsPage() {
         );
     }
 
+    const firstItem = totalCount === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1;
+    const lastItem = Math.min(currentPage * PAGE_SIZE, totalCount);
+
     return (
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -93,16 +121,28 @@ export default function BookingsPage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                    {/* Date filter (client-side) */}
                     <div className="relative overflow-hidden group hover:bg-zinc-800 bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2 flex items-center justify-center gap-2 transition-colors">
-                        <CalendarIcon className="w-4 h-4 text-emerald-500" />
-                        <span className="text-white text-sm font-medium">{format(selectedDate, "MMM dd, yyyy")}</span>
+                        <CalendarIcon className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                        <span className="text-white text-sm font-medium">
+                            {selectedDate ? format(selectedDate, "MMM dd, yyyy") : "All Dates"}
+                        </span>
+                        {selectedDate && (
+                            <button
+                                onClick={() => setSelectedDate(null)}
+                                className="ml-1 text-zinc-500 hover:text-white text-xs font-bold leading-none"
+                                title="Clear date filter"
+                            >
+                                ✕
+                            </button>
+                        )}
                         <input
                             type="date"
                             title="Filter by date"
-                            value={format(selectedDate, "yyyy-MM-dd")}
+                            value={selectedDate ? format(selectedDate, "yyyy-MM-dd") : ""}
                             onChange={(e) => {
                                 if (e.target.value) {
-                                    const parts = e.target.value.split('-');
+                                    const parts = e.target.value.split("-");
                                     if (parts.length === 3) {
                                         setSelectedDate(new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
                                     }
@@ -112,6 +152,7 @@ export default function BookingsPage() {
                         />
                     </div>
 
+                    {/* Search */}
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
                         <input
@@ -123,6 +164,7 @@ export default function BookingsPage() {
                         />
                     </div>
 
+                    {/* Status Filter */}
                     <div className="flex bg-zinc-900 p-1 rounded-xl border border-zinc-800">
                         {(["all", "pending", "confirmed", "cancelled"] as const).map((s) => (
                             <button
@@ -177,7 +219,8 @@ export default function BookingsPage() {
                                             </div>
                                         </td>
                                         <td className="p-5">
-                                            <span className="text-zinc-500 text-xs capitalize">{booking.court?.sport_type?.name || 'Sport'}</span>
+                                            <span className="text-zinc-300 text-sm font-medium">{booking.court?.name || "—"}</span>
+                                            <span className="block text-zinc-500 text-xs capitalize">{booking.court?.sport_type?.name || ""}</span>
                                         </td>
                                         <td className="p-5">
                                             <StatusBadge status={booking.status} />
@@ -207,19 +250,17 @@ export default function BookingsPage() {
                                                         Confirm
                                                     </Button>
                                                 )}
-
                                                 {booking.payment_status !== "paid" && booking.status !== "cancelled" && (
-                                                    <Button size="sm" variant="outline" onClick={() => handleAction("pay", booking.id)} className="h-8 border-zinc-700 text-emerald-500 hover:bg-emerald-500/10 hover:text-emerald-400">
+                                                    <Button size="sm" variant="outline" onClick={() => handleAction("pay", booking.id)} className="h-8 border-zinc-700 text-emerald-500 hover:bg-emerald-500/10 hover:text-emerald-400" title="Mark as paid">
                                                         <DollarSign className="w-3 h-3" />
                                                     </Button>
                                                 )}
-
                                                 {booking.status !== "cancelled" && (
                                                     <>
-                                                        <Button size="sm" variant="outline" onClick={() => handleAction("noshow", booking.id)} className={`h-8 border-zinc-700 ${booking.is_no_show ? "bg-red-500/20 text-red-500 border-red-500/20" : "text-zinc-400 hover:text-red-400 hover:bg-red-500/10"}`}>
+                                                        <Button size="sm" variant="outline" onClick={() => handleAction("noshow", booking.id)} className={`h-8 border-zinc-700 ${booking.is_no_show ? "bg-red-500/20 text-red-500 border-red-500/20" : "text-zinc-400 hover:text-red-400 hover:bg-red-500/10"}`} title="Toggle no-show">
                                                             <UserX className="w-3 h-3" />
                                                         </Button>
-                                                        <Button size="sm" variant="outline" onClick={() => handleAction("cancel", booking.id)} className="h-8 border-zinc-700 text-zinc-400 hover:text-red-400 hover:bg-red-500/10">
+                                                        <Button size="sm" variant="outline" onClick={() => handleAction("cancel", booking.id)} className="h-8 border-zinc-700 text-zinc-400 hover:text-red-400 hover:bg-red-500/10" title="Cancel booking">
                                                             <XCircle className="w-3 h-3" />
                                                         </Button>
                                                     </>
@@ -243,13 +284,59 @@ export default function BookingsPage() {
                     </table>
                 </div>
 
-                {/* Pagination (Visual only for now) */}
-                {bookings.length > 0 && (
-                    <div className="bg-zinc-900 border-t border-zinc-800 p-4 flex justify-between items-center text-xs text-zinc-500">
-                        <span>Showing {bookings.length} results</span>
-                        <div className="flex gap-2">
-                            <button disabled className="px-3 py-1 rounded bg-zinc-800 text-zinc-600 cursor-not-allowed">Previous</button>
-                            <button disabled className="px-3 py-1 rounded bg-zinc-800 text-zinc-600 cursor-not-allowed">Next</button>
+                {/* Pagination */}
+                {totalCount > 0 && (
+                    <div className="bg-zinc-900 border-t border-zinc-800 px-5 py-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+                        <span className="text-xs text-zinc-500">
+                            {selectedDate
+                                ? `Showing ${bookings.length} of ${allBookings.length} results on this page (${totalCount} total)`
+                                : `Showing ${firstItem}–${lastItem} of ${totalCount} bookings`}
+                        </span>
+
+                        <div className="flex items-center gap-1">
+                            <button
+                                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                                disabled={currentPage === 1 || isLoading}
+                                className="p-2 rounded-lg bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                title="Previous page"
+                            >
+                                <ChevronLeft className="w-4 h-4" />
+                            </button>
+
+                            {/* Page number pills */}
+                            {Array.from({ length: totalPages }, (_, i) => i + 1)
+                                .filter((p) => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 2)
+                                .reduce<(number | "...")[]>((acc, p, idx, arr) => {
+                                    if (idx > 0 && p - (arr[idx - 1] as number) > 1) acc.push("...");
+                                    acc.push(p);
+                                    return acc;
+                                }, [])
+                                .map((item, idx) =>
+                                    item === "..." ? (
+                                        <span key={`ellipsis-${idx}`} className="px-2 text-zinc-600 text-xs select-none">…</span>
+                                    ) : (
+                                        <button
+                                            key={item}
+                                            onClick={() => setCurrentPage(item as number)}
+                                            disabled={isLoading}
+                                            className={`min-w-[2rem] h-8 px-2 rounded-lg text-xs font-bold transition-colors disabled:cursor-wait ${currentPage === item
+                                                ? "bg-emerald-500 text-black"
+                                                : "bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700"
+                                                }`}
+                                        >
+                                            {item}
+                                        </button>
+                                    )
+                                )}
+
+                            <button
+                                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                                disabled={currentPage === totalPages || isLoading}
+                                className="p-2 rounded-lg bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                title="Next page"
+                            >
+                                <ChevronRight className="w-4 h-4" />
+                            </button>
                         </div>
                     </div>
                 )}

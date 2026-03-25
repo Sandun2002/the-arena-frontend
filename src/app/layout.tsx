@@ -22,6 +22,12 @@ export const metadata: Metadata = {
   description: "Book high-end sports venues with ease.",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{

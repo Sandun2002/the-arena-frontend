@@ -1,6 +1,6 @@
 
 import apiClient from "./apiClient";
-import { Venue, Court, VenueManager, ManagerInvitation } from "@/types";
+import { Venue, Court, VenueManager } from "@/types";
 import { normalizeVenue, normalizeVenueManager } from "./normalizers";
 
 export const venueApiService = {
@@ -59,15 +59,6 @@ export const venueApiService = {
     getManagers: async (venueId: string) => {
         const response = await apiClient.get<any[]>(`/venues/${venueId}/managers`);
         return response.data.map(normalizeVenueManager);
-    },
-
-    // === Invitations ===
-    getInvitations: async (venueId: string) => {
-        return [] as ManagerInvitation[];
-    },
-
-    revokeInvitation: async (venueId: string, invitationId: string) => {
-        return;
     },
 
     // === Sports ===

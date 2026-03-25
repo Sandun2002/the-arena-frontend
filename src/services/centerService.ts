@@ -193,7 +193,7 @@ export const centerService = {
 
     deleteRecurringBooking: async (id: string, venueId?: string) => {
         const params = venueId ? { venue_id: venueId } : {};
-        await apiClient.delete(`/center/recurring-bookings/${id}`, { params });
+        await apiClient.put(`/center/recurring-bookings/${id}/deactivate`, null, { params });
     },
 
     // === Closures ===

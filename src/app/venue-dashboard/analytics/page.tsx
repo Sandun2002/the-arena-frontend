@@ -36,14 +36,20 @@ export default function AnalyticsPage() {
         if (!currentVenue) return;
         setIsLoading(true);
         try {
-            const [statsRes, revenueRes, utilizationRes] = await Promise.all([
+            // Revenue endpoint is owner-only — only call it for owners
+            const baseRequests = [
                 centerService.getStats(currentVenue.id),
-                centerService.getRevenueAnalytics(period, currentVenue.id),
-                centerService.getUtilizationAnalytics(period, currentVenue.id)
-            ]);
+                centerService.getUtilizationAnalytics(period, currentVenue.id),
+            ] as const;
+
+            const [statsRes, utilizationRes] = await Promise.all(baseRequests);
             setStats(statsRes);
-            setRevenueData(revenueRes);
             setUtilizationData(utilizationRes);
+
+            if (isVenueOwner) {
+                const revenueRes = await centerService.getRevenueAnalytics(period, currentVenue.id);
+                setRevenueData(revenueRes);
+            }
         } catch (error) {
             console.error(error);
             addToast("Failed to load analytics data", "error");

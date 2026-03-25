@@ -29,11 +29,11 @@ export default function Header() {
   ];
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 bg-black/50 backdrop-blur-lg border-b border-white/5">
-      <div className="container mx-auto px-4 h-20 flex items-center justify-between">
+    <header className="fixed top-0 left-0 w-full z-50 bg-black/50 backdrop-blur-lg border-b border-white/5 overflow-visible">
+      <div className="max-w-7xl w-full mx-auto px-4 h-20 flex items-center justify-between min-w-0">
 
         {/* Logo Area */}
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-6 min-w-0 shrink-0">
           <Link href={isVenueContext ? "/venue-dashboard" : "/"} className="flex items-center gap-2 group">
             <div className="relative w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center overflow-hidden group-hover:bg-white/20 transition-colors">
               <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500 to-blue-500 opacity-50"></div>
@@ -54,7 +54,7 @@ export default function Header() {
         </div>
 
         {/* Desktop Nav */}
-        <nav className={`hidden ${isVenueContext ? 'xl:flex' : 'md:flex'} items-center gap-6 lg:gap-8`}>
+        <nav className={`hidden ${isVenueContext ? 'xl:flex' : 'md:flex'} items-center gap-6 lg:gap-8 min-w-0`}>
           {navLinks.map((link) => (
             <Link
               key={link.name}
@@ -72,7 +72,7 @@ export default function Header() {
         </nav>
 
         {/* Auth Buttons */}
-        <div className="hidden md:flex items-center gap-4">
+        <div className="hidden md:flex items-center gap-4 shrink-0">
           {isLoggedIn ? (
             <div className="flex items-center gap-4">
 
@@ -192,14 +192,7 @@ export default function Header() {
               </Link>
             ))}
 
-            {/* Explicit message to use floating button for venue dashboard mobile menu to avoid confusion */}
-            {isVenueContext && (
-              <div className="mt-8 border-t border-zinc-800 pt-6">
-                <p className="text-zinc-500 text-sm font-bold leading-relaxed">
-                  Navigate venue settings using the green floating menu button at the bottom right.
-                </p>
-              </div>
-            )}
+
           </div>
 
           <div className="mt-auto pt-6 border-t border-zinc-800 flex flex-col gap-3">

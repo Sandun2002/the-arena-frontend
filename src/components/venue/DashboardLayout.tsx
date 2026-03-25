@@ -8,7 +8,7 @@ import {
     LayoutDashboard, Calendar, CalendarCheck, Users, Settings,
     LogOut, Menu, X, Building2, Image as ImageIcon,
     Hammer, Repeat, ChevronRight, BarChart2, DollarSign,
-    PieChart, Activity, Clock
+    PieChart, Activity, Clock, XCircle
 } from "lucide-react";
 import { useAuth } from "@/services/authContext";
 import { useVenue } from "./VenueContext";
@@ -24,7 +24,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const { user, logout, isVenueManager, isLoggedIn, loading } = useAuth();
     const { currentVenue } = useVenue();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [scrolled, setScrolled] = useState(false);
 
     // Auth Guard
     useEffect(() => {
@@ -38,35 +37,38 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         if (!loading && isLoggedIn && currentVenue && !currentVenue.is_verified) {
             const allRoutes = [...routes, ...analyticsRoutes];
             const currentRoute = allRoutes.find(r => r.path === pathname);
-            
             if (currentRoute?.verifiedOnly) {
                 router.replace("/venue-dashboard");
             }
         }
     }, [currentVenue, pathname, loading, isLoggedIn, router]);
 
-    const sidebarRef = useRef(null);
+    // Close sidebar on route change (mobile)
+    useEffect(() => {
+        setIsSidebarOpen(false);
+    }, [pathname]);
+
+    // Lock body scroll on mobile when sidebar open
+    useEffect(() => {
+        if (isSidebarOpen) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "";
+        }
+        return () => { document.body.style.overflow = ""; };
+    }, [isSidebarOpen]);
+
     const contentRef = useRef(null);
 
-    // GSAP Entry Animations - apply ONLY to content to avoid CSS conflict w/ sidebar translate-x
+    // GSAP Entry Animation for content
     useGSAP(() => {
         if (!contentRef.current) return;
-        const tl = gsap.timeline();
-
-        tl.from(contentRef.current, {
+        gsap.from(contentRef.current, {
             y: 20,
             opacity: 0,
             duration: 0.6,
             ease: "power3.out"
         });
-
-    }, []);
-
-    // Handle scroll effect for header
-    useEffect(() => {
-        const handleScroll = () => setScrolled(window.scrollY > 20);
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
     const routes = [
@@ -80,27 +82,47 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         { name: "Settings", path: "/venue-dashboard/settings", icon: Settings, verifiedOnly: true },
     ];
 
-    // Analytics Sub-menu
     const analyticsRoutes = [
         { name: "Overview", path: "/venue-dashboard/analytics", icon: BarChart2, verifiedOnly: true },
         { name: "Revenue", path: "/venue-dashboard/analytics/revenue", icon: DollarSign, ownerOnly: true, verifiedOnly: true },
         { name: "Utilization", path: "/venue-dashboard/analytics/utilization", icon: Activity, verifiedOnly: true },
         { name: "Fees", path: "/venue-dashboard/analytics/fees", icon: PieChart, ownerOnly: true, verifiedOnly: true },
+        { name: "Cancellations", path: "/venue-dashboard/analytics/cancellations", icon: XCircle, verifiedOnly: true },
     ];
-
-    const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
     if (loading || !isLoggedIn) {
         return <FullScreenSpinner />;
     }
 
+    // Get current page name for the mobile top bar
+    const allRoutes = [...routes, ...analyticsRoutes];
+    const currentRouteName = allRoutes.find(r => r.path === pathname)?.name || "Dashboard";
+
     return (
-        <div className="min-h-screen bg-black text-zinc-100 flex selection:bg-emerald-500/30 overflow-hidden lg:pt-20 pt-0">
+        <div className="min-h-screen bg-black text-zinc-100 flex selection:bg-emerald-500/30 overflow-x-hidden lg:pt-20 pt-0">
 
             {/* Global Ambient Background */}
             <div className="fixed inset-0 pointer-events-none z-0">
                 <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-emerald-500/5 rounded-full blur-[150px]" />
                 <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/5 rounded-full blur-[150px]" />
+            </div>
+
+            {/* ── MOBILE ONLY: Fixed top bar (always visible, even when user scrolls) ── */}
+            <div
+                className="lg:hidden fixed top-20 left-0 right-0 z-[58] bg-zinc-900/95 border-b border-zinc-800 backdrop-blur-xl px-4 flex items-center justify-between h-12"
+                data-lenis-prevent
+            >
+                <button
+                    onClick={() => setIsSidebarOpen(true)}
+                    className="p-2 rounded-lg bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700 transition-colors"
+                    aria-label="Open sidebar"
+                >
+                    <Menu className="w-5 h-5" />
+                </button>
+                <span className="text-sm font-bold text-white truncate px-3">
+                    {currentVenue?.name ? `${currentVenue.name} — ${currentRouteName}` : currentRouteName}
+                </span>
+                <div className="w-9" /> {/* Spacer for symmetry */}
             </div>
 
             {/* Mobile Overlay */}
@@ -111,11 +133,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 />
             )}
 
-            {/* Sidebar */}
+            {/* Sidebar — data-lenis-prevent stops Lenis intercepting wheel events inside it */}
             <aside
-                ref={sidebarRef}
+                data-lenis-prevent
                 className={`
-                    fixed lg:top-20 top-0 left-0 z-[60] lg:z-40 lg:h-[calc(100vh-5rem)] h-[100dvh] w-72 
+                    fixed lg:top-20 top-0 left-0 z-[60] lg:z-40
+                    lg:h-[calc(100vh-5rem)] h-[100dvh] w-72
                     bg-zinc-900/60 border-r border-zinc-800/60 backdrop-blur-xl
                     transition-transform duration-300 ease-in-out
                     flex flex-col
@@ -123,33 +146,32 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 `}
             >
                 <div className="flex flex-col h-full">
-                    {/* Header */}
+                    {/* Sidebar Header */}
                     <div className="p-6 border-b border-zinc-800/60 flex items-center justify-between gap-4">
                         <div className="flex-1">
                             <VenueSwitcher hideCreateAction={true} />
                         </div>
-                        <button className="lg:hidden p-2 text-zinc-400 hover:text-white bg-black/40 rounded-xl" onClick={() => setIsSidebarOpen(false)}>
+                        <button
+                            className="lg:hidden p-2 text-zinc-400 hover:text-white bg-black/40 rounded-xl"
+                            onClick={() => setIsSidebarOpen(false)}
+                        >
                             <X className="w-5 h-5" />
                         </button>
                     </div>
 
-                    {/* Nav Links */}
+                    {/* Nav Links — overflow-y-auto allows native sidebar scroll */}
                     <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-1 custom-scrollbar">
                         <p className="px-4 text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3">Menu</p>
 
                         {routes.map((route) => {
                             const isActive = pathname === route.path;
                             const isDisabled = route.verifiedOnly && currentVenue && !currentVenue.is_verified;
-                            
                             return (
                                 <Link
                                     key={route.path}
                                     href={isDisabled ? "#" : route.path}
                                     onClick={(e) => {
-                                        if (isDisabled) {
-                                            e.preventDefault();
-                                            return;
-                                        }
+                                        if (isDisabled) { e.preventDefault(); return; }
                                         setIsSidebarOpen(false);
                                     }}
                                     className={`
@@ -157,7 +179,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                         ${isDisabled ? "opacity-40 cursor-not-allowed filter grayscale" : "cursor-pointer"}
                                         ${isActive
                                             ? "text-emerald-400 font-bold bg-zinc-800/50 border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.1)]"
-                                            : isDisabled 
+                                            : isDisabled
                                                 ? "text-zinc-600"
                                                 : "text-zinc-400 hover:bg-zinc-800/40 hover:text-white border border-transparent"
                                         }
@@ -172,48 +194,48 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             );
                         })}
 
+                        {/* Analytics Sub-menu */}
                         <div className="pt-8 pb-2">
                             <p className="px-4 text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3">Analytics</p>
                             {analyticsRoutes.map((route) => {
-                                if (isVenueManager && route.ownerOnly) return null; // RBAC Check
+                                if (isVenueManager && route.ownerOnly) return null;
 
                                 const isActive = pathname === route.path;
                                 const isDisabled = route.verifiedOnly && currentVenue && !currentVenue.is_verified;
-
                                 return (
                                     <Link
                                         key={route.path}
                                         href={isDisabled ? "#" : route.path}
                                         onClick={(e) => {
-                                            if (isDisabled) {
-                                                e.preventDefault();
-                                                return;
-                                            }
+                                            if (isDisabled) { e.preventDefault(); return; }
                                             setIsSidebarOpen(false);
                                         }}
                                         className={`
-                                             flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden
-                                             ${isDisabled ? "opacity-40 cursor-not-allowed filter grayscale" : "cursor-pointer"}
-                                             ${isActive
+                                            flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden
+                                            ${isDisabled ? "opacity-40 cursor-not-allowed filter grayscale" : "cursor-pointer"}
+                                            ${isActive
                                                 ? "text-blue-400 font-bold bg-zinc-800/50 border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.1)]"
                                                 : isDisabled
                                                     ? "text-zinc-600"
                                                     : "text-zinc-400 hover:bg-zinc-800/40 hover:text-white border border-transparent"
                                             }
-                                         `}
+                                        `}
                                     >
                                         {isActive && <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent pointer-events-none" />}
                                         <route.icon className={`w-5 h-5 relative z-10 ${isActive ? "text-blue-400" : isDisabled ? "text-zinc-700" : "text-zinc-500 group-hover:text-blue-500 transition-colors"}`} />
                                         <span className="relative z-10">{route.name}</span>
+                                        {isActive && <ChevronRight className="ml-auto w-4 h-4 text-blue-500/80 relative z-10" />}
                                     </Link>
                                 );
                             })}
                         </div>
 
+                        {/* Managers (owner-only) */}
                         {!isVenueManager && (
                             <div className="pt-2">
                                 <Link
                                     href="/venue-dashboard/managers"
+                                    onClick={() => setIsSidebarOpen(false)}
                                     className={`
                                         flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden
                                         ${pathname === "/venue-dashboard/managers"
@@ -229,6 +251,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             </div>
                         )}
 
+                        {/* Return to Player View */}
                         <div className="pt-4 pb-2 mt-4 border-t border-zinc-800/60">
                             <Link
                                 href="/"
@@ -240,7 +263,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         </div>
                     </nav>
 
-                    {/* Footer */}
+                    {/* Sidebar Footer — User info + logout */}
                     <div className="p-4 border-t border-zinc-800/60 bg-zinc-900/40 backdrop-blur-md">
                         <div className="flex items-center gap-3 px-2 mb-3">
                             <div className="w-10 h-10 rounded-full bg-zinc-800 ring-2 ring-zinc-700 flex items-center justify-center text-white font-bold shadow-lg">
@@ -261,22 +284,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </div>
             </aside>
 
-            {/* Main Content */}
-            <div className="flex-1 flex flex-col min-h-screen w-full relative z-10 lg:pl-72">
-                {/* Floating Action Button for Mobile Sidebar */}
-                <button
-                    onClick={toggleSidebar}
-                    className={`
-                        lg:hidden fixed bottom-6 right-6 z-40 w-14 h-14 
-                        bg-emerald-500 rounded-full flex items-center justify-center 
-                        text-black shadow-[0_0_20px_rgba(16,185,129,0.4)]
-                        hover:bg-emerald-400 hover:scale-105 transition-all duration-300
-                        ${isSidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}
-                    `}
-                >
-                    <Menu className="w-6 h-6" />
-                </button>
-
+            {/* Main Content Area */}
+            {/* lg: push right by sidebar width. Mobile: add top padding for mobile top bar */}
+            <div className="flex-1 flex flex-col min-h-screen w-full relative z-10 lg:pl-72 pt-12 lg:pt-0">
                 <main ref={contentRef} className="flex-1 w-full max-w-7xl mx-auto p-4 md:p-8 lg:p-10">
                     {children}
                 </main>
