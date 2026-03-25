@@ -20,7 +20,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
   const { isLoggedIn, login } = useAuth();
   const { addToast } = useToast();
 
-  const [date, setDate] = useState<string>(format(new Date(), "yyyy-MM-dd"));
+  const [date, setDate] = useState<string>("");
   const [courtsData, setCourtsData] = useState<any[]>([]);
   const [selectedCourtId, setSelectedCourtId] = useState<string>("");
   const [selectedSlots, setSelectedSlots] = useState<{ start: string, end: string }[]>([]);
@@ -31,6 +31,10 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
 
   const [showSuccess, setShowSuccess] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+
+  useEffect(() => {
+    setDate(format(new Date(), "yyyy-MM-dd"));
+  }, []);
 
   // Fetch Slots
   useEffect(() => {

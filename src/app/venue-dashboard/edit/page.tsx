@@ -54,7 +54,7 @@ export default function EditVenuePage() {
             setValue("name", currentVenue.name);
             setValue("description", currentVenue.description ?? "");
             setValue("operating_hours_summary", formatOperatingHoursSummary(currentVenue.operating_hours));
-            setValue("contact_number", currentVenue.contact_number ?? "");
+            setValue("contact_number", currentVenue.phone_contact ?? "");
             setValue("contact_email", user?.email || ""); // Venue object doesn't have email usually, using user's or empty
             setValue("city", currentVenue.city);
             setValue("address", currentVenue.address ?? "");

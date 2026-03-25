@@ -12,13 +12,16 @@ import {
 } from "@/types";
 
 const SPORT_IMAGE_MAP: Record<string, string> = {
-  badminton: "/sports/badminton.jpg",
-  basketball: "/sports/basketball.jpg",
-  cricket: "/sports/cricket.jpg",
-  football: "/sports/football.jpg",
-  futsal: "/sports/futsal.jpg",
-  padel: "/sports/padel.jpg",
-  tennis: "/sports/tennis.jpg",
+  badminton: "/sports/badminton.png",
+  basketball: "/sports/basketball.png",
+  cricket: "/sports/cricket.png",
+  football: "/sports/futsal.png", // Changed to futsal as football.png is missing
+  futsal: "/sports/futsal.png",
+  pickleball: "/sports/pickleball.png",
+  pool: "/sports/pool.png",
+  squash: "/sports/squash.png",
+  swimming: "/sports/swimming.png",
+  tennis: "/sports/tennis.png",
 };
 
 const toTitleCase = (value: string) =>
@@ -30,7 +33,7 @@ const toTitleCase = (value: string) =>
 
 export const getSportImage = (name: string) => {
   const key = name.trim().toLowerCase();
-  return SPORT_IMAGE_MAP[key] || "/sports/football.jpg";
+  return SPORT_IMAGE_MAP[key] || "/sports/futsal.png";
 };
 
 export const createSport = (name: string): Sport => ({

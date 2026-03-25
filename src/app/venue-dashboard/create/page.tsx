@@ -11,6 +11,8 @@ import { useToast } from "@/components/ui/Toast";
 import { useAuth } from "@/services/authContext";
 import { useVenue } from "@/components/venue/VenueContext";
 import Script from "next/script";
+import { api } from "@/services/api";
+import { City } from "@/types";
 import { useRef, useEffect } from "react";
 
 type Step = "details" | "location" | "amenities" | "document";
@@ -26,6 +28,9 @@ export default function CreateVenuePage() {
     const [geoLat, setGeoLat] = useState<number | null>(null);
     const [geoLng, setGeoLng] = useState<number | null>(null);
     const [mapLoaded, setMapLoaded] = useState(false);
+    const [availableCities, setAvailableCities] = useState<City[]>([]);
+    const [isLoadingCities, setIsLoadingCities] = useState(false);
+    const [mounted, setMounted] = useState(false);
     const searchInputRef = useRef<HTMLInputElement | null>(null);
 
     const { register, handleSubmit, setValue, formState: { errors } } = useForm({
@@ -74,6 +79,22 @@ export default function CreateVenuePage() {
         }
     }, [mapLoaded, step]);
 
+    useEffect(() => {
+        setMounted(true);
+        const fetchCities = async () => {
+            setIsLoadingCities(true);
+            try {
+                const cities = await api.getCities();
+                setAvailableCities(cities);
+            } catch (error) {
+                console.error("Failed to fetch cities", error);
+            } finally {
+                setIsLoadingCities(false);
+            }
+        };
+        fetchCities();
+    }, []);
+
     const onSubmit = async (data: any) => {
         if (!brDocument) {
             addToast("Business Registration document is required.", "error");
@@ -109,6 +130,8 @@ export default function CreateVenuePage() {
             setIsSubmitting(false);
         }
     };
+
+    if (!mounted || !user) return null;
 
     return (
         <main className="min-h-screen bg-black pt-24 pb-12 px-4 flex items-center justify-center relative overflow-hidden">
@@ -218,14 +241,21 @@ export default function CreateVenuePage() {
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
+                                     <div className="space-y-2">
                                         <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">City</label>
-                                        <input
+                                        <select
                                             {...register("city", { required: "City is required" })}
-                                            className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
-                                            placeholder="Ex: Colombo"
-                                        />
+                                            className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none"
+                                        >
+                                            <option value="" disabled>Select a city</option>
+                                            {availableCities.map((city) => (
+                                                <option key={city.name} value={city.name}>
+                                                    {city.name}
+                                                </option>
+                                            ))}
+                                        </select>
                                         {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city.message as string}</p>}
+                                        {isLoadingCities && <p className="text-zinc-500 text-[10px] mt-1 animate-pulse">Loading cities...</p>}
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Coordinates</label>

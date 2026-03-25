@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { api } from "@/services/api";
-import { Sport } from "@/types";
+import { Sport, SearchParams } from "@/types";
+import { useToast } from "@/components/ui/Toast";
 import {
     MapPin,
     Calendar,
@@ -12,8 +13,10 @@ import {
     Navigation,
     ChevronDown,
     Loader2,
-    Sparkles
+    Sparkles,
+    Building
 } from "lucide-react";
+import { City } from "@/types";
 
 const TIME_SLOTS = [
     "06:00", "07:00", "08:00", "09:00", "10:00", "11:00",
@@ -21,54 +24,104 @@ const TIME_SLOTS = [
     "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"
 ];
 
-const LOCATIONS = [
-    "All Locations",
-    "Colombo",
-    "Kandy",
-    "Galle",
-    "Negombo",
-    "Jaffna",
-    "Batticaloa"
-];
 
 interface CourtFinderPanelProps {
-    selectedSport: string;
-    setSelectedSport: (sport: string) => void;
-    onSearch: () => void;
+    onSearch: (params: SearchParams) => void;
+    initialSport?: string;
 }
 
-export default function CourtFinderPanel({
-    selectedSport,
-    setSelectedSport,
-    onSearch
-}: CourtFinderPanelProps) {
+export default function CourtFinderPanel({ onSearch, initialSport = "All" }: CourtFinderPanelProps) {
+    const { addToast } = useToast();
     // Dynamic sports from API
     const [sports, setSports] = useState<Sport[]>([]);
     const [loadingSports, setLoadingSports] = useState(true);
 
-    const [selectedDate, setSelectedDate] = useState(() => {
-        const today = new Date();
-        return today.toISOString().split('T')[0];
-    });
+    const [selectedSport, setSelectedSport] = useState(initialSport);
+    const [selectedDate, setSelectedDate] = useState("");
     const [startTime, setStartTime] = useState("10:00");
     const [endTime, setEndTime] = useState("11:00");
     const [location, setLocation] = useState("All Locations");
     const [useMyLocation, setUseMyLocation] = useState(false);
+    const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+    const [isSearching, setIsSearching] = useState(false);
+    const [availableCities, setAvailableCities] = useState<City[]>([]);
+    const [loadingCities, setLoadingCities] = useState(true);
 
-    // Fetch sports on mount
+
+    // Fetch sports and cities on mount
     useEffect(() => {
-        const loadSports = async () => {
+        // Set deterministic client-side dates
+        const now = new Date();
+        setSelectedDate(now.toISOString().split('T')[0]);
+        
+        const nextHour = now.getHours() + 1;
+        if (nextHour < 23) {
+            setStartTime(`${nextHour.toString().padStart(2, '0')}:00`);
+            setEndTime(`${(nextHour + 1).toString().padStart(2, '0')}:00`);
+        } else {
+            setStartTime("22:00");
+            setEndTime("23:00");
+        }
+
+        const loadInitialData = async () => {
             try {
-                const data = await api.getSports();
-                setSports(data);
+                const [sportsData, citiesData] = await Promise.all([
+                    api.getSports(),
+                    api.getCities()
+                ]);
+                setSports(sportsData);
+                setAvailableCities(citiesData);
             } catch (error) {
-                console.error("Error loading sports:", error);
+                console.error("Error loading initial data:", error);
             } finally {
                 setLoadingSports(false);
+                setLoadingCities(false);
             }
         };
-        loadSports();
+        loadInitialData();
     }, []);
+
+    const handleSearch = () => {
+        setIsSearching(true);
+        try {
+            const isAllLocations = location.toLowerCase() === "all locations";
+            
+            // Backend validation: Search requires city OR geolocation
+            if (isAllLocations && !useMyLocation) {
+                addToast("Please select a specific city or use 'Live' location to search.", "warning");
+                setIsSearching(false);
+                return;
+            }
+
+            // Find the actual sport slug
+            const sportObj = sports.find(s => s.name === selectedSport);
+            const sportSlug = sportObj?.slug || selectedSport.toLowerCase().replace(/\s+/g, '-');
+
+            const params: SearchParams = {
+                sport: sportSlug === "all" ? undefined : sportSlug,
+                city: isAllLocations ? undefined : location,
+                date: selectedDate,
+                start_time: startTime,
+                end_time: endTime,
+                lat: useMyLocation && userLocation ? userLocation.lat : undefined,
+                lng: useMyLocation && userLocation ? userLocation.lng : undefined,
+                radius_km: useMyLocation ? 5 : undefined, // Default radius if using location
+            };
+
+            // Basic validation
+            if (!params.sport) {
+                addToast("Please select a sport", "error");
+                setIsSearching(false);
+                return;
+            }
+
+            onSearch(params);
+        } catch (error) {
+            console.error("Search preparation failed", error);
+        } finally {
+            setIsSearching(false);
+        }
+    };
 
     return (
         <div className="relative">
@@ -299,16 +352,18 @@ export default function CourtFinderPanel({
                                     <select
                                         value={location}
                                         onChange={(e) => setLocation(e.target.value)}
+                                        disabled={loadingCities}
                                         className={`
                                             w-full appearance-none bg-zinc-800/70 border border-zinc-700/50 rounded-xl
                                             py-3.5 md:py-2.5 pl-12 pr-10 text-white text-sm font-medium
                                             focus:outline-none focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20
                                             hover:border-zinc-600
-                                            transition-all duration-200 cursor-pointer
+                                            transition-all duration-200 cursor-pointer disabled:opacity-50
                                         `}
                                     >
-                                        {LOCATIONS.map(loc => (
-                                            <option key={loc} value={loc}>{loc}</option>
+                                        <option value="All Locations">All Locations</option>
+                                        {availableCities.map(city => (
+                                            <option key={city.name} value={city.name}>{city.name}</option>
                                         ))}
                                     </select>
                                     <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 pointer-events-none" />
@@ -331,11 +386,10 @@ export default function CourtFinderPanel({
                                 </button>
                             </div>
                         </div>
-
-                        {/* Search Button - Full width on mobile */}
                         <div className="pt-2">
                             <button
-                                onClick={onSearch}
+                                onClick={handleSearch}
+                                disabled={isSearching}
                                 className={`
                                     group relative overflow-hidden flex items-center justify-center gap-3
                                     w-full md:w-auto md:ml-auto md:flex px-8 py-4 md:py-3 rounded-2xl md:rounded-xl font-bold text-base md:text-sm
@@ -346,19 +400,22 @@ export default function CourtFinderPanel({
                                     hover:scale-[1.02]
                                     active:scale-[0.98]
                                     transition-all duration-300 ease-out
+                                    disabled:opacity-70 disabled:cursor-not-allowed
                                 `}
                             >
                                 {/* Animated shimmer effect */}
                                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-
-                                {/* Glow pulse */}
-                                <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 animate-pulse transition-opacity" />
-
-                                <Search className="w-5 h-5 relative z-10 group-hover:rotate-12 transition-transform duration-300" />
-                                <span className="relative z-10">Search Courts</span>
-
-                                {/* Arrow animation */}
-                                <span className="relative z-10 group-hover:translate-x-0.5 transition-transform duration-300">→</span>
+                                
+                                {isSearching ? (
+                                    <Loader2 className="w-5 h-5 animate-spin relative z-10" />
+                                ) : (
+                                    <Search className="w-5 h-5 relative z-10 group-hover:rotate-12 transition-transform duration-300" />
+                                )}
+                                <span className="relative z-10">{isSearching ? 'Searching...' : 'Search Courts'}</span>
+                                
+                                {!isSearching && (
+                                    <span className="relative z-10 group-hover:translate-x-0.5 transition-transform duration-300">→</span>
+                                )}
                             </button>
                         </div>
 

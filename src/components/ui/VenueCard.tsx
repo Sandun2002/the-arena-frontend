@@ -14,10 +14,11 @@ export default function VenueCard({ venue }: VenueCardProps) {
       {/* Image Section */}
       <div className="relative h-64 w-full overflow-hidden">
         <Image
-          src={venue.cover_image || "/images/placeholder.jpg"}
+          src={venue.cover_image || "/sports/futsal.png"}
           alt={venue.name}
           fill
           className="object-cover transition-transform duration-700 group-hover:scale-110"
+          unoptimized
         />
         {/* Gradient Overlay for text readability */}
         <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent opacity-90" />

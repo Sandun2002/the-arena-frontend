@@ -54,8 +54,9 @@ export const api = {
   },
 
   getTrendingVenues: async (): Promise<Venue[]> => {
-    const response = await apiClient.get<FeaturedVenueApiResponse>('/venues/featured/list');
-    return (response.data.venues || []).map(normalizeVenue);
+    // The backend returns a bare List[Venue], so response.data is the array itself
+    const response = await apiClient.get<any[]>('/venues/featured/list');
+    return (Array.isArray(response.data) ? response.data : []).map(normalizeVenue);
   },
 
   getFeaturedVenues: async (): Promise<Venue[]> => {

@@ -206,6 +206,8 @@ export interface SearchParams {
   end_time?: string;
   lat?: number;
   lng?: number;
+  radius_km?: number;
+  sort_by?: "nearest" | "price_low" | "price_high";
   page?: number;
   page_size?: number;
 }
@@ -256,8 +258,8 @@ export interface VenueSlotsResponse {
   date: string;
   is_closed: boolean;
   operating_hours: {
-    open: string | null;
-    close: string | null;
+    opening: string | null;
+    closing: string | null;
   } | null;
   courts: Array<{
     court_id: string;

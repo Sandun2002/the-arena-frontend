@@ -37,12 +37,15 @@ export const centerService = {
         return {
             ...normalizeVenue(response.data),
             operating_schedule: Array.isArray(response.data.operating_hours)
-                ? response.data.operating_hours.map((hour: any) => ({
-                    day: String(hour.day_of_week),
-                    open: hour.opening_time ?? "",
-                    close: hour.closing_time ?? "",
-                    is_closed: Boolean(hour.is_closed),
-                }))
+                ? response.data.operating_hours.map((hour: any) => {
+                    const days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+                    return {
+                        day: days[hour.day_of_week] || String(hour.day_of_week),
+                        open: hour.opening_time ? hour.opening_time.substring(0, 5) : "",
+                        close: hour.closing_time ? hour.closing_time.substring(0, 5) : "",
+                        is_closed: Boolean(hour.is_closed),
+                    };
+                })
                 : [],
         } as VenueProfile;
     },
@@ -58,11 +61,12 @@ export const centerService = {
             } else {
                 dayOfWeek = dayMap[h.day.toLowerCase()] ?? 0;
             }
+            const isReallyClosed = (h.is_closed === true || h.is_closed === "true") && !h.open && !h.close;
             return {
                 day_of_week: dayOfWeek,
-                opening_time: h.is_closed ? null : (h.open ? (h.open.length === 5 ? `${h.open}:00` : h.open) : null),
-                closing_time: h.is_closed ? null : (h.close ? (h.close.length === 5 ? `${h.close}:00` : h.close) : null),
-                is_closed: h.is_closed,
+                opening_time: isReallyClosed ? null : (h.open ? (h.open.length === 5 ? `${h.open}:00` : h.open) : null),
+                closing_time: isReallyClosed ? null : (h.close ? (h.close.length === 5 ? `${h.close}:00` : h.close) : null),
+                is_closed: isReallyClosed,
             };
         });
         await apiClient.put('/center/operating-hours', { hours: formattedHours }, { params: { venue_id: venueId } });

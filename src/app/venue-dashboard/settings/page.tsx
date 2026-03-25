@@ -11,7 +11,8 @@ import { venueApiService } from "@/services/venueApiService";
 import { centerService } from "@/services/centerService";
 import { useToast } from "@/components/ui/Toast";
 import { useVenue } from "@/components/venue/VenueContext";
-import { Venue, VenueProfile } from "@/types";
+import { api } from "@/services/api";
+import { Venue, VenueProfile, City } from "@/types";
 
 export default function VenueSettingsPage() {
     const { user } = useAuth();
@@ -26,6 +27,9 @@ export default function VenueSettingsPage() {
 
     // Detailed profile state for schedule
     const [profile, setProfile] = useState<VenueProfile | null>(null);
+    const [availableCities, setAvailableCities] = useState<City[]>([]);
+    const [isLoadingCities, setIsLoadingCities] = useState(false);
+    const [mounted, setMounted] = useState(false);
     const { register, handleSubmit, setValue, control, formState: { errors } } = useForm({
         defaultValues: {
             name: "",
@@ -50,6 +54,20 @@ export default function VenueSettingsPage() {
         control,
         name: "schedule"
     });
+
+    const TIME_OPTIONS = Array.from({ length: 48 }, (_, i) => {
+        const hour = Math.floor(i / 2).toString().padStart(2, "0");
+        const min = (i % 2 === 0 ? "00" : "30");
+        return `${hour}:${min}`;
+    });
+
+    const formatTimeForDisplay = (timeStr: string) => {
+        if (!timeStr) return "Select time";
+        const [hours, mins] = timeStr.split(":").map(Number);
+        const ampm = hours >= 12 ? "PM" : "AM";
+        const displayHours = hours % 12 || 12;
+        return `${displayHours}:${mins.toString().padStart(2, "0")} ${ampm}`;
+    };
 
     const formatOperatingHoursSummary = (operatingHours: Venue["operating_hours"]) => {
         const openDays = operatingHours.filter((entry) => !entry.is_closed && entry.open_time && entry.close_time);
@@ -79,6 +97,22 @@ export default function VenueSettingsPage() {
             loadProfile();
         }
     }, [currentVenue, setValue]);
+
+    useEffect(() => {
+        setMounted(true);
+        const fetchCities = async () => {
+            setIsLoadingCities(true);
+            try {
+                const cities = await api.getCities();
+                setAvailableCities(cities);
+            } catch (error) {
+                console.error("Failed to fetch cities", error);
+            } finally {
+                setIsLoadingCities(false);
+            }
+        };
+        fetchCities();
+    }, []);
 
     const initAutocomplete = () => {
         if (!(window as any).google || !searchInputRef.current) return;
@@ -163,7 +197,7 @@ export default function VenueSettingsPage() {
         }
     };
 
-    if (!user) return null;
+    if (!mounted || !user) return null;
 
     if (!currentVenue) {
         return (
@@ -253,13 +287,21 @@ export default function VenueSettingsPage() {
                                     />
                                     {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message as string}</p>}
                                 </div>
-                                <div className="space-y-2">
+                                 <div className="space-y-2">
                                     <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">City</label>
-                                    <input
+                                    <select
                                         {...register("city", { required: "City is required" })}
-                                        className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
-                                        placeholder="e.g. Colombo"
-                                    />
+                                        className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none"
+                                    >
+                                        <option value="" disabled>Select a city</option>
+                                        {availableCities.map((city) => (
+                                            <option key={city.name} value={city.name}>
+                                                {city.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city.message as string}</p>}
+                                    {isLoadingCities && <p className="text-zinc-500 text-[10px] mt-1 animate-pulse">Loading cities...</p>}
                                 </div>
                             </div>
 
@@ -384,36 +426,33 @@ export default function VenueSettingsPage() {
                         <div className="space-y-4">
                             {scheduleFields.map((field, index) => (
                                 <div key={field.id} className="grid grid-cols-12 gap-4 items-center bg-zinc-900/50 p-4 rounded-xl border border-zinc-800/50">
-                                    <div className="col-span-3">
+                                    <div className="col-span-4">
                                         <span className="text-sm font-bold text-white capitalize">{field.day}</span>
                                     </div>
                                     <div className="col-span-3">
-                                        <input
-                                            type="time"
+                                        <select
                                             {...register(`schedule.${index}.open`)}
-                                            disabled={field.is_closed}
-                                            className="w-full bg-black border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm focus:border-purple-500 focus:outline-none disabled:opacity-50"
-                                        />
+                                            className="w-full bg-black border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm focus:border-purple-500 focus:outline-none appearance-none cursor-pointer"
+                                        >
+                                            <option value="">Opening Time</option>
+                                            {TIME_OPTIONS.map(time => (
+                                                <option key={time} value={time}>{formatTimeForDisplay(time)}</option>
+                                            ))}
+                                        </select>
                                     </div>
                                     <div className="col-span-1 text-center text-zinc-500">-</div>
                                     <div className="col-span-3">
-                                        <input
-                                            type="time"
+                                        <select
                                             {...register(`schedule.${index}.close`)}
-                                            disabled={field.is_closed}
-                                            className="w-full bg-black border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm focus:border-purple-500 focus:outline-none disabled:opacity-50"
-                                        />
+                                            className="w-full bg-black border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm focus:border-purple-500 focus:outline-none appearance-none cursor-pointer"
+                                        >
+                                            <option value="">Closing Time</option>
+                                            {TIME_OPTIONS.map(time => (
+                                                <option key={time} value={time}>{formatTimeForDisplay(time)}</option>
+                                            ))}
+                                        </select>
                                     </div>
-                                    <div className="col-span-2 flex justify-end">
-                                        <label className="flex items-center gap-2 cursor-pointer">
-                                            <input
-                                                type="checkbox"
-                                                {...register(`schedule.${index}.is_closed`)}
-                                                className="w-4 h-4 rounded border-zinc-600 text-red-500 focus:ring-red-500 accent-red-500"
-                                            />
-                                            <span className="text-xs font-medium text-zinc-400">Closed</span>
-                                        </label>
-                                    </div>
+                                    {/* Removed Closed checkbox as per user request */}
                                 </div>
                             ))}
                         </div>

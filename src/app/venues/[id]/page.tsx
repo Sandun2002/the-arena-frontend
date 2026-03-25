@@ -17,11 +17,15 @@ export default function VenueDetailsPage() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [slots, setSlots] = useState<VenueSlotsResponse | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
+  const [selectedDate, setSelectedDate] = useState("");
+
+  useEffect(() => {
+    setSelectedDate(new Date().toISOString().split("T")[0]);
+  }, []);
 
   useEffect(() => {
     const loadVenue = async () => {
-      if (!params.id) return;
+      if (!params.id || !selectedDate) return;
       const id = Array.isArray(params.id) ? params.id[0] : params.id;
       try {
         const [venueData, slotsData] = await Promise.all([
@@ -92,14 +96,14 @@ export default function VenueDetailsPage() {
       <div className="container mx-auto px-4 mb-12 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 h-[400px] md:h-[500px]">
           <div className="md:col-span-3 relative rounded-[2rem] overflow-hidden border border-zinc-800 group cursor-pointer bg-zinc-900">
-            {gallery[0] ? <Image src={gallery[0].url} alt={venue.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" priority /> : <div className="h-full w-full bg-zinc-900" />}
+            {gallery[0] ? <Image src={gallery[0].url} alt={venue.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" priority unoptimized /> : <div className="h-full w-full bg-zinc-900" />}
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
 
           <div className="hidden md:flex flex-col gap-4">
             {gallery.slice(1, 3).map((image) => (
               <div key={image.id} className="relative flex-1 rounded-[2rem] overflow-hidden border border-zinc-800 group cursor-pointer">
-                <Image src={image.url} alt={venue.name} fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
+                <Image src={image.url} alt={venue.name} fill className="object-cover transition-transform duration-700 group-hover:scale-110" unoptimized />
               </div>
             ))}
           </div>
