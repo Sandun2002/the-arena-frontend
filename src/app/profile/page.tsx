@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
     User as UserIcon, Trophy, Calendar, MapPin, Edit2, Shield,
-    Activity, TrendingUp, Mail, ChevronRight, Star, Lock, CreditCard, LogOut
+    Activity, TrendingUp, Mail, ChevronRight, Star, Lock, LogOut,
+    Clock, Plus, Zap
 } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
@@ -16,12 +17,28 @@ export default function ProfilePage() {
     const { user, logout } = useAuth();
     const [stats, setStats] = useState<any>(null);
     const [bookings, setBookings] = useState<Booking[]>([]);
+    const [upcomingBookings, setUpcomingBookings] = useState<Booking[]>([]);
     const [gamification, setGamification] = useState<{ challenges: Challenge[], achievements: UserAchievement[] } | null>(null);
 
     useEffect(() => {
         if (user) {
             playerService.getStats().then(setStats);
-            playerService.getBookings().then(d => setBookings(d.slice(0, 3))); // Top 3 recent
+            playerService.getBookings().then(all => {
+                // Sort newest first for recent activity
+                const sorted = [...all].sort(
+                    (a, b) => new Date(b.start_time).getTime() - new Date(a.start_time).getTime()
+                );
+                // Upcoming: confirmed/pending future bookings
+                const upcoming = all
+                    .filter(b =>
+                        ["confirmed", "payment_pending"].includes(b.status) &&
+                        new Date(b.start_time) > new Date()
+                    )
+                    .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
+
+                setUpcomingBookings(upcoming.slice(0, 3));
+                setBookings(sorted.slice(0, 3));
+            });
             playerService.getChallenges().then(setGamification);
         }
     }, [user]);
@@ -30,11 +47,15 @@ export default function ProfilePage() {
 
     const completedChallengesCount = gamification?.achievements.filter(a => a.is_completed).length || 0;
     const totalChallengesCount = gamification?.challenges.length || 0;
-    const verificationStatus = user.verification_status ?? "unverified";
-    const level = user.level ?? 1;
-    const xp = user.xp ?? 0;
-    const nextLevelXp = user.next_level_xp ?? 0;
-    const xpProgressPercent = user.xp_progress_percent ?? 0;
+    const level = stats?.level ?? (user.level ?? 1);
+    const xp = stats?.xp ?? (user.xp ?? 0);
+    const tier = stats?.tier ?? "Rookie";
+    const nextTier = stats?.next_tier ?? null;
+    const xpToNextTier = stats?.xp_to_next_tier ?? 0;
+    // Compute progress percent from tier thresholds embedded in stats
+    const tierXpProgress = nextTier && xpToNextTier > 0
+        ? Math.min(100, Math.round(((xp) / (xp + xpToNextTier)) * 100))
+        : 100;
 
     return (
         <main className="min-h-screen bg-black pt-24 pb-12 px-4 selection:bg-emerald-500/30">
@@ -69,38 +90,41 @@ export default function ProfilePage() {
                         {/* Info */}
                         <div className="flex-1 pb-2 w-full text-center md:text-left">
                             <h1 className="text-3xl md:text-5xl font-bold text-white mb-2 tracking-tight">{user.full_name}</h1>
-                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-zinc-400 text-sm mb-6">
+                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 text-zinc-400 text-sm mb-5">
                                 <span className="flex items-center gap-1.5 bg-zinc-900/50 px-3 py-1 rounded-full border border-zinc-800">
                                     <Mail className="w-3.5 h-3.5" /> {user.email}
                                 </span>
                                 <span className="flex items-center gap-1.5 bg-zinc-900/50 px-3 py-1 rounded-full border border-zinc-800">
                                     <Calendar className="w-3.5 h-3.5" /> Joined {format(new Date(user.created_at), "MMM yyyy")}
                                 </span>
-                                <span className={`flex items-center gap-1.5 px-3 py-1 rounded-full border ${statusColors[verificationStatus]}`}>
-                                    {verificationStatus === "verified" && <Shield className="w-3.5 h-3.5" />}
-                                    <span className="capitalize">{verificationStatus}</span>
+                                {/* Tier Badge */}
+                                <span className="flex items-center gap-1.5 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 text-emerald-400">
+                                    <Zap className="w-3.5 h-3.5" /> {tier}
                                 </span>
                             </div>
 
-                            {/* XP Progress */}
+                            {/* XP → Next Tier Progress */}
                             <div className="max-w-md mx-auto md:mx-0">
                                 <div className="flex justify-between text-xs font-bold uppercase text-zinc-500 mb-2 tracking-wider">
-                                    <span>Level {level}</span>
-                                    <span>{xp} / {nextLevelXp} XP</span>
+                                    <span>Level {level} · <span className="text-emerald-400">{tier}</span></span>
+                                    <span>{xp} XP</span>
                                 </div>
                                 <div className="h-3 bg-zinc-800 rounded-full overflow-hidden p-0.5 border border-zinc-700/50">
                                     <div
                                         className="h-full bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.3)] transition-all duration-1000 ease-out"
-                                        style={{ width: `${xpProgressPercent}%` }}
+                                        style={{ width: `${tierXpProgress}%` }}
                                     ></div>
                                 </div>
                                 <p className="text-xs text-zinc-500 mt-2 text-right">
-                                    {Math.max(nextLevelXp - xp, 0)} XP to next level
+                                    {nextTier
+                                        ? <>{xpToNextTier} XP to reach <span className="text-zinc-400">{nextTier}</span></>
+                                        : <span className="text-yellow-500">Max tier reached!</span>
+                                    }
                                 </p>
                             </div>
                         </div>
 
-                        {/* Quick Edit (Mobile hidden, Desktop visible) */}
+                        {/* Quick Edit (Desktop) */}
                         <div className="hidden md:block">
                             <Link href="/profile/settings">
                                 <Button variant="outline" className="border-zinc-700 hover:bg-zinc-800">
@@ -125,15 +149,15 @@ export default function ProfilePage() {
                             />
                             <StatsCard
                                 icon={<Activity className="w-5 h-5 text-emerald-500" />}
-                                label="Activity"
+                                label="Bookings"
                                 value={stats?.total_bookings || 0}
-                                subtext="Bookings"
+                                subtext="Total games"
                             />
                             <StatsCard
                                 icon={<TrendingUp className="w-5 h-5 text-purple-500" />}
                                 label="Play Time"
                                 value={`${stats?.hours_played || 0}h`}
-                                subtext="Hours"
+                                subtext="Hours on court"
                                 fullWidth
                             />
                         </div>
@@ -143,7 +167,6 @@ export default function ProfilePage() {
                             <MenuLink href="/profile/settings" icon={<Edit2 className="w-4 h-4" />} label="Edit Profile" />
                             <MenuLink href="/settings/sessions" icon={<Shield className="w-4 h-4" />} label="Security & Sessions" />
                             <MenuLink href="/profile/password" icon={<Lock className="w-4 h-4" />} label="Change Password" />
-                            <MenuLink href="/bookings" icon={<CreditCard className="w-4 h-4" />} label="Payment Methods" />
                             <MenuLink href="/reviews" icon={<Star className="w-4 h-4" />} label="My Reviews" />
                             <button
                                 onClick={logout}
@@ -156,8 +179,69 @@ export default function ProfilePage() {
                         </div>
                     </div>
 
-                    {/* Right Column: Bio & Recent Activity */}
+                    {/* Right Column */}
                     <div className="lg:col-span-2 space-y-6">
+
+                        {/* Upcoming Games — merged from /dashboard */}
+                        <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-6 backdrop-blur-sm">
+                            <div className="flex justify-between items-center mb-5">
+                                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                                    <Calendar className="w-5 h-5 text-emerald-400" /> Upcoming Games
+                                </h3>
+                                <Link href="/venues">
+                                    <Button size="sm" className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-8 px-4 text-xs">
+                                        <Plus className="w-3.5 h-3.5 mr-1" /> Book
+                                    </Button>
+                                </Link>
+                            </div>
+
+                            {upcomingBookings.length > 0 ? (
+                                <div className="space-y-3">
+                                    {upcomingBookings.map(booking => (
+                                        <Link href={`/bookings/${booking.id}`} key={booking.id} className="block group">
+                                            <div className="flex items-center gap-4 p-4 rounded-2xl bg-black/40 border border-zinc-800 hover:border-emerald-500/30 hover:bg-zinc-800/50 transition-all">
+                                                <div className="w-12 h-12 bg-zinc-800 rounded-xl flex flex-col items-center justify-center shrink-0 border border-zinc-700 group-hover:border-emerald-500/30 transition-colors">
+                                                    <span className="text-[9px] font-bold text-zinc-500 uppercase">{format(new Date(booking.start_time), "MMM")}</span>
+                                                    <span className="text-lg font-black text-white leading-none">{format(new Date(booking.start_time), "dd")}</span>
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <h4 className="text-white font-bold text-sm truncate group-hover:text-emerald-400 transition-colors">
+                                                        {booking.court?.sport_type?.name || booking.sport || "Sport"}
+                                                    </h4>
+                                                    <p className="text-xs text-zinc-500 flex items-center gap-1.5 truncate">
+                                                        <MapPin className="w-3 h-3 flex-shrink-0" />{booking.court?.venue_name}
+                                                    </p>
+                                                    <p className="text-xs text-zinc-400 flex items-center gap-1.5 font-mono mt-0.5">
+                                                        <Clock className="w-3 h-3 flex-shrink-0" />
+                                                        {format(new Date(booking.start_time), "h:mm a")}
+                                                    </p>
+                                                </div>
+                                                <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${
+                                                    booking.status === "confirmed"
+                                                        ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                                                        : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                                                }`}>
+                                                    {booking.status === "confirmed" ? "Confirmed" : "Pending"}
+                                                </span>
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-8 text-zinc-500">
+                                    <Calendar className="w-10 h-10 text-zinc-600 mx-auto mb-3" />
+                                    <p className="text-sm text-zinc-400 mb-4">No upcoming bookings.</p>
+                                    <Link href="/venues">
+                                        <Button variant="outline" size="sm">Find a Court</Button>
+                                    </Link>
+                                </div>
+                            )}
+                            {upcomingBookings.length > 0 && (
+                                <Link href="/bookings" className="block mt-5 text-center text-sm font-bold text-zinc-500 hover:text-white transition-colors">
+                                    View All Bookings
+                                </Link>
+                            )}
+                        </div>
 
                         {/* Gamification Teaser */}
                         <Link href="/challenges">
@@ -171,7 +255,7 @@ export default function ProfilePage() {
                                         Achievements & Challenges
                                     </h3>
                                     <p className="text-zinc-400 mb-4 max-w-md">
-                                        Complete daily challenges to earn XP, unlock badges, and get exclusive discounts on your bookings.
+                                        Complete daily challenges to earn XP, unlock badges, and climb the tiers.
                                     </p>
                                     <div className="flex items-center gap-4 text-sm font-bold text-emerald-500 group-hover:translate-x-1 transition-transform">
                                         View All Challenges <ChevronRight className="w-4 h-4" />
@@ -182,52 +266,52 @@ export default function ProfilePage() {
 
                         {/* Recent Activity */}
                         <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-6 backdrop-blur-sm">
-                            <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
-                                <Calendar className="w-5 h-5 text-zinc-400" /> Recent Activity
+                            <h3 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
+                                <Activity className="w-5 h-5 text-zinc-400" /> Recent Activity
                             </h3>
 
-                            <div className="space-y-4">
+                            <div className="space-y-3">
                                 {bookings.length > 0 ? (
                                     bookings.map((booking) => (
                                         <Link href={`/bookings/${booking.id}`} key={booking.id}>
                                             <div className="flex items-center gap-4 p-4 rounded-2xl bg-black/40 border border-zinc-800 hover:bg-zinc-800/50 transition-colors group">
-                                                <div className="w-12 h-12 rounded-xl bg-zinc-800 flex items-center justify-center shrink-0 group-hover:bg-zinc-700 transition-colors">
-                                                    <Activity className="w-6 h-6 text-zinc-500 group-hover:text-emerald-500 transition-colors" />
+                                                <div className="w-10 h-10 bg-zinc-800 rounded-xl flex items-center justify-center text-zinc-500 text-[10px] font-bold uppercase shrink-0 group-hover:bg-zinc-700 transition-colors">
+                                                    {format(new Date(booking.start_time), "MMM dd")}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <h4 className="text-white font-medium truncate group-hover:text-emerald-400 transition-colors">{booking.court?.venue_name || "Unknown Venue"}</h4>
-                                                    <p className="text-sm text-zinc-500 truncate">{booking.court?.name} • {booking.court?.sport_type?.name || 'Sport'}</p>
+                                                    <h4 className="text-white font-medium text-sm truncate group-hover:text-emerald-400 transition-colors">
+                                                        {booking.court?.venue_name || "Venue"}
+                                                    </h4>
+                                                    <p className="text-xs text-zinc-500 truncate">
+                                                        {booking.court?.name} · {booking.court?.sport_type?.name || booking.sport || "Sport"}
+                                                    </p>
                                                 </div>
-                                                <div className="text-right">
-                                                    <p className="text-white font-bold text-sm">LKR {booking.total_price}</p>
-                                                    <p className="text-xs text-zinc-500">{format(new Date(booking.start_time), "MMM d")}</p>
+                                                <div className="text-right shrink-0">
+                                                    <p className="text-white font-bold text-sm">LKR {booking.total_price.toLocaleString()}</p>
                                                 </div>
                                             </div>
                                         </Link>
                                     ))
                                 ) : (
                                     <div className="text-center py-8 text-zinc-500">
-                                        <p>No recent bookings found.</p>
-                                        <Link href="/venues">
-                                            <Button variant="outline" className="mt-4">Book Now</Button>
-                                        </Link>
+                                        <p>No recent activity.</p>
                                     </div>
                                 )}
                             </div>
                             {bookings.length > 0 && (
-                                <Link href="/bookings" className="block mt-6 text-center text-sm font-bold text-zinc-400 hover:text-white transition-colors">
+                                <Link href="/bookings" className="block mt-5 text-center text-sm font-bold text-zinc-400 hover:text-white transition-colors">
                                     View All Bookings
                                 </Link>
                             )}
                         </div>
 
                         {/* Bio */}
-                        <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-6 backdrop-blur-sm">
-                            <h3 className="text-lg font-bold text-white mb-4">About Me</h3>
-                            <p className="text-zinc-400 leading-relaxed">
-                                {user.bio || "No bio added yet."}
-                            </p>
-                        </div>
+                        {user.bio && (
+                            <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-6 backdrop-blur-sm">
+                                <h3 className="text-lg font-bold text-white mb-4">About Me</h3>
+                                <p className="text-zinc-400 leading-relaxed">{user.bio}</p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -259,9 +343,3 @@ function MenuLink({ href, icon, label }: any) {
         </Link>
     )
 }
-
-const statusColors: any = {
-    verified: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
-    pending: "bg-yellow-500/10 text-yellow-500 border-yellow-500/20",
-    unverified: "bg-zinc-500/10 text-zinc-500 border-zinc-500/20",
-};

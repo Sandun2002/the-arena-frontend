@@ -50,7 +50,7 @@ export default function LoginPage() {
       if (isOwnerOrManager) {
         router.push("/venue-dashboard");
       } else {
-        router.push("/dashboard");
+        router.push("/profile");
       }
     } catch (error) {
       addToast("Invalid email or password", "error");

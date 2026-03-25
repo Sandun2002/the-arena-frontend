@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
 import Button from "../ui/Button";
-import { Menu, X, User, LogOut, LayoutDashboard, Calendar, Settings, Shield } from "lucide-react";
+import { Menu, X, User, LogOut, Calendar, Settings, Shield } from "lucide-react";
 import { useAuth } from "@/services/authContext";
 import VenueSwitcher from "@/components/venue/VenueSwitcher";
 
@@ -113,16 +113,13 @@ export default function Header() {
                         <p className="text-xs text-zinc-500 truncate">{user?.email}</p>
                       </div>
                       <div className="p-2">
-                        <Link href="/dashboard" className="flex items-center gap-2 px-3 py-2 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors">
-                          <LayoutDashboard className="w-4 h-4" /> Dashboard
+                        <Link href="/profile" className="flex items-center gap-2 px-3 py-2 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors">
+                          <User className="w-4 h-4" /> My Profile
                         </Link>
                         <Link href="/bookings" className="flex items-center gap-2 px-3 py-2 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors">
                           <Calendar className="w-4 h-4" /> My Bookings
                         </Link>
-                        <Link href="/profile" className="flex items-center gap-2 px-3 py-2 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors">
-                          <Settings className="w-4 h-4" /> Profile Settings
-                        </Link>
-                        <Link href="/security" className="flex items-center gap-2 px-3 py-2 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors">
+                        <Link href="/settings/sessions" className="flex items-center gap-2 px-3 py-2 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors">
                           <Shield className="w-4 h-4" /> Security
                         </Link>
                       </div>

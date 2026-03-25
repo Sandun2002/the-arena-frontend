@@ -35,12 +35,9 @@ export interface User {
   roles: RoleResponse[];
   email_verified?: boolean;
   phone_verified?: boolean;
-  verification_status?: "unverified" | "pending" | "verified";
   is_mfa_enabled?: boolean;
   xp?: number;
   level?: number;
-  next_level_xp?: number;
-  xp_progress_percent?: number;
   created_at: string;
   updated_at: string | null;
 }
