@@ -1,13 +1,23 @@
 import Image from "next/image";
 import Link from "next/link";
 import { MapPin, Star, ArrowRight } from "lucide-react";
-import { Venue } from "@/types";
+import { Venue, SearchParams } from "@/types";
 
 interface VenueCardProps {
   venue: Venue;
+  searchParams?: SearchParams | null;
 }
 
-export default function VenueCard({ venue }: VenueCardProps) {
+export default function VenueCard({ venue, searchParams }: VenueCardProps) {
+  const queryStr = searchParams 
+    ? new URLSearchParams({
+        date: searchParams.date || "",
+        sport: searchParams.sport || "",
+        start: searchParams.start_time || "",
+        end: searchParams.end_time || ""
+      }).toString()
+    : "";
+    
   return (
     <div className="group relative w-full overflow-hidden rounded-xl bg-zinc-900 border border-zinc-800 transition-all hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-900/20">
 
@@ -58,7 +68,7 @@ export default function VenueCard({ venue }: VenueCardProps) {
           </div>
 
           <Link
-            href={`/venues/${venue.id}`}
+            href={`/venues/${venue.id}${queryStr ? `?${queryStr}` : ""}`}
             className="flex items-center gap-2 text-sm font-bold text-emerald-500 transition-transform group-hover:translate-x-1"
           >
             Details <ArrowRight className="h-4 w-4" />

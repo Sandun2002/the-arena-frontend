@@ -21,8 +21,16 @@ function SearchContent() {
     const [selectedCity, setSelectedCity] = useState(searchParams.get("city") || "All");
     const [selectedDate, setSelectedDate] = useState(searchParams.get("date") || new Date().toISOString().split("T")[0]);
     const [selectedSport, setSelectedSport] = useState(searchParams.get("sport") || "All");
-    const [startTime, setStartTime] = useState(searchParams.get("start") || "18:00");
-    const [endTime, setEndTime] = useState(searchParams.get("end") || "19:00");
+    const [startTime, setStartTime] = useState(() => {
+        if (searchParams.get("start")) return searchParams.get("start") as string;
+        const nextHour = new Date().getHours() + 1;
+        return nextHour < 23 ? `${nextHour.toString().padStart(2, '0')}:00` : "22:00";
+    });
+    const [endTime, setEndTime] = useState(() => {
+        if (searchParams.get("end")) return searchParams.get("end") as string;
+        const nextHour = new Date().getHours() + 1;
+        return nextHour < 23 ? `${(nextHour + 1).toString().padStart(2, '0')}:00` : "23:00";
+    });
 
     useEffect(() => {
         const ctx = gsap.context(() => {
@@ -48,6 +56,12 @@ function SearchContent() {
     };
 
     const loadResults = async () => {
+        if (selectedCity === "All") {
+            setResults([]);
+            setLoading(false);
+            return;
+        }
+
         setSubmitting(true);
         try {
             // Find the selected sport object to get its backend slug
@@ -161,13 +175,27 @@ function SearchContent() {
                     <div className="lg:col-span-3 space-y-6">
                         {loading ? (
                             <div className="rounded-[2rem] border border-zinc-800 bg-zinc-900/40 p-10 text-center text-zinc-500">Loading live availability...</div>
+                        ) : selectedCity === "All" && results.length === 0 ? (
+                            <div className="text-center py-20">
+                                <p className="text-zinc-500 text-lg">Please select a City to view live availability.</p>
+                            </div>
                         ) : results.length === 0 ? (
                             <div className="text-center py-20">
                                 <p className="text-zinc-500 text-lg">No venues found matching your criteria.</p>
                                 <button onClick={() => { setSelectedCity("All"); setSelectedSport("All"); }} className="mt-4 text-emerald-500 hover:underline">Clear Filters</button>
                             </div>
                         ) : (
-                            results.map((venue) => (
+                            results.map((venue) => {
+                                const sportObj = sports.find(s => s.name === selectedSport);
+                                const sportValue = sportObj?.slug || (selectedSport === "All" ? "" : selectedSport.toLowerCase());
+                                const queryStr = new URLSearchParams({
+                                    date: selectedDate,
+                                    sport: sportValue,
+                                    start: startTime,
+                                    end: endTime
+                                }).toString();
+
+                                return (
                                 <div key={venue.venue_id} className="venue-card group rounded-[2rem] border border-zinc-800 bg-zinc-900/40 backdrop-blur-sm overflow-hidden hover:border-emerald-500/30 transition-all duration-300">
                                     <div className="grid md:grid-cols-3 gap-0">
                                         <div className="relative h-48 md:h-auto overflow-hidden bg-zinc-950">
@@ -214,14 +242,15 @@ function SearchContent() {
 
                                             <div className="flex justify-between items-center gap-4">
                                                 <p className="text-xs text-zinc-500">Search window: {selectedDate} · {startTime} - {endTime}</p>
-                                                <Link href={`/venues/${venue.venue_id}`} className="text-sm font-bold text-white hover:text-emerald-400 transition-colors flex items-center gap-1">
+                                                <Link href={`/venues/${venue.venue_id}?${queryStr}`} className="text-sm font-bold text-white hover:text-emerald-400 transition-colors flex items-center gap-1">
                                                     View Venue Details <Search className="h-4 w-4" />
                                                 </Link>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            ))
+                                );
+                            })
                         )}
                     </div>
                 </div>

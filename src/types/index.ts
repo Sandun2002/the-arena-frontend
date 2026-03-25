@@ -143,7 +143,7 @@ export interface ManagerInvitation {
 }
 
 // === Booking ===
-export type BookingStatus = "payment_pending" | "confirmed" | "completed" | "cancelled" | "rejected";
+export type BookingStatus = "payment_pending" | "confirmed" | "completed" | "cancelled" | "rejected" | "blocked" | "maintenance";
 export type PaymentStatus = "pending" | "paid" | "refunded" | "failed";
 export type PaymentMethod = "card" | "cash" | "bank_transfer";
 
@@ -155,6 +155,7 @@ export interface Booking {
   hourly_rate: number;
   subtotal: number;
   total_price: number;
+  sport: string;
   platform_fee: number;
   venue_commission: number;
   venue_payout: number;
@@ -398,19 +399,19 @@ export interface UpcomingBooking {
 
 // === Gamification ===
 export interface Challenge {
-  id: string;
+  id: string | number;
   title: string;
   description: string;
   xp_reward: number;
   icon: string;
-  type: "booking" | "review" | "scout" | "social";
+  type: "booking" | "review" | "scout" | "social" | string;
   target_count: number;
 }
 
 export interface UserAchievement {
-  id: string;
+  id: string | number;
   user_id: string;
-  challenge_id: string;
+  challenge_id: string | number;
   progress: number;
   is_completed: boolean;
   completed_at: string | null;

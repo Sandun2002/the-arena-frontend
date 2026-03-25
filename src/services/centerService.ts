@@ -5,7 +5,7 @@ import {
     UpcomingBooking, Court, Closure, GalleryImage,
     AnalyticsRevenue, AnalyticsUtilization, AnalyticsFees, AnalyticsCancellations
 } from "@/types";
-import { normalizeBooking, normalizeVenue, normalizeCourt, normalizeGalleryImage } from "./normalizers";
+import { normalizeBooking, normalizeVenue, normalizeCourt, normalizeGalleryImage, normalizeRecurringBooking } from "./normalizers";
 
 export const centerService = {
     // === Dashboard ===
@@ -61,7 +61,7 @@ export const centerService = {
             } else {
                 dayOfWeek = dayMap[h.day.toLowerCase()] ?? 0;
             }
-            const isReallyClosed = (h.is_closed === true || h.is_closed === "true") && !h.open && !h.close;
+            const isReallyClosed = (h.is_closed === true || String(h.is_closed) === "true") && !h.open && !h.close;
             return {
                 day_of_week: dayOfWeek,
                 opening_time: isReallyClosed ? null : (h.open ? (h.open.length === 5 ? `${h.open}:00` : h.open) : null),
@@ -165,20 +165,20 @@ export const centerService = {
     // === Recurring ===
     getRecurringBookings: async (venueId?: string) => {
         const params = venueId ? { venue_id: venueId } : {};
-        const response = await apiClient.get<{ items: RecurringBooking[] }>('/center/recurring-bookings', { params });
-        return response.data.items || [];
+        const response = await apiClient.get<{ items: any[] }>('/center/recurring-bookings', { params });
+        return (response.data.items || []).map(normalizeRecurringBooking);
     },
 
     createRecurringBooking: async (data: any, venueId?: string) => {
         const params = venueId ? { venue_id: venueId } : {};
-        const response = await apiClient.post<RecurringBooking>('/center/recurring-bookings', data, { params });
-        return response.data;
+        const response = await apiClient.post<any>('/center/recurring-bookings', data, { params });
+        return normalizeRecurringBooking(response.data);
     },
 
     updateRecurringBooking: async (id: string, data: any, venueId?: string) => {
         const params = venueId ? { venue_id: venueId } : {};
-        const response = await apiClient.put<RecurringBooking>(`/center/recurring-bookings/${id}`, data, { params });
-        return response.data;
+        const response = await apiClient.put<any>(`/center/recurring-bookings/${id}`, data, { params });
+        return normalizeRecurringBooking(response.data);
     },
 
     pauseRecurringBooking: async (id: string, venueId?: string) => {

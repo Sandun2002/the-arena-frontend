@@ -16,6 +16,7 @@ export default function VenuesPage() {
     const [isSearching, setIsSearching] = useState(false);
     const [hasSearched, setHasSearched] = useState(false);
     const [selectedSport, setSelectedSport] = useState("All");
+    const [lastSearchParams, setLastSearchParams] = useState<SearchParams | null>(null);
 
     // 1. Fetch Data on Load
     useEffect(() => {
@@ -36,6 +37,7 @@ export default function VenuesPage() {
     const handleSearch = async (params: SearchParams) => {
         setHasSearched(true);
         setIsSearching(true);
+        setLastSearchParams(params);
         try {
             const response = await api.searchVenues(params);
             setSearchResults(response.results);
@@ -150,6 +152,7 @@ export default function VenuesPage() {
                                             suspended_at: null,
                                             deleted_at: null
                                         }} 
+                                        searchParams={lastSearchParams}
                                     />
                                 ))}
                             </div>

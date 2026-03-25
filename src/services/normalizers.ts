@@ -2,6 +2,7 @@ import {
   Booking,
   City,
   Court,
+  RecurringBooking,
   Review,
   ReviewStats,
   Session,
@@ -141,6 +142,7 @@ export const normalizeBooking = (raw: any): Booking => ({
   hourly_rate: Number(raw.hourly_rate ?? 0),
   subtotal: Number(raw.subtotal ?? raw.total_price ?? 0),
   total_price: Number(raw.total_price ?? raw.subtotal ?? 0),
+  sport: raw.sport ?? "",
   platform_fee: Number(raw.platform_fee ?? raw.service_fee ?? 0),
   venue_commission: Number(raw.venue_commission ?? 0),
   venue_payout: Number(raw.venue_payout ?? 0),
@@ -228,3 +230,21 @@ export const normalizeReviewStats = (raw: any): ReviewStats => ({
 
 export const normalizeCities = (cities: string[]): City[] =>
   cities.map((city) => ({ name: city }));
+
+export const normalizeRecurringBooking = (raw: any): RecurringBooking => ({
+  id: String(raw.id),
+  venue_id: String(raw.venue_id),
+  court_id: String(raw.court_id),
+  court_name: raw.court_name ?? raw.court?.name ?? "Unknown Court",
+  client_name: raw.customer_name ?? raw.client_name,
+  client_phone: raw.customer_phone ?? raw.client_phone ?? undefined,
+  day_of_week: raw.day_name ?? String(raw.day_of_week),
+  start_time: String(raw.start_time).substring(0, 5),
+  end_time: String(raw.end_time).substring(0, 5),
+  start_date: String(raw.start_date),
+  end_date: String(raw.end_date),
+  status: raw.is_paused ? "paused" : (raw.is_expired ? "expired" : (raw.is_active ? "active" : "cancelled")),
+  next_booking_date: raw.next_booking_date ?? null,
+  price_per_hour: Number(raw.price_per_hour ?? 0),
+  total_value: Number(raw.total_value ?? 0),
+});

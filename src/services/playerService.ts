@@ -75,8 +75,29 @@ class PlayerService {
 
     // === Gamification ===
     async getChallenges(): Promise<{ challenges: Challenge[], achievements: UserAchievement[] }> {
-        const response = await apiClient.get<{ challenges: Challenge[], achievements: UserAchievement[] }>('/player/challenges');
-        return response.data;
+        const response = await apiClient.get<any>('/player/challenges');
+        const rawChallenges = response.data.challenges || [];
+        
+        const challenges: Challenge[] = rawChallenges.map((c: any) => ({
+            id: c.id,
+            title: c.name,
+            description: c.description,
+            xp_reward: c.xp_reward,
+            icon: c.icon || "🏆",
+            type: c.challenge_type,
+            target_count: c.target_value
+        }));
+
+        const achievements: UserAchievement[] = rawChallenges.map((c: any) => ({
+            id: `ach_${c.id}`,
+            user_id: "",
+            challenge_id: c.id,
+            progress: c.current_progress,
+            is_completed: c.is_completed,
+            completed_at: c.completed_at
+        }));
+
+        return { challenges, achievements };
     }
 
     // === Dashboard Stats ===

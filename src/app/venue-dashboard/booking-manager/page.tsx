@@ -22,6 +22,9 @@ export default function BookingManagerPage() {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [activeCourtId, setActiveCourtId] = useState<string>("");
     const [isLoading, setIsLoading] = useState(true);
+    
+    const [operatingSchedule, setOperatingSchedule] = useState<any[]>([]);
+    const [isVenueClosed, setIsVenueClosed] = useState(false);
 
     // Modal State
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -46,6 +49,8 @@ export default function BookingManagerPage() {
     useEffect(() => {
         if (currentVenue) {
             loadSchedule();
+            const intervalId = setInterval(loadSchedule, 30000); // 30s polling
+            return () => clearInterval(intervalId);
         }
     }, [currentVenue, selectedDate]);
 
@@ -61,12 +66,26 @@ export default function BookingManagerPage() {
         setIsLoading(true);
         try {
             const dateStr = format(selectedDate, 'yyyy-MM-dd');
-            const [courtsData, bookingsData] = await Promise.all([
+            const [courtsData, bookingsData, profileData, closuresData] = await Promise.all([
                 centerService.getCourts(currentVenue.id),
-                centerService.getBookingsByDate(dateStr, currentVenue.id)
+                centerService.getBookingsByDate(dateStr, currentVenue.id),
+                centerService.getProfile(currentVenue.id),
+                centerService.getClosures(currentVenue.id, false)
             ]);
             setCourts(courtsData);
             setBookings(bookingsData);
+            setOperatingSchedule(profileData?.operating_schedule || []);
+
+            // Check if venue is closed on selected date
+            const isClosedDate = closuresData.some((c: any) => {
+                const start = new Date(c.start_date);
+                start.setHours(0, 0, 0, 0); // normalize time for correct date matching
+                const end = new Date(c.end_date);
+                end.setHours(23, 59, 59, 999);
+                return selectedDate >= start && selectedDate <= end;
+            });
+            setIsVenueClosed(isClosedDate);
+
         } catch (error) {
             console.error("Failed to load calendar data", error);
             addToast("Failed to load schedule", "error");
@@ -147,7 +166,37 @@ export default function BookingManagerPage() {
         }
     };
 
-    const hours = Array.from({ length: 24 }, (_, i) => i);
+    const getOperatingHoursForDate = () => {
+        if (!operatingSchedule.length) return Array.from({ length: 24 }, (_, i) => i);
+        
+        const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+        const currentDayName = dayNames[selectedDate.getDay()];
+        
+        const daySchedule = operatingSchedule.find(s => s.day.toLowerCase() === currentDayName);
+        
+        if (!daySchedule || daySchedule.is_closed || !daySchedule.open || !daySchedule.close) {
+            return []; // Closed or no hours configured
+        }
+        
+        const openHour = parseInt(daySchedule.open.split(':')[0], 10);
+        let closeHour = parseInt(daySchedule.close.split(':')[0], 10);
+        
+        // Handle midnight or overnight edge cases for the current day's view
+        if (closeHour === 0 || closeHour < openHour) {
+             closeHour = 24;
+        }
+        
+        const start = Math.max(0, openHour);
+        const end = Math.min(24, closeHour);
+        
+        const hoursList = [];
+        for (let i = start; i < end; i++) {
+            hoursList.push(i);
+        }
+        return hoursList;
+    };
+
+    const hours = getOperatingHoursForDate();
 
     const getBookingForSlot = (courtId: string, hour: number) => {
         const slotStart = new Date(selectedDate);
@@ -162,7 +211,7 @@ export default function BookingManagerPage() {
                 b.court_id === courtId &&
                 bStart < slotEnd &&
                 bEnd > slotStart &&
-                (b.status === "confirmed" || b.status === "payment_pending" || b.status === "completed")
+                (b.status === "confirmed" || b.status === "payment_pending" || b.status === "completed" || b.status === "blocked" || b.status === "maintenance")
             );
         });
     };
@@ -252,6 +301,12 @@ export default function BookingManagerPage() {
                         <Loader2 className="w-8 h-8 animate-spin mb-4 text-emerald-500" />
                         <p>Loading slots...</p>
                     </div>
+                ) : isVenueClosed || hours.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-full text-red-500/80 py-20 border border-red-500/10 rounded-2xl bg-red-500/5">
+                        <CalendarIcon className="w-12 h-12 mb-4 text-red-500/60" />
+                        <h2 className="text-xl font-bold mb-2 text-red-400">Venue Closed</h2>
+                        <p className="text-red-400/80">The venue is not operating on {format(selectedDate, "MMM dd, yyyy")}.</p>
+                    </div>
                 ) : !activeCourtId ? (
                     <div className="flex flex-col items-center justify-center h-full text-zinc-500 py-20">
                         <p>No courts available. Please add courts first.</p>
@@ -280,7 +335,9 @@ export default function BookingManagerPage() {
                                         {booking ? (
                                             <div className={`
                                                 h-full rounded-2xl p-4 border transition-all flex justify-between items-center group relative overflow-hidden backdrop-blur-sm
-                                                ${booking.status === "confirmed" || booking.payment_status === "paid"
+                                                ${booking.status === "blocked" || booking.status === "maintenance"
+                                                    ? "bg-zinc-800/50 border-zinc-700/50 shadow-[inset_4px_0_0_0_rgba(161,161,170,1)] hover:bg-zinc-800/70"
+                                                    : booking.status === "confirmed" || booking.payment_status === "paid"
                                                     ? "bg-emerald-500/10 border-emerald-500/20 shadow-[inset_4px_0_0_0_rgba(16,185,129,1)] hover:bg-emerald-500/15"
                                                     : "bg-amber-500/10 border-amber-500/20 shadow-[inset_4px_0_0_0_rgba(245,158,11,1)] hover:bg-amber-500/15"
                                                 }
@@ -298,6 +355,10 @@ export default function BookingManagerPage() {
                                                     {booking.status === "payment_pending" ? (
                                                         <span className="flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1 rounded-md bg-amber-500/20 text-amber-500 uppercase tracking-widest border border-amber-500/30">
                                                             Pending
+                                                        </span>
+                                                    ) : booking.status === "blocked" || booking.status === "maintenance" ? (
+                                                        <span className="flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1 rounded-md bg-zinc-500/20 text-zinc-400 uppercase tracking-widest border border-zinc-500/30">
+                                                            <XCircle className="w-3 h-3" /> Blocked
                                                         </span>
                                                     ) : (
                                                         <span className="flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1 rounded-md bg-emerald-500/20 text-emerald-500 uppercase tracking-widest border border-emerald-500/30">

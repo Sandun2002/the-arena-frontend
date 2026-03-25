@@ -126,14 +126,14 @@ export default function ProfilePage() {
                             <StatsCard
                                 icon={<Activity className="w-5 h-5 text-emerald-500" />}
                                 label="Activity"
-                                value={stats?.bookings_completed || 0}
+                                value={stats?.total_bookings || 0}
                                 subtext="Bookings"
                             />
                             <StatsCard
                                 icon={<TrendingUp className="w-5 h-5 text-purple-500" />}
-                                label="Savings"
-                                value={`LKR ${stats?.money_saved || 0}`}
-                                subtext="Loyalty"
+                                label="Play Time"
+                                value={`${stats?.hours_played || 0}h`}
+                                subtext="Hours"
                                 fullWidth
                             />
                         </div>

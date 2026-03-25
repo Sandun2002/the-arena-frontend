@@ -107,6 +107,31 @@ apiClient.interceptors.response.use(
             originalRequest._retry = true;
             isRefreshing = true;
 
+            // CROSS-TAB CHECK 1: Ensure we haven't already refreshed in another tab
+            const tokenUsed = originalRequest.headers?.Authorization?.toString().replace('Bearer ', '');
+            const currentTokenBefore = getAccessToken();
+            
+            if (currentTokenBefore && tokenUsed && currentTokenBefore !== tokenUsed) {
+                // Another tab already refreshed! Use the new token.
+                isRefreshing = false;
+                if (originalRequest.headers) {
+                    originalRequest.headers.Authorization = `Bearer ${currentTokenBefore}`;
+                }
+                return apiClient(originalRequest);
+            }
+
+            // ADD RANDOM JITTER to desynchronize tabs, then check again
+            await new Promise(resolve => setTimeout(resolve, Math.random() * 500 + 100));
+            
+            const currentTokenAfter = getAccessToken();
+            if (currentTokenAfter && tokenUsed && currentTokenAfter !== tokenUsed) {
+                isRefreshing = false;
+                if (originalRequest.headers) {
+                    originalRequest.headers.Authorization = `Bearer ${currentTokenAfter}`;
+                }
+                return apiClient(originalRequest);
+            }
+
             const refreshToken = getRefreshToken();
             if (!refreshToken) {
                 // No refresh token -> logout
@@ -135,7 +160,23 @@ apiClient.interceptors.response.use(
                 return apiClient(originalRequest);
 
             } catch (refreshError) {
-                // Refresh failed -> logout
+                // Cross-tab collision mitigation: Wait briefly to see if another tab updates localStorage
+                // If it was a token reuse error (401), the other tab might just be writing to localStorage now.
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                const latestToken = getAccessToken();
+                const latestRefreshToken = getRefreshToken();
+                
+                if (latestToken && latestRefreshToken && latestRefreshToken !== refreshToken) {
+                    // Another tab successfully refreshed the token! Recovery successful.
+                    processQueue(null, latestToken);
+                    if (originalRequest.headers) {
+                        originalRequest.headers.Authorization = `Bearer ${latestToken}`;
+                    }
+                    return apiClient(originalRequest);
+                }
+
+                // Refresh truly failed -> logout
                 processQueue(refreshError, null);
                 clearTokens();
                 if (typeof window !== 'undefined') window.location.href = '/login?session=expired';

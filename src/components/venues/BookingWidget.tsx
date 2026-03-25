@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Venue } from "@/types";
 import Button from "@/components/ui/Button";
 import { Calendar, Check, LogIn, Loader2 } from "lucide-react";
@@ -17,13 +17,21 @@ interface BookingWidgetProps {
 
 export default function BookingWidget({ venue }: BookingWidgetProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { isLoggedIn, login } = useAuth();
   const { addToast } = useToast();
 
-  const [date, setDate] = useState<string>("");
+  const rqDate = searchParams.get("date");
+  const rqSport = searchParams.get("sport");
+  const rqStart = searchParams.get("start");
+  const rqEnd = searchParams.get("end");
+
+  const [date, setDate] = useState<string>(rqDate || "");
   const [courtsData, setCourtsData] = useState<any[]>([]);
   const [selectedCourtId, setSelectedCourtId] = useState<string>("");
   const [selectedSlots, setSelectedSlots] = useState<{ start: string, end: string }[]>([]);
+  const [isVenueClosed, setIsVenueClosed] = useState(false);
+  const [hasAutoSelected, setHasAutoSelected] = useState(false);
 
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [pricing, setPricing] = useState<any>(null);
@@ -33,19 +41,23 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   useEffect(() => {
-    setDate(format(new Date(), "yyyy-MM-dd"));
-  }, []);
+    if (!rqDate) {
+      setDate(format(new Date(), "yyyy-MM-dd"));
+    }
+  }, [rqDate]);
 
   // Fetch Slots
-  useEffect(() => {
+  const loadSlots = () => {
     if (!venue?.id || !date) return;
     setLoadingSlots(true);
     api.getVenueSlots(venue.id, date)
       .then((res: any) => {
+        setIsVenueClosed(res.is_closed || false);
         const data = (res.courts || []).map((court: any) => ({
           court: {
             id: court.court_id,
             name: court.court_name,
+            sport: court.sport_type,
           },
           slots: court.slots.map((slot: any) => ({
             start: `${slot.date}T${slot.start}`,
@@ -54,12 +66,52 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
           })),
         }));
         setCourtsData(data);
-        if (data.length > 0 && !selectedCourtId) {
-          setSelectedCourtId(data[0].court.id);
+        
+        let targetCourtId = selectedCourtId;
+
+        // Auto-select court logic 
+        if (data.length > 0 && !targetCourtId) {
+          // If sport is provided in URL, try to match it against court name or just use first court
+          // Since the backend doesn't explicitly return sport_type with slots, we match name fuzzily or default
+          const matchedCourt = rqSport 
+            ? data.find((c: any) => c.court.sport?.toLowerCase() === rqSport.toLowerCase())
+            : null;
+            
+          targetCourtId = matchedCourt ? matchedCourt.court.id : data[0].court.id;
+          setSelectedCourtId(targetCourtId);
+        }
+
+        // Auto-select slots logic
+        if (rqStart && !hasAutoSelected && targetCourtId) {
+          const targetCourtData = data.find((c: any) => c.court.id === targetCourtId);
+          if (targetCourtData && targetCourtData.slots) {
+            // Find start and end indices
+            const startIndex = targetCourtData.slots.findIndex((s: any) => s.start.includes(`T${rqStart}`) || s.start.includes(` ${rqStart}`));
+            const endIndex = rqEnd ? targetCourtData.slots.findIndex((s: any) => s.end.includes(`T${rqEnd}`) || s.end.includes(` ${rqEnd}`)) : startIndex;
+            
+            if (startIndex !== -1) {
+              const eIndex = endIndex !== -1 ? endIndex : startIndex;
+              const slotsToSelect = targetCourtData.slots.slice(startIndex, eIndex + 1);
+              
+              // Only pick available ones
+              const validSlots = slotsToSelect.filter((s: any) => s.status === "available");
+              if (validSlots.length > 0) {
+                setSelectedSlots(validSlots.map((s: any) => ({ start: s.start, end: s.end })));
+              }
+            }
+          }
+          setHasAutoSelected(true);
         }
       })
       .catch(console.error)
       .finally(() => setLoadingSlots(false));
+  };
+
+  useEffect(() => {
+    loadSlots();
+    // Refresh slots every 30 seconds for real-time updates
+    const intervalId = setInterval(loadSlots, 30000);
+    return () => clearInterval(intervalId);
   }, [date, venue?.id]);
 
   // Calculate Price
@@ -71,7 +123,26 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
 
       bookingService.calculatePrice(selectedCourtId, date, timeSlotsFormatted)
         .then(setPricing)
-        .catch(() => setPricing(null));
+        .catch((error: any) => {
+          setPricing(null);
+          if (error.response?.status === 409) {
+            addToast("Selected slot(s) are no longer available.", "error");
+            setCourtsData(prev => prev.map(c => {
+               if (c.court.id === selectedCourtId) {
+                 return {
+                   ...c,
+                   slots: c.slots.map((s: any) => 
+                     selectedSlots.some(sel => sel.start === s.start)
+                       ? { ...s, status: "booked" }
+                       : s
+                   )
+                 };
+               }
+               return c;
+            }));
+            setSelectedSlots([]);
+          }
+        });
     } else {
       setPricing(null);
     }
@@ -103,7 +174,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
       const startTime = sortedSlots[0].start;
       const endTime = sortedSlots[sortedSlots.length - 1].end;
 
-      await bookingService.createBooking({
+      const booking = await bookingService.createBooking({
         venue_id: venue.id,
         court_id: selectedCourtId,
         start_time: startTime,
@@ -111,12 +182,28 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
         payment_method: "card"
       });
 
-      setShowSuccess(true);
-      setTimeout(() => {
-        router.push(`/bookings`);
-      }, 2000);
-    } catch (e) {
-      addToast("Failed to create booking", "error");
+      // Redirect to checkout to complete payment
+      router.push(`/checkout/${booking.id}`);
+    } catch (e: any) {
+      if (e.response?.status === 409) {
+         addToast("This time slot was just booked. Please select another.", "error");
+         setCourtsData(prev => prev.map(c => {
+            if (c.court.id === selectedCourtId) {
+              return {
+                ...c,
+                slots: c.slots.map((s: any) => 
+                  selectedSlots.some(sel => sel.start === s.start)
+                    ? { ...s, status: "booked" }
+                    : s
+                )
+              };
+            }
+            return c;
+         }));
+         setSelectedSlots([]);
+      } else {
+         addToast("Failed to create booking", "error");
+      }
       setSubmitting(false);
     }
   };
@@ -187,77 +274,116 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
       </div>
 
       {/* Court Selection Tabs */}
-      <div className="mb-6">
-        <label className="mb-2 block text-xs font-bold text-zinc-500 uppercase tracking-wider">Select Court</label>
-        <div className="flex bg-zinc-950 p-1 rounded-lg border border-zinc-800 overflow-x-auto scrollbar-hide">
-          {courtsData.map((cData) => (
-            <button
-              key={cData.court.id}
-              onClick={() => {
-                setSelectedCourtId(cData.court.id);
-                setSelectedSlots([]);
-              }}
-              className={`flex-shrink-0 min-w-[80px] px-4 py-2 text-xs font-bold rounded-md transition-all ${selectedCourtId === cData.court.id
-                ? "bg-emerald-500 text-black shadow-lg"
-                : "text-zinc-400 hover:text-white"
-                }`}
-            >
-              {cData.court.name}
-            </button>
-          ))}
-          {loadingSlots && courtsData.length === 0 && (
-            <span className="py-2 px-4 text-xs text-zinc-500">Loading...</span>
-          )}
-          {!loadingSlots && courtsData.length === 0 && (
-            <span className="py-2 px-4 text-xs text-zinc-500">No courts available</span>
-          )}
+      {!isVenueClosed && (
+        <div className="mb-6">
+          <label className="mb-2 block text-xs font-bold text-zinc-500 uppercase tracking-wider">Select Court</label>
+          <div className="flex bg-zinc-950 p-1 rounded-lg border border-zinc-800 overflow-x-auto scrollbar-hide">
+            {courtsData.map((cData) => (
+              <button
+                key={cData.court.id}
+                onClick={() => {
+                  setSelectedCourtId(cData.court.id);
+                  setSelectedSlots([]);
+                }}
+                className={`flex-shrink-0 min-w-[120px] px-4 py-2 text-xs font-bold rounded-md transition-all ${selectedCourtId === cData.court.id
+                  ? "bg-emerald-500 text-black shadow-lg"
+                  : "text-zinc-400 hover:text-white"
+                  }`}
+              >
+                {cData.court.name} <span className="opacity-60 font-normal">({cData.court.sport})</span>
+              </button>
+            ))}
+            {loadingSlots && courtsData.length === 0 && (
+              <span className="py-2 px-4 text-xs text-zinc-500">Loading...</span>
+            )}
+            {!loadingSlots && courtsData.length === 0 && (
+              <span className="py-2 px-4 text-xs text-zinc-500">No courts available</span>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Legend */}
-      <div className="flex justify-between text-[10px] text-zinc-400 mb-4 px-1">
-        <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(80,200,120,0.6)]"></span> Selected</div>
-        <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500/50"></span> Booked</div>
-        <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-zinc-600"></span> Available</div>
-      </div>
+      {!isVenueClosed && (
+        <div className="flex justify-between text-[10px] text-zinc-400 mb-4 px-1 flex-wrap gap-2">
+          <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(80,200,120,0.6)]"></span> Selected</div>
+          <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500/50"></span> Booked</div>
+          <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full border border-zinc-600 bg-zinc-800/50"></span> Past/Closed</div>
+          <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-zinc-600"></span> Available</div>
+        </div>
+      )}
 
       {/* Time Slots Grid */}
-      <div className="grid grid-cols-4 gap-2 mb-8 min-h-[120px]">
-        {loadingSlots ? (
-          <div className="col-span-4 flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin text-emerald-500" /></div>
-        ) : (
-          timeSlots.map((slot: any) => {
-            const isSelected = selectedSlots.some(s => s.start === slot.start);
-            const isBooked = slot.status !== "available";
+      {isVenueClosed ? (
+        <div className="mb-8 p-6 rounded-xl border border-red-500/20 bg-red-500/5 text-center">
+          <Calendar className="w-8 h-8 text-red-500/50 mx-auto mb-3" />
+          <h4 className="text-red-400 font-bold mb-1">Venue Closed</h4>
+          <p className="text-zinc-400 text-sm">This venue is closed on the selected date. Please choose another date.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-4 gap-2 mb-8 min-h-[120px]">
+          {loadingSlots ? (
+            <div className="col-span-4 flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin text-emerald-500" /></div>
+          ) : (
+            timeSlots.map((slot: any) => {
+              const isSelected = selectedSlots.some(s => s.start === slot.start);
+              
+              // Determine logic states
+              const slotTime = parseISO(slot.start);
+              const now = new Date();
+              const isPast = slotTime < now;
+              const isBooked = slot.status === "booked";
+              const isClosed = slot.status === "closed";
+              
+              const isUnavailable = isBooked || isClosed || isPast;
 
-            return (
-              <button
-                key={slot.start}
-                disabled={isBooked}
-                onClick={() => toggleSlot({ start: slot.start, end: slot.end })}
-                className={`
-                    py-2 rounded-lg text-xs font-medium border transition-all duration-200
-                    ${isBooked
-                    ? "bg-red-900/20 border-red-900/50 text-red-500 cursor-not-allowed opacity-60"
-                    : isSelected
-                      ? "bg-emerald-500 border-emerald-500 text-black shadow-[0_0_10px_rgba(80,200,120,0.4)] scale-105"
-                      : "bg-zinc-800 border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:bg-zinc-700"
-                  }
-                `}
-              >
-                {isBooked ? "Booked" : format(parseISO(slot.start), "HH:mm")}
-              </button>
-            );
-          })
-        )}
-      </div>
+              return (
+                <button
+                  key={slot.start}
+                  disabled={isUnavailable}
+                  onClick={() => toggleSlot({ start: slot.start, end: slot.end })}
+                  className={`
+                      py-2 rounded-lg text-xs font-medium border transition-all duration-200
+                      ${isBooked
+                        ? "bg-red-900/20 border-red-900/50 text-red-500 cursor-not-allowed opacity-60"
+                        : isClosed || isPast
+                          ? "bg-black/20 border-zinc-800/50 text-zinc-600 cursor-not-allowed"
+                          : isSelected
+                            ? "bg-emerald-500 border-emerald-500 text-black shadow-[0_0_10px_rgba(80,200,120,0.4)] scale-105"
+                            : "bg-zinc-800 border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:bg-zinc-700"
+                    }
+                  `}
+                >
+                  {isBooked ? "Booked" : isClosed ? "Closed" : isPast ? "Past" : format(slotTime, "HH:mm")}
+                </button>
+              );
+            })
+          )}
+        </div>
+      )}
+
+      {/* Warning Box */}
+      {!isVenueClosed && pricing && selectedSlots.length > 0 && (
+        <div className="mb-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 animate-in fade-in slide-in-from-bottom-2">
+          <h4 className="flex items-center gap-2 text-sm font-bold text-amber-500 mb-1">
+            ⚠️ Double Check Your Court!
+          </h4>
+          <p className="text-xs text-amber-500/80 leading-relaxed">
+            Please make sure you are booking the correct court for your sport. You have selected:
+            <br/>
+            <span className="font-bold text-amber-400 mt-1 inline-block">
+              {courtsData.find(c => c.court.id === selectedCourtId)?.court.name || "Court"}
+            </span>
+          </p>
+        </div>
+      )}
 
       {/* Total & Action */}
       <div className="border-t border-zinc-800 pt-4">
         <div className="flex justify-between items-center mb-4">
           <span className="text-sm text-zinc-400">Total:</span>
           <span className="text-2xl font-bold text-white">
-            {pricing ? `LKR ${pricing.total_price.toLocaleString()}` : "LKR 0"}
+            {pricing ? `LKR ${pricing.total.toLocaleString()}` : "LKR 0"}
           </span>
         </div>
 
