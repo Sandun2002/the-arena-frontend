@@ -1,10 +1,9 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Venue } from "@/types";
 import Button from "@/components/ui/Button";
-import { Calendar, Check, LogIn, Loader2 } from "lucide-react";
+import DatePicker from "@/components/ui/DatePicker";
+import { Check, LogIn, Loader2, Calendar } from "lucide-react";
 import { useAuth } from "@/services/authContext";
 import { api } from "@/services/api";
 import { bookingService } from "@/services/bookingService";
@@ -258,19 +257,13 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
 
       {/* Date Picker */}
       <div className="mb-6">
-        <label className="mb-2 block text-xs font-bold text-zinc-500 uppercase tracking-wider">Date</label>
-        <div className="relative group">
-          <Calendar className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-400 group-hover:text-emerald-500 transition-colors" />
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => {
-              setDate(e.target.value);
-              setSelectedSlots([]);
-            }}
-            className="w-full rounded-xl bg-zinc-800 border border-zinc-700 py-3 px-4 text-white placeholder-zinc-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all font-mono"
-          />
-        </div>
+        <DatePicker
+          label="Date"
+          value={date}
+          onChange={(v) => { setDate(v); setSelectedSlots([]); }}
+          disablePast={true}
+          placeholder="Select a date"
+        />
       </div>
 
       {/* Court Selection Tabs */}

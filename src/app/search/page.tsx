@@ -4,9 +4,11 @@ import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Calendar, Clock, Filter, MapPin, Search } from "lucide-react";
+import { Filter, MapPin, Search } from "lucide-react";
 import gsap from "gsap";
 import Button from "@/components/ui/Button";
+import TimePicker from "@/components/ui/TimePicker";
+import DatePicker from "@/components/ui/DatePicker";
 import { api } from "@/services/api";
 import { City, Sport, VenueSearchResult } from "@/types";
 
@@ -127,28 +129,43 @@ function SearchContent() {
                             </div>
 
                             <div className="mb-6">
-                                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Date</label>
-                                <div className="relative">
-                                    <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none" />
-                                    <Calendar className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 pointer-events-none" />
-                                </div>
+                                <DatePicker
+                                    label="Date"
+                                    value={selectedDate}
+                                    onChange={setSelectedDate}
+                                    disablePast={true}
+                                    placeholder="Select date"
+                                />
                             </div>
 
                             <div className="mb-6 grid grid-cols-2 gap-3">
-                                <div>
-                                    <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Start</label>
-                                    <div className="relative">
-                                        <input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none" />
-                                        <Clock className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 pointer-events-none" />
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">End</label>
-                                    <div className="relative">
-                                        <input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none" />
-                                        <Clock className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 pointer-events-none" />
-                                    </div>
-                                </div>
+                                {/* Compute if today is selected for past-blocking */}
+                                {(() => {
+                                    const today = new Date().toISOString().split("T")[0];
+                                    const isToday = selectedDate === today;
+                                    return (
+                                        <>
+                                            <div>
+                                                <TimePicker
+                                                    label="Start"
+                                                    value={startTime}
+                                                    onChange={setStartTime}
+                                                    disablePast={true}
+                                                    sameDay={isToday}
+                                                />
+                                            </div>
+                                            <div>
+                                                <TimePicker
+                                                    label="End"
+                                                    value={endTime}
+                                                    onChange={setEndTime}
+                                                    disablePast={true}
+                                                    sameDay={isToday}
+                                                />
+                                            </div>
+                                        </>
+                                    );
+                                })()}
                             </div>
 
                             <div className="mb-6">

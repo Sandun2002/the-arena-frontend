@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { format } from "date-fns";
 import { Loader2, Calendar, MapPin, Clock } from "lucide-react";
 import Button from "@/components/ui/Button";
+import DatePicker from "@/components/ui/DatePicker";
 import { centerService } from "@/services/centerService";
 import { Court } from "@/types";
 import { useToast } from "@/components/ui/Toast";
@@ -23,7 +24,7 @@ export default function ClosureFormModal({ venueId, courts, onClose, onSuccess }
     const [selectedSlots, setSelectedSlots] = useState<number[]>([]);
     const today = format(new Date(), "yyyy-MM-dd");
 
-    const { register, handleSubmit, formState: { errors }, watch } = useForm({
+    const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm({
         defaultValues: {
             title: "",
             start_date: "",
@@ -139,21 +140,22 @@ export default function ClosureFormModal({ venueId, courts, onClose, onSuccess }
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Start Date</label>
-                                <input
-                                    type="date"
-                                    {...register("start_date", { required: "Start date is required" })}
-                                    min={today}
-                                    className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
+                                <DatePicker
+                                    label="Start Date"
+                                    value={watch("start_date") || ""}
+                                    onChange={(v) => setValue("start_date", v)}
+                                    disablePast={true}
+                                    placeholder="Start date"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">End Date</label>
-                                <input
-                                    type="date"
-                                    {...register("end_date")}
-                                    min={watch("start_date") || today}
-                                    className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
+                                <DatePicker
+                                    label="End Date"
+                                    value={watch("end_date") || ""}
+                                    onChange={(v) => setValue("end_date", v)}
+                                    disablePast={true}
+                                    minDate={watch("start_date") || undefined}
+                                    placeholder="End date"
                                 />
                             </div>
                         </div>
@@ -173,12 +175,12 @@ export default function ClosureFormModal({ venueId, courts, onClose, onSuccess }
                                 </select>
                             </div>
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Date</label>
-                                <input
-                                    type="date"
-                                    {...register("date", { required: "Date is required" })}
-                                    min={today}
-                                    className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
+                                <DatePicker
+                                    label="Date"
+                                    value={watch("date") || ""}
+                                    onChange={(v) => setValue("date", v)}
+                                    disablePast={true}
+                                    placeholder="Select date"
                                 />
                             </div>
                         </div>

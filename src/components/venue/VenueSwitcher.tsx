@@ -38,7 +38,7 @@ export default function VenueSwitcher({ hideCreateAction = false }: { hideCreate
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700 flex items-center justify-center text-emerald-500 group-hover:border-emerald-500/50 transition-colors">
                     <Building2 className="w-5 h-5" />
                 </div>
-                <div className="text-left hidden md:block flex-1 overflow-hidden">
+                <div className="text-left flex-1 overflow-hidden">
                     <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Current Venue</div>
                     <div className="text-sm font-bold text-white leading-tight truncate">
                         {currentVenue?.name || "Select Venue"}

@@ -5,24 +5,18 @@ import Image from "next/image";
 import { api } from "@/services/api";
 import { Sport, SearchParams } from "@/types";
 import { useToast } from "@/components/ui/Toast";
+import TimePicker from "@/components/ui/TimePicker";
+import DatePicker from "@/components/ui/DatePicker";
 import {
     MapPin,
-    Calendar,
-    Clock,
+    ChevronDown,
     Search,
     Navigation,
-    ChevronDown,
     Loader2,
     Sparkles,
     Building
 } from "lucide-react";
 import { City } from "@/types";
-
-const TIME_SLOTS = [
-    "06:00", "07:00", "08:00", "09:00", "10:00", "11:00",
-    "12:00", "13:00", "14:00", "15:00", "16:00", "17:00",
-    "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"
-];
 
 
 interface CourtFinderPanelProps {
@@ -266,72 +260,36 @@ export default function CourtFinderPanel({ onSearch, initialSport = "All" }: Cou
                             {/* Mobile: Stacked layout, Desktop: Row */}
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                                 {/* Date Picker */}
-                                <div className="relative group">
-                                    <div className="absolute left-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-zinc-700/50">
-                                        <Calendar className="w-4 h-4 text-emerald-400" />
-                                    </div>
-                                    <input
-                                        type="date"
-                                        value={selectedDate}
-                                        onChange={(e) => setSelectedDate(e.target.value)}
-                                        className={`
-                                            w-full bg-zinc-800/70 border border-zinc-700/50 rounded-xl py-3.5 md:py-2.5 pl-12 pr-3
-                                            text-white text-sm font-medium
-                                            focus:outline-none focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20
-                                            hover:border-zinc-600
-                                            transition-all duration-200
-                                            [color-scheme:dark]
-                                        `}
-                                    />
-                                </div>
+                                <DatePicker
+                                    value={selectedDate}
+                                    onChange={setSelectedDate}
+                                    disablePast={true}
+                                    placeholder="Select date"
+                                />
 
                                 {/* Time row on mobile */}
                                 <div className="grid grid-cols-2 gap-3 md:contents">
-                                    {/* Start Time */}
-                                    <div className="relative group">
-                                        <div className="absolute left-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-zinc-700/50">
-                                            <Clock className="w-4 h-4 text-emerald-400" />
-                                        </div>
-                                        <select
-                                            value={startTime}
-                                            onChange={(e) => setStartTime(e.target.value)}
-                                            className={`
-                                                w-full appearance-none bg-zinc-800/70 border border-zinc-700/50 rounded-xl
-                                                py-3.5 md:py-2.5 pl-12 pr-8 text-white text-sm font-medium
-                                                focus:outline-none focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20
-                                                hover:border-zinc-600
-                                                transition-all duration-200 cursor-pointer
-                                            `}
-                                        >
-                                            {TIME_SLOTS.map(time => (
-                                                <option key={time} value={time}>{time}</option>
-                                            ))}
-                                        </select>
-                                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 pointer-events-none" />
-                                    </div>
-
-                                    {/* End Time */}
-                                    <div className="relative group">
-                                        <div className="absolute left-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-zinc-700/50">
-                                            <Clock className="w-4 h-4 text-emerald-400" />
-                                        </div>
-                                        <select
-                                            value={endTime}
-                                            onChange={(e) => setEndTime(e.target.value)}
-                                            className={`
-                                                w-full appearance-none bg-zinc-800/70 border border-zinc-700/50 rounded-xl
-                                                py-3.5 md:py-2.5 pl-12 pr-8 text-white text-sm font-medium
-                                                focus:outline-none focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20
-                                                hover:border-zinc-600
-                                                transition-all duration-200 cursor-pointer
-                                            `}
-                                        >
-                                            {TIME_SLOTS.map(time => (
-                                                <option key={time} value={time}>{time}</option>
-                                            ))}
-                                        </select>
-                                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 pointer-events-none" />
-                                    </div>
+                                    {/* Compute isToday for past-blocking */}
+                                    {(() => {
+                                        const today = new Date().toISOString().split("T")[0];
+                                        const isToday = selectedDate === today;
+                                        return (
+                                            <>
+                                                <TimePicker
+                                                    value={startTime}
+                                                    onChange={setStartTime}
+                                                    disablePast={true}
+                                                    sameDay={isToday}
+                                                />
+                                                <TimePicker
+                                                    value={endTime}
+                                                    onChange={setEndTime}
+                                                    disablePast={true}
+                                                    sameDay={isToday}
+                                                />
+                                            </>
+                                        );
+                                    })()}
                                 </div>
                             </div>
                         </div>

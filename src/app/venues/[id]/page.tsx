@@ -8,7 +8,8 @@ import { formatDistanceToNow } from "date-fns";
 import { api } from "@/services/api";
 import { Review, Venue, VenueSlotsResponse } from "@/types";
 import BookingWidget from "@/components/venues/BookingWidget";
-import { Calendar, CheckCircle, MapPin, Star, Trophy } from "lucide-react";
+import DatePicker from "@/components/ui/DatePicker";
+import { CheckCircle, MapPin, Star, Trophy } from "lucide-react";
 import Button from "@/components/ui/Button";
 
 export default function VenueDetailsPage() {
@@ -123,9 +124,13 @@ export default function VenueDetailsPage() {
             <section>
               <div className="flex justify-between items-end mb-6 gap-4">
                 <h3 className="text-xl font-black text-white uppercase tracking-tight">Live Availability</h3>
-                <div className="relative">
-                  <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} className="rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none" />
-                  <Calendar className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+                <div className="w-56">
+                  <DatePicker
+                    value={selectedDate}
+                    onChange={setSelectedDate}
+                    disablePast={true}
+                    placeholder="Select date"
+                  />
                 </div>
               </div>
 

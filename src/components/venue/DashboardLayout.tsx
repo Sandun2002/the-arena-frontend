@@ -76,9 +76,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         { name: "Booking Manager", path: "/venue-dashboard/booking-manager", icon: Calendar, verifiedOnly: true },
         { name: "Bookings", path: "/venue-dashboard/bookings", icon: CalendarCheck, verifiedOnly: true },
         { name: "Courts", path: "/venue-dashboard/courts", icon: Building2, verifiedOnly: true },
-        { name: "Gallery", path: "/venue-dashboard/gallery", icon: ImageIcon, verifiedOnly: true },
         { name: "Recurring", path: "/venue-dashboard/recurring", icon: Repeat, verifiedOnly: true },
         { name: "Closures", path: "/venue-dashboard/closures", icon: Hammer, verifiedOnly: true },
+        { name: "Gallery", path: "/venue-dashboard/gallery", icon: ImageIcon, verifiedOnly: true },
         { name: "Settings", path: "/venue-dashboard/settings", icon: Settings, verifiedOnly: true },
     ];
 

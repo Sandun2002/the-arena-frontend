@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { Building2, MapPin, Loader2, Info, CheckCircle, ArrowRight, ArrowLeft } from "lucide-react";
 import Button from "@/components/ui/Button";
+import TimePicker from "@/components/ui/TimePicker";
 import { venueApiService } from "@/services/venueApiService";
 import { useToast } from "@/components/ui/Toast";
 import { useAuth } from "@/services/authContext";
@@ -33,11 +34,12 @@ export default function CreateVenuePage() {
     const [mounted, setMounted] = useState(false);
     const searchInputRef = useRef<HTMLInputElement | null>(null);
 
-    const { register, handleSubmit, setValue, formState: { errors } } = useForm({
+    const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm({
         defaultValues: {
             name: "",
             description: "",
-            operating_hours: "06:00 - 23:00",
+            opening_time: "06:00",
+            closing_time: "23:00",
             contact_number: user?.phone_number || "",
             contact_email: user?.email || "",
             city: "",
@@ -45,6 +47,9 @@ export default function CreateVenuePage() {
             amenities: [] as string[]
         }
     });
+
+    const openingTime = watch("opening_time");
+    const closingTime = watch("closing_time");
 
     const amenitiesList = ["Parking", "A/C", "Showers", "Equipment Rental", "Cafe", "WiFi", "Lockers", "First Aid"];
 
@@ -206,13 +211,23 @@ export default function CreateVenuePage() {
                                     </div>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Operating Hours</label>
-                                    <input
-                                        {...register("operating_hours")}
-                                        className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
-                                        placeholder="Ex: 06:00 - 23:00"
-                                    />
+                                <div className="space-y-4">
+                                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider block">Operating Hours</label>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <TimePicker
+                                            label="Opening Time"
+                                            value={openingTime || "06:00"}
+                                            onChange={(v) => setValue("opening_time" as any, v)}
+                                        />
+                                        <TimePicker
+                                            label="Closing Time"
+                                            value={closingTime || "23:00"}
+                                            onChange={(v) => setValue("closing_time" as any, v)}
+                                        />
+                                    </div>
+                                    {openingTime === closingTime && (
+                                        <p className="text-red-500 text-[10px] font-bold mt-1">Opening and closing times must differ</p>
+                                    )}
                                 </div>
 
                                 <Button type="button" onClick={() => setStep("location")} className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-12 text-lg shadow-[0_0_20px_rgba(16,185,129,0.2)]">

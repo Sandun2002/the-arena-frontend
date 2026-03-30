@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { format, addDays, parseISO } from "date-fns";
-import { ChevronLeft, ChevronRight, Loader2, Calendar as CalendarIcon, Clock, User, DollarSign, Wallet, CheckCircle, XCircle, MapPin } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, Calendar as CalendarIcon, Clock, User, DollarSign, Wallet, CheckCircle, XCircle, MapPin, Hammer } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useAuth } from "@/services/authContext";
 import { centerService } from "@/services/centerService";
@@ -98,6 +98,7 @@ export default function BookingManagerPage() {
     const handleNextDay = () => setSelectedDate(prev => addDays(prev, 1));
 
     const openBookingModal = (hour: number) => {
+        if (isVenueClosed) return; // Block opening modal if venue is closed
         setSelectedHour(hour);
         reset({ customer_name: "", customer_phone: "", duration: 1, payment_method: "cash" });
         setIsModalOpen(true);
@@ -352,23 +353,23 @@ export default function BookingManagerPage() {
 
                                                 {/* Badges/Actions */}
                                                 <div className="flex flex-col items-end gap-2">
-                                                    {booking.status === "payment_pending" ? (
+                                                    {booking.status === "blocked" || booking.status === "maintenance" ? (
+                                                        <span className="flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1 rounded-md bg-orange-500/15 text-orange-400 uppercase tracking-widest border border-orange-500/30">
+                                                            <Hammer className="w-3 h-3" /> Maintenance
+                                                        </span>
+                                                    ) : booking.status === "payment_pending" ? (
                                                         <span className="flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1 rounded-md bg-amber-500/20 text-amber-500 uppercase tracking-widest border border-amber-500/30">
                                                             Pending
                                                         </span>
-                                                    ) : booking.status === "blocked" || booking.status === "maintenance" ? (
-                                                        <span className="flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1 rounded-md bg-zinc-500/20 text-zinc-400 uppercase tracking-widest border border-zinc-500/30">
-                                                            <XCircle className="w-3 h-3" /> Blocked
-                                                        </span>
                                                     ) : (
                                                         <span className="flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1 rounded-md bg-emerald-500/20 text-emerald-500 uppercase tracking-widest border border-emerald-500/30">
-                                                            <CheckCircle className="w-3 h-3" /> Paid
+                                                            <CheckCircle className="w-3 h-3" /> Confirmed
                                                         </span>
                                                     )}
 
-                                                    {/* Manager actions for pending walk-ins */}
+                                                    {/* Manager actions for pending walk-ins — always visible on mobile, hover-reveal on desktop */}
                                                     {booking.status === "payment_pending" && (
-                                                        <div className="absolute top-0 right-0 h-full flex items-center gap-1.5 px-3 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-4 group-hover:translate-x-0 bg-gradient-to-l from-amber-500/20 via-amber-500/10 to-transparent">
+                                                        <div className="flex items-center gap-1.5 lg:absolute lg:top-0 lg:right-0 lg:h-full lg:px-3 lg:opacity-0 lg:group-hover:opacity-100 lg:transition-all lg:duration-300 lg:translate-x-4 lg:group-hover:translate-x-0 lg:bg-gradient-to-l lg:from-amber-500/20 lg:via-amber-500/10 lg:to-transparent">
                                                             <button
                                                                 onClick={() => confirmBookingState(booking.id)}
                                                                 title="Mark as Paid"
@@ -389,18 +390,18 @@ export default function BookingManagerPage() {
                                             </div>
                                         ) : (
                                             <div
-                                                onClick={() => !isPast ? openBookingModal(hour) : null}
+                                                onClick={() => !isPast && !isVenueClosed ? openBookingModal(hour) : null}
                                                 className={`h-full rounded-2xl p-4 border transition-all flex items-center justify-between group
-                                                    ${isPast
+                                                    ${isPast || isVenueClosed
                                                         ? "bg-black/20 border-zinc-800/50 cursor-not-allowed"
                                                         : "bg-black/40 border-zinc-800 hover:border-emerald-500/40 hover:bg-emerald-500/5 cursor-pointer shadow-sm hover:shadow-[0_0_20px_rgba(16,185,129,0.1)]"
                                                     }
                                                 `}
                                             >
-                                                <span className={`font-bold ${isPast ? "text-zinc-600" : "text-emerald-500"}`}>
-                                                    Available
+                                                <span className={`font-bold ${isPast || isVenueClosed ? "text-zinc-600" : "text-emerald-500"}`}>
+                                                    {isVenueClosed ? "Closed" : "Available"}
                                                 </span>
-                                                {!isPast && (
+                                                {!isPast && !isVenueClosed && (
                                                     <span className="text-sm font-bold text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity translate-x-2 group-hover:translate-x-0 duration-300 flex items-center gap-1 bg-emerald-500/10 px-3 py-1.5 rounded-lg">
                                                         + Book
                                                     </span>
@@ -476,12 +477,21 @@ export default function BookingManagerPage() {
                                 className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3.5 text-white focus:border-emerald-500 focus:outline-none transition-all placeholder:text-zinc-600 focus:bg-black"
                             />
                             <input
-                                {...register("customer_phone", { required: true })}
-                                placeholder="Phone (Required)"
+                                {...register("customer_phone", {
+                                    required: "Phone number is required",
+                                    pattern: {
+                                        value: /^[0-9]{10}$/,
+                                        message: "Phone must be exactly 10 digits"
+                                    }
+                                })}
+                                type="tel"
+                                maxLength={10}
+                                placeholder="Phone — 10 digits (Required)"
                                 className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3.5 text-white focus:border-emerald-500 focus:outline-none transition-all placeholder:text-zinc-600 focus:bg-black"
                             />
                         </div>
-                        {(errors.customer_name || errors.customer_phone) && <p className="text-red-500 text-xs font-bold">Name and Phone are required.</p>}
+                        {errors.customer_name && <p className="text-red-500 text-xs font-bold mt-1">Name is required.</p>}
+                        {errors.customer_phone && <p className="text-red-500 text-xs font-bold mt-1">{errors.customer_phone.message as string}</p>}
                     </div>
 
                     {/* Payment Method */}

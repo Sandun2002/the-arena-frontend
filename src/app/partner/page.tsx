@@ -279,7 +279,7 @@ export default function PartnerPage() {
                         </p>
 
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                            <Button className="w-full sm:w-auto px-12 py-5 text-xl font-bold rounded-full">
+                            <Button href="/signup/venue" className="w-full sm:w-auto px-12 py-5 text-xl font-bold rounded-full">
                                 Create Partner Account
                             </Button>
                             <p className="text-zinc-500 text-sm mt-4 sm:mt-0 font-medium">
