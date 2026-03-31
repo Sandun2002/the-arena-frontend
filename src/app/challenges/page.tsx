@@ -43,7 +43,7 @@ export default function ChallengesPage() {
         }
     };
 
-    const getProgress = (challengeId: string) => {
+    const getProgress = (challengeId: string | number) => {
         const achievement = gamification?.achievements.find(a => a.challenge_id === challengeId);
         if (!achievement) return 0;
         const challenge = gamification?.challenges.find(c => c.id === challengeId);
@@ -51,7 +51,7 @@ export default function ChallengesPage() {
         return Math.min(100, Math.round((achievement.progress / challenge.target_count) * 100));
     };
 
-    const isCompleted = (challengeId: string) => {
+    const isCompleted = (challengeId: string | number) => {
         return gamification?.achievements.some(a => a.challenge_id === challengeId && a.is_completed);
     };
 

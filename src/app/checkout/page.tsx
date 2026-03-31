@@ -42,7 +42,12 @@ function CheckoutContent() {
                 const venueData = await api.getVenueById(venueId);
                 setVenue(venueData);
                 const price = await bookingService.calculatePrice(courtId, date, [startTime]);
-                setPricing(price);
+                setPricing({
+                    total_price: price.total,
+                    subtotal: price.subtotal,
+                    platform_fee: price.service_fee,
+                    duration_hours: price.duration_hours
+                });
             } catch {
                 addToast("Unable to load checkout details", "error");
             } finally {
