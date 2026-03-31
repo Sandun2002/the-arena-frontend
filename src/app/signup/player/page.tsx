@@ -54,7 +54,7 @@ export default function PlayerSignupPage() {
       });
 
       addToast("Account created successfully! Please log in.", "success");
-      router.push("/login?email=" + encodeURIComponent(data.email));
+      router.push("/check-email?email=" + encodeURIComponent(data.email));
     } catch (error: any) {
       console.error("Signup error details:", error);
       let errorMessage = "Failed to create account.";

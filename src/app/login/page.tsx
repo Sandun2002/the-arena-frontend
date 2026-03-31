@@ -19,6 +19,8 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [emailNotVerified, setEmailNotVerified] = useState(false);
+  const [isResendingVerification, setIsResendingVerification] = useState(false);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -38,23 +40,44 @@ export default function LoginPage() {
     }
 
     setIsLoading(true);
+    setEmailNotVerified(false);
     try {
-      // In real backend: POST /auth/login (form-data)
       const userData = await login(email, password);
-
       addToast("Welcome back!", "success");
-
-      // Redirect logic based on actual user roles
       const isOwnerOrManager = userData.roles.some((r) => r.slug === "venue_owner" || r.slug === "venue_manager");
-
       if (isOwnerOrManager) {
         router.push("/venue-dashboard");
       } else {
         router.push("/profile");
       }
-    } catch (error) {
-      addToast("Invalid email or password", "error");
+    } catch (error: any) {
+      const detail = error?.response?.data?.detail || error?.message || "";
+      if (detail === "email_not_verified") {
+        setEmailNotVerified(true);
+      } else {
+        addToast("Invalid email or password", "error");
+      }
       setIsLoading(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    if (!email) {
+      addToast("Enter your email address above first.", "warning");
+      return;
+    }
+    setIsResendingVerification(true);
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/resend-verification`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      addToast("Verification email sent! Please check your inbox.", "success");
+    } catch {
+      addToast("Failed to resend. Please try again.", "error");
+    } finally {
+      setIsResendingVerification(false);
     }
   };
 
@@ -134,6 +157,29 @@ export default function LoginPage() {
               )}
             </Button>
           </form>
+
+          {/* Email Not Verified Banner */}
+          {emailNotVerified && (
+            <div className="mt-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4">
+              <div className="flex items-start gap-3">
+                <Mail className="w-5 h-5 text-amber-400 mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="text-amber-300 text-sm font-semibold mb-1">Email Not Verified</p>
+                  <p className="text-zinc-400 text-xs leading-relaxed mb-3">
+                    Please verify your email address before logging in.
+                    Check your inbox or click below to resend the link.
+                  </p>
+                  <button
+                    onClick={handleResendVerification}
+                    disabled={isResendingVerification}
+                    className="text-xs bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-black font-bold px-4 py-2 rounded-lg transition-colors"
+                  >
+                    {isResendingVerification ? "Sending..." : "Resend Verification Email"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           <p className="mt-8 text-center text-zinc-500 text-sm">
             Don&apos;t have an account?{" "}

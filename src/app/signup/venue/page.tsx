@@ -54,7 +54,7 @@ export default function VenueSignupPage() {
       // For now just creating the owner account
 
       addToast("Owner account created! Please log in to setup your venue.", "success");
-      router.push("/login?email=" + encodeURIComponent(data.email));
+      router.push("/check-email?email=" + encodeURIComponent(data.email));
     } catch (error: any) {
       console.error("Signup error details:", error);
       let errorMessage = "Failed to create account.";
