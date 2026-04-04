@@ -62,9 +62,7 @@ function VerifyEmailContent() {
         {/* Logo */}
         <div className="text-center mb-10">
           <Link href="/">
-            <span className="font-black text-3xl text-white tracking-tight">
-              ARENA<span className="text-emerald-500">.LK</span>
-            </span>
+            <img src="/logo.png" alt="The Arena" className="h-14 w-auto mx-auto object-contain" />
           </Link>
         </div>
 

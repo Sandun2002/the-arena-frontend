@@ -34,11 +34,8 @@ export default function Header() {
 
         {/* Logo Area */}
         <div className="flex items-center gap-6 min-w-0 shrink-0">
-          <Link href={isVenueContext ? "/venue-dashboard" : "/"} className="flex items-center gap-2 group">
-            <div className="relative w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center overflow-hidden group-hover:bg-white/20 transition-colors">
-              <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500 to-blue-500 opacity-50"></div>
-              <span className="relative font-bold text-white">A</span>
-            </div>
+          <Link href={isVenueContext ? "/venue-dashboard" : "/"} className="flex items-center gap-3 group">
+            <img src="/logo.png" alt="The Arena" className="h-10 w-auto object-contain" />
             <span className="font-black text-xl text-white tracking-tight hidden sm:inline-block">
               ARENA<span className="text-emerald-500">.LK</span>
             </span>

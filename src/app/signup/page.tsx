@@ -28,9 +28,7 @@ export default function SignupSelectionPage() {
 
       <div className="text-center mb-12 relative z-10">
         <Link href="/" className="inline-block mb-8">
-          <span className="font-black text-3xl text-white tracking-tight">
-            ARENA<span className="text-emerald-500">.LK</span>
-          </span>
+          <img src="/logo.png" alt="The Arena" className="h-14 w-auto mx-auto object-contain" />
         </Link>
         <h1 className="text-3xl md:text-5xl font-black text-white mb-4 uppercase tracking-tight">
           Join The <span className="text-emerald-500">Revolution</span>

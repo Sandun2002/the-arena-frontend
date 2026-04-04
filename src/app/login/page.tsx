@@ -93,9 +93,7 @@ export default function LoginPage() {
       <div className="login-card w-full max-w-md relative z-10">
         <div className="text-center mb-8">
           <Link href="/" className="inline-block mb-6 group">
-            <span className="font-black text-3xl text-white tracking-tight">
-              ARENA<span className="text-emerald-500">.LK</span>
-            </span>
+            <img src="/logo.png" alt="The Arena" className="h-14 w-auto mx-auto object-contain" />
           </Link>
           <h1 className="text-2xl font-bold text-white mb-2">Welcome Back</h1>
           <p className="text-zinc-400 text-sm">Sign in to access your account</p>
