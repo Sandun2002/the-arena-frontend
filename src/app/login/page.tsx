@@ -93,9 +93,7 @@ export default function LoginPage() {
       <div className="login-card w-full max-w-md relative z-10">
         <div className="text-center mb-8">
           <Link href="/" className="inline-block mb-6 group">
-            <div className="h-20 w-20 mx-auto overflow-hidden rounded-full drop-shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-transform group-hover:scale-105">
-              <img src="/logo.png" alt="The Arena" className="h-full max-w-none object-left" />
-            </div>
+            <img src="/logo-full.png" alt="The Arena" className="h-20 w-auto mx-auto object-contain drop-shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-transform group-hover:scale-105" />
           </Link>
           <h1 className="text-2xl font-bold text-white mb-2">Welcome Back</h1>
           <p className="text-zinc-400 text-sm">Sign in to access your account</p>

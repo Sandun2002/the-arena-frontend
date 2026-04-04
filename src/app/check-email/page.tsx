@@ -51,9 +51,7 @@ function CheckEmailContent() {
       <div className="relative z-10 w-full max-w-md">
         <div className="text-center mb-10">
           <Link href="/" className="inline-block group">
-            <div className="h-20 w-20 mx-auto overflow-hidden rounded-full drop-shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-transform group-hover:scale-105">
-              <img src="/logo.png" alt="The Arena" className="h-full max-w-none object-left" />
-            </div>
+            <img src="/logo-full.png" alt="The Arena" className="h-20 w-auto mx-auto object-contain drop-shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-transform group-hover:scale-105" />
           </Link>
         </div>
 
