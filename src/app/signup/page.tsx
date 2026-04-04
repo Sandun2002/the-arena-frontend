@@ -27,8 +27,8 @@ export default function SignupSelectionPage() {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-emerald-900/10 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="text-center mb-12 relative z-10">
-        <Link href="/" className="inline-block mb-8">
-          <img src="/logo.png" alt="The Arena" className="h-14 w-auto mx-auto object-contain" />
+        <Link href="/" className="inline-block mb-8 group">
+          <img src="/logo.png" alt="The Arena" className="h-20 w-auto mx-auto object-contain drop-shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-transform group-hover:scale-105" />
         </Link>
         <h1 className="text-3xl md:text-5xl font-black text-white mb-4 uppercase tracking-tight">
           Join The <span className="text-emerald-500">Revolution</span>
