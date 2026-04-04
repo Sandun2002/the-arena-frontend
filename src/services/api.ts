@@ -69,14 +69,23 @@ export const api = {
   },
 
   searchVenues: async (params: SearchParams): Promise<VenueSearchResponse> => {
+    // Build clean params — only send keys the backend accepts, skip undefined values
+    const cleanParams: Record<string, any> = {};
+
+    if (params.sport)       cleanParams.sport       = params.sport;
+    if (params.date)        cleanParams.date         = params.date;
+    if (params.start_time)  cleanParams.start_time   = params.start_time;
+    if (params.end_time)    cleanParams.end_time     = params.end_time;
+    if (params.city)        cleanParams.city         = params.city;
+    if (params.lat != null) cleanParams.lat          = params.lat;
+    if (params.lng != null) cleanParams.lng          = params.lng;
+    if (params.radius_km != null) cleanParams.radius_km = params.radius_km;
+    if (params.sort_by)     cleanParams.sort_by      = params.sort_by;
+    if (params.page)        cleanParams.page         = params.page;
+    if (params.page_size)   cleanParams.page_size    = params.page_size;
+
     const response = await apiClient.get<VenueSearchResponse>('/search/courts', {
-      params: {
-        ...params,
-        page: undefined,
-        page_size: undefined,
-        limit: params.page_size,
-        skip: params.page && params.page_size ? (params.page - 1) * params.page_size : 0,
-      },
+      params: cleanParams,
     });
     return response.data;
   },
