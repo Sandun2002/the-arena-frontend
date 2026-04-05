@@ -6,7 +6,7 @@ import { normalizeVenue, normalizeVenueManager } from "./normalizers";
 export const venueApiService = {
     // === Venue CRUD ===
     createVenue: async (data: Partial<Venue>) => {
-        const response = await apiClient.post<Venue>('/venues', data);
+        const response = await apiClient.post<Venue>('/venues/', data);
         return response.data;
     },
 
