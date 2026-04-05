@@ -114,10 +114,14 @@ export default function CreateVenuePage() {
 
             // 2. Create the venue with the returned document URL
             await venueApiService.createVenue({
-                ...data,
-                sport: "generic", // Default for now, could be added to form
-                location: data.city, // Backward compatibility
-                owner_id: user?.id,
+                name: data.name,
+                description: data.description,
+                opening_time: data.opening_time,
+                closing_time: data.closing_time,
+                phone_contact: data.contact_number,
+                city: data.city,
+                address: data.address,
+                amenities: data.amenities,
                 br_document_url: brDocumentUrl,
                 geo_lat: geoLat,
                 geo_lng: geoLng

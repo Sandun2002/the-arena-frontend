@@ -34,7 +34,7 @@ export default function SignupSelectionPage() {
           Join The <span className="text-emerald-500">Revolution</span>
         </h1>
         <p className="text-zinc-400 max-w-md mx-auto">
-          Choose how you want to use Arena.lk. Are you here to play, or here to host?
+          Choose how you want to use TheArena.lk. Are you here to play, or here to host?
         </p>
       </div>
 

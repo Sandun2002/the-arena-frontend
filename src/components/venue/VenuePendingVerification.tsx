@@ -41,7 +41,7 @@ export default function VenuePendingVerification({ venue }: VenuePendingVerifica
                             <div>
                                 <p className="text-sm font-bold text-white mb-1">Why is this required?</p>
                                 <p className="text-xs text-zinc-500 leading-relaxed">
-                                    To maintain the highest quality and security on Arena.lk, all venues must undergo a manual verification process before they can accept public bookings.
+                                    To maintain the highest quality and security on TheArena.lk, all venues must undergo a manual verification process before they can accept public bookings.
                                 </p>
                             </div>
                         </div>

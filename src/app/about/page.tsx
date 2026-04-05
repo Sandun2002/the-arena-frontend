@@ -65,7 +65,7 @@ export default function AboutPage() {
                                 After weeks of busy schedules, when you and your friends finally align on a time to play, the last thing you want is to discover that every venue is booked.
                             </p>
                             <p className="text-white font-bold text-2xl pt-4">
-                                It was this exact frustration—the difficulty of finding a place for that one precious window of free time—that sparked the idea for ARENA.LK.
+                                It was this exact frustration—the difficulty of finding a place for that one precious window of free time—that sparked the idea for TheArena.lk.
                             </p>
                         </div>
                     </div>
@@ -119,7 +119,7 @@ export default function AboutPage() {
 
                     <div className="prose prose-lg prose-invert mx-auto text-zinc-400 leading-relaxed">
                         <p className="mb-8 text-xl">
-                            Our goal is to bring sports back into the lives of everyday Sri Lankans. Whether you&apos;re a casual player, a pro athlete, or a facility owner, ARENA.LK is here to make the experience seamless.
+                            Our goal is to bring sports back into the lives of everyday Sri Lankans. Whether you're a casual player, a pro athlete, or a facility owner, TheArena.lk is here to make the experience seamless.
                         </p>
                         <p className="text-white font-medium text-2xl">
                             Join us in making every game easier to play and every match a chance to connect.

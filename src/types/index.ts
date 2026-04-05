@@ -75,6 +75,7 @@ export interface Venue {
   is_featured: boolean;
   status: VenueStatus;
   cover_image: string | null;
+  br_document_url?: string | null;
   gallery_images: { id: string; url: string; is_cover: boolean; display_order: number }[];
   courts: Court[];
   operating_hours: {

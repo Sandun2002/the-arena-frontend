@@ -112,7 +112,7 @@ export default function VenueSignupPage() {
                 {...register("email")}
                 type="email"
                 className="w-full rounded-xl border border-zinc-700 bg-black/50 p-3 text-white focus:border-blue-500 focus:outline-none transition-colors"
-                placeholder="owner@arena.lk"
+                placeholder="owner@thearena.lk"
               />
               {errors.email && <p className="text-red-500 text-xs">{errors.email.message}</p>}
             </div>
