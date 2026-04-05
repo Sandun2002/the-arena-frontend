@@ -1,20 +1,18 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { Building2, MapPin, Loader2, Info, CheckCircle, ArrowRight, ArrowLeft } from "lucide-react";
+import { Building2, MapPin, Loader2, Info, CheckCircle, ArrowRight, ArrowLeft, Link2, ExternalLink } from "lucide-react";
 import Button from "@/components/ui/Button";
 import TimePicker from "@/components/ui/TimePicker";
 import { venueApiService } from "@/services/venueApiService";
 import { useToast } from "@/components/ui/Toast";
 import { useAuth } from "@/services/authContext";
 import { useVenue } from "@/components/venue/VenueContext";
-import Script from "next/script";
 import { api } from "@/services/api";
 import { City } from "@/types";
-import { useRef, useEffect } from "react";
 
 type Step = "details" | "location" | "amenities" | "document";
 
@@ -28,11 +26,11 @@ export default function CreateVenuePage() {
     const [brDocument, setBrDocument] = useState<File | null>(null);
     const [geoLat, setGeoLat] = useState<number | null>(null);
     const [geoLng, setGeoLng] = useState<number | null>(null);
-    const [mapLoaded, setMapLoaded] = useState(false);
+    const [mapsLink, setMapsLink] = useState("");
+    const [mapsLinkError, setMapsLinkError] = useState<string | null>(null);
     const [availableCities, setAvailableCities] = useState<City[]>([]);
     const [isLoadingCities, setIsLoadingCities] = useState(false);
     const [mounted, setMounted] = useState(false);
-    const searchInputRef = useRef<HTMLInputElement | null>(null);
 
     const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm({
         defaultValues: {
@@ -53,36 +51,54 @@ export default function CreateVenuePage() {
 
     const amenitiesList = ["Parking", "A/C", "Showers", "Equipment Rental", "Cafe", "WiFi", "Lockers", "First Aid"];
 
-    const initAutocomplete = () => {
-        if (!(window as any).google || !searchInputRef.current) return;
+    const parseGoogleMapsLink = (url: string) => {
+        setMapsLink(url);
+        setMapsLinkError(null);
+        setGeoLat(null);
+        setGeoLng(null);
 
-        const autocomplete = new (window as any).google.maps.places.Autocomplete(searchInputRef.current, {
-            types: ['address'],
-            componentRestrictions: { country: 'lk' }
-        });
+        if (!url.trim()) return;
 
-        autocomplete.addListener('place_changed', () => {
-            const place = autocomplete.getPlace();
-            if (!place.geometry || !place.geometry.location) return;
-
-            setGeoLat(place.geometry.location.lat());
-            setGeoLng(place.geometry.location.lng());
-            setValue("address", place.formatted_address || "");
-
-            const cityComp = place.address_components?.find((c: any) => 
-                c.types.includes('locality') || c.types.includes('administrative_area_level_2')
-            );
-            if (cityComp) {
-                setValue("city", cityComp.long_name);
-            }
-        });
-    };
-
-    useEffect(() => {
-        if (mapLoaded && step === "location" && searchInputRef.current) {
-            initAutocomplete();
+        // Validate it's a Google Maps URL
+        if (!url.match(/google\.com\/maps|maps\.google|maps\.app\.goo\.gl|goo\.gl\/maps/i)) {
+            setMapsLinkError("Please paste a valid Google Maps link.");
+            return;
         }
-    }, [mapLoaded, step]);
+
+        // Pattern 1: /@LAT,LNG (most common when sharing from Maps)
+        const atMatch = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+        if (atMatch) {
+            setGeoLat(parseFloat(atMatch[1]));
+            setGeoLng(parseFloat(atMatch[2]));
+            return;
+        }
+
+        // Pattern 2: ?q=LAT,LNG or &q=LAT,LNG
+        const qMatch = url.match(/[?&]q=(-?\d+\.\d+),(-?\d+\.\d+)/);
+        if (qMatch) {
+            setGeoLat(parseFloat(qMatch[1]));
+            setGeoLng(parseFloat(qMatch[2]));
+            return;
+        }
+
+        // Pattern 3: /place/LAT,LNG
+        const placeMatch = url.match(/\/place\/(-?\d+\.\d+),(-?\d+\.\d+)/);
+        if (placeMatch) {
+            setGeoLat(parseFloat(placeMatch[1]));
+            setGeoLng(parseFloat(placeMatch[2]));
+            return;
+        }
+
+        // Pattern 4: !3dLAT!4dLNG (embedded/iframe format)
+        const embedMatch = url.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/);
+        if (embedMatch) {
+            setGeoLat(parseFloat(embedMatch[1]));
+            setGeoLng(parseFloat(embedMatch[2]));
+            return;
+        }
+
+        setMapsLinkError("Could not extract coordinates. Try right-clicking the location on Google Maps and copying the link.");
+    };
 
     useEffect(() => {
         setMounted(true);
@@ -250,18 +266,45 @@ export default function CreateVenuePage() {
                                     <h2 className="text-xl font-bold text-white">Location</h2>
                                 </div>
 
+                                {/* Google Maps Link Input */}
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Search on Google Maps</label>
-                                    <input
-                                        ref={searchInputRef}
-                                        className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
-                                        placeholder="Search for address..."
-                                    />
+                                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1.5">
+                                        <Link2 className="w-3 h-3" /> Google Maps Location Link <span className="text-red-500">*</span>
+                                    </label>
+                                    <div className="relative">
+                                        <input
+                                            type="url"
+                                            value={mapsLink}
+                                            onChange={(e) => parseGoogleMapsLink(e.target.value)}
+                                            className={`w-full bg-black/50 border rounded-xl px-4 py-3 text-white focus:outline-none transition-colors pr-10 ${
+                                                mapsLinkError ? "border-red-500/50 focus:border-red-500" :
+                                                geoLat ? "border-emerald-500/50 focus:border-emerald-500" :
+                                                "border-zinc-700 focus:border-blue-500"
+                                            }`}
+                                            placeholder="https://maps.google.com/maps?q=..."
+                                        />
+                                        {geoLat && (
+                                            <CheckCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-500" />
+                                        )}
+                                    </div>
+                                    {mapsLinkError && <p className="text-red-400 text-xs mt-1">{mapsLinkError}</p>}
+                                    {!mapsLink && <p className="text-zinc-600 text-[11px] mt-1">Open Google Maps → Find your venue → Share → Copy link → Paste here</p>}
                                 </div>
+
+                                {/* Coordinates Display */}
+                                {geoLat && geoLng && (
+                                    <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 flex items-center gap-3">
+                                        <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+                                        <div>
+                                            <p className="text-sm font-bold text-emerald-400">Coordinates detected</p>
+                                            <p className="text-xs text-emerald-300/70 font-mono mt-0.5">{geoLat.toFixed(6)}, {geoLng.toFixed(6)}</p>
+                                        </div>
+                                    </div>
+                                )}
 
                                 <div className="grid grid-cols-2 gap-4">
                                      <div className="space-y-2">
-                                        <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">City</label>
+                                        <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">City <span className="text-red-500">*</span></label>
                                         <select
                                             {...register("city", { required: "City is required" })}
                                             className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none"
@@ -277,42 +320,39 @@ export default function CreateVenuePage() {
                                         {isLoadingCities && <p className="text-zinc-500 text-[10px] mt-1 animate-pulse">Loading cities...</p>}
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Coordinates</label>
-                                        <div className="h-12 bg-black/30 border border-zinc-800 rounded-xl px-4 flex items-center text-xs text-zinc-500 italic">
-                                            {geoLat ? `${geoLat.toFixed(4)}, ${geoLng?.toFixed(4)}` : "Auto-detected from search"}
-                                        </div>
+                                        <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Full Address <span className="text-red-500">*</span></label>
+                                        <input
+                                            {...register("address", { required: "Address is required" })}
+                                            className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
+                                            placeholder="Street, Area, etc."
+                                        />
+                                        {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address.message as string}</p>}
                                     </div>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Full Address</label>
-                                    <textarea
-                                        {...register("address", { required: "Address is required" })}
-                                        rows={1}
-                                        className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors resize-none"
-                                        placeholder="Street, Area, etc."
-                                    />
-                                    {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address.message as string}</p>}
                                 </div>
 
                                 <div className="bg-blue-500/10 p-4 rounded-xl flex gap-3 items-start border border-blue-500/20">
                                     <Info className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
                                     <div className="text-sm text-blue-200/80 leading-relaxed">
-                                        <span className="font-bold text-blue-400 block mb-1">Interactive Setup</span>
-                                        Find your venue on the map above to automatically sync coordinates. This ensures better visibility in "Near Me" searches.
+                                        <span className="font-bold text-blue-400 block mb-1">How to get your Google Maps link</span>
+                                        Open <a href="https://maps.google.com" target="_blank" rel="noopener noreferrer" className="text-blue-400 underline inline-flex items-center gap-1">Google Maps <ExternalLink className="w-3 h-3" /></a>, search for your venue, right-click the exact location, and select &quot;Share&quot; → &quot;Copy link&quot;. Paste it above to auto-detect your coordinates.
                                     </div>
                                 </div>
-
-                                <Script 
-                                    src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
-                                    onLoad={() => setMapLoaded(true)}
-                                />
 
                                 <div className="flex gap-3 pt-4">
                                     <Button type="button" variant="ghost" onClick={() => setStep("details")} className="flex-1 h-12 text-zinc-400 hover:text-white">
                                         <ArrowLeft className="w-5 h-5 mr-2" /> Back
                                     </Button>
-                                    <Button type="button" onClick={() => setStep("amenities")} className="flex-[2] bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-12 text-lg shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+                                    <Button
+                                        type="button"
+                                        onClick={() => {
+                                            if (!geoLat || !geoLng) {
+                                                setMapsLinkError("Please paste a valid Google Maps link to set your venue location.");
+                                                return;
+                                            }
+                                            setStep("amenities");
+                                        }}
+                                        className="flex-[2] bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-12 text-lg shadow-[0_0_20px_rgba(16,185,129,0.2)]"
+                                    >
                                         Next: Amenities <ArrowRight className="w-5 h-5 ml-2" />
                                     </Button>
                                 </div>
