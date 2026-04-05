@@ -1,16 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { format, addDays, parseISO } from "date-fns";
-import { ChevronLeft, ChevronRight, Loader2, Calendar as CalendarIcon, Clock, User, DollarSign, Wallet, CheckCircle, XCircle, MapPin, Hammer } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
+import { format, addDays, isSameDay } from "date-fns";
+import { ChevronLeft, ChevronRight, Loader2, Calendar as CalendarIcon, Clock, DollarSign, CheckCircle, XCircle, MapPin, Hammer, Globe, UserPlus, UserCheck, Repeat, Zap, RefreshCcw } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useAuth } from "@/services/authContext";
 import { centerService } from "@/services/centerService";
-import { Booking, Court } from "@/types";
+import { Booking, Court, RecurringBlock } from "@/types";
 import { useVenue } from "@/components/venue/VenueContext";
 import { useToast } from "@/components/ui/Toast";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
+
+function getBookingType(booking: Booking): "platform" | "walkin" | "maintenance" {
+    if (booking.status === "blocked" || booking.status === "maintenance") return "maintenance";
+    if (booking.is_manual) return "walkin";
+    return "platform";
+}
 
 export default function BookingManagerPage() {
     const { user } = useAuth();
@@ -19,12 +25,16 @@ export default function BookingManagerPage() {
 
     const [courts, setCourts] = useState<Court[]>([]);
     const [bookings, setBookings] = useState<Booking[]>([]);
+    const [recurringBlocks, setRecurringBlocks] = useState<RecurringBlock[]>([]);
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [activeCourtId, setActiveCourtId] = useState<string>("");
     const [isLoading, setIsLoading] = useState(true);
+    const [lastSynced, setLastSynced] = useState<Date>(new Date());
     
     const [operatingSchedule, setOperatingSchedule] = useState<any[]>([]);
     const [isVenueClosed, setIsVenueClosed] = useState(false);
+
+    const prevBookingIdsRef = useRef<Set<string>>(new Set());
 
     // Modal State
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -49,13 +59,14 @@ export default function BookingManagerPage() {
     useEffect(() => {
         if (currentVenue) {
             loadSchedule();
-            const intervalId = setInterval(loadSchedule, 30000); // 30s polling
+            const isToday = isSameDay(selectedDate, new Date());
+            const pollMs = isToday ? 15000 : 30000;
+            const intervalId = setInterval(loadSchedule, pollMs);
             return () => clearInterval(intervalId);
         }
     }, [currentVenue, selectedDate]);
 
     useEffect(() => {
-        // Set first court active by default if not set
         if (courts.length > 0 && !activeCourtId) {
             setActiveCourtId(courts[0].id);
         }
@@ -66,25 +77,38 @@ export default function BookingManagerPage() {
         setIsLoading(true);
         try {
             const dateStr = format(selectedDate, 'yyyy-MM-dd');
-            const [courtsData, bookingsData, profileData, closuresData] = await Promise.all([
+            const [courtsData, scheduleData, profileData, closuresData] = await Promise.all([
                 centerService.getCourts(currentVenue.id),
                 centerService.getBookingsByDate(dateStr, currentVenue.id),
                 centerService.getProfile(currentVenue.id),
                 centerService.getClosures(currentVenue.id, false)
             ]);
             setCourts(courtsData);
-            setBookings(bookingsData);
+            setBookings(scheduleData.bookings);
+            setRecurringBlocks(scheduleData.recurringBlocks);
             setOperatingSchedule(profileData?.operating_schedule || []);
+            setLastSynced(new Date());
 
-            // Check if venue is closed on selected date
-            const isClosedDate = closuresData.some((c: any) => {
-                const start = new Date(c.start_date);
-                start.setHours(0, 0, 0, 0); // normalize time for correct date matching
-                const end = new Date(c.end_date);
+            // Detect new bookings for toast
+            const currentIds = new Set(scheduleData.bookings.map(b => b.id));
+            if (prevBookingIdsRef.current.size > 0) {
+                const newCount = [...currentIds].filter(id => !prevBookingIdsRef.current.has(id)).length;
+                if (newCount > 0) {
+                    addToast(`${newCount} new booking${newCount > 1 ? 's' : ''} arrived!`, "success");
+                }
+            }
+            prevBookingIdsRef.current = currentIds;
+
+            // Check closure from schedule data or manual closure list
+            const isClosedFromSchedule = scheduleData.isClosed;
+            const isClosedFromList = closuresData.some((c: any) => {
+                const start = new Date(c.start_date ?? c.closure_date);
+                start.setHours(0, 0, 0, 0);
+                const end = c.end_date ? new Date(c.end_date) : new Date(start);
                 end.setHours(23, 59, 59, 999);
                 return selectedDate >= start && selectedDate <= end;
             });
-            setIsVenueClosed(isClosedDate);
+            setIsVenueClosed(isClosedFromSchedule || isClosedFromList);
 
         } catch (error) {
             console.error("Failed to load calendar data", error);
@@ -98,7 +122,7 @@ export default function BookingManagerPage() {
     const handleNextDay = () => setSelectedDate(prev => addDays(prev, 1));
 
     const openBookingModal = (hour: number) => {
-        if (isVenueClosed) return; // Block opening modal if venue is closed
+        if (isVenueClosed) return;
         setSelectedHour(hour);
         reset({ customer_name: "", customer_phone: "", duration: 1, payment_method: "cash" });
         setIsModalOpen(true);
@@ -109,16 +133,11 @@ export default function BookingManagerPage() {
         setIsSubmitting(true);
         try {
             const dateStr = format(selectedDate, 'yyyy-MM-dd');
-            // Format time correctly (e.g. "08:00")
             const timeStr = `${selectedHour.toString().padStart(2, '0')}:00`;
             const startDateTime = new Date(`${dateStr}T${timeStr}`);
-
-            // Calculate end time
             const endDateTime = new Date(startDateTime);
             endDateTime.setHours(startDateTime.getHours() + data.duration);
 
-            // If start time is in the past, adjust it to "now" + 1 min buffer to satisfy backend validation 
-            // (server might have strict "must be in future" check)
             const now = new Date();
             const finalStartDateTime = startDateTime < now ? new Date(now.getTime() + 60000) : startDateTime;
 
@@ -172,26 +191,18 @@ export default function BookingManagerPage() {
         
         const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
         const currentDayName = dayNames[selectedDate.getDay()];
-        
         const daySchedule = operatingSchedule.find(s => s.day.toLowerCase() === currentDayName);
         
         if (!daySchedule || daySchedule.is_closed || !daySchedule.open || !daySchedule.close) {
-            return []; // Closed or no hours configured
+            return [];
         }
         
         const openHour = parseInt(daySchedule.open.split(':')[0], 10);
         let closeHour = parseInt(daySchedule.close.split(':')[0], 10);
-        
-        // Handle midnight or overnight edge cases for the current day's view
-        if (closeHour === 0 || closeHour < openHour) {
-             closeHour = 24;
-        }
-        
-        const start = Math.max(0, openHour);
-        const end = Math.min(24, closeHour);
+        if (closeHour === 0 || closeHour < openHour) closeHour = 24;
         
         const hoursList = [];
-        for (let i = start; i < end; i++) {
+        for (let i = Math.max(0, openHour); i < Math.min(24, closeHour); i++) {
             hoursList.push(i);
         }
         return hoursList;
@@ -217,6 +228,19 @@ export default function BookingManagerPage() {
         });
     };
 
+    const getRecurringForSlot = (courtId: string, hour: number) => {
+        const slotStart = new Date(selectedDate);
+        slotStart.setHours(hour, 0, 0, 0);
+        const slotEnd = new Date(slotStart);
+        slotEnd.setHours(hour + 1);
+
+        return recurringBlocks.find(rb => {
+            const bStart = new Date(rb.start_time);
+            const bEnd = new Date(rb.end_time);
+            return rb.court_id === courtId && bStart < slotEnd && bEnd > slotStart;
+        });
+    };
+
     if (!user) return null;
 
     if (!currentVenue) {
@@ -236,7 +260,13 @@ export default function BookingManagerPage() {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-6 bg-zinc-900/50 border border-zinc-800 rounded-3xl backdrop-blur-sm gap-4">
                 <div>
                     <h1 className="text-3xl font-black text-white uppercase tracking-tight mb-1">Booking Manager</h1>
-                    <p className="text-zinc-400">Manage slots for <span className="text-emerald-500 font-bold">{activeCourt?.name || "the venue"}</span></p>
+                    <div className="flex items-center gap-3">
+                        <p className="text-zinc-400">Manage slots for <span className="text-emerald-500 font-bold">{activeCourt?.name || "the venue"}</span></p>
+                        <span className="flex items-center gap-1.5 text-[10px] text-zinc-600 font-medium">
+                            <RefreshCcw className="w-3 h-3" />
+                            {format(lastSynced, "HH:mm:ss")}
+                        </span>
+                    </div>
                 </div>
 
                 {/* Date Picker (Top Right) */}
@@ -248,16 +278,15 @@ export default function BookingManagerPage() {
                     <div className="px-2 relative cursor-pointer group hover:bg-zinc-800 rounded-lg transition-colors py-2 flex items-center gap-2" onClick={() => (document.getElementById('date-picker') as HTMLInputElement)?.showPicker()}>
                         <CalendarIcon className="w-4 h-4 text-emerald-500 group-hover:scale-110 transition-transform" />
                         <span className="text-white font-bold text-sm tracking-wide">{format(selectedDate, "MM/dd/yyyy")}</span>
-                        <CalendarIcon className="w-4 h-4 text-zinc-500 group-hover:text-emerald-500 transition-colors" />
-
-                        {/* Hidden Native Date Picker overlay */}
+                        {isSameDay(selectedDate, new Date()) && (
+                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">TODAY</span>
+                        )}
                         <input
                             id="date-picker"
                             type="date"
                             value={format(selectedDate, "yyyy-MM-dd")}
                             onChange={(e) => {
                                 if (e.target.value) {
-                                    // Make sure to parse it safely into local time avoiding timezone shift issues
                                     const parts = e.target.value.split('-');
                                     if (parts.length === 3) {
                                         setSelectedDate(new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
@@ -313,106 +342,90 @@ export default function BookingManagerPage() {
                         <p>No courts available. Please add courts first.</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-4">
-                        {hours.map(hour => {
-                            const slotStart = new Date(selectedDate);
-                            slotStart.setHours(hour, 0, 0, 0);
-                            const slotEnd = new Date(slotStart);
-                            slotEnd.setHours(hour + 1);
+                    <>
+                        {/* Legend */}
+                        <div className="flex flex-wrap items-center gap-4 mb-6 pb-4 border-b border-zinc-800/60">
+                            <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">Legend</span>
+                            <div className="flex items-center gap-1.5 text-[11px] text-zinc-400">
+                                <Globe className="w-3 h-3 text-blue-400" />
+                                <span>Platform</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-[11px] text-zinc-400">
+                                <UserPlus className="w-3 h-3 text-orange-400" />
+                                <span>Walk-in</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-[11px] text-zinc-400">
+                                <Repeat className="w-3 h-3 text-indigo-400" />
+                                <span>Recurring</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-[11px] text-zinc-400">
+                                <Hammer className="w-3 h-3 text-zinc-500" />
+                                <span>Maintenance</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-[11px] text-zinc-400">
+                                <Zap className="w-3 h-3 text-green-400" />
+                                <span>Live Now</span>
+                            </div>
+                        </div>
 
-                            const booking = getBookingForSlot(activeCourtId, hour);
-                            const isPast = slotStart < new Date();
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-4">
+                            {hours.map(hour => {
+                                const slotStart = new Date(selectedDate);
+                                slotStart.setHours(hour, 0, 0, 0);
+                                const slotEnd = new Date(slotStart);
+                                slotEnd.setHours(hour + 1);
 
-                            return (
-                                <div key={hour} className={`flex gap-4 ${isPast && !booking ? 'opacity-50' : ''}`}>
-                                    {/* Time Indicator */}
-                                    <div className="w-24 flex-shrink-0 text-right pt-4">
-                                        <p className="text-sm font-bold text-zinc-300">{format(slotStart, "h:mm a")}</p>
-                                        <p className="text-xs text-zinc-600 font-medium">to {format(slotEnd, "h:mm a")}</p>
-                                    </div>
+                                const booking = getBookingForSlot(activeCourtId, hour);
+                                const recurring = !booking ? getRecurringForSlot(activeCourtId, hour) : undefined;
+                                const isPast = slotStart < new Date();
+                                const isLive = slotStart <= new Date() && new Date() < slotEnd;
 
-                                    {/* Slot Card */}
-                                    <div className="flex-1 min-h-[85px]">
-                                        {booking ? (
-                                            <div className={`
-                                                h-full rounded-2xl p-4 border transition-all flex justify-between items-center group relative overflow-hidden backdrop-blur-sm
-                                                ${booking.status === "blocked" || booking.status === "maintenance"
-                                                    ? "bg-zinc-800/50 border-zinc-700/50 shadow-[inset_4px_0_0_0_rgba(161,161,170,1)] hover:bg-zinc-800/70"
-                                                    : booking.status === "confirmed" || booking.payment_status === "paid"
-                                                    ? "bg-emerald-500/10 border-emerald-500/20 shadow-[inset_4px_0_0_0_rgba(16,185,129,1)] hover:bg-emerald-500/15"
-                                                    : "bg-amber-500/10 border-amber-500/20 shadow-[inset_4px_0_0_0_rgba(245,158,11,1)] hover:bg-amber-500/15"
-                                                }
-                                            `}>
-                                                {/* Details */}
-                                                <div>
-                                                    <p className="font-bold text-white text-base">{booking.user?.full_name || booking.customer_name || "Guest"}</p>
-                                                    <p className={`text-xs mt-1 font-medium ${booking.status === "confirmed" || booking.payment_status === "paid" ? "text-emerald-500/70" : "text-amber-500/70"}`}>
-                                                        {activeCourt?.name}
-                                                    </p>
-                                                </div>
+                                return (
+                                    <div key={hour} className={`flex gap-4 ${isPast && !booking && !recurring ? 'opacity-50' : ''}`}>
+                                        {/* Time Indicator */}
+                                        <div className="w-24 flex-shrink-0 text-right pt-4">
+                                            <p className={`text-sm font-bold ${isLive ? 'text-green-400' : 'text-zinc-300'}`}>{format(slotStart, "h:mm a")}</p>
+                                            <p className="text-xs text-zinc-600 font-medium">to {format(slotEnd, "h:mm a")}</p>
+                                        </div>
 
-                                                {/* Badges/Actions */}
-                                                <div className="flex flex-col items-end gap-2">
-                                                    {booking.status === "blocked" || booking.status === "maintenance" ? (
-                                                        <span className="flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1 rounded-md bg-orange-500/15 text-orange-400 uppercase tracking-widest border border-orange-500/30">
-                                                            <Hammer className="w-3 h-3" /> Maintenance
-                                                        </span>
-                                                    ) : booking.status === "payment_pending" ? (
-                                                        <span className="flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1 rounded-md bg-amber-500/20 text-amber-500 uppercase tracking-widest border border-amber-500/30">
-                                                            Pending
-                                                        </span>
-                                                    ) : (
-                                                        <span className="flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1 rounded-md bg-emerald-500/20 text-emerald-500 uppercase tracking-widest border border-emerald-500/30">
-                                                            <CheckCircle className="w-3 h-3" /> Confirmed
-                                                        </span>
-                                                    )}
-
-                                                    {/* Manager actions for pending walk-ins — always visible on mobile, hover-reveal on desktop */}
-                                                    {booking.status === "payment_pending" && (
-                                                        <div className="flex items-center gap-1.5 lg:absolute lg:top-0 lg:right-0 lg:h-full lg:px-3 lg:opacity-0 lg:group-hover:opacity-100 lg:transition-all lg:duration-300 lg:translate-x-4 lg:group-hover:translate-x-0 lg:bg-gradient-to-l lg:from-amber-500/20 lg:via-amber-500/10 lg:to-transparent">
-                                                            <button
-                                                                onClick={() => confirmBookingState(booking.id)}
-                                                                title="Mark as Paid"
-                                                                className="p-2 bg-emerald-500/20 text-emerald-500 hover:bg-emerald-500 hover:text-black rounded-xl transition-all shadow-lg active:scale-95"
-                                                            >
-                                                                <CheckCircle className="w-5 h-5" />
-                                                            </button>
-                                                            <button
-                                                                onClick={() => cancelBookingState(booking.id)}
-                                                                title="Cancel Booking"
-                                                                className="p-2 bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-white rounded-xl transition-all shadow-lg active:scale-95"
-                                                            >
-                                                                <XCircle className="w-5 h-5" />
-                                                            </button>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div
-                                                onClick={() => !isPast && !isVenueClosed ? openBookingModal(hour) : null}
-                                                className={`h-full rounded-2xl p-4 border transition-all flex items-center justify-between group
-                                                    ${isPast || isVenueClosed
-                                                        ? "bg-black/20 border-zinc-800/50 cursor-not-allowed"
-                                                        : "bg-black/40 border-zinc-800 hover:border-emerald-500/40 hover:bg-emerald-500/5 cursor-pointer shadow-sm hover:shadow-[0_0_20px_rgba(16,185,129,0.1)]"
-                                                    }
-                                                `}
-                                            >
-                                                <span className={`font-bold ${isPast || isVenueClosed ? "text-zinc-600" : "text-emerald-500"}`}>
-                                                    {isVenueClosed ? "Closed" : "Available"}
-                                                </span>
-                                                {!isPast && !isVenueClosed && (
-                                                    <span className="text-sm font-bold text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity translate-x-2 group-hover:translate-x-0 duration-300 flex items-center gap-1 bg-emerald-500/10 px-3 py-1.5 rounded-lg">
-                                                        + Book
+                                        {/* Slot Card */}
+                                        <div className="flex-1 min-h-[85px]">
+                                            {booking ? (
+                                                <BookingSlotCard
+                                                    booking={booking}
+                                                    isLive={isLive}
+                                                    activeCourt={activeCourt}
+                                                    onConfirm={confirmBookingState}
+                                                    onCancel={cancelBookingState}
+                                                />
+                                            ) : recurring ? (
+                                                <RecurringSlotCard recurring={recurring} isLive={isLive} />
+                                            ) : (
+                                                <div
+                                                    onClick={() => !isPast && !isVenueClosed ? openBookingModal(hour) : null}
+                                                    className={`h-full rounded-2xl p-4 border transition-all flex items-center justify-between group
+                                                        ${isPast || isVenueClosed
+                                                            ? "bg-black/20 border-zinc-800/50 cursor-not-allowed"
+                                                            : "bg-black/40 border-zinc-800 hover:border-emerald-500/40 hover:bg-emerald-500/5 cursor-pointer shadow-sm hover:shadow-[0_0_20px_rgba(16,185,129,0.1)]"
+                                                        }
+                                                    `}
+                                                >
+                                                    <span className={`font-bold ${isPast || isVenueClosed ? "text-zinc-600" : "text-emerald-500"}`}>
+                                                        {isVenueClosed ? "Closed" : "Available"}
                                                     </span>
-                                                )}
-                                            </div>
-                                        )}
+                                                    {!isPast && !isVenueClosed && (
+                                                        <span className="text-sm font-bold text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity translate-x-2 group-hover:translate-x-0 duration-300 flex items-center gap-1 bg-emerald-500/10 px-3 py-1.5 rounded-lg">
+                                                            + Book
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                            )
-                        })}
-                    </div>
+                                )
+                            })}
+                        </div>
+                    </>
                 )}
             </div>
 
@@ -547,6 +560,131 @@ export default function BookingManagerPage() {
                     </div>
                 </form>
             </Modal>
+        </div>
+    );
+}
+
+function BookingSlotCard({
+    booking,
+    isLive,
+    activeCourt,
+    onConfirm,
+    onCancel,
+}: {
+    booking: Booking;
+    isLive: boolean;
+    activeCourt: Court | undefined;
+    onConfirm: (id: string) => void;
+    onCancel: (id: string) => void;
+}) {
+    const type = getBookingType(booking);
+    const isConfirmed = booking.status === "confirmed" || booking.is_paid;
+    const isPending = booking.status === "payment_pending";
+    const isMaintenance = type === "maintenance";
+
+    const borderColor = isMaintenance
+        ? "shadow-[inset_4px_0_0_0_rgba(161,161,170,0.8)]"
+        : isConfirmed
+        ? "shadow-[inset_4px_0_0_0_rgba(16,185,129,1)]"
+        : "shadow-[inset_4px_0_0_0_rgba(245,158,11,1)]";
+
+    const bgColor = isMaintenance
+        ? "bg-zinc-800/50 border-zinc-700/50 hover:bg-zinc-800/70"
+        : isConfirmed
+        ? "bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/15"
+        : "bg-amber-500/10 border-amber-500/20 hover:bg-amber-500/15";
+
+    return (
+        <div className={`h-full rounded-2xl p-4 border transition-all flex justify-between items-center group relative overflow-hidden backdrop-blur-sm ${bgColor} ${borderColor}`}>
+            <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                    <p className="font-bold text-white text-base truncate">{booking.user?.full_name || booking.customer_name || "Guest"}</p>
+                    {isLive && (
+                        <span className="flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded bg-green-500/20 text-green-400 border border-green-500/30 flex-shrink-0">
+                            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                            LIVE
+                        </span>
+                    )}
+                </div>
+                <p className={`text-xs mt-0.5 font-medium truncate ${isMaintenance ? "text-zinc-500" : isConfirmed ? "text-emerald-500/70" : "text-amber-500/70"}`}>
+                    {activeCourt?.name}
+                    {booking.customer_phone && <span className="text-zinc-600 ml-2">{booking.customer_phone}</span>}
+                </p>
+            </div>
+
+            <div className="flex flex-col items-end gap-1.5 flex-shrink-0 ml-3">
+                {/* Source badge */}
+                {isMaintenance ? (
+                    <span className="flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded border bg-zinc-700/30 text-zinc-400 border-zinc-600/50 uppercase tracking-wider">
+                        <Hammer className="w-2.5 h-2.5" /> Maintenance
+                    </span>
+                ) : type === "walkin" ? (
+                    <span className="flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded border bg-orange-500/10 text-orange-400 border-orange-500/30 uppercase tracking-wider">
+                        {isConfirmed ? <UserCheck className="w-2.5 h-2.5" /> : <UserPlus className="w-2.5 h-2.5" />} Walk-in
+                    </span>
+                ) : (
+                    <span className="flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded border bg-blue-500/10 text-blue-400 border-blue-500/30 uppercase tracking-wider">
+                        <Globe className="w-2.5 h-2.5" /> Platform
+                    </span>
+                )}
+
+                {/* Status badge */}
+                {!isMaintenance && (
+                    isPending ? (
+                        <span className="text-[9px] font-bold px-2 py-0.5 rounded border bg-amber-500/20 text-amber-500 border-amber-500/30 uppercase tracking-wider">
+                            Pending
+                        </span>
+                    ) : (
+                        <span className="flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded border bg-emerald-500/20 text-emerald-500 border-emerald-500/30 uppercase tracking-wider">
+                            <CheckCircle className="w-2.5 h-2.5" /> Confirmed
+                        </span>
+                    )
+                )}
+
+                {/* Pending actions — hover-reveal on desktop */}
+                {isPending && (
+                    <div className="flex items-center gap-1 lg:absolute lg:top-0 lg:right-0 lg:h-full lg:px-3 lg:opacity-0 lg:group-hover:opacity-100 lg:transition-all lg:duration-300 lg:translate-x-4 lg:group-hover:translate-x-0 lg:bg-gradient-to-l lg:from-amber-500/20 lg:via-amber-500/10 lg:to-transparent">
+                        <button
+                            onClick={() => onConfirm(booking.id)}
+                            title="Mark as Paid"
+                            className="p-2 bg-emerald-500/20 text-emerald-500 hover:bg-emerald-500 hover:text-black rounded-xl transition-all shadow-lg active:scale-95"
+                        >
+                            <CheckCircle className="w-4 h-4" />
+                        </button>
+                        <button
+                            onClick={() => onCancel(booking.id)}
+                            title="Cancel Booking"
+                            className="p-2 bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-white rounded-xl transition-all shadow-lg active:scale-95"
+                        >
+                            <XCircle className="w-4 h-4" />
+                        </button>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
+
+function RecurringSlotCard({ recurring, isLive }: { recurring: RecurringBlock; isLive: boolean }) {
+    return (
+        <div className="h-full rounded-2xl p-4 border transition-all flex justify-between items-center backdrop-blur-sm bg-indigo-500/10 border-indigo-500/20 shadow-[inset_4px_0_0_0_rgba(99,102,241,1)] hover:bg-indigo-500/15">
+            <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                    <p className="font-bold text-white text-base truncate">{recurring.customer_name}</p>
+                    {isLive && (
+                        <span className="flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded bg-green-500/20 text-green-400 border border-green-500/30 flex-shrink-0">
+                            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                            LIVE
+                        </span>
+                    )}
+                </div>
+                <p className="text-xs mt-0.5 font-medium text-indigo-400/70 truncate">{recurring.court_name}</p>
+            </div>
+            <div className="flex-shrink-0 ml-3">
+                <span className="flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded border bg-indigo-500/10 text-indigo-400 border-indigo-500/30 uppercase tracking-wider">
+                    <Repeat className="w-2.5 h-2.5" /> Recurring
+                </span>
+            </div>
         </div>
     );
 }

@@ -191,9 +191,28 @@ export interface Booking {
 export interface SlotAvailability {
   start: string;
   end: string;
-  status: "available" | "booked" | "held";
+  status: "available" | "booked" | "held" | "recurring";
   is_peak: boolean;
   price: number;
+}
+
+export interface RecurringBlock {
+  id: string;
+  court_id: string;
+  court_name: string;
+  customer_name: string;
+  start_time: string;
+  end_time: string;
+  status: "recurring";
+  is_recurring: true;
+  day_of_week: number;
+}
+
+export interface ScheduleData {
+  bookings: Booking[];
+  recurringBlocks: RecurringBlock[];
+  isClosed: boolean;
+  closureReason: string | null;
 }
 
 export interface SearchParams {
@@ -271,7 +290,7 @@ export interface VenueSlotsResponse {
       start: string;
       end: string;
       date: string;
-      status: "available" | "booked" | "held" | "closed";
+      status: "available" | "booked" | "held" | "closed" | "recurring";
     }>;
   }>;
 }

@@ -5,12 +5,13 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
     Building2, Users, Receipt, Calendar, CalendarCheck,
-    AlertTriangle, Clock, Plus, ArrowUpRight, ArrowDownRight
+    AlertTriangle, Clock, Plus, ArrowUpRight, ArrowDownRight,
+    Globe, UserPlus, Repeat, Hammer
 } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
 import { centerService as venueService } from "@/services/centerService";
-import { DashboardStats, UpcomingBooking } from "@/types";
+import { DashboardStats, UpcomingBooking, ScheduleData } from "@/types";
 import { useVenue } from "@/components/venue/VenueContext";
 import { format } from "date-fns";
 import VenuePendingVerification from "@/components/venue/VenuePendingVerification";
@@ -20,6 +21,8 @@ export default function VenueDashboardPage() {
     const { currentVenue, isLoading: isVenueLoading } = useVenue();
     const [stats, setStats] = useState<DashboardStats | null>(null);
     const [upcoming, setUpcoming] = useState<UpcomingBooking[]>([]);
+    const [todaySchedule, setTodaySchedule] = useState<ScheduleData | null>(null);
+    const [upcomingClosures, setUpcomingClosures] = useState<any[]>([]);
     const [loadingStats, setLoadingStats] = useState(false);
 
     useEffect(() => {
@@ -31,12 +34,17 @@ export default function VenueDashboardPage() {
     const loadDashboardData = async (venueId: string) => {
         setLoadingStats(true);
         try {
-            const [statsData, upcomingData] = await Promise.all([
+            const today = format(new Date(), 'yyyy-MM-dd');
+            const [statsData, upcomingData, scheduleData, closuresData] = await Promise.all([
                 venueService.getStats(venueId),
-                venueService.getUpcoming(venueId)
+                venueService.getUpcoming(venueId),
+                venueService.getBookingsByDate(today, venueId),
+                venueService.getClosures(venueId, true),
             ]);
             setStats(statsData);
             setUpcoming(upcomingData);
+            setTodaySchedule(scheduleData);
+            setUpcomingClosures(closuresData);
         } catch (error) {
             console.error("Failed to load dashboard data", error);
         } finally {
@@ -115,6 +123,22 @@ export default function VenueDashboardPage() {
                 </div>
             )}
 
+            {/* Active Upcoming Closure Banner */}
+            {upcomingClosures.length > 0 && (
+                <div className="bg-orange-500/10 border border-orange-500/20 rounded-2xl p-4 flex items-center gap-4">
+                    <div className="p-2 bg-orange-500/20 rounded-xl flex-shrink-0">
+                        <AlertTriangle className="w-6 h-6 text-orange-500" />
+                    </div>
+                    <div className="flex-grow min-w-0">
+                        <h3 className="text-sm font-bold text-white mb-0.5">Upcoming Venue Closure{upcomingClosures.length > 1 ? `s (${upcomingClosures.length})` : ""}</h3>
+                        <p className="text-orange-200/70 text-xs truncate">
+                            {upcomingClosures[0].reason || "Closed"} — {upcomingClosures[0].closure_date ?? upcomingClosures[0].start_date ?? ""}
+                        </p>
+                    </div>
+                    <Link href="/venue-dashboard/closures" className="text-xs font-bold text-orange-400 hover:text-orange-300 flex-shrink-0">Manage</Link>
+                </div>
+            )}
+
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Bookings Today */}
@@ -168,6 +192,60 @@ export default function VenueDashboardPage() {
                     <p className="text-sm font-bold text-zinc-500 uppercase tracking-wide">Total Bookings</p>
                 </div>
             </div>
+
+            {/* Today's Schedule Summary */}
+            {todaySchedule && !loadingStats && (
+                <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-6 backdrop-blur-sm">
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-lg font-bold text-white">Today's Schedule</h2>
+                        <Link href="/venue-dashboard/booking-manager" className="text-xs font-bold text-emerald-500 hover:text-emerald-400 uppercase tracking-wider">Open Manager</Link>
+                    </div>
+                    {todaySchedule.isClosed ? (
+                        <p className="text-red-400/70 text-sm font-medium">Venue is closed today{todaySchedule.closureReason ? ` — ${todaySchedule.closureReason}` : ""}.</p>
+                    ) : (
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            {[
+                                {
+                                    label: "Platform",
+                                    count: todaySchedule.bookings.filter(b => !b.is_manual && b.status !== "blocked" && b.status !== "maintenance").length,
+                                    icon: <Globe className="w-4 h-4 text-blue-400" />,
+                                    color: "text-blue-400",
+                                    bg: "bg-blue-500/10 border-blue-500/20",
+                                },
+                                {
+                                    label: "Walk-ins",
+                                    count: todaySchedule.bookings.filter(b => b.is_manual && b.status !== "blocked" && b.status !== "maintenance").length,
+                                    icon: <UserPlus className="w-4 h-4 text-orange-400" />,
+                                    color: "text-orange-400",
+                                    bg: "bg-orange-500/10 border-orange-500/20",
+                                },
+                                {
+                                    label: "Recurring",
+                                    count: todaySchedule.recurringBlocks.length,
+                                    icon: <Repeat className="w-4 h-4 text-indigo-400" />,
+                                    color: "text-indigo-400",
+                                    bg: "bg-indigo-500/10 border-indigo-500/20",
+                                },
+                                {
+                                    label: "Blocked",
+                                    count: todaySchedule.bookings.filter(b => b.status === "blocked" || b.status === "maintenance").length,
+                                    icon: <Hammer className="w-4 h-4 text-zinc-400" />,
+                                    color: "text-zinc-400",
+                                    bg: "bg-zinc-800/50 border-zinc-700/50",
+                                },
+                            ].map(({ label, count, icon, color, bg }) => (
+                                <div key={label} className={`rounded-2xl border p-4 flex flex-col gap-2 ${bg}`}>
+                                    <div className="flex items-center gap-2">
+                                        {icon}
+                                        <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider">{label}</span>
+                                    </div>
+                                    <p className={`text-3xl font-black ${color}`}>{count}</p>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
 
             <div className="grid lg:grid-cols-3 gap-8">
                 {/* Quick Actions */}

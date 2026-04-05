@@ -301,6 +301,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
         <div className="flex justify-between text-[10px] text-zinc-400 mb-4 px-1 flex-wrap gap-2">
           <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(80,200,120,0.6)]"></span> Selected</div>
           <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500/50"></span> Booked</div>
+          <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-indigo-500/60"></span> Reserved</div>
           <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full border border-zinc-600 bg-zinc-800/50"></span> Past/Closed</div>
           <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-zinc-600"></span> Available</div>
         </div>
@@ -327,27 +328,31 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
               const isPast = slotTime < now;
               const isBooked = slot.status === "booked";
               const isClosed = slot.status === "closed";
+              const isRecurring = slot.status === "recurring";
               
-              const isUnavailable = isBooked || isClosed || isPast;
+              const isUnavailable = isBooked || isClosed || isPast || isRecurring;
 
               return (
                 <button
                   key={slot.start}
                   disabled={isUnavailable}
+                  title={isRecurring ? "Reserved — recurring booking" : undefined}
                   onClick={() => toggleSlot({ start: slot.start, end: slot.end })}
                   className={`
                       py-2 rounded-lg text-xs font-medium border transition-all duration-200
                       ${isBooked
                         ? "bg-red-900/20 border-red-900/50 text-red-500 cursor-not-allowed opacity-60"
-                        : isClosed || isPast
-                          ? "bg-black/20 border-zinc-800/50 text-zinc-600 cursor-not-allowed"
-                          : isSelected
-                            ? "bg-emerald-500 border-emerald-500 text-black shadow-[0_0_10px_rgba(80,200,120,0.4)] scale-105"
-                            : "bg-zinc-800 border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:bg-zinc-700"
+                        : isRecurring
+                          ? "bg-indigo-900/30 border-indigo-700/50 text-indigo-400 cursor-not-allowed"
+                          : isClosed || isPast
+                            ? "bg-black/20 border-zinc-800/50 text-zinc-600 cursor-not-allowed"
+                            : isSelected
+                              ? "bg-emerald-500 border-emerald-500 text-black shadow-[0_0_10px_rgba(80,200,120,0.4)] scale-105"
+                              : "bg-zinc-800 border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:bg-zinc-700"
                     }
                   `}
                 >
-                  {isBooked ? "Booked" : isClosed ? "Closed" : isPast ? "Past" : format(slotTime, "HH:mm")}
+                  {isBooked ? "Booked" : isRecurring ? "Reserved" : isClosed ? "Closed" : isPast ? "Past" : format(slotTime, "HH:mm")}
                 </button>
               );
             })

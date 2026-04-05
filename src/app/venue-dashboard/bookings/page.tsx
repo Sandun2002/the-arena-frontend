@@ -3,7 +3,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { format, isSameDay, isValid } from "date-fns";
-import { Search, CheckCircle, XCircle, DollarSign, UserX, AlertCircle, Calendar as CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, CheckCircle, XCircle, DollarSign, UserX, AlertCircle, Calendar as CalendarIcon, ChevronLeft, ChevronRight, Globe, UserPlus, Hammer } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
 import { centerService } from "@/services/centerService";
@@ -29,6 +29,7 @@ export default function BookingsPage() {
     // Filters
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "confirmed" | "cancelled">("all");
+    const [sourceFilter, setSourceFilter] = useState<"all" | "platform" | "walkin" | "blocked">("all");
     const [searchQuery, setSearchQuery] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
 
@@ -43,7 +44,7 @@ export default function BookingsPage() {
     // Reset to page 1 when filters change
     useEffect(() => {
         setCurrentPage(1);
-    }, [statusFilter, debouncedSearch, selectedDate, currentVenue]);
+    }, [statusFilter, sourceFilter, debouncedSearch, selectedDate, currentVenue]);
 
     const loadBookings = useCallback(async () => {
         if (!currentVenue) return;
@@ -71,17 +72,24 @@ export default function BookingsPage() {
         loadBookings();
     }, [loadBookings]);
 
-    // Client-side date filtering (backend doesn't support a date param)
-    const bookings = selectedDate
-        ? allBookings.filter((b) => {
-              try {
-                  const startDate = new Date(b.start_time);
-                  return isValid(startDate) && isSameDay(startDate, selectedDate);
-              } catch {
-                  return false;
-              }
-          })
-        : allBookings;
+    const getBookingSource = (b: Booking): "platform" | "walkin" | "blocked" => {
+        if (b.status === "blocked" || b.status === "maintenance") return "blocked";
+        if (b.is_manual) return "walkin";
+        return "platform";
+    };
+
+    // Client-side date + source filtering (backend doesn't support these params)
+    const bookings = allBookings
+        .filter((b) => {
+            if (selectedDate) {
+                try {
+                    const startDate = new Date(b.start_time);
+                    if (!isValid(startDate) || !isSameDay(startDate, selectedDate)) return false;
+                } catch { return false; }
+            }
+            if (sourceFilter !== "all" && getBookingSource(b) !== sourceFilter) return false;
+            return true;
+        });
 
     const handleAction = async (action: string, id: string) => {
         if (!confirm(`Are you sure you want to ${action} this booking?`)) return;
@@ -120,7 +128,7 @@ export default function BookingsPage() {
                     <p className="text-zinc-400">Manage {currentVenue.name} reservations.</p>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto flex-wrap">
                     {/* Date filter (client-side) */}
                     <div className="relative overflow-hidden group hover:bg-zinc-800 bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2 flex items-center justify-center gap-2 transition-colors">
                         <CalendarIcon className="w-4 h-4 text-emerald-500 flex-shrink-0" />
@@ -179,6 +187,22 @@ export default function BookingsPage() {
                             </button>
                         ))}
                     </div>
+
+                    {/* Source Filter */}
+                    <div className="flex bg-zinc-900 p-1 rounded-xl border border-zinc-800">
+                        {(["all", "platform", "walkin", "blocked"] as const).map((s) => (
+                            <button
+                                key={s}
+                                onClick={() => setSourceFilter(s)}
+                                className={`px-3 py-1.5 text-xs font-bold rounded-lg capitalize transition-colors ${sourceFilter === s
+                                    ? "bg-zinc-800 text-white shadow-sm"
+                                    : "text-zinc-500 hover:text-zinc-300"
+                                    }`}
+                            >
+                                {s === "walkin" ? "Walk-in" : s === "all" ? "All Sources" : s.charAt(0).toUpperCase() + s.slice(1)}
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </div>
 
@@ -190,6 +214,7 @@ export default function BookingsPage() {
                                 <th className="p-5 text-xs font-bold text-zinc-500 uppercase tracking-wider">Booking Info</th>
                                 <th className="p-5 text-xs font-bold text-zinc-500 uppercase tracking-wider">Customer</th>
                                 <th className="p-5 text-xs font-bold text-zinc-500 uppercase tracking-wider">Court</th>
+                                <th className="p-5 text-xs font-bold text-zinc-500 uppercase tracking-wider">Source</th>
                                 <th className="p-5 text-xs font-bold text-zinc-500 uppercase tracking-wider">Status</th>
                                 <th className="p-5 text-xs font-bold text-zinc-500 uppercase tracking-wider">Payment</th>
                                 <th className="p-5 text-xs font-bold text-zinc-500 uppercase tracking-wider text-right">Actions</th>
@@ -197,7 +222,7 @@ export default function BookingsPage() {
                         </thead>
                         <tbody className="divide-y divide-zinc-800/50">
                             {isLoading ? (
-                                <tr><td colSpan={6} className="p-12 text-center text-zinc-500 animate-pulse">Loading bookings...</td></tr>
+                                <tr><td colSpan={7} className="p-12 text-center text-zinc-500 animate-pulse">Loading bookings...</td></tr>
                             ) : bookings.length > 0 ? (
                                 bookings.map((booking) => (
                                     <tr key={booking.id} className="hover:bg-zinc-800/30 transition-colors group">
@@ -221,6 +246,9 @@ export default function BookingsPage() {
                                         <td className="p-5">
                                             <span className="text-zinc-300 text-sm font-medium">{booking.court?.name || "—"}</span>
                                             <span className="block text-zinc-500 text-xs capitalize">{booking.court?.sport_type?.name || ""}</span>
+                                        </td>
+                                        <td className="p-5">
+                                            <SourceBadge booking={booking} />
                                         </td>
                                         <td className="p-5">
                                             <StatusBadge status={booking.status} />
@@ -271,7 +299,7 @@ export default function BookingsPage() {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={6} className="p-12 text-center">
+                                    <td colSpan={7} className="p-12 text-center">
                                         <div className="flex flex-col items-center justify-center text-zinc-500">
                                             <Search className="w-8 h-8 mb-3 opacity-20" />
                                             <p className="font-medium">No bookings found</p>
@@ -357,6 +385,28 @@ function StatusBadge({ status }: { status: string }) {
     return (
         <span className={`inline-flex px-2.5 py-1 rounded-md text-[10px] font-bold uppercase border ${styles[status] || "bg-zinc-800 text-zinc-400 border-zinc-700"}`}>
             {status.replace("_", " ")}
+        </span>
+    );
+}
+
+function SourceBadge({ booking }: { booking: Booking }) {
+    if (booking.status === "blocked" || booking.status === "maintenance") {
+        return (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded border bg-zinc-700/30 text-zinc-400 border-zinc-600/50 text-[10px] font-bold uppercase tracking-wider">
+                <Hammer className="w-3 h-3" /> Blocked
+            </span>
+        );
+    }
+    if (booking.is_manual) {
+        return (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded border bg-orange-500/10 text-orange-400 border-orange-500/30 text-[10px] font-bold uppercase tracking-wider">
+                <UserPlus className="w-3 h-3" /> Walk-in
+            </span>
+        );
+    }
+    return (
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded border bg-blue-500/10 text-blue-400 border-blue-500/30 text-[10px] font-bold uppercase tracking-wider">
+            <Globe className="w-3 h-3" /> Platform
         </span>
     );
 }

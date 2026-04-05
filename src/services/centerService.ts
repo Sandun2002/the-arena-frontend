@@ -3,7 +3,8 @@ import apiClient from "./apiClient";
 import {
     DashboardStats, Booking, VenueProfile, RecurringBooking,
     UpcomingBooking, Court, Closure, GalleryImage,
-    AnalyticsRevenue, AnalyticsUtilization, AnalyticsFees, AnalyticsCancellations
+    AnalyticsRevenue, AnalyticsUtilization, AnalyticsFees, AnalyticsCancellations,
+    RecurringBlock, ScheduleData
 } from "@/types";
 import { normalizeBooking, normalizeVenue, normalizeCourt, normalizeGalleryImage, normalizeRecurringBooking } from "./normalizers";
 
@@ -73,10 +74,15 @@ export const centerService = {
     },
 
     // === Bookings ===
-    getBookingsByDate: async (targetDate: string, venueId?: string) => {
+    getBookingsByDate: async (targetDate: string, venueId?: string): Promise<ScheduleData> => {
         const params = { target_date: targetDate, ...(venueId ? { venue_id: venueId } : {}) };
         const response = await apiClient.get<any>('/center/bookings', { params });
-        return (response.data.bookings || []).map(normalizeBooking);
+        return {
+            bookings: (response.data.bookings || []).map(normalizeBooking),
+            recurringBlocks: (response.data.recurring_blocks || []) as RecurringBlock[],
+            isClosed: Boolean(response.data.is_closed),
+            closureReason: response.data.closure_reason ?? null,
+        };
     },
 
     getBookingsList: async (params: { venue_id?: string, date?: string, search?: string, status?: string, skip?: number, limit?: number }) => {
