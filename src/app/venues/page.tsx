@@ -1,39 +1,22 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState } from "react";
 import { api } from "@/services/api";
-import { Sport, Venue, VenueSearchResult, SearchParams } from "@/types";
+import { VenueSearchResult, SearchParams } from "@/types";
 import VenueCard from "@/components/ui/VenueCard";
 import CourtFinderPanel from "@/components/venues/CourtFinderPanel";
-import { Loader2, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
 
 export default function VenuesPage() {
     const { addToast } = useToast();
-    const [allVenues, setAllVenues] = useState<Venue[]>([]);
     const [searchResults, setSearchResults] = useState<VenueSearchResult[]>([]);
-    const [loading, setLoading] = useState(true);
     const [isSearching, setIsSearching] = useState(false);
     const [hasSearched, setHasSearched] = useState(false);
     const [selectedSport, setSelectedSport] = useState("All");
     const [lastSearchParams, setLastSearchParams] = useState<SearchParams | null>(null);
 
-    // 1. Fetch Data on Load
-    useEffect(() => {
-        const loadVenues = async () => {
-            try {
-                const data = await api.getVenues();
-                setAllVenues(data);
-            } catch (error) {
-                console.error("Error loading venues:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        loadVenues();
-    }, []);
-
-    // 2. Filter Logic
+    // Filter Logic
     const handleSearch = async (params: SearchParams) => {
         setHasSearched(true);
         setIsSearching(true);
@@ -112,7 +95,7 @@ export default function VenuesPage() {
                             </div>
                         )}
 
-                        {loading || isSearching ? (
+                        {isSearching ? (
                             /* Loading States */
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -174,16 +157,15 @@ export default function VenuesPage() {
                                 </button>
                             </div>
                         ) : (
-                            /* Initial State - Show All Venues or Prompt */
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                                {allVenues.slice(0, 6).map((venue) => (
-                                    <VenueCard key={venue.id} venue={venue} />
-                                ))}
-                                {allVenues.length === 0 && (
-                                    <div className="col-span-full py-16 text-center text-zinc-500">
-                                        Select your preferences above to find venues
-                                    </div>
-                                )}
+                            /* Initial State - Search Prompt */
+                            <div className="flex flex-col items-center justify-center py-24 text-center">
+                                <div className="w-20 h-20 bg-zinc-900 rounded-full flex items-center justify-center mb-6">
+                                    <Search className="w-10 h-10 text-zinc-700" />
+                                </div>
+                                <h3 className="text-2xl font-black text-white mb-3 uppercase tracking-tight">Find Your Court</h3>
+                                <p className="text-zinc-500 max-w-md">
+                                    Choose a sport, pick a date, and enter your city above to discover available venues near you.
+                                </p>
                             </div>
                         )}
                     </div>

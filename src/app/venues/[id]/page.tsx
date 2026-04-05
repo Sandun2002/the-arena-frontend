@@ -6,35 +6,23 @@ import Image from "next/image";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { api } from "@/services/api";
-import { Review, Venue, VenueSlotsResponse } from "@/types";
+import { Review, Venue } from "@/types";
 import BookingWidget from "@/components/venues/BookingWidget";
-import DatePicker from "@/components/ui/DatePicker";
 import { CheckCircle, MapPin, Star, Trophy } from "lucide-react";
-import Button from "@/components/ui/Button";
 
 export default function VenueDetailsPage() {
   const params = useParams();
   const [venue, setVenue] = useState<Venue | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [slots, setSlots] = useState<VenueSlotsResponse | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedDate, setSelectedDate] = useState("");
-
-  useEffect(() => {
-    setSelectedDate(new Date().toISOString().split("T")[0]);
-  }, []);
 
   useEffect(() => {
     const loadVenue = async () => {
-      if (!params.id || !selectedDate) return;
+      if (!params.id) return;
       const id = Array.isArray(params.id) ? params.id[0] : params.id;
       try {
-        const [venueData, slotsData] = await Promise.all([
-          api.getVenueById(id),
-          api.getVenueSlots(id, selectedDate).catch(() => null),
-        ]);
+        const venueData = await api.getVenueById(id);
         setVenue(venueData);
-        setSlots(slotsData);
         const reviewsData = await api.getVenueReviews(id, venueData);
         setReviews(reviewsData);
       } finally {
@@ -42,7 +30,7 @@ export default function VenueDetailsPage() {
       }
     };
     loadVenue();
-  }, [params.id, selectedDate]);
+  }, [params.id]);
 
   const gallery = useMemo(() => {
     if (!venue) return [];
@@ -122,41 +110,6 @@ export default function VenueDetailsPage() {
             </section>
 
             <section>
-              <div className="flex justify-between items-end mb-6 gap-4">
-                <h3 className="text-xl font-black text-white uppercase tracking-tight">Live Availability</h3>
-                <div className="w-56">
-                  <DatePicker
-                    value={selectedDate}
-                    onChange={setSelectedDate}
-                    disablePast={true}
-                    placeholder="Select date"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-4 rounded-[2rem] border border-zinc-800 bg-zinc-900/40 p-6">
-                {slots?.courts?.length ? slots.courts.map((court) => (
-                  <div key={court.court_id} className="rounded-xl border border-zinc-800/60 bg-black/20 p-4">
-                    <div className="mb-3 flex items-center justify-between gap-4">
-                      <div>
-                        <h4 className="text-sm font-bold text-white">{court.court_name}</h4>
-                        <p className="text-xs text-zinc-500">{court.sport_type} · {court.is_indoor ? "Indoor" : "Outdoor"}</p>
-                      </div>
-                      <span className="text-sm font-bold text-emerald-400">LKR {court.hourly_rate.toLocaleString()}/hr</span>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {court.slots.slice(0, 8).map((slot) => (
-                        <span key={`${court.court_id}-${slot.start}`} className={`rounded-lg border px-3 py-2 text-xs font-bold ${slot.status === "available" ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400" : "border-zinc-800 bg-zinc-800/50 text-zinc-500"}`}>
-                          {slot.start.slice(0, 5)}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )) : <p className="text-sm text-zinc-500">No slot data available for the selected date.</p>}
-              </div>
-            </section>
-
-            <section>
               <h3 className="text-xl font-black text-white uppercase tracking-tight mb-6">Amenities</h3>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {venue.amenities.length > 0 ? venue.amenities.map((amenity) => (
@@ -195,13 +148,24 @@ export default function VenueDetailsPage() {
 
             <section>
               <h3 className="text-xl font-black text-white uppercase tracking-tight mb-6">Location</h3>
-              <div className="rounded-[2rem] border border-zinc-800 bg-zinc-900 p-8">
-                <div className="flex items-start gap-3">
-                  <MapPin className="mt-1 h-5 w-5 text-emerald-500" />
-                  <div>
-                    <p className="text-sm font-bold uppercase tracking-wider text-emerald-500">Address</p>
-                    <p className="mt-2 text-lg font-bold text-white">{venue.address}</p>
-                    <p className="text-sm text-zinc-500">{venue.city}</p>
+              <div className="rounded-[2rem] border border-zinc-800 bg-zinc-900 overflow-hidden">
+                {venue.geo_lat && venue.geo_lng && process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ? (
+                  <iframe
+                    title="Venue location"
+                    className="w-full h-64 border-0"
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${venue.geo_lat},${venue.geo_lng}&zoom=15`}
+                  />
+                ) : null}
+                <div className="p-8">
+                  <div className="flex items-start gap-3">
+                    <MapPin className="mt-1 h-5 w-5 text-emerald-500" />
+                    <div>
+                      <p className="text-sm font-bold uppercase tracking-wider text-emerald-500">Address</p>
+                      <p className="mt-2 text-lg font-bold text-white">{venue.address}</p>
+                      <p className="text-sm text-zinc-500">{venue.city}</p>
+                    </div>
                   </div>
                 </div>
               </div>

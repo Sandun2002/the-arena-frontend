@@ -51,7 +51,7 @@ class BookingService {
 
     async createBooking(data: CreateBookingRequest): Promise<Booking> {
         try {
-            const response = await apiClient.post<Booking>('/bookings', data);
+            const response = await apiClient.post<Booking>('/bookings/', data);
             return response.data;
         } catch (error: any) {
             // BACKEND WORKAROUND: The backend successfully creates the booking but crashes 
