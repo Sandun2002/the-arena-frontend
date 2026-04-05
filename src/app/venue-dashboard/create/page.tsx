@@ -29,6 +29,7 @@ export default function CreateVenuePage() {
     const [geoLng, setGeoLng] = useState<number | null>(null);
     const [mapsLink, setMapsLink] = useState("");
     const [mapsLinkError, setMapsLinkError] = useState<string | null>(null);
+    const [isResolvingMapLink, setIsResolvingMapLink] = useState(false);
     const [availableCities, setAvailableCities] = useState<City[]>([]);
     const [isLoadingCities, setIsLoadingCities] = useState(false);
     const [mounted, setMounted] = useState(false);
@@ -52,7 +53,31 @@ export default function CreateVenuePage() {
 
     const amenitiesList = ["Parking", "A/C", "Showers", "Equipment Rental", "Cafe", "WiFi", "Lockers", "First Aid"];
 
-    const parseGoogleMapsLink = (url: string) => {
+    const extractCoords = (url: string): [number, number] | null => {
+        // Pattern 1: /@LAT,LNG (most common when sharing from Maps)
+        const atMatch = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+        if (atMatch) return [parseFloat(atMatch[1]), parseFloat(atMatch[2])];
+
+        // Pattern 2: ?q=LAT,LNG or &q=LAT,LNG
+        const qMatch = url.match(/[?&]q=(-?\d+\.\d+),(-?\d+\.\d+)/);
+        if (qMatch) return [parseFloat(qMatch[1]), parseFloat(qMatch[2])];
+
+        // Pattern 3: /place/LAT,LNG
+        const placeMatch = url.match(/\/place\/(-?\d+\.\d+),(-?\d+\.\d+)/);
+        if (placeMatch) return [parseFloat(placeMatch[1]), parseFloat(placeMatch[2])];
+
+        // Pattern 4: !3dLAT!4dLNG (embedded/iframe format)
+        const embedMatch = url.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/);
+        if (embedMatch) return [parseFloat(embedMatch[1]), parseFloat(embedMatch[2])];
+
+        // Pattern 5: /search/LAT,LNG — with optional space/+ between coords
+        const searchMatch = url.match(/\/search\/(-?\d+\.\d+)[,\s%20+]+(-?\d+\.\d+)/);
+        if (searchMatch) return [parseFloat(searchMatch[1]), parseFloat(searchMatch[2])];
+
+        return null;
+    };
+
+    const parseGoogleMapsLink = async (url: string) => {
         setMapsLink(url);
         setMapsLinkError(null);
         setGeoLat(null);
@@ -66,39 +91,43 @@ export default function CreateVenuePage() {
             return;
         }
 
-        // Pattern 1: /@LAT,LNG (most common when sharing from Maps)
-        const atMatch = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
-        if (atMatch) {
-            setGeoLat(parseFloat(atMatch[1]));
-            setGeoLng(parseFloat(atMatch[2]));
+        // Short links: resolve server-side then re-parse
+        if (/maps\.app\.goo\.gl|goo\.gl\/maps/i.test(url)) {
+            setIsResolvingMapLink(true);
+            try {
+                const res = await fetch("/api/resolve-maps-link", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ url }),
+                });
+                const data = await res.json();
+                if (!res.ok || !data.expandedUrl) {
+                    setMapsLinkError("Could not resolve this short link. Try using the full Google Maps share link instead.");
+                    return;
+                }
+                const coords = extractCoords(data.expandedUrl);
+                if (coords) {
+                    setGeoLat(coords[0]);
+                    setGeoLng(coords[1]);
+                } else {
+                    setMapsLinkError("Link resolved but coordinates couldn't be extracted. Try the full Google Maps link instead.");
+                }
+            } catch {
+                setMapsLinkError("Network error while resolving link. Please try the full Google Maps link instead.");
+            } finally {
+                setIsResolvingMapLink(false);
+            }
             return;
         }
 
-        // Pattern 2: ?q=LAT,LNG or &q=LAT,LNG
-        const qMatch = url.match(/[?&]q=(-?\d+\.\d+),(-?\d+\.\d+)/);
-        if (qMatch) {
-            setGeoLat(parseFloat(qMatch[1]));
-            setGeoLng(parseFloat(qMatch[2]));
-            return;
+        // Try all regex patterns on the long-form URL
+        const coords = extractCoords(url);
+        if (coords) {
+            setGeoLat(coords[0]);
+            setGeoLng(coords[1]);
+        } else {
+            setMapsLinkError("Could not extract coordinates. Try right-clicking the exact location on Google Maps and selecting \"Copy link\".");
         }
-
-        // Pattern 3: /place/LAT,LNG
-        const placeMatch = url.match(/\/place\/(-?\d+\.\d+),(-?\d+\.\d+)/);
-        if (placeMatch) {
-            setGeoLat(parseFloat(placeMatch[1]));
-            setGeoLng(parseFloat(placeMatch[2]));
-            return;
-        }
-
-        // Pattern 4: !3dLAT!4dLNG (embedded/iframe format)
-        const embedMatch = url.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/);
-        if (embedMatch) {
-            setGeoLat(parseFloat(embedMatch[1]));
-            setGeoLng(parseFloat(embedMatch[2]));
-            return;
-        }
-
-        setMapsLinkError("Could not extract coordinates. Try right-clicking the location on Google Maps and copying the link.");
     };
 
     useEffect(() => {
@@ -277,19 +306,25 @@ export default function CreateVenuePage() {
                                             type="url"
                                             value={mapsLink}
                                             onChange={(e) => parseGoogleMapsLink(e.target.value)}
+                                            disabled={isResolvingMapLink}
                                             className={`w-full bg-black/50 border rounded-xl px-4 py-3 text-white focus:outline-none transition-colors pr-10 ${
                                                 mapsLinkError ? "border-red-500/50 focus:border-red-500" :
+                                                isResolvingMapLink ? "border-blue-500/50 focus:border-blue-500" :
                                                 geoLat ? "border-emerald-500/50 focus:border-emerald-500" :
                                                 "border-zinc-700 focus:border-blue-500"
                                             }`}
                                             placeholder="https://maps.google.com/maps?q=..."
                                         />
-                                        {geoLat && (
+                                        {isResolvingMapLink && (
+                                            <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-400 animate-spin" />
+                                        )}
+                                        {!isResolvingMapLink && geoLat && (
                                             <CheckCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-500" />
                                         )}
                                     </div>
-                                    {mapsLinkError && <p className="text-red-400 text-xs mt-1">{mapsLinkError}</p>}
-                                    {!mapsLink && <p className="text-zinc-600 text-[11px] mt-1">Open Google Maps → Find your venue → Share → Copy link → Paste here</p>}
+                                    {isResolvingMapLink && <p className="text-blue-400 text-xs mt-1 animate-pulse">Resolving short link...</p>}
+                                    {!isResolvingMapLink && mapsLinkError && <p className="text-red-400 text-xs mt-1">{mapsLinkError}</p>}
+                                    {!isResolvingMapLink && !mapsLink && <p className="text-zinc-600 text-[11px] mt-1">Supports full links and short links (maps.app.goo.gl)</p>}
                                 </div>
 
                                 {/* Coordinates Display */}
@@ -341,6 +376,7 @@ export default function CreateVenuePage() {
                                     </Button>
                                     <Button
                                         type="button"
+                                        disabled={isResolvingMapLink}
                                         onClick={() => {
                                             if (!geoLat || !geoLng) {
                                                 setMapsLinkError("Please paste a valid Google Maps link to set your venue location.");
@@ -348,7 +384,7 @@ export default function CreateVenuePage() {
                                             }
                                             setStep("amenities");
                                         }}
-                                        className="flex-[2] bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-12 text-lg shadow-[0_0_20px_rgba(16,185,129,0.2)]"
+                                        className="flex-[2] bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-12 text-lg shadow-[0_0_20px_rgba(16,185,129,0.2)] disabled:opacity-50 disabled:shadow-none"
                                     >
                                         Next: Amenities <ArrowRight className="w-5 h-5 ml-2" />
                                     </Button>
