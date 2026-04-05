@@ -7,9 +7,9 @@ import { Sport, SearchParams, City } from "@/types";
 import { useToast } from "@/components/ui/Toast";
 import TimePicker from "@/components/ui/TimePicker";
 import DatePicker from "@/components/ui/DatePicker";
+import CityCombobox from "@/components/ui/CityCombobox";
 import {
     MapPin,
-    ChevronDown,
     Search,
     Navigation,
     Loader2,
@@ -362,28 +362,16 @@ export default function CourtFinderPanel({ onSearch, initialSport = "All" }: Cou
                             </h3>
 
                             <div className="flex gap-3 md:gap-4">
-                                {/* City Dropdown — disabled when live location is active */}
-                                <div className={`relative flex-1 group shadow-inner shadow-black/20 rounded-xl transition-opacity duration-300 ${useMyLocation ? 'opacity-40 pointer-events-none' : ''}`}>
-                                    <div className="absolute left-3.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-zinc-700/50">
-                                        <MapPin className="w-4 h-4 text-emerald-400" />
-                                    </div>
-                                    <select
+                                {/* City Combobox — disabled when live location is active */}
+                                <div className="flex-1">
+                                    <CityCombobox
+                                        cities={availableCities}
                                         value={location}
-                                        onChange={(e) => setLocation(e.target.value)}
-                                        disabled={loadingCities || useMyLocation}
-                                        className={`
-                                            w-full appearance-none bg-zinc-800/80 border border-zinc-700/50 rounded-xl
-                                            py-4 md:py-3.5 pl-14 pr-10 text-white text-sm font-medium
-                                            focus:outline-none focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20
-                                            hover:border-zinc-600
-                                            transition-all duration-200 cursor-pointer disabled:opacity-50
-                                        `}
-                                    >
-                                        {availableCities.map(city => (
-                                            <option key={city.name} value={city.name}>{city.name}</option>
-                                        ))}
-                                    </select>
-                                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none group-hover:text-zinc-300 transition-colors" />
+                                        onChange={setLocation}
+                                        loading={loadingCities}
+                                        disabled={useMyLocation}
+                                        placeholder="Select a city..."
+                                    />
                                 </div>
 
                                 {/* Live Location Button */}

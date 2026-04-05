@@ -11,6 +11,7 @@ import TimePicker from "@/components/ui/TimePicker";
 import DatePicker from "@/components/ui/DatePicker";
 import { api } from "@/services/api";
 import { City, Sport, VenueSearchResult } from "@/types";
+import CityCombobox from "@/components/ui/CityCombobox";
 
 function SearchContent() {
     const searchParams = useSearchParams();
@@ -20,7 +21,7 @@ function SearchContent() {
     const [results, setResults] = useState<VenueSearchResult[]>([]);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
-    const [selectedCity, setSelectedCity] = useState(searchParams.get("city") || "All");
+    const [selectedCity, setSelectedCity] = useState(searchParams.get("city") || "");
     const [selectedDate, setSelectedDate] = useState(searchParams.get("date") || new Date().toISOString().split("T")[0]);
     const [selectedSport, setSelectedSport] = useState(searchParams.get("sport") || "All");
     const [startTime, setStartTime] = useState(() => {
@@ -58,7 +59,7 @@ function SearchContent() {
     };
 
     const loadResults = async () => {
-        if (selectedCity === "All") {
+        if (selectedCity === "") {
             setResults([]);
             setLoading(false);
             return;
@@ -71,7 +72,7 @@ function SearchContent() {
             const sportValue = sportObj?.slug || (selectedSport === "All" ? undefined : selectedSport.toLowerCase());
 
             const response = await api.searchVenues({
-                city: selectedCity === "All" ? undefined : selectedCity,
+                city: selectedCity || undefined,
                 sport: sportValue,
                 date: selectedDate,
                 start_time: startTime,
@@ -122,10 +123,14 @@ function SearchContent() {
 
                             <div className="mb-6">
                                 <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">City</label>
-                                <select value={selectedCity} onChange={(e) => setSelectedCity(e.target.value)} className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer">
-                                    <option value="All">All Cities</option>
-                                    {cities.map((city) => <option key={city.name} value={city.name}>{city.name}</option>)}
-                                </select>
+                                <CityCombobox
+                                    cities={cities}
+                                    value={selectedCity}
+                                    onChange={setSelectedCity}
+                                    allowAll
+                                    loading={loading}
+                                    placeholder="All Cities"
+                                />
                             </div>
 
                             <div className="mb-6">
@@ -192,14 +197,14 @@ function SearchContent() {
                     <div className="lg:col-span-3 space-y-6">
                         {loading ? (
                             <div className="rounded-[2rem] border border-zinc-800 bg-zinc-900/40 p-10 text-center text-zinc-500">Loading live availability...</div>
-                        ) : selectedCity === "All" && results.length === 0 ? (
+                        ) : selectedCity === "" && results.length === 0 ? (
                             <div className="text-center py-20">
                                 <p className="text-zinc-500 text-lg">Please select a City to view live availability.</p>
                             </div>
                         ) : results.length === 0 ? (
                             <div className="text-center py-20">
                                 <p className="text-zinc-500 text-lg">No venues found matching your criteria.</p>
-                                <button onClick={() => { setSelectedCity("All"); setSelectedSport("All"); }} className="mt-4 text-emerald-500 hover:underline">Clear Filters</button>
+                                <button onClick={() => { setSelectedCity(""); setSelectedSport("All"); }} className="mt-4 text-emerald-500 hover:underline">Clear Filters</button>
                             </div>
                         ) : (
                             results.map((venue) => {

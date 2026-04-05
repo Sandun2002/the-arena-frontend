@@ -21,7 +21,7 @@ export default function SignupSelectionPage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-black flex flex-col items-center justify-center p-4 relative overflow-hidden" ref={containerRef}>
+    <main className="min-h-screen bg-black flex flex-col items-center justify-start pt-24 pb-12 px-4 relative overflow-hidden" ref={containerRef}>
 
       {/* Background Glower */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-emerald-900/10 rounded-full blur-[120px] pointer-events-none" />

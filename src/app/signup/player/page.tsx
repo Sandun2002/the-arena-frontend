@@ -78,7 +78,7 @@ export default function PlayerSignupPage() {
   };
 
   return (
-    <main className="min-h-screen bg-black flex items-center justify-center p-4">
+    <main className="min-h-screen bg-black flex flex-col items-center justify-start pt-24 pb-12 px-4">
       <div className="w-full max-w-md">
         <Link href="/signup" className="mb-8 inline-flex items-center text-sm text-zinc-500 hover:text-white transition-colors">
           <ArrowLeft className="mr-2 h-4 w-4" /> Back to Selection

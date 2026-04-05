@@ -13,6 +13,7 @@ import { useToast } from "@/components/ui/Toast";
 import { useVenue } from "@/components/venue/VenueContext";
 import { api } from "@/services/api";
 import { Venue, VenueProfile, City } from "@/types";
+import CityCombobox from "@/components/ui/CityCombobox";
 
 export default function VenueSettingsPage() {
     const { user } = useAuth();
@@ -30,7 +31,7 @@ export default function VenueSettingsPage() {
     const [availableCities, setAvailableCities] = useState<City[]>([]);
     const [isLoadingCities, setIsLoadingCities] = useState(false);
     const [mounted, setMounted] = useState(false);
-    const { register, handleSubmit, setValue, control, formState: { errors } } = useForm({
+    const { register, handleSubmit, setValue, watch, control, formState: { errors } } = useForm({
         defaultValues: {
             name: "",
             description: "",
@@ -289,19 +290,15 @@ export default function VenueSettingsPage() {
                                 </div>
                                  <div className="space-y-2">
                                     <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">City</label>
-                                    <select
-                                        {...register("city", { required: "City is required" })}
-                                        className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none"
-                                    >
-                                        <option value="" disabled>Select a city</option>
-                                        {availableCities.map((city) => (
-                                            <option key={city.name} value={city.name}>
-                                                {city.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city.message as string}</p>}
-                                    {isLoadingCities && <p className="text-zinc-500 text-[10px] mt-1 animate-pulse">Loading cities...</p>}
+                                    <input type="hidden" {...register("city", { required: "City is required" })} />
+                                    <CityCombobox
+                                        cities={availableCities}
+                                        value={watch("city")}
+                                        onChange={(val) => setValue("city", val, { shouldValidate: true })}
+                                        loading={isLoadingCities}
+                                        required
+                                        error={errors.city?.message as string}
+                                    />
                                 </div>
                             </div>
 
