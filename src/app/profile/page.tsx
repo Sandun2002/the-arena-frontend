@@ -244,7 +244,7 @@ export default function ProfilePage() {
                         </div>
 
                         {/* Gamification Teaser */}
-                        <Link href="/challenges">
+                        <Link href="/challenges" className="block">
                             <div className="bg-gradient-to-br from-zinc-900 to-black border border-zinc-800 rounded-3xl p-6 relative overflow-hidden group hover:border-emerald-500/50 transition-colors cursor-pointer">
                                 <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
                                     <Trophy className="w-32 h-32 text-emerald-500" />
@@ -273,7 +273,7 @@ export default function ProfilePage() {
                             <div className="space-y-3">
                                 {bookings.length > 0 ? (
                                     bookings.map((booking) => (
-                                        <Link href={`/bookings/${booking.id}`} key={booking.id}>
+                                        <Link href={`/bookings/${booking.id}`} key={booking.id} className="block">
                                             <div className="flex items-center gap-4 p-4 rounded-2xl bg-black/40 border border-zinc-800 hover:bg-zinc-800/50 transition-colors group">
                                                 <div className="w-10 h-10 bg-zinc-800 rounded-xl flex items-center justify-center text-zinc-500 text-[10px] font-bold uppercase shrink-0 group-hover:bg-zinc-700 transition-colors">
                                                     {format(new Date(booking.start_time), "MMM dd")}
