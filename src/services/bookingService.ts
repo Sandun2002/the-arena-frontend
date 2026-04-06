@@ -35,6 +35,7 @@ export interface PayHereCheckoutData {
     city: string;
     country: string;
     hash: string;
+    sandbox: string;
     checkout_url: string;
     booking_id: string;
 }

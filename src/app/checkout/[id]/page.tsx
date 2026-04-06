@@ -152,7 +152,7 @@ export default function CheckoutPage() {
     attachPayHereHandlers();
 
     window.payhere.startPayment({
-      sandbox:            process.env.NEXT_PUBLIC_PAYHERE_SANDBOX || "true",
+      sandbox:            checkoutData.sandbox,
       merchant_id:        checkoutData.merchant_id,
       return_url:         checkoutData.return_url,
       cancel_url:         checkoutData.cancel_url,
