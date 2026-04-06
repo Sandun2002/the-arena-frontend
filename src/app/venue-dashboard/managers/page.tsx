@@ -22,9 +22,10 @@ function InviteManagerForm({ venueId, onClose, onSuccess }: { venueId: string, o
             await venueApiService.addManager(venueId, email);
             addToast("Manager added successfully", "success");
             onSuccess();
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            addToast("Failed to add manager", "error");
+            const detail = error?.response?.data?.detail || "Failed to add manager";
+            addToast(detail, "error");
         } finally {
             setIsSubmitting(false);
         }
