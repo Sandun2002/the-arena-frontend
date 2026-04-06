@@ -22,7 +22,11 @@ function SearchContent() {
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [selectedCity, setSelectedCity] = useState(searchParams.get("city") || "");
-    const [selectedDate, setSelectedDate] = useState(searchParams.get("date") || new Date().toISOString().split("T")[0]);
+    const [selectedDate, setSelectedDate] = useState(() => {
+        if (searchParams.get("date")) return searchParams.get("date") as string;
+        const now = new Date();
+        return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    });
     const [selectedSport, setSelectedSport] = useState(searchParams.get("sport") || "All");
     const [startTime, setStartTime] = useState(() => {
         if (searchParams.get("start")) return searchParams.get("start") as string;
@@ -146,7 +150,8 @@ function SearchContent() {
                             <div className="mb-6 grid grid-cols-2 gap-3">
                                 {/* Compute if today is selected for past-blocking */}
                                 {(() => {
-                                    const today = new Date().toISOString().split("T")[0];
+                                    const _now = new Date();
+                                    const today = `${_now.getFullYear()}-${String(_now.getMonth() + 1).padStart(2, '0')}-${String(_now.getDate()).padStart(2, '0')}`;
                                     const isToday = selectedDate === today;
                                     return (
                                         <>

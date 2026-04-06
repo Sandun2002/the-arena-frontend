@@ -46,7 +46,7 @@ export default function CourtFinderPanel({ onSearch, initialSport = "All" }: Cou
     useEffect(() => {
         // Set deterministic client-side dates
         const now = new Date();
-        setSelectedDate(now.toISOString().split('T')[0]);
+        setSelectedDate(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`);
         
         const nextHour = now.getHours() + 1;
         if (nextHour < 23) {
@@ -327,7 +327,7 @@ export default function CourtFinderPanel({ onSearch, initialSport = "All" }: Cou
 
                                 <div className="grid grid-cols-2 gap-3 md:contents">
                                     {(() => {
-                                        const today = new Date().toISOString().split("T")[0];
+                                        const _td = new Date(); const today = `${_td.getFullYear()}-${String(_td.getMonth() + 1).padStart(2, '0')}-${String(_td.getDate()).padStart(2, '0')}`;
                                         const isToday = selectedDate === today;
                                         return (
                                             <>
