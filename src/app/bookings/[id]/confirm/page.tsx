@@ -3,49 +3,60 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle, Calendar, MapPin, Clock, FileText, Share2, Download, Home } from "lucide-react";
+import { CheckCircle, XCircle, Calendar, MapPin, FileText, Home, CreditCard } from "lucide-react";
 import Button from "@/components/ui/Button";
-import { useAuth } from "@/services/authContext";
 import { playerService } from "@/services/playerService";
 import { Booking } from "@/types";
 import { format, parseISO } from "date-fns";
-// Removing confetti import to avoid build errors if not installed.
 
 export default function BookingConfirmationPage() {
     const params = useParams();
     const router = useRouter();
-    const { user } = useAuth();
     const [booking, setBooking] = useState<Booking | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (user && params.id) {
-            playerService.getBookings().then(bookings => {
-                const found = bookings.find(b => b.id === params.id);
-                if (found) {
-                    setBooking(found);
-                } else {
-                    // Handle not found
-                    // router.push("/bookings");
+        if (!params.id) return;
+        playerService.getBookingById(params.id as string)
+            .then(b => {
+                if (b.status === "payment_pending") {
+                    router.replace(`/checkout/${b.id}`);
+                    return;
                 }
-                setLoading(false);
-            });
-        }
-    }, [user, params.id]);
+                setBooking(b);
+            })
+            .catch(() => setBooking(null))
+            .finally(() => setLoading(false));
+    }, [params.id, router]);
 
-    if (loading) return <div className="min-h-screen bg-black flex items-center justify-center text-emerald-500">Loading...</div>;
+    if (loading) return <div className="min-h-screen bg-black flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-emerald-500" /></div>;
     if (!booking) return <div className="min-h-screen bg-black pt-24 text-white text-center">Booking not found</div>;
+
+    const isCancelled = booking.status === "cancelled" || booking.status === "rejected";
+    const isConfirmed = booking.status === "confirmed" || booking.status === "completed";
 
     return (
         <main className="min-h-screen bg-black pt-24 pb-12 px-4 selection:bg-emerald-500/30">
             <div className="container mx-auto max-w-2xl text-center">
 
                 <div className="mb-8 animate-in zoom-in duration-500">
-                    <div className="w-24 h-24 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_40px_rgba(16,185,129,0.4)]">
-                        <CheckCircle className="w-12 h-12 text-black" />
-                    </div>
-                    <h1 className="text-3xl md:text-5xl font-bold text-white mb-2">Booking Confirmed!</h1>
-                    <p className="text-zinc-400">Your court is reserved. Get ready to play.</p>
+                    {isCancelled ? (
+                        <>
+                            <div className="w-24 h-24 bg-red-500/10 border border-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <XCircle className="w-12 h-12 text-red-500" />
+                            </div>
+                            <h1 className="text-3xl md:text-5xl font-bold text-white mb-2">Booking Cancelled</h1>
+                            <p className="text-zinc-400">This booking has been cancelled or rejected.</p>
+                        </>
+                    ) : (
+                        <>
+                            <div className="w-24 h-24 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_40px_rgba(16,185,129,0.4)]">
+                                <CheckCircle className="w-12 h-12 text-black" />
+                            </div>
+                            <h1 className="text-3xl md:text-5xl font-bold text-white mb-2">Booking Confirmed!</h1>
+                            <p className="text-zinc-400">Your court is reserved. Get ready to play.</p>
+                        </>
+                    )}
                 </div>
 
                 <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl overflow-hidden backdrop-blur-md mb-8 text-left animate-in slide-in-from-bottom-8 duration-700">
@@ -56,9 +67,15 @@ export default function BookingConfirmationPage() {
                                 <p className="text-zinc-500 text-sm font-bold uppercase tracking-wider mb-1">Booking Reference</p>
                                 <p className="text-white text-2xl font-mono mobile:text-xl">{booking.booking_reference}</p>
                             </div>
-                            <div className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-emerald-500 text-xs font-bold uppercase">
-                                Paid • Confirmed
-                            </div>
+                            {isCancelled ? (
+                                <div className="px-3 py-1 bg-red-500/10 border border-red-500/20 rounded-full text-red-400 text-xs font-bold uppercase">
+                                    {booking.status === "rejected" ? "Rejected" : "Cancelled"}
+                                </div>
+                            ) : (
+                                <div className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-emerald-500 text-xs font-bold uppercase">
+                                    Paid • Confirmed
+                                </div>
+                            )}
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -104,7 +121,7 @@ export default function BookingConfirmationPage() {
 
                     </div>
                     <div className="bg-black/40 p-4 flex justify-between items-center text-xs text-zinc-500 border-t border-zinc-800">
-                        <span>Paid with {booking.payment_method === 'card' ? 'Credit Card' : 'Cash'}</span>
+                        <span>{isConfirmed ? `Paid with ${booking.payment_method === 'card' ? 'Credit Card' : 'Cash'}` : `Status: ${booking.status}`}</span>
                         <span>{format(parseISO(booking.created_at), "MMM d, h:mm a")}</span>
                     </div>
                 </div>
@@ -115,11 +132,19 @@ export default function BookingConfirmationPage() {
                             View My Bookings
                         </Button>
                     </Link>
-                    <Link href="/" className="w-full md:w-auto">
-                        <Button className="w-full bg-zinc-100 text-black hover:bg-white font-bold">
-                            <Home className="w-4 h-4 mr-2" /> Back to Home
-                        </Button>
-                    </Link>
+                    {isCancelled ? (
+                        <Link href="/venues" className="w-full md:w-auto">
+                            <Button className="w-full bg-emerald-500 text-black hover:bg-emerald-400 font-bold">
+                                <CreditCard className="w-4 h-4 mr-2" /> Book Again
+                            </Button>
+                        </Link>
+                    ) : (
+                        <Link href="/" className="w-full md:w-auto">
+                            <Button className="w-full bg-zinc-100 text-black hover:bg-white font-bold">
+                                <Home className="w-4 h-4 mr-2" /> Back to Home
+                            </Button>
+                        </Link>
+                    )}
                 </div>
             </div>
         </main>

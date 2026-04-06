@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Calendar, Check, Clock, Lock, MapPin, ShieldCheck, User } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, Lock, MapPin, ShieldCheck, User } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { api } from "@/services/api";
 import { bookingService } from "@/services/bookingService";
@@ -26,7 +26,6 @@ function CheckoutContent() {
     const [venue, setVenue] = useState<Venue | null>(null);
     const [pricing, setPricing] = useState<{ total_price: number; subtotal: number; platform_fee: number; duration_hours: number } | null>(null);
     const [submitting, setSubmitting] = useState(false);
-    const [bookingReference, setBookingReference] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
     const court = venue?.courts.find((item) => item.id === courtId) ?? null;
@@ -74,7 +73,7 @@ function CheckoutContent() {
                 end_time: `${date}T${endTime}:00`,
                 payment_method: "card",
             });
-            setBookingReference(booking.booking_reference);
+            router.push(`/checkout/${booking.id}`);
         } catch {
             addToast("Failed to create booking", "error");
         } finally {
@@ -103,29 +102,10 @@ function CheckoutContent() {
             <div className="absolute inset-0 pointer-events-none"><div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[120px]" /></div>
 
             <div className="container mx-auto px-4 max-w-4xl relative z-10">
-                {!bookingReference && <Link href={`/venues/${venue.id}`} className="inline-flex items-center text-zinc-500 hover:text-white mb-8 transition-colors group"><ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" /> Back to Venue</Link>}
+                <Link href={`/venues/${venue.id}`} className="inline-flex items-center text-zinc-500 hover:text-white mb-8 transition-colors group"><ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" /> Back to Venue</Link>
 
                 <div className="grid md:grid-cols-3 gap-8">
                     <div className="md:col-span-2 space-y-6">
-                        {bookingReference ? (
-                            <div className="bg-zinc-900/40 border border-emerald-500 rounded-[2rem] p-10 text-center backdrop-blur-sm">
-                                <div className="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(16,185,129,0.4)]"><Check className="h-10 w-10 text-black" /></div>
-                                <h2 className="text-3xl font-black text-white mb-2 uppercase tracking-tight">Booking Confirmed</h2>
-                                <p className="text-zinc-400 mb-8 max-w-md mx-auto">Your booking has been created and is awaiting the normal payment confirmation flow.</p>
-                                <div className="bg-black/40 rounded-xl p-6 mb-8 border border-zinc-800 text-left">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div><p className="text-xs text-zinc-500 uppercase font-bold">Booking Reference</p><p className="text-white font-mono">{bookingReference}</p></div>
-                                        <div><p className="text-xs text-zinc-500 uppercase font-bold">Date</p><p className="text-white">{date}</p></div>
-                                        <div><p className="text-xs text-zinc-500 uppercase font-bold">Time</p><p className="text-white">{startTime} - {endTime}</p></div>
-                                        <div><p className="text-xs text-zinc-500 uppercase font-bold">Venue</p><p className="text-white truncate">{venue.name}</p></div>
-                                    </div>
-                                </div>
-                                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                                    <Link href="/bookings"><Button className="w-full sm:w-auto bg-emerald-500 text-black font-bold hover:bg-emerald-400 px-8">View My Bookings</Button></Link>
-                                    <Link href="/"><Button variant="outline" className="w-full sm:w-auto border-zinc-700 text-white hover:bg-zinc-800">Return Home</Button></Link>
-                                </div>
-                            </div>
-                        ) : (
                             <div className="rounded-[2rem] border border-zinc-800 bg-zinc-900/40 backdrop-blur-sm overflow-hidden">
                                 <div className="p-6 border-b border-zinc-800">
                                     <h1 className="text-3xl font-black text-white mb-1 uppercase tracking-tight">{venue.name}</h1>
@@ -148,10 +128,8 @@ function CheckoutContent() {
                                     </div>
                                 </div>
                             </div>
-                        )}
                     </div>
 
-                    {!bookingReference && (
                         <div className="md:col-span-1">
                             <div className="sticky top-24 space-y-4">
                                 <div className="rounded-[2rem] border border-zinc-800 bg-zinc-900/60 backdrop-blur-xl p-6 shadow-xl">
@@ -169,7 +147,6 @@ function CheckoutContent() {
                                 </div>
                             </div>
                         </div>
-                    )}
                 </div>
             </div>
         </main>

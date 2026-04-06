@@ -108,9 +108,8 @@ export default function BookingPage() {
                 end_time: selectedSlot.end,
                 payment_method: "card"
             });
-            addToast("Booking Confirmed!", "success");
-            // Redirect to confirmation page (Phase 4 task)
-            router.push(`/bookings/${booking.id}/confirm`);
+            addToast("Booking created! Redirecting to payment...", "info");
+            router.push(`/checkout/${booking.id}`);
         } catch (error) {
             addToast("Booking failed. Please try again.", "error");
         } finally {
