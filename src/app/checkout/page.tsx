@@ -69,8 +69,8 @@ function CheckoutContent() {
             const booking = await bookingService.createBooking({
                 venue_id: venue.id,
                 court_id: courtId,
-                start_time: `${date}T${startTime}:00`,
-                end_time: `${date}T${endTime}:00`,
+                start_time: new Date(`${date}T${startTime}:00`).toISOString(),
+                end_time: new Date(`${date}T${endTime}:00`).toISOString(),
                 payment_method: "card",
             });
             router.push(`/checkout/${booking.id}`);
