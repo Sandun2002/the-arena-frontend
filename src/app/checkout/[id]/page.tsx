@@ -22,7 +22,7 @@ import Script from "next/script";
 declare global {
   interface Window {
     payhere: {
-      startPayment: (payment: Record<string, string>) => void;
+      startPayment: (payment: Record<string, string | boolean>) => void;
       onCompleted: (orderId: string) => void;
       onDismissed: () => void;
       onError: (error: string) => void;
@@ -152,7 +152,7 @@ export default function CheckoutPage() {
     attachPayHereHandlers();
 
     window.payhere.startPayment({
-      sandbox:            checkoutData.sandbox,
+      sandbox:            checkoutData.sandbox === "true",
       merchant_id:        checkoutData.merchant_id,
       return_url:         checkoutData.return_url,
       cancel_url:         checkoutData.cancel_url,
