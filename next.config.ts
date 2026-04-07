@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
         port: '8000',
         pathname: '/api/v1/media*',
       },
+      {
+        protocol: 'https',
+        hostname: 'api.thearena.lk',
+        pathname: '/api/v1/media*',
+      },
     ],
   },
 };

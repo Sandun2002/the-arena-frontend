@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { MapPin } from "lucide-react";
 import { Venue } from "@/types";
 
@@ -9,12 +10,13 @@ interface HeroVenueCardProps {
 
 export default function HeroVenueCard({ venue, isActive }: HeroVenueCardProps) {
   return (
-    <div
+    <Link
+      href={`/venues/${venue.id}`}
       className={`
-        group relative 
+        group relative block
         h-[200px] md:h-[280px]
         w-full overflow-hidden 
-        rounded-2xl
+        rounded-2xl cursor-pointer
         transition-all duration-500 ease-out
         ${isActive
           ? "shadow-[0_8px_40px_-8px_rgba(80,200,120,0.5)] ring-2 ring-emerald-400/50"
@@ -27,6 +29,7 @@ export default function HeroVenueCard({ venue, isActive }: HeroVenueCardProps) {
         src={venue.cover_image || "/images/placeholder.jpg"}
         alt={venue.name}
         fill
+        unoptimized
         className={`
           object-cover transition-all duration-700
           ${isActive ? "scale-105" : "scale-100"}
@@ -79,6 +82,6 @@ export default function HeroVenueCard({ venue, isActive }: HeroVenueCardProps) {
           <span className="truncate">{venue.city}</span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

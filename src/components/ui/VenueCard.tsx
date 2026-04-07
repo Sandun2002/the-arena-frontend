@@ -18,8 +18,10 @@ export default function VenueCard({ venue, searchParams }: VenueCardProps) {
       }).toString()
     : "";
     
+  const href = `/venues/${venue.id}${queryStr ? `?${queryStr}` : ""}`;
+
   return (
-    <div className="group relative w-full overflow-hidden rounded-xl bg-zinc-900 border border-zinc-800 transition-all hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-900/20">
+    <Link href={href} className="group relative block w-full overflow-hidden rounded-xl bg-zinc-900 border border-zinc-800 transition-all hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-900/20">
 
       {/* Image Section */}
       <div className="relative h-64 w-full overflow-hidden">
@@ -67,14 +69,11 @@ export default function VenueCard({ venue, searchParams }: VenueCardProps) {
             </span>
           </div>
 
-          <Link
-            href={`/venues/${venue.id}${queryStr ? `?${queryStr}` : ""}`}
-            className="flex items-center gap-2 text-sm font-bold text-emerald-500 transition-transform group-hover:translate-x-1"
-          >
+          <span className="flex items-center gap-2 text-sm font-bold text-emerald-500 transition-transform group-hover:translate-x-1">
             Details <ArrowRight className="h-4 w-4" />
-          </Link>
+          </span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
