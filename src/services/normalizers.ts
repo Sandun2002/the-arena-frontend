@@ -98,7 +98,7 @@ export const normalizeVenue = (raw: any): Venue => {
     is_verified: Boolean(raw.is_verified ?? false),
     is_featured: Boolean(raw.is_featured ?? false),
     status: raw.status ?? (raw.suspended_at ? "suspended" : raw.deleted_at ? "deleted" : !raw.is_active ? "blocked" : !raw.is_verified ? "pending" : "active"),
-    cover_image: raw.cover_image ?? null,
+    cover_image: raw.cover_image ?? courts.find((c: Court) => c.cover_image)?.cover_image ?? null,
     gallery_images: Array.isArray(raw.gallery_images)
       ? raw.gallery_images.map(normalizeGalleryImage)
       : [],
