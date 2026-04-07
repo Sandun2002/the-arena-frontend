@@ -10,7 +10,6 @@ import gsap from "gsap";
 export default function Hero() {
   const [venues, setVenues] = useState<Venue[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
   const textRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
 
@@ -21,7 +20,6 @@ export default function Hero() {
         setVenues(data);
       } catch (error) {
         console.error("Failed to load venues:", error);
-        setError(error);
       } finally {
         setIsLoading(false);
       }
