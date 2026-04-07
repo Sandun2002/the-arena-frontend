@@ -9,13 +9,22 @@ import gsap from "gsap";
 
 export default function Hero() {
   const [venues, setVenues] = useState<Venue[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const textRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const loadData = async () => {
-      const data = await api.getFeaturedVenues();
-      setVenues(data);
+      try {
+        const data = await api.getFeaturedVenues();
+        setVenues(data);
+      } catch (error) {
+        console.error("Failed to load venues:", error);
+        setError(error);
+      } finally {
+        setIsLoading(false);
+      }
     };
     loadData();
 
@@ -62,11 +71,11 @@ export default function Hero() {
         <div className="hero-carousel-container w-full">
           {venues.length > 0 ? (
             <HeroCarousel venues={venues} />
-          ) : (
+          ) : isLoading ? (
             <div className="h-[180px] md:h-[260px] w-full flex items-center justify-center text-zinc-600">
               Loading Arenas...
             </div>
-          )}
+          ) : null}
         </div>
 
         {/* 2. PREMIUM BUTTON (Middle) */}
