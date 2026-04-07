@@ -65,7 +65,7 @@ export default function TermsPage() {
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-[260px,1fr] gap-6 md:gap-10">
-          <aside className="hidden lg:block sticky top-28 h-fit max-h-[calc(100vh-8rem)] overflow-auto pr-2">
+          <aside data-lenis-prevent className="hidden lg:block sticky top-28 h-fit max-h-[calc(100vh-8rem)] overflow-y-auto pr-2">
             <p className="text-xs text-zinc-500 uppercase tracking-[0.18em] font-bold border-b border-zinc-800 pb-3 mb-4">Contents</p>
             <nav className="space-y-1">
               {tocItems.map((item) => (
@@ -88,16 +88,12 @@ export default function TermsPage() {
               <h1 className="mt-5 text-3xl sm:text-4xl md:text-6xl font-black tracking-tight text-white">
                 Terms of <span className="text-emerald-500">Service</span>
               </h1>
-              <div className="mt-4 text-sm text-zinc-400 space-y-1">
-                <p>
-                  Operated by <span className="text-white font-medium">Astryx Global (Pvt) Ltd</span>
-                </p>
-                <p>
-                  Effective Date: <span className="text-white font-medium">[INSERT DATE]</span> · Last Updated:{" "}
-                  <span className="text-white font-medium">[INSERT DATE]</span>
-                </p>
+              <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-1 text-sm text-zinc-400">
+                <span>Operated by <span className="text-white font-semibold">Astryx Global (Pvt) Ltd</span></span>
+                <span>Effective: <span className="text-white font-semibold">[INSERT DATE]</span></span>
+                <span>Last Updated: <span className="text-white font-semibold">[INSERT DATE]</span></span>
               </div>
-              <p className="mt-6 border border-zinc-800 bg-zinc-900/40 rounded-xl p-4 md:p-5 leading-7 md:leading-8 text-[14px] md:text-[15px]">
+              <p className="mt-6 border-l-[3px] border-l-emerald-500/50 bg-zinc-900/60 pl-5 pr-4 py-4 leading-7 md:leading-8 text-[14px] md:text-[15px] rounded-r-lg">
                 Please read these Terms of Service carefully before using The Arena platform. By accessing or using the Platform —
                 whether as a Player or a Vendor — you agree to be legally bound by these Terms. If you do not agree, you must
                 not use the Platform.
@@ -109,7 +105,7 @@ export default function TermsPage() {
                 Jump to Section
                 <span className="text-xs uppercase tracking-wider text-zinc-500">18 items</span>
               </summary>
-              <nav className="px-4 pb-4 pt-1 space-y-1 max-h-64 overflow-auto border-t border-zinc-800">
+              <nav data-lenis-prevent className="px-4 pb-4 pt-1 space-y-1 max-h-64 overflow-y-auto border-t border-zinc-800">
                 {tocItems.map((item) => (
                   <a
                     key={`mobile-${item.id}`}
