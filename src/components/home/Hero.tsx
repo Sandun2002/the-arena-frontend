@@ -34,7 +34,7 @@ export default function Hero() {
     if (buttonRef.current) {
       gsap.fromTo(buttonRef.current,
         { scale: 0.8, opacity: 0 },
-        { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(2)", delay: 0.3 }
+        { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(2)", delay: 1.5 }
       );
     }
 
@@ -42,18 +42,18 @@ export default function Hero() {
     if (textRef.current) {
       gsap.fromTo(textRef.current.querySelectorAll(".hero-word"),
         { y: 30, opacity: 0, rotateX: -20 },
-        { y: 0, opacity: 1, rotateX: 0, duration: 0.6, stagger: 0.1, ease: "back.out(1.5)", delay: 0.1 }
+        { y: 0, opacity: 1, rotateX: 0, duration: 0.6, stagger: 0.1, ease: "back.out(1.5)", delay: 0.9 }
       );
 
       gsap.fromTo(textRef.current.querySelector(".hero-tagline"),
         { y: 15, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.5, ease: "power2.out", delay: 0.5 }
+        { y: 0, opacity: 1, duration: 0.5, ease: "power2.out", delay: 1.3 }
       );
     }
   }, []);
 
   return (
-    <section className="relative w-full flex flex-col justify-start items-center overflow-hidden pt-24 md:pt-32 pb-6 md:pb-12">
+    <section className="relative w-full flex flex-col justify-start items-center overflow-hidden pt-24 md:pt-32 pb-10 md:pb-16">
 
       {/* Background Effects */}
       <div className="absolute inset-0 bg-black z-0 pointer-events-none">
@@ -61,10 +61,21 @@ export default function Hero() {
         <div className="absolute bottom-[-20%] right-[-10%] w-[400px] h-[400px] bg-emerald-500/5 rounded-full blur-[100px]" />
       </div>
 
-      <div className="relative z-10 container mx-auto px-4 flex flex-col items-center w-full gap-3 md:gap-5">
+      <div className="relative z-10 container mx-auto px-4 flex flex-col items-center w-full gap-0">
 
-        {/* 1. TEXT (Top) */}
-        <div ref={textRef} className="text-center max-w-2xl perspective-[1000px]">
+        {/* 1. CAROUSEL (Top) */}
+        <div className="w-full">
+          {venues.length > 0 ? (
+            <HeroCarousel venues={venues} />
+          ) : isLoading ? (
+            <div className="h-[180px] md:h-[260px] w-full flex items-center justify-center text-zinc-600">
+              Loading Arenas...
+            </div>
+          ) : null}
+        </div>
+
+        {/* 2. TEXT (Middle) */}
+        <div ref={textRef} className="text-center max-w-2xl perspective-[1000px] mt-6 md:mt-8 px-2">
           <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tighter text-white mb-1 md:mb-2 flex flex-wrap justify-center gap-x-2 md:gap-x-3">
             <span className="hero-word inline-block">WHERE</span>
             <span className="hero-word inline-block text-transparent bg-gradient-to-r from-emerald-400 to-emerald-500 bg-clip-text">CHAMPIONS</span>
@@ -75,8 +86,8 @@ export default function Hero() {
           </p>
         </div>
 
-        {/* 2. PREMIUM BUTTON (Middle) */}
-        <div ref={buttonRef} className="flex flex-col items-center">
+        {/* 3. PREMIUM BUTTON (Bottom) */}
+        <div ref={buttonRef} className="flex flex-col items-center mt-5 md:mt-6">
           <Button
             href="/venues"
             className="
@@ -107,17 +118,6 @@ export default function Hero() {
               </svg>
             </span>
           </Button>
-        </div>
-
-        {/* 3. CAROUSEL (Bottom) */}
-        <div className="w-full">
-          {venues.length > 0 ? (
-            <HeroCarousel venues={venues} />
-          ) : isLoading ? (
-            <div className="h-[180px] md:h-[260px] w-full flex items-center justify-center text-zinc-600">
-              Loading Arenas...
-            </div>
-          ) : null}
         </div>
 
       </div>
