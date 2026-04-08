@@ -11,12 +11,16 @@ import { gsap } from "gsap";
 export default function ChallengesPage() {
     const { user } = useAuth();
     const [gamification, setGamification] = useState<{ challenges: Challenge[], achievements: UserAchievement[] } | null>(null);
+    const [freshXp, setFreshXp] = useState<number | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (user) {
             playerService.getChallenges().then(data => {
                 setGamification(data);
+            });
+            playerService.getStats().then(stats => {
+                setFreshXp(stats?.xp ?? null);
             });
         }
     }, [user]);
@@ -65,7 +69,7 @@ export default function ChallengesPage() {
                     </Link>
                     <div className="bg-zinc-900 border border-zinc-800 px-4 py-1.5 rounded-full flex items-center gap-2">
                         <span className="text-zinc-400 text-xs font-bold uppercase tracking-wider">Total XP</span>
-                        <span className="text-emerald-500 font-bold">{user.xp ?? 0}</span>
+                        <span className="text-emerald-500 font-bold">{freshXp ?? user.xp ?? 0}</span>
                     </div>
                 </div>
 

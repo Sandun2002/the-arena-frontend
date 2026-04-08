@@ -24,11 +24,13 @@ export function VenueProvider({ children }: { children: React.ReactNode }) {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // Load venues when user is authenticated
+    const isVenueUser = user?.roles?.some(r => r.slug === "venue_owner" || r.slug === "venue_manager") ?? false;
+
+    // Load venues only for venue owners/managers (not customers)
     useEffect(() => {
         if (isAuthLoading) return;
 
-        if (!user) {
+        if (!user || !isVenueUser) {
             setVenues([]);
             setCurrentVenue(null);
             setIsLoading(false);
