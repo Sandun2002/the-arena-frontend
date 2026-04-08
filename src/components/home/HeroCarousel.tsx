@@ -7,7 +7,9 @@ import "swiper/css";
 import "swiper/css/effect-coverflow";
 import "swiper/css/pagination";
 import HeroVenueCard from "./HeroVenueCard";
-import { useState, useMemo } from "react";
+import { useState, useRef } from "react";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
 
 interface HeroCarouselProps {
   venues: Venue[];
@@ -15,21 +17,22 @@ interface HeroCarouselProps {
 
 export default function HeroCarousel({ venues }: HeroCarouselProps) {
   const [, setActiveIndex] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Ensure enough slides for a smooth loop by duplicating if needed (min 5)
-  const slides = useMemo(() => {
-    if (venues.length === 0) return [];
-    if (venues.length >= 5) return venues;
-    // Duplicate the array until we have at least 5 slides
-    const repeated = [];
-    while (repeated.length < 5) {
-      repeated.push(...venues);
+  useGSAP(() => {
+    if (containerRef.current) {
+      gsap.fromTo(
+        containerRef.current,
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.8, ease: "power3.out", delay: 0.1 }
+      );
     }
-    return repeated.slice(0, Math.max(5, venues.length));
-  }, [venues]);
+  }, { scope: containerRef });
+
+  const enableLoop = venues.length >= 3;
 
   return (
-    <div className="w-full pt-4 pb-2 md:py-4 relative overflow-hidden">
+    <div ref={containerRef} className="w-full pt-4 pb-2 md:py-4 relative overflow-hidden">
       {/* Subtle background glow */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[250px] bg-emerald-500/10 rounded-full blur-[80px]" />
@@ -39,9 +42,9 @@ export default function HeroCarousel({ venues }: HeroCarouselProps) {
         effect={"coverflow"}
         grabCursor={true}
         centeredSlides={true}
-        loop={true}
+        loop={enableLoop}
         slidesPerView={"auto"}
-        initialSlide={Math.floor(slides.length / 2)}
+        initialSlide={Math.floor(venues.length / 2)}
         loopAdditionalSlides={2}
         coverflowEffect={{
           rotate: 0,
@@ -53,7 +56,7 @@ export default function HeroCarousel({ venues }: HeroCarouselProps) {
         autoplay={{
           delay: 3500,
           disableOnInteraction: false,
-          pauseOnMouseEnter: true
+          pauseOnMouseEnter: true,
         }}
         pagination={{
           clickable: true,
@@ -62,9 +65,9 @@ export default function HeroCarousel({ venues }: HeroCarouselProps) {
         speed={500}
         onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
         modules={[EffectCoverflow, Autoplay, Pagination]}
-        className="hero-carousel w-full !pb-8"
+        className="hero-carousel touch-pan-y w-full !pb-8"
       >
-        {slides.map((venue, idx) => (
+        {venues.map((venue, idx) => (
           <SwiperSlide
             key={`${venue.id}-${idx}`}
             className="!w-[280px] md:!w-[400px]"

@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef } from "react";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
 import { api } from "@/services/api";
 import { Venue } from "@/types";
 import HeroCarousel from "./HeroCarousel";
 import Button from "@/components/ui/Button";
-import gsap from "gsap";
+import { useEffect } from "react";
 
 export default function Hero() {
   const [venues, setVenues] = useState<Venue[]>([]);
@@ -25,18 +27,14 @@ export default function Hero() {
       }
     };
     loadData();
+  }, []);
 
-    // Animate carousel
-    gsap.fromTo(".hero-carousel-container",
-      { y: 20, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.8, ease: "power3.out", delay: 0.1 }
-    );
-
+  useGSAP(() => {
     // Animate button with bounce effect
     if (buttonRef.current) {
       gsap.fromTo(buttonRef.current,
         { scale: 0.8, opacity: 0 },
-        { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(2)", delay: 0.5 }
+        { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(2)", delay: 0.3 }
       );
     }
 
@@ -44,12 +42,12 @@ export default function Hero() {
     if (textRef.current) {
       gsap.fromTo(textRef.current.querySelectorAll(".hero-word"),
         { y: 30, opacity: 0, rotateX: -20 },
-        { y: 0, opacity: 1, rotateX: 0, duration: 0.6, stagger: 0.1, ease: "back.out(1.5)", delay: 0.7 }
+        { y: 0, opacity: 1, rotateX: 0, duration: 0.6, stagger: 0.1, ease: "back.out(1.5)", delay: 0.1 }
       );
 
       gsap.fromTo(textRef.current.querySelector(".hero-tagline"),
         { y: 15, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.5, ease: "power2.out", delay: 1.0 }
+        { y: 0, opacity: 1, duration: 0.5, ease: "power2.out", delay: 0.5 }
       );
     }
   }, []);
@@ -65,15 +63,16 @@ export default function Hero() {
 
       <div className="relative z-10 container mx-auto px-4 flex flex-col items-center w-full gap-3 md:gap-5">
 
-        {/* 1. CAROUSEL (Top) */}
-        <div className="hero-carousel-container w-full">
-          {venues.length > 0 ? (
-            <HeroCarousel venues={venues} />
-          ) : isLoading ? (
-            <div className="h-[180px] md:h-[260px] w-full flex items-center justify-center text-zinc-600">
-              Loading Arenas...
-            </div>
-          ) : null}
+        {/* 1. TEXT (Top) */}
+        <div ref={textRef} className="text-center max-w-2xl perspective-[1000px]">
+          <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tighter text-white mb-1 md:mb-2 flex flex-wrap justify-center gap-x-2 md:gap-x-3">
+            <span className="hero-word inline-block">WHERE</span>
+            <span className="hero-word inline-block text-transparent bg-gradient-to-r from-emerald-400 to-emerald-500 bg-clip-text">CHAMPIONS</span>
+            <span className="hero-word inline-block">PLAY</span>
+          </h1>
+          <p className="hero-tagline text-zinc-400 text-xs sm:text-sm md:text-base">
+            Discover and book Sri Lanka&apos;s most premium sports venues instantly.
+          </p>
         </div>
 
         {/* 2. PREMIUM BUTTON (Middle) */}
@@ -110,16 +109,15 @@ export default function Hero() {
           </Button>
         </div>
 
-        {/* 3. TEXT (Bottom) */}
-        <div ref={textRef} className="text-center max-w-2xl perspective-1000">
-          <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tighter text-white mb-1 md:mb-2 flex flex-wrap justify-center gap-x-2 md:gap-x-3">
-            <span className="hero-word inline-block">WHERE</span>
-            <span className="hero-word inline-block text-transparent bg-gradient-to-r from-emerald-400 to-emerald-500 bg-clip-text">CHAMPIONS</span>
-            <span className="hero-word inline-block">PLAY</span>
-          </h1>
-          <p className="hero-tagline text-zinc-400 text-xs sm:text-sm md:text-base">
-            Discover and book Sri Lanka&apos;s most premium sports venues instantly.
-          </p>
+        {/* 3. CAROUSEL (Bottom) */}
+        <div className="w-full">
+          {venues.length > 0 ? (
+            <HeroCarousel venues={venues} />
+          ) : isLoading ? (
+            <div className="h-[180px] md:h-[260px] w-full flex items-center justify-center text-zinc-600">
+              Loading Arenas...
+            </div>
+          ) : null}
         </div>
 
       </div>

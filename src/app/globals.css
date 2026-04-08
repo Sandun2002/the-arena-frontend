@@ -42,14 +42,14 @@
 
 html {
     overscroll-behavior-y: none;
-    overflow-x: hidden; /* Prevent horizontal scroll at root */
+    overflow-x: clip; /* Prevent horizontal scroll without breaking scroll observers */
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
-  overflow-x: hidden; /* Prevent horizontal scroll */
+  overflow-x: clip; /* Prevent horizontal scroll without breaking scroll observers */
   
   /* Premium Font Rendering */
   -webkit-font-smoothing: antialiased;
@@ -157,4 +157,4 @@ select option {
 select:focus {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2350C878' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
 }
-
+
