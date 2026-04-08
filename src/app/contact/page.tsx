@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import gsap from "gsap";
+import apiClient from "@/services/apiClient";
 import Button from "@/components/ui/Button";
 import { Mail, MapPin, Phone, MessageSquare, Send, CheckCircle, Loader2 } from "lucide-react";
 
@@ -17,7 +18,6 @@ const contactSchema = z.object({
 
 type ContactFormValues = z.infer<typeof contactSchema>;
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
 
 export default function ContactPage() {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -46,17 +46,7 @@ export default function ContactPage() {
     async function onSubmit(data: ContactFormValues) {
         setServerError(null);
         try {
-            const res = await fetch(`${API_URL}/contact`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data),
-            });
-
-            if (!res.ok) {
-                const body = await res.json().catch(() => ({}));
-                throw new Error(body?.detail ?? "Something went wrong. Please try again.");
-            }
-
+            await apiClient.post("/contact", data);
             setSubmitted(true);
         } catch (err: unknown) {
             setServerError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
