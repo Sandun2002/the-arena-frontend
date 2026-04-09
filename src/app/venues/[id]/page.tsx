@@ -149,13 +149,13 @@ export default function VenueDetailsPage() {
             <section>
               <h3 className="text-xl font-black text-white uppercase tracking-tight mb-6">Location</h3>
               <div className="rounded-[2rem] border border-zinc-800 bg-zinc-900 overflow-hidden">
-                {venue.geo_lat && venue.geo_lng && process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ? (
+                {venue.geo_lat && venue.geo_lng ? (
                   <iframe
                     title="Venue location"
                     className="w-full h-64 border-0"
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
-                    src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${venue.geo_lat},${venue.geo_lng}&zoom=15`}
+                    src={`https://maps.google.com/maps?q=${venue.geo_lat},${venue.geo_lng}&z=15&output=embed`}
                   />
                 ) : null}
                 <div className="p-8">
