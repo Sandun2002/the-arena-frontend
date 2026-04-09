@@ -65,12 +65,12 @@ export default function HeroCarousel({ venues }: HeroCarouselProps) {
         speed={500}
         onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
         modules={[EffectCoverflow, Autoplay, Pagination]}
-        className="hero-carousel touch-pan-y w-full !pb-8"
+        className="hero-carousel touch-pan-y w-full"
       >
         {venues.map((venue, idx) => (
           <SwiperSlide
             key={`${venue.id}-${idx}`}
-            className="!w-[280px] md:!w-[400px]"
+            className="!w-[280px] md:!w-[400px] py-4"
           >
             {({ isActive }) => (
               <HeroVenueCard venue={venue} isActive={isActive} />

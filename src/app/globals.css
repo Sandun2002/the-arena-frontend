@@ -78,6 +78,13 @@ body {
   color: transparent;
 }
 
+/* Hero Carousel - Override Swiper's overflow:hidden and padding:0 */
+.hero-carousel {
+  overflow: visible !important;
+  padding-top: 16px !important;
+  padding-bottom: 32px !important;
+}
+
 /* Hero Carousel Pagination Styles */
 .hero-carousel .swiper-pagination {
   bottom: 0 !important;
