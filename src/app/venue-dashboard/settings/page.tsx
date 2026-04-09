@@ -3,7 +3,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
-import { Save, Loader2, MapPin, Phone, Clock, FileText, Calendar, Globe, AlertCircle, CheckCircle2, Search } from "lucide-react";
+import { Save, Loader2, MapPin, Phone, Clock, FileText, Calendar, Globe, AlertCircle, CheckCircle2, Search, Shield } from "lucide-react";
 import Script from "next/script";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
@@ -31,6 +31,8 @@ export default function VenueSettingsPage() {
     const [availableCities, setAvailableCities] = useState<City[]>([]);
     const [isLoadingCities, setIsLoadingCities] = useState(false);
     const [mounted, setMounted] = useState(false);
+    const amenitiesList = ["Parking", "A/C", "Showers", "Equipment Rental", "Cafe", "WiFi", "Lockers", "First Aid"];
+
     const { register, handleSubmit, setValue, watch, control, formState: { errors } } = useForm({
         defaultValues: {
             name: "",
@@ -39,6 +41,7 @@ export default function VenueSettingsPage() {
             operating_hours_summary: "", // Summary string
             address: "",
             city: "",
+            amenities: [] as string[],
             schedule: [
                 { day: "monday", open: "09:00", close: "22:00", is_closed: false },
                 { day: "tuesday", open: "09:00", close: "22:00", is_closed: false },
@@ -90,6 +93,7 @@ export default function VenueSettingsPage() {
             setValue("operating_hours_summary", formatOperatingHoursSummary(currentVenue.operating_hours));
             setValue("address", currentVenue.address ?? "");
             setValue("city", currentVenue.city);
+            setValue("amenities", currentVenue.amenities.map((a) => a.name));
             
             setGeoLat(currentVenue.geo_lat);
             setGeoLng(currentVenue.geo_lng);
@@ -180,7 +184,8 @@ export default function VenueSettingsPage() {
                 address: data.address,
                 city: data.city,
                 geo_lat: geoLat,
-                geo_lng: geoLng
+                geo_lng: geoLng,
+                amenities: data.amenities,
             } as any);
 
             // Update Schedule
@@ -410,6 +415,28 @@ export default function VenueSettingsPage() {
                         src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
                         onLoad={() => setMapLoaded(true)}
                     />
+
+                    {/* Amenities */}
+                    <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-8 backdrop-blur-sm">
+                        <div className="border-b border-zinc-800 pb-2 mb-6">
+                            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                                <Shield className="w-5 h-5 text-emerald-500" /> Facilities & Amenities
+                            </h2>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            {amenitiesList.map((amenity) => (
+                                <label key={amenity} className="flex items-center gap-3 p-3 rounded-xl border border-zinc-800 bg-black/40 cursor-pointer hover:border-emerald-500/50 hover:bg-zinc-900 transition-all group">
+                                    <input
+                                        type="checkbox"
+                                        value={amenity}
+                                        {...register("amenities")}
+                                        className="w-4 h-4 rounded border-zinc-600 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-black accent-emerald-500"
+                                    />
+                                    <span className="text-sm font-medium text-zinc-300 group-hover:text-white transition-colors">{amenity}</span>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
 
                     {/* Weekly Schedule */}
                     <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-8 backdrop-blur-sm">
