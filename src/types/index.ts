@@ -358,11 +358,13 @@ export interface AnalyticsFees {
   pending_payout: number;
   venue_commission: number;
   total_revenue: number;
+  total_platform_revenue: number;  // Subtotal of platform bookings (what centre received before commission)
   breakdown?: {
     platform_bookings: { count: number; revenue: number; platform_fees: number; venue_commission: number; venue_payout: number };
     manual_bookings: { count: number; revenue: number; platform_fees: number; venue_commission: number; venue_payout: number };
   };
 }
+
 
 export interface AnalyticsCancellations {
   total_cancellations: number;

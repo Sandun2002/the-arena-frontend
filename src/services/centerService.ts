@@ -287,11 +287,13 @@ export const centerService = {
         return {
             total_platform_fees: Number(response.data.platform_fees ?? 0),
             net_payout: Number(response.data.venue_payout ?? 0),
-            pending_payout: 0,
+            pending_payout: Number(response.data.pending_payout ?? 0),
             venue_commission: Number(response.data.venue_commission ?? 0),
             total_revenue: Number(response.data.total_revenue ?? 0),
+            total_platform_revenue: Number(response.data.total_platform_revenue ?? 0),
             breakdown: response.data.breakdown || undefined,
         } satisfies AnalyticsFees;
+
     },
 
     getCancellationAnalytics: async (period: 'daily' | 'weekly' | 'monthly', venueId?: string) => {
