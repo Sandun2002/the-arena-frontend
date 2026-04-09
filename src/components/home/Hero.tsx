@@ -53,7 +53,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="relative w-full flex flex-col justify-start items-center overflow-hidden pt-24 md:pt-32 pb-10 md:pb-16">
+    <section className="relative w-full flex flex-col justify-start items-center pt-24 md:pt-32 pb-10 md:pb-16">
 
       {/* Background Effects */}
       <div className="absolute inset-0 bg-black z-0 pointer-events-none">
@@ -64,7 +64,7 @@ export default function Hero() {
       <div className="relative z-10 container mx-auto px-4 flex flex-col items-center w-full gap-0">
 
         {/* 1. CAROUSEL (Top) */}
-        <div className="w-full">
+        <div className="w-full pt-4">
           {venues.length > 0 ? (
             <HeroCarousel venues={venues} />
           ) : isLoading ? (
