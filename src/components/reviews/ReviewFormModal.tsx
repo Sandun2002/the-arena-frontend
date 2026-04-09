@@ -42,6 +42,10 @@ export default function ReviewFormModal({ venueId, bookingId, onClose, onSuccess
             addToast("Please give a rating", "warning");
             return;
         }
+        if (comment.length < 10) {
+            addToast("Comment must be at least 10 characters", "warning");
+            return;
+        }
         if (!user) return;
         if (!bookingId) {
             addToast("Reviews require a completed booking", "error");
@@ -112,7 +116,7 @@ export default function ReviewFormModal({ venueId, bookingId, onClose, onSuccess
             </div>
 
             <div className="space-y-2">
-                <label className="text-xs font-bold text-zinc-500 uppercase">Comment (Optional)</label>
+                <label className="text-xs font-bold text-zinc-500 uppercase">Comment (Minimum 10 characters)</label>
                 <textarea
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}

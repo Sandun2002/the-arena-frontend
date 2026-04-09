@@ -7,6 +7,9 @@ import { format } from "date-fns";
 import { Calendar, Clock, MapPin, ChevronRight, Filter, Search } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
+import { useToast } from "@/components/ui/Toast";
+import Modal from "@/components/ui/Modal";
+import ReviewFormModal from "@/components/reviews/ReviewFormModal";
 import { playerService } from "@/services/playerService";
 import { Booking, BookingStatus } from "@/types";
 
@@ -15,6 +18,7 @@ export default function BookingsPage() {
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [filter, setFilter] = useState<"upcoming" | "past" | "cancelled">("upcoming");
     const [isLoading, setIsLoading] = useState(true);
+    const [selectedBookingForReview, setSelectedBookingForReview] = useState<Booking | null>(null);
 
     useEffect(() => {
         if (user) {
@@ -51,7 +55,11 @@ export default function BookingsPage() {
                         [1, 2, 3].map(i => <div key={i} className="h-32 bg-zinc-900/50 rounded-2xl animate-pulse" />)
                     ) : filteredBookings.length > 0 ? (
                         filteredBookings.map((booking) => (
-                            <BookingCard key={booking.id} booking={booking} />
+                            <BookingCard 
+                                key={booking.id} 
+                                booking={booking} 
+                                onReviewClick={() => setSelectedBookingForReview(booking)}
+                            />
                         ))
                     ) : (
                         <div className="text-center py-12 bg-zinc-900/30 rounded-3xl border border-zinc-800">
@@ -67,6 +75,25 @@ export default function BookingsPage() {
                     )}
                 </div>
             </div>
+
+            {/* Review Modal */}
+            <Modal
+                isOpen={!!selectedBookingForReview}
+                onClose={() => setSelectedBookingForReview(null)}
+                title="Rate your experience"
+            >
+                {selectedBookingForReview && (
+                    <ReviewFormModal
+                        venueId={selectedBookingForReview.court?.venue_id || ""}
+                        bookingId={selectedBookingForReview.id}
+                        onClose={() => setSelectedBookingForReview(null)}
+                        onSuccess={() => {
+                            // Refresh bookings to update review status if needed
+                            playerService.getBookings().then(setBookings);
+                        }}
+                    />
+                )}
+            </Modal>
         </main>
     );
 }
@@ -90,7 +117,7 @@ function TabButton({ active, onClick, label, count }: any) {
     );
 }
 
-function BookingCard({ booking }: { booking: Booking }) {
+function BookingCard({ booking, onReviewClick }: { booking: Booking, onReviewClick: () => void }) {
     const statusConfig = {
         payment_pending: { color: "text-amber-500", bg: "bg-amber-500/10", border: "border-amber-500/20", label: "Payment Pending" },
         confirmed: { color: "text-emerald-500", bg: "bg-emerald-500/10", border: "border-emerald-500/20", label: "Confirmed" },
@@ -148,6 +175,21 @@ function BookingCard({ booking }: { booking: Booking }) {
                             <div className="text-[10px] font-bold text-emerald-500 uppercase">Paid</div>
                         )}
                     </div>
+
+                    {/* Leave Review Button */}
+                    {booking.status === 'completed' && !booking.review && (
+                        <button
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                onReviewClick();
+                            }}
+                            className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-bold rounded-full transition-colors"
+                        >
+                            Leave a Review
+                        </button>
+                    )}
+
                     <div className="p-2 rounded-full border border-zinc-800 bg-zinc-900 text-zinc-400 group-hover:bg-emerald-500 group-hover:text-black group-hover:border-emerald-500 transition-colors">
                         <ChevronRight className="w-4 h-4" />
                     </div>

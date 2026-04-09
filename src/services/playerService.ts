@@ -66,7 +66,8 @@ class PlayerService {
     }
 
     async checkReviewEligibility(userId: string, venueId: string): Promise<{ eligible: boolean; reason?: string }> {
-        return { eligible: true };
+        const response = await apiClient.get(`/venues/${venueId}/reviews/eligibility`);
+        return response.data;
     }
 
     async deleteReview(reviewId: string): Promise<void> {
