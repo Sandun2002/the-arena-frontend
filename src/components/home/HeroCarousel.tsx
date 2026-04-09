@@ -32,7 +32,7 @@ export default function HeroCarousel({ venues }: HeroCarouselProps) {
   const enableLoop = venues.length >= 3;
 
   return (
-    <div ref={containerRef} className="w-full pt-4 pb-2 md:py-4 relative overflow-hidden">
+    <div ref={containerRef} className="w-full pt-6 pb-2 md:pt-8 md:pb-4 relative">
       {/* Subtle background glow */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[250px] bg-emerald-500/10 rounded-full blur-[80px]" />
