@@ -78,6 +78,16 @@ body {
   color: transparent;
 }
 
+/* Hero section: natural height on mobile, full viewport on desktop */
+.hero-section {
+  min-height: auto;
+}
+@media (min-width: 768px) {
+  .hero-section {
+    min-height: calc(100vh - 80px);
+  }
+}
+
 /* Hero Carousel - Override Swiper's overflow:hidden and padding:0 */
 .hero-carousel {
   overflow: visible !important;
