@@ -62,7 +62,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="relative w-full flex flex-col justify-start items-center pt-24 md:pt-28 pb-20" style={{ minHeight: 'calc(100vh - 80px)' }}>
+    <section className="relative w-full flex flex-col justify-start items-center pt-24 md:pt-28 pb-10 md:pb-20 md:min-h-[calc(100vh-80px)]">
 
       {/* Background Effects */}
       <div className="absolute inset-0 bg-black z-0 pointer-events-none">
@@ -132,7 +132,7 @@ export default function Hero() {
       </div>
 
       {/* Scroll Indicator */}
-      <div ref={scrollIndicatorRef} className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 opacity-0 z-20">
+      <div ref={scrollIndicatorRef} className="hidden md:flex absolute bottom-6 left-1/2 -translate-x-1/2 flex-col items-center gap-1.5 opacity-0 z-20">
         <span className="text-zinc-500 text-[10px] uppercase tracking-widest">Scroll</span>
         <div className="w-5 h-8 rounded-full border border-zinc-600 flex items-start justify-center p-1">
           <div className="w-1 h-1.5 bg-emerald-400 rounded-full animate-scroll" />
