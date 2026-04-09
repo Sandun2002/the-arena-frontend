@@ -79,20 +79,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* Trusted By Section */}
-      <section className="py-20 border-t border-zinc-800/50">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-xs font-bold text-zinc-600 tracking-[0.2em] uppercase mb-12">Trusted by Leading Sports Brands</p>
-          <div className="flex flex-wrap justify-center gap-12 md:gap-20 opacity-30 grayscale hover:grayscale-0 transition-all duration-500">
-            <span className="text-2xl font-black text-white hover:text-emerald-500 transition-colors cursor-default">NIKE</span>
-            <span className="text-2xl font-black text-white hover:text-emerald-500 transition-colors cursor-default">ADIDAS</span>
-            <span className="text-2xl font-black text-white hover:text-emerald-500 transition-colors cursor-default">PUMA</span>
-            <span className="text-2xl font-black text-white hover:text-emerald-500 transition-colors cursor-default">UNDER ARMOUR</span>
-            <span className="text-2xl font-black text-white hover:text-emerald-500 transition-colors cursor-default">DECATHLON</span>
-          </div>
-        </div>
-      </section>
     </main>
   );
 }
