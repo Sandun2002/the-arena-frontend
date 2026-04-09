@@ -14,6 +14,7 @@ export default function Hero() {
   const [isLoading, setIsLoading] = useState(true);
   const textRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
+  const scrollIndicatorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -38,6 +39,14 @@ export default function Hero() {
       );
     }
 
+    // Animate scroll indicator
+    if (scrollIndicatorRef.current) {
+      gsap.fromTo(scrollIndicatorRef.current,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.6, ease: "power2.out", delay: 2.2 }
+      );
+    }
+
     // Animate text with stagger effect
     if (textRef.current) {
       gsap.fromTo(textRef.current.querySelectorAll(".hero-word"),
@@ -53,7 +62,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="relative w-full flex flex-col justify-start items-center pt-24 md:pt-32 pb-10 md:pb-16">
+    <section className="relative w-full flex flex-col justify-start items-center pt-24 md:pt-28 pb-20" style={{ minHeight: 'calc(100vh - 80px)' }}>
 
       {/* Background Effects */}
       <div className="absolute inset-0 bg-black z-0 pointer-events-none">
@@ -64,7 +73,7 @@ export default function Hero() {
       <div className="relative z-10 container mx-auto px-4 flex flex-col items-center w-full gap-0">
 
         {/* 1. CAROUSEL (Top) */}
-        <div className="w-full pt-4">
+        <div className="w-full">
           {venues.length > 0 ? (
             <HeroCarousel venues={venues} />
           ) : isLoading ? (
@@ -75,7 +84,7 @@ export default function Hero() {
         </div>
 
         {/* 2. TEXT (Middle) */}
-        <div ref={textRef} className="text-center max-w-2xl perspective-[1000px] mt-6 md:mt-8 px-2">
+        <div ref={textRef} className="text-center max-w-2xl perspective-[1000px] mt-4 md:mt-6 px-2">
           <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tighter text-white mb-1 md:mb-2 flex flex-wrap justify-center gap-x-2 md:gap-x-3">
             <span className="hero-word inline-block">WHERE</span>
             <span className="hero-word inline-block text-transparent bg-gradient-to-r from-emerald-400 to-emerald-500 bg-clip-text">CHAMPIONS</span>
@@ -87,7 +96,7 @@ export default function Hero() {
         </div>
 
         {/* 3. PREMIUM BUTTON (Bottom) */}
-        <div ref={buttonRef} className="flex flex-col items-center mt-5 md:mt-6">
+        <div ref={buttonRef} className="flex flex-col items-center mt-4 md:mt-5">
           <Button
             href="/venues"
             className="
@@ -121,6 +130,15 @@ export default function Hero() {
         </div>
 
       </div>
+
+      {/* Scroll Indicator */}
+      <div ref={scrollIndicatorRef} className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 opacity-0 z-20">
+        <span className="text-zinc-500 text-[10px] uppercase tracking-widest">Scroll</span>
+        <div className="w-5 h-8 rounded-full border border-zinc-600 flex items-start justify-center p-1">
+          <div className="w-1 h-1.5 bg-emerald-400 rounded-full animate-scroll" />
+        </div>
+      </div>
+
     </section>
   );
 }
