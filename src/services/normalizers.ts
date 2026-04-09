@@ -182,6 +182,7 @@ export const normalizeBooking = (raw: any): Booking => ({
         phone_number: raw.user.phone_number,
       }
     : null,
+  review: raw.review ? normalizeReview(raw.review) : null,
 });
 
 export const normalizeSession = (raw: any): Session => {

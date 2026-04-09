@@ -186,6 +186,7 @@ export interface Booking {
     full_name: string;
     phone_number: string;
   } | null;
+  review?: Review | null;
 }
 
 export interface SlotAvailability {
