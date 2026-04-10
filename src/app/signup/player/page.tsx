@@ -106,116 +106,29 @@ export default function PlayerSignupPage() {
   };
 
   return (
-    <main className="min-h-screen bg-black flex flex-col items-center justify-start pt-24 pb-12 px-4">
+    <main className="min-h-screen bg-black flex flex-col items-center justify-start pt-16 pb-24 px-4">
       <div className="w-full max-w-md">
-        <Link href="/signup" className="mb-8 inline-flex items-center text-sm text-zinc-500 hover:text-white transition-colors">
+        <Link href="/signup" className="mb-6 inline-flex items-center text-sm text-zinc-500 hover:text-white transition-colors">
           <ArrowLeft className="mr-2 h-4 w-4" /> Back to Selection
         </Link>
 
-        <div className="rounded-3xl border border-zinc-800 bg-zinc-900/50 p-8 backdrop-blur-xl shadow-2xl">
-          <h1 className="text-3xl font-bold text-white mb-2">Player Sign Up</h1>
-          <p className="text-zinc-400 mb-8">Create your athlete profile to start booking.</p>
+        <div className="rounded-3xl border border-zinc-800 bg-zinc-900/50 p-6 sm:p-8 backdrop-blur-xl shadow-2xl">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">Player Sign Up</h1>
+          <p className="text-zinc-400 text-sm mb-6">Create your athlete profile to start booking.</p>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="block text-xs font-bold text-zinc-500 uppercase">First Name</label>
-                <input
-                  {...register("firstName")}
-                  className="w-full rounded-xl border border-zinc-700 bg-black/50 p-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
-                  placeholder="Dilshan"
-                />
-                {errors.firstName && <p className="text-red-500 text-xs">{errors.firstName.message}</p>}
-              </div>
-              <div className="space-y-2">
-                <label className="block text-xs font-bold text-zinc-500 uppercase">Last Name</label>
-                <input
-                  {...register("lastName")}
-                  className="w-full rounded-xl border border-zinc-700 bg-black/50 p-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
-                  placeholder="Perera"
-                />
-                {errors.lastName && <p className="text-red-500 text-xs">{errors.lastName.message}</p>}
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="block text-xs font-bold text-zinc-500 uppercase">Email</label>
-              <input
-                {...register("email")}
-                type="email"
-                className="w-full rounded-xl border border-zinc-700 bg-black/50 p-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
-                placeholder="dilshan@example.com"
-              />
-              {errors.email && <p className="text-red-500 text-xs">{errors.email.message}</p>}
-            </div>
-
-            <div className="space-y-2">
-              <label className="block text-xs font-bold text-zinc-500 uppercase">
-                Phone Number <span className="text-zinc-600 text-[10px] normal-case ml-1">(e.g. 0771234567)</span>
-              </label>
-              <input
-                {...register("phone")}
-                type="tel"
-                className="w-full rounded-xl border border-zinc-700 bg-black/50 p-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
-                placeholder="0771234567"
-              />
-              {errors.phone && <p className="text-red-500 text-xs">{errors.phone.message}</p>}
-            </div>
-
-            <div className="space-y-2">
-              <label className="block text-xs font-bold text-zinc-500 uppercase">Password</label>
-              <input
-                {...register("password")}
-                type="password"
-                className="w-full rounded-xl border border-zinc-700 bg-black/50 p-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
-                placeholder="••••••••"
-              />
-              {errors.password && <p className="text-red-500 text-xs">{errors.password.message}</p>}
-            </div>
-
-            <div className="space-y-2">
-              <label className="block text-xs font-bold text-zinc-500 uppercase">Confirm Password</label>
-              <input
-                {...register("confirmPassword")}
-                type="password"
-                className="w-full rounded-xl border border-zinc-700 bg-black/50 p-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
-                placeholder="••••••••"
-              />
-              {errors.confirmPassword && <p className="text-red-500 text-xs">{errors.confirmPassword.message}</p>}
-            </div>
-
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full py-4 mt-6 bg-emerald-500 hover:bg-emerald-400 text-black font-bold tracking-wide"
-            >
-              {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "Create Account"}
-            </Button>
-          </form>
-
+          {/* Google Sign-Up — TOP for best UX and visibility */}
           {mounted && (
-            <>
-              {/* Divider */}
-              <div className="relative my-6">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-zinc-800" />
-                </div>
-                <div className="relative flex justify-center">
-                  <span className="bg-zinc-900 px-3 text-xs text-zinc-500">or sign up with</span>
-                </div>
-              </div>
-
-              {/* Google Sign-Up */}
+            <div className="mb-6">
               <button
                 type="button"
                 onClick={() => handleGoogleSignup()}
                 disabled={isGoogleLoading}
-                className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl border border-zinc-700 bg-black/30 hover:bg-zinc-800 hover:border-zinc-600 text-white text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center gap-3 py-3.5 px-4 rounded-xl border border-zinc-600 bg-zinc-800/60 hover:bg-zinc-700 hover:border-zinc-500 text-white text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
               >
                 {isGoogleLoading ? (
-                  <div className="w-4 h-4 border-2 border-zinc-600 border-t-white rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-zinc-500 border-t-white rounded-full animate-spin" />
                 ) : (
-                  <svg className="w-4 h-4" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                     <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
                     <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" />
@@ -224,15 +137,102 @@ export default function PlayerSignupPage() {
                 )}
                 <span>{isGoogleLoading ? "Connecting..." : "Continue with Google"}</span>
               </button>
-
-              <p className="mt-6 text-center text-zinc-500 text-sm">
-                Already have an account?{" "}
-                <Link href="/login" className="text-white font-bold hover:text-emerald-500 transition-colors">
-                  Log In
-                </Link>
-              </p>
-            </>
+            </div>
           )}
+
+          {/* Divider */}
+          <div className="relative mb-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-zinc-800" />
+            </div>
+            <div className="relative flex justify-center">
+              <span className="bg-zinc-900/50 px-3 text-xs text-zinc-500">or sign up with email</span>
+            </div>
+          </div>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-zinc-500 uppercase">First Name</label>
+                <input
+                  {...register("firstName")}
+                  className="w-full rounded-xl border border-zinc-700 bg-black/50 p-3 text-white placeholder-zinc-600 focus:border-emerald-500 focus:outline-none transition-colors"
+                  placeholder="Dilshan"
+                />
+                {errors.firstName && <p className="text-red-500 text-xs">{errors.firstName.message}</p>}
+              </div>
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-zinc-500 uppercase">Last Name</label>
+                <input
+                  {...register("lastName")}
+                  className="w-full rounded-xl border border-zinc-700 bg-black/50 p-3 text-white placeholder-zinc-600 focus:border-emerald-500 focus:outline-none transition-colors"
+                  placeholder="Perera"
+                />
+                {errors.lastName && <p className="text-red-500 text-xs">{errors.lastName.message}</p>}
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold text-zinc-500 uppercase">Email</label>
+              <input
+                {...register("email")}
+                type="email"
+                className="w-full rounded-xl border border-zinc-700 bg-black/50 p-3 text-white placeholder-zinc-600 focus:border-emerald-500 focus:outline-none transition-colors"
+                placeholder="dilshan@example.com"
+              />
+              {errors.email && <p className="text-red-500 text-xs">{errors.email.message}</p>}
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold text-zinc-500 uppercase">
+                Phone Number <span className="text-zinc-600 text-[10px] normal-case ml-1">(e.g. 0771234567)</span>
+              </label>
+              <input
+                {...register("phone")}
+                type="tel"
+                className="w-full rounded-xl border border-zinc-700 bg-black/50 p-3 text-white placeholder-zinc-600 focus:border-emerald-500 focus:outline-none transition-colors"
+                placeholder="0771234567"
+              />
+              {errors.phone && <p className="text-red-500 text-xs">{errors.phone.message}</p>}
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold text-zinc-500 uppercase">Password</label>
+              <input
+                {...register("password")}
+                type="password"
+                className="w-full rounded-xl border border-zinc-700 bg-black/50 p-3 text-white placeholder-zinc-600 focus:border-emerald-500 focus:outline-none transition-colors"
+                placeholder="••••••••"
+              />
+              {errors.password && <p className="text-red-500 text-xs">{errors.password.message}</p>}
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold text-zinc-500 uppercase">Confirm Password</label>
+              <input
+                {...register("confirmPassword")}
+                type="password"
+                className="w-full rounded-xl border border-zinc-700 bg-black/50 p-3 text-white placeholder-zinc-600 focus:border-emerald-500 focus:outline-none transition-colors"
+                placeholder="••••••••"
+              />
+              {errors.confirmPassword && <p className="text-red-500 text-xs">{errors.confirmPassword.message}</p>}
+            </div>
+
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full py-4 mt-2 bg-emerald-500 hover:bg-emerald-400 text-black font-bold tracking-wide"
+            >
+              {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "Create Account"}
+            </Button>
+          </form>
+
+          <p className="mt-6 text-center text-zinc-500 text-sm">
+            Already have an account?{" "}
+            <Link href="/login" className="text-white font-bold hover:text-emerald-500 transition-colors">
+              Log In
+            </Link>
+          </p>
         </div>
       </div>
     </main>
