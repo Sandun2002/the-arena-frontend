@@ -65,9 +65,9 @@ export default function Hero() {
     <section className="hero-section relative w-full flex flex-col justify-start items-center pt-24 md:pt-28 pb-6 md:pb-20">
 
       {/* Background Effects */}
-      <div className="absolute inset-0 bg-black z-0 pointer-events-none">
-        <div className="absolute top-[-20%] left-[-10%] w-[400px] h-[400px] bg-emerald-500/10 rounded-full blur-[100px]" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[400px] h-[400px] bg-emerald-500/5 rounded-full blur-[100px]" />
+      <div className="absolute inset-0 bg-black z-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-0 left-0 w-[400px] h-[400px] bg-emerald-500/10 rounded-full blur-[100px] -translate-x-1/4 -translate-y-1/4" />
+        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-emerald-500/5 rounded-full blur-[100px] translate-x-1/4 translate-y-1/4" />
       </div>
 
       <div className="relative z-10 container mx-auto px-4 flex flex-col items-center w-full gap-0">

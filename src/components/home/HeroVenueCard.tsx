@@ -6,9 +6,10 @@ import { Venue } from "@/types";
 interface HeroVenueCardProps {
   venue: Venue;
   isActive: boolean;
+  priority?: boolean;
 }
 
-export default function HeroVenueCard({ venue, isActive }: HeroVenueCardProps) {
+export default function HeroVenueCard({ venue, isActive, priority }: HeroVenueCardProps) {
   return (
     <Link
       href={`/venues/${venue.id}`}
@@ -29,7 +30,8 @@ export default function HeroVenueCard({ venue, isActive }: HeroVenueCardProps) {
         src={venue.cover_image || "/images/placeholder.jpg"}
         alt={venue.name}
         fill
-        unoptimized
+        sizes="(max-width: 768px) 280px, 400px"
+        priority={priority}
         className={`
           object-cover transition-all duration-700
           ${isActive ? "scale-105" : "scale-100"}

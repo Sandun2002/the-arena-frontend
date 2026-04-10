@@ -41,13 +41,13 @@ export default function Footer() {
           <div>
             <h4 className="mb-4 font-semibold text-white">Follow Us</h4>
             <div className="flex gap-4">
-              <Link href="#" className="hover:text-emerald-400 transition-colors">
+              <Link href="#" aria-label="Follow us on Instagram" className="hover:text-emerald-400 transition-colors">
                 <Instagram className="h-5 w-5" />
               </Link>
-              <Link href="#" className="hover:text-emerald-400 transition-colors">
+              <Link href="#" aria-label="Follow us on Twitter" className="hover:text-emerald-400 transition-colors">
                 <Twitter className="h-5 w-5" />
               </Link>
-              <Link href="#" className="hover:text-emerald-400 transition-colors">
+              <Link href="#" aria-label="Follow us on LinkedIn" className="hover:text-emerald-400 transition-colors">
                 <Linkedin className="h-5 w-5" />
               </Link>
             </div>
@@ -55,7 +55,7 @@ export default function Footer() {
         </div>
         
         <div className="mt-12 border-t border-zinc-800 pt-8 text-center text-xs">
-          © <span suppressHydrationWarning>{new Date().getFullYear()}</span> The Arena. All rights reserved.
+          &copy; <span suppressHydrationWarning>{new Date().getFullYear()}</span> The Arena. All rights reserved.
         </div>
       </div>
     </footer>
