@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
     User as UserIcon, Trophy, Calendar, MapPin, Edit2, Shield,
     Activity, TrendingUp, Mail, ChevronRight, Star, Lock, LogOut,
-    Clock, Plus, Zap
+    Clock, Plus, Zap, LayoutDashboard
 } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
@@ -14,7 +14,7 @@ import { fmtTime, fmtMonthAbbr, fmtDayNum, fmtMonthYear } from "@/lib/utils";
 import { Booking, Challenge, UserAchievement } from "@/types";
 
 export default function ProfilePage() {
-    const { user, logout } = useAuth();
+    const { user, logout, isVenueOwner, isVenueManager } = useAuth();
     const [stats, setStats] = useState<any>(null);
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [upcomingBookings, setUpcomingBookings] = useState<Booking[]>([]);
@@ -164,6 +164,9 @@ export default function ProfilePage() {
 
                         {/* Menu */}
                         <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-2 backdrop-blur-sm">
+                            {(isVenueOwner || isVenueManager) && (
+                                <MenuLink href="/venue-dashboard" icon={<LayoutDashboard className="w-4 h-4" />} label="Manager Dashboard" />
+                            )}
                             <MenuLink href="/profile/settings" icon={<Edit2 className="w-4 h-4" />} label="Edit Profile" />
                             <MenuLink href="/settings/sessions" icon={<Shield className="w-4 h-4" />} label="Security & Sessions" />
                             <MenuLink href="/profile/password" icon={<Lock className="w-4 h-4" />} label="Change Password" />

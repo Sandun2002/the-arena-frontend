@@ -29,7 +29,7 @@ export default function Header() {
   ];
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 bg-black/50 backdrop-blur-lg border-b border-white/5 overflow-visible">
+    <header className={`fixed top-0 left-0 w-full z-50 bg-black/50 backdrop-blur-lg border-b border-white/5 overflow-visible${isVenueContext ? "" : " hidden md:block"}`}>
       <div className="max-w-7xl w-full mx-auto px-4 h-20 flex items-center justify-between min-w-0">
 
         {/* Logo Area */}

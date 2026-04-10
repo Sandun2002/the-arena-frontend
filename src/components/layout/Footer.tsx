@@ -1,9 +1,15 @@
+"use client";
+
 import Link from "next/link";
 import { Instagram, Twitter, Linkedin } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 export default function Footer() {
+  const pathname = usePathname();
+  const isVenueContext = pathname?.startsWith("/venue-dashboard");
+
   return (
-    <footer className="w-full border-t border-zinc-800 bg-black py-12 text-zinc-400">
+    <footer className={`w-full border-t border-zinc-800 bg-black py-12 text-zinc-400${isVenueContext ? "" : " hidden md:block"}`}>
       <div className="container mx-auto px-4 md:px-6">
         <div className="grid gap-8 md:grid-cols-4">
           
