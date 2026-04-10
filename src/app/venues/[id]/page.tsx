@@ -172,25 +172,23 @@ export default function VenueDetailsPage() {
             </section>
           </div>
 
-          <div className="relative">
-            <div className="sticky top-24">
-              <BookingWidget venue={venue} />
+          <div className="space-y-6">
+            <BookingWidget venue={venue} />
 
-              <div className="mt-8 p-6 rounded-[2rem] bg-gradient-to-br from-zinc-900 to-zinc-900/50 border border-zinc-800 text-center">
-                <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-4 text-emerald-500">
-                  <CheckCircle className="h-6 w-6" />
-                </div>
-                <h4 className="font-bold text-white mb-2">{venue.is_verified ? "Verified Venue" : "Venue Listed"}</h4>
-                <p className="text-xs text-zinc-500">{venue.is_verified ? "This venue meets Arena's standards for quality and safety." : "Venue information is available and bookable through Arena."}</p>
+            <div className="p-6 rounded-[2rem] bg-gradient-to-br from-zinc-900 to-zinc-900/50 border border-zinc-800 text-center">
+              <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-4 text-emerald-500">
+                <CheckCircle className="h-6 w-6" />
               </div>
-
-              {venue.available_sports && venue.available_sports.length > 0 && (
-                <div className="mt-6 rounded-[2rem] border border-zinc-800 bg-zinc-900/40 p-6">
-                  <div className="mb-3 flex items-center gap-2 text-white font-bold"><Trophy className="h-4 w-4 text-emerald-500" /> Sports Available</div>
-                  <div className="flex flex-wrap gap-2">{venue.available_sports.map((sport) => <span key={sport} className="rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-300">{sport}</span>)}</div>
-                </div>
-              )}
+              <h4 className="font-bold text-white mb-2">{venue.is_verified ? "Verified Venue" : "Venue Listed"}</h4>
+              <p className="text-xs text-zinc-500">{venue.is_verified ? "This venue meets Arena's standards for quality and safety." : "Venue information is available and bookable through Arena."}</p>
             </div>
+
+            {venue.available_sports && venue.available_sports.length > 0 && (
+              <div className="rounded-[2rem] border border-zinc-800 bg-zinc-900/40 p-6">
+                <div className="mb-3 flex items-center gap-2 text-white font-bold"><Trophy className="h-4 w-4 text-emerald-500" /> Sports Available</div>
+                <div className="flex flex-wrap gap-2">{venue.available_sports.map((sport) => <span key={sport} className="rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-300">{sport}</span>)}</div>
+              </div>
+            )}
           </div>
         </div>
       </div>
