@@ -34,7 +34,7 @@ export const api = {
         id: sport.id,
         name: sport.display_name, // Display name for UI
         slug: sport.name,         // Slug name for API filtering
-        imageUrl: getSportImage(sport.name),
+        imageUrl: sport.icon || getSportImage(sport.name),
         isActive: true,
       }));
     } catch (error) {

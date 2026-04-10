@@ -65,7 +65,7 @@ export default function ProfilePage() {
 
                 {/* Header / Cover */}
                 <div className="relative h-48 md:h-64 rounded-3xl overflow-hidden mb-20 bg-gradient-to-r from-zinc-900 to-zinc-800 border border-zinc-800 group">
-                    <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=2669&auto=format&fit=crop')] bg-cover bg-center opacity-30 group-hover:scale-105 transition-transform duration-700"></div>
+                    <div className="absolute inset-0 bg-[url('/profile-cover.jpg')] bg-cover bg-center opacity-30 group-hover:scale-105 transition-transform duration-700"></div>
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
                 </div>
 
