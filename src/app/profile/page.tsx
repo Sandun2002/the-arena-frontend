@@ -8,6 +8,7 @@ import {
     Clock, Plus, Zap, LayoutDashboard
 } from "lucide-react";
 import Button from "@/components/ui/Button";
+import { useRequireAuth, AuthLoadingSpinner } from "@/components/auth/RequireAuth";
 import { useAuth } from "@/services/authContext";
 import { playerService } from "@/services/playerService";
 import { fmtTime, fmtMonthAbbr, fmtDayNum, fmtMonthYear } from "@/lib/utils";
@@ -15,6 +16,7 @@ import { Booking, Challenge, UserAchievement } from "@/types";
 
 export default function ProfilePage() {
     const { user, logout, isVenueOwner, isVenueManager } = useAuth();
+    const isAuthPending = useRequireAuth();
     const [stats, setStats] = useState<any>(null);
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [upcomingBookings, setUpcomingBookings] = useState<Booking[]>([]);
@@ -43,7 +45,7 @@ export default function ProfilePage() {
         }
     }, [user]);
 
-    if (!user) return null;
+    if (isAuthPending || !user) return <AuthLoadingSpinner />;
 
     const completedChallengesCount = gamification?.achievements.filter(a => a.is_completed).length || 0;
     const totalChallengesCount = gamification?.challenges.length || 0;

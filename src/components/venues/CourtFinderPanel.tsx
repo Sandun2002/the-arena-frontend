@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { api } from "@/services/api";
 import { Sport, SearchParams, City } from "@/types";
 import { useToast } from "@/components/ui/Toast";
+import { useLocation } from "@/contexts/LocationContext";
 import TimePicker from "@/components/ui/TimePicker";
 import DatePicker from "@/components/ui/DatePicker";
 import CityCombobox from "@/components/ui/CityCombobox";
@@ -35,8 +36,11 @@ export default function CourtFinderPanel({ onSearch, initialSport = "All" }: Cou
     const [endTime, setEndTime] = useState("11:00");
     const [location, setLocation] = useState("");
     const [useMyLocation, setUseMyLocation] = useState(false);
-    const [fetchingLocation, setFetchingLocation] = useState(false);
     const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+
+    const { coords, locState, locName: ctxLocName, requestLocation, clearLocation } = useLocation();
+    const fetchingLocation = locState === "loading";
+    const panelRequestedRef = useRef(false);
     const [searchRadius, setSearchRadius] = useState<number>(5);
     const [isSearching, setIsSearching] = useState(false);
     const [availableCities, setAvailableCities] = useState<City[]>([]);
@@ -79,14 +83,30 @@ export default function CourtFinderPanel({ onSearch, initialSport = "All" }: Cou
         loadInitialData();
     }, []);
 
+    // Sync location context → panel state
+    useEffect(() => {
+        if (locState === "granted" && coords) {
+            setUserLocation(coords);
+            setUseMyLocation(true);
+            if (panelRequestedRef.current) {
+                addToast(`Location set: ${ctxLocName || "your location"}`, "success");
+                panelRequestedRef.current = false;
+            }
+        } else if (locState === "denied" && panelRequestedRef.current) {
+            panelRequestedRef.current = false;
+            addToast("Location blocked. Click the 🔒 icon in your address bar to enable it.", "error");
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [locState, coords]);
+
     // Handle Live location toggle
     const handleToggleLiveLocation = () => {
-        // Guard: prevent double-click/tap
         if (fetchingLocation) return;
 
         if (useMyLocation) {
             setUseMyLocation(false);
             setUserLocation(null);
+            clearLocation();
             if (availableCities.length > 0 && !location) {
                 setLocation(availableCities[0].name);
             }
@@ -98,36 +118,16 @@ export default function CourtFinderPanel({ onSearch, initialSport = "All" }: Cou
             return;
         }
 
+        // Already have coords from top bar — use instantly
+        if (locState === "granted" && coords) {
+            setUserLocation(coords);
+            setUseMyLocation(true);
+            addToast(`Using location: ${ctxLocName || "your location"}`, "success");
+            return;
+        }
 
-        setFetchingLocation(true);
-
-        // Chrome/Windows dual-callback guard: delay error so success can cancel it
-        let succeeded = false;
-        let errorTimer: ReturnType<typeof setTimeout> | null = null;
-
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                succeeded = true;
-                if (errorTimer) clearTimeout(errorTimer);
-                const { latitude, longitude } = position.coords;
-                setUserLocation({ lat: latitude, lng: longitude });
-                setUseMyLocation(true);
-                setFetchingLocation(false);
-                addToast(`Location detected! (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`, "success");
-            },
-            (error) => {
-                errorTimer = setTimeout(() => {
-                    if (succeeded) return;
-                    setFetchingLocation(false);
-                    if (error.code === 1) {
-                        addToast("Location blocked. Click the 🔒 icon in your address bar to enable it.", "error");
-                    } else {
-                        addToast("Could not detect your location. Please select a city instead.", "error");
-                    }
-                }, 2000);
-            },
-            { enableHighAccuracy: true, timeout: 15000, maximumAge: 600000 }
-        );
+        panelRequestedRef.current = true;
+        requestLocation();
     };
 
     const handleSearch = () => {

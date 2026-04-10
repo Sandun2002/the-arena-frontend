@@ -9,7 +9,7 @@ export default function Footer() {
   const isVenueContext = pathname?.startsWith("/venue-dashboard");
 
   return (
-    <footer className={`w-full border-t border-zinc-800 bg-black py-12 text-zinc-400${isVenueContext ? "" : " hidden md:block"}`}>
+    <footer className={`w-full border-t border-zinc-800 bg-black pt-12 pb-28 md:pb-12 text-zinc-400${isVenueContext ? " hidden" : ""}`}>
       <div className="container mx-auto px-4 md:px-6">
         <div className="grid gap-8 md:grid-cols-4">
           

@@ -5,6 +5,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import MobileMainWrapper from "@/components/layout/MobileMainWrapper";
+import MobileTopBar from "@/components/layout/MobileTopBar";
 // Import the new smooth scroll wrapper
 import SmoothScrolling from "@/components/layout/SmoothScrolling";
 import Providers from "@/components/Providers";
@@ -55,6 +56,7 @@ export default function RootLayout({
         <Providers>
           <SmoothScrolling>
             <Header />
+            <MobileTopBar />
             <MobileMainWrapper>
               {children}
             </MobileMainWrapper>

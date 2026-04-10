@@ -12,9 +12,11 @@ import Modal from "@/components/ui/Modal";
 import ReviewFormModal from "@/components/reviews/ReviewFormModal";
 import { playerService } from "@/services/playerService";
 import { Booking, BookingStatus } from "@/types";
+import { useRequireAuth, AuthLoadingSpinner } from "@/components/auth/RequireAuth";
 
 export default function BookingsPage() {
     const { user } = useAuth();
+    const isAuthPending = useRequireAuth();
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [filter, setFilter] = useState<"upcoming" | "past" | "cancelled">("upcoming");
     const [isLoading, setIsLoading] = useState(true);
@@ -35,7 +37,7 @@ export default function BookingsPage() {
         return ["confirmed", "payment_pending"].includes(b.status);
     });
 
-    if (!user) return null;
+    if (isAuthPending || !user) return <AuthLoadingSpinner />;
 
     return (
         <main className="min-h-screen bg-black pt-24 pb-12 px-4">

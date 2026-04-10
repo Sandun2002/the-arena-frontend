@@ -7,9 +7,11 @@ import { useAuth } from "@/services/authContext";
 import { playerService } from "@/services/playerService";
 import { Challenge, UserAchievement } from "@/types";
 import { gsap } from "gsap";
+import { useRequireAuth, AuthLoadingSpinner } from "@/components/auth/RequireAuth";
 
 export default function ChallengesPage() {
     const { user } = useAuth();
+    const isAuthPending = useRequireAuth();
     const [gamification, setGamification] = useState<{ challenges: Challenge[], achievements: UserAchievement[] } | null>(null);
     const [freshXp, setFreshXp] = useState<number | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -35,7 +37,7 @@ export default function ChallengesPage() {
         }
     }, [gamification]);
 
-    if (!user) return null;
+    if (isAuthPending || !user) return <AuthLoadingSpinner />;
 
     const getIcon = (type: string) => {
         switch (type) {

@@ -9,6 +9,7 @@ import { api } from "@/services/api";
 import { Review, Venue } from "@/types";
 import BookingWidget from "@/components/venues/BookingWidget";
 import { CheckCircle, MapPin, Star, Trophy } from "lucide-react";
+import RequireAuth from "@/components/auth/RequireAuth";
 
 export default function VenueDetailsPage() {
   const params = useParams();
@@ -47,6 +48,7 @@ export default function VenueDetailsPage() {
   }
 
   return (
+    <RequireAuth>
     <main className="min-h-screen bg-black text-white pb-20 pt-24">
       <div className="fixed top-0 left-0 w-full h-[500px] bg-emerald-500/5 blur-[120px] pointer-events-none" />
 
@@ -193,5 +195,6 @@ export default function VenueDetailsPage() {
         </div>
       </div>
     </main>
+    </RequireAuth>
   );
 }

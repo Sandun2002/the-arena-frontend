@@ -1,18 +1,18 @@
-
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import gsap from "gsap";
 import { ArrowRight, Lock, Mail, Shield } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
 import { useToast } from "@/components/ui/Toast";
 
-export default function LoginPage() {
+function LoginContent() {
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login, loading } = useAuth();
   const { addToast } = useToast();
 
@@ -44,8 +44,11 @@ export default function LoginPage() {
     try {
       const userData = await login(email, password);
       addToast("Welcome back!", "success");
+      const next = searchParams?.get("next");
       const isOwnerOrManager = userData.roles.some((r) => r.slug === "venue_owner" || r.slug === "venue_manager");
-      if (isOwnerOrManager) {
+      if (next && next.startsWith("/")) {
+        router.push(next);
+      } else if (isOwnerOrManager) {
         router.push("/venue-dashboard");
       } else {
         router.push("/profile");
@@ -198,5 +201,13 @@ export default function LoginPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginContent />
+    </Suspense>
   );
 }
