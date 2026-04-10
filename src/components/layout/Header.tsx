@@ -3,6 +3,7 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import Button from "../ui/Button";
 import { Menu, X, User, LogOut, Calendar, Settings, Shield } from "lucide-react";
@@ -35,7 +36,7 @@ export default function Header() {
         {/* Logo Area */}
         <div className="flex items-center gap-6 min-w-0 shrink-0">
           <Link href={isVenueContext ? "/venue-dashboard" : "/"} className="flex items-center gap-3 group">
-            <img src="/logo-nav.png" alt="The Arena" width="160" height="70" className="h-10 md:h-12 w-auto object-contain" />
+            <Image src="/logo-nav.png" alt="The Arena" width={160} height={70} priority className="h-10 md:h-12 w-auto object-contain" />
             {isVenueContext && <span className="ml-2 text-[10px] font-bold bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded border border-blue-500/30 uppercase tracking-wide">Business</span>}
           </Link>
 

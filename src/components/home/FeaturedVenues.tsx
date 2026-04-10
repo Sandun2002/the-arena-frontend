@@ -42,7 +42,7 @@ export default function FeaturedVenues() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 min-h-[420px] md:min-h-[440px]">
           {loading ? (
             [...Array(3)].map((_, i) => (
               <div key={i} className="rounded-xl bg-zinc-900 border border-zinc-800 overflow-hidden animate-pulse">

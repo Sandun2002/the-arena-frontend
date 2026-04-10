@@ -80,7 +80,7 @@ export default function MobileBottomNav() {
 
           {/* Center Explore Button — breaks through the top */}
           <div className="absolute -top-6 left-1/2 -translate-x-1/2">
-            <Link href="/venues" className="relative block active:scale-95 transition-transform">
+            <Link href="/venues" aria-label="Explore venues" className="relative block active:scale-95 transition-transform">
               {/* Ambient glow ring */}
               {exploreActive && (
                 <span className="absolute -inset-1.5 rounded-full bg-emerald-500/25 animate-ping" />

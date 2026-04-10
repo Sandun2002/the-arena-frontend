@@ -105,7 +105,7 @@ body {
   height: 10px;
   background: rgba(255, 255, 255, 0.3);
   opacity: 1;
-  transition: all 0.3s ease;
+  transition: background 0.3s ease, width 0.3s ease, border-radius 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
 }
 
 .hero-carousel .swiper-pagination-bullet-active {
@@ -113,6 +113,7 @@ body {
   width: 28px;
   border-radius: 5px;
   box-shadow: 0 0 15px rgba(80, 200, 120, 0.5);
+  will-change: width, background;
 }
 
 /* Shimmer Animation */

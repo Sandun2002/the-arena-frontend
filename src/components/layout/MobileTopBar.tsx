@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { MapPin, Loader2, MapPinOff } from "lucide-react";
 import { useLocation } from "@/contexts/LocationContext";
@@ -19,7 +20,7 @@ export default function MobileTopBar() {
 
     if (locState === "loading") {
       return (
-        <span className={`${base} bg-zinc-800/60 border-zinc-700/40 text-zinc-500 pointer-events-none`}>
+        <span className={`${base} bg-zinc-800/60 border-zinc-700/40 text-zinc-400 pointer-events-none`}>
           <Loader2 className="w-3 h-3 animate-spin shrink-0" />
           <span className="truncate">Locating…</span>
         </span>
@@ -42,7 +43,7 @@ export default function MobileTopBar() {
       return (
         <button
           onClick={requestLocation}
-          className={`${base} bg-zinc-800/60 border-zinc-700/40 text-zinc-500 hover:border-zinc-600 hover:text-zinc-400`}
+          className={`${base} bg-zinc-800/60 border-zinc-700/40 text-zinc-400 hover:border-zinc-600 hover:text-zinc-300`}
         >
           <MapPinOff className="w-3 h-3 shrink-0" />
           <span className="truncate">No location</span>
@@ -54,7 +55,7 @@ export default function MobileTopBar() {
     return (
       <button
         onClick={requestLocation}
-        className={`${base} bg-zinc-800/60 border-zinc-700/40 text-zinc-500 hover:border-emerald-500/30 hover:text-emerald-400 hover:bg-emerald-500/5`}
+        className={`${base} bg-zinc-800/60 border-zinc-700/40 text-zinc-400 hover:border-emerald-500/30 hover:text-emerald-400 hover:bg-emerald-500/5`}
       >
         <MapPin className="w-3 h-3 shrink-0" />
         <span className="truncate">Set location</span>
@@ -68,9 +69,12 @@ export default function MobileTopBar() {
 
         {/* Left: Logo */}
         <Link href="/" className="shrink-0">
-          <img
+          <Image
             src="/logo-nav.png"
             alt="The Arena"
+            width={144}
+            height={63}
+            priority
             className="h-9 w-auto object-contain"
           />
         </Link>
