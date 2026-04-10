@@ -210,7 +210,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
   // Success overlay
   if (showSuccess) {
     return (
-      <div className="sticky top-24 w-full rounded-2xl bg-zinc-900/80 border border-emerald-500 p-8 backdrop-blur-md shadow-xl text-center">
+      <div className="w-full rounded-2xl bg-zinc-900/80 border border-emerald-500 p-8 backdrop-blur-md shadow-xl text-center">
         <div className="w-16 h-16 rounded-full bg-emerald-500 flex items-center justify-center mx-auto mb-4">
           <Check className="h-8 w-8 text-black" />
         </div>
@@ -224,7 +224,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
   // Login prompt overlay
   if (showLoginPrompt) {
     return (
-      <div className="sticky top-24 w-full rounded-2xl bg-zinc-900/80 border border-zinc-800 p-8 backdrop-blur-md shadow-xl text-center">
+      <div className="w-full rounded-2xl bg-zinc-900/80 border border-zinc-800 p-8 backdrop-blur-md shadow-xl text-center">
         <div className="w-16 h-16 rounded-full bg-zinc-800 flex items-center justify-center mx-auto mb-4">
           <LogIn className="h-8 w-8 text-emerald-500" />
         </div>
@@ -250,7 +250,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
   }
 
   return (
-    <div className="sticky top-24 w-full rounded-2xl bg-zinc-900/80 border border-zinc-800 p-6 backdrop-blur-md shadow-xl">
+    <div className="w-full rounded-2xl bg-zinc-900/80 border border-zinc-800 p-6 backdrop-blur-md shadow-xl">
 
       <h3 className="text-xl font-bold text-white mb-1">Confirm Booking</h3>
       <p className="text-xs text-zinc-400 mb-6">Select your date, court, and time slots.</p>
