@@ -14,6 +14,7 @@ import { centerService as venueService } from "@/services/centerService";
 import { DashboardStats, UpcomingBooking, ScheduleData } from "@/types";
 import { useVenue } from "@/components/venue/VenueContext";
 import { format } from "date-fns";
+import { fmtTime } from "@/lib/utils";
 import VenuePendingVerification from "@/components/venue/VenuePendingVerification";
 
 export default function VenueDashboardPage() {
@@ -329,7 +330,7 @@ export default function VenueDashboardPage() {
                                         <div className="flex justify-between items-center mt-1">
                                             <p className="text-xs text-zinc-500 truncate">{booking.court_name}</p>
                                             <p className="text-xs font-mono font-medium text-zinc-400 bg-zinc-800 px-1.5 py-0.5 rounded">
-                                                {format(new Date(booking.start_time), 'HH:mm')}
+                                                {fmtTime(booking.start_time)}
                                             </p>
                                         </div>
                                     </div>

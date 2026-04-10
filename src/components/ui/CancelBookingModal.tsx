@@ -3,6 +3,7 @@
 import { X } from "lucide-react";
 import { useState } from "react";
 import { Booking } from "@/types";
+import { fmtTime, fmtDateShort } from "@/lib/utils";
 
 interface CancelBookingModalProps {
     booking: Booking | null;
@@ -70,11 +71,11 @@ export default function CancelBookingModal({ booking, isOpen, onClose, onConfirm
                     <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                             <span className="text-zinc-500">Date</span>
-                            <span className="text-white font-bold">{new Date(booking.start_time).toLocaleDateString()}</span>
+                            <span className="text-white font-bold">{fmtDateShort(booking.start_time)}</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="text-zinc-500">Time</span>
-                            <span className="text-white font-bold">{`${new Date(booking.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${new Date(booking.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}</span>
+                            <span className="text-white font-bold">{fmtTime(booking.start_time)} - {fmtTime(booking.end_time)}</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="text-zinc-500">Amount</span>

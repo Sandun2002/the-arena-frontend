@@ -3,6 +3,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { format, isSameDay, isValid } from "date-fns";
+import { fmtTime, fmtDateShort } from "@/lib/utils";
 import { Search, CheckCircle, XCircle, DollarSign, UserX, AlertCircle, Calendar as CalendarIcon, ChevronLeft, ChevronRight, Globe, UserPlus, Hammer } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
@@ -228,8 +229,8 @@ export default function BookingsPage() {
                                     <tr key={booking.id} className="hover:bg-zinc-800/30 transition-colors group">
                                         <td className="p-5">
                                             <span className="block font-mono text-[10px] text-zinc-500 mb-1">{booking.booking_reference}</span>
-                                            <span className="block text-white font-bold text-sm mb-0.5">{format(new Date(booking.start_time), "MMM dd, yyyy")}</span>
-                                            <span className="text-zinc-400 text-xs font-medium">{format(new Date(booking.start_time), "h:mm a")} - {format(new Date(booking.end_time), "h:mm a")}</span>
+                                            <span className="block text-white font-bold text-sm mb-0.5">{fmtDateShort(booking.start_time)}</span>
+                                            <span className="text-zinc-400 text-xs font-medium">{fmtTime(booking.start_time)} - {fmtTime(booking.end_time)}</span>
                                         </td>
                                         <td className="p-5">
                                             <div className="flex items-center gap-3">

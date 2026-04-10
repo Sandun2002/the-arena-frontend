@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { format } from "date-fns";
+import { fmtTime, fmtMonthAbbr, fmtDayNum } from "@/lib/utils";
 import { Calendar, Clock, MapPin, ChevronRight, Filter, Search } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
@@ -136,8 +136,8 @@ function BookingCard({ booking, onReviewClick }: { booking: Booking, onReviewCli
 
                 {/* Date Box */}
                 <div className="flex-shrink-0 w-full md:w-20 bg-zinc-950 rounded-xl p-4 text-center border border-zinc-800 group-hover:border-zinc-700 transition-colors">
-                    <div className="text-xs font-bold text-zinc-500 uppercase mb-1">{format(new Date(booking.start_time), "MMM")}</div>
-                    <div className="text-2xl font-black text-white">{format(new Date(booking.start_time), "dd")}</div>
+                    <div className="text-xs font-bold text-zinc-500 uppercase mb-1">{fmtMonthAbbr(booking.start_time)}</div>
+                    <div className="text-2xl font-black text-white">{fmtDayNum(booking.start_time)}</div>
                 </div>
 
                 {/* Info */}
@@ -158,7 +158,7 @@ function BookingCard({ booking, onReviewClick }: { booking: Booking, onReviewCli
                     <div className="flex flex-wrap gap-4 text-xs font-medium text-zinc-400">
                         <div className="flex items-center gap-1.5">
                             <Clock className="w-3.5 h-3.5" />
-                            {format(new Date(booking.start_time), "h:mm a")} - {format(new Date(booking.end_time), "h:mm a")}
+                            {fmtTime(booking.start_time)} - {fmtTime(booking.end_time)}
                         </div>
                         <div className="flex items-center gap-1.5">
                             <MapPin className="w-3.5 h-3.5" />

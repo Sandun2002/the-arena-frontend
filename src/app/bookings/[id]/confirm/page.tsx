@@ -7,7 +7,7 @@ import { CheckCircle, XCircle, Calendar, MapPin, FileText, Home, CreditCard } fr
 import Button from "@/components/ui/Button";
 import { playerService } from "@/services/playerService";
 import { Booking } from "@/types";
-import { format, parseISO } from "date-fns";
+import { fmtTime, fmtDateShort, fmtDateTime } from "@/lib/utils";
 
 export default function BookingConfirmationPage() {
     const params = useParams();
@@ -91,10 +91,10 @@ export default function BookingConfirmationPage() {
                                     <Calendar className="w-4 h-4 text-emerald-500" /> Date & Time
                                 </h3>
                                 <p className="text-zinc-300 font-medium">
-                                    {format(parseISO(booking.start_time), "EEE, MMM d, yyyy")}
+                                    {fmtDateShort(booking.start_time)}
                                 </p>
                                 <p className="text-zinc-500 text-sm">
-                                    {format(parseISO(booking.start_time), "h:mm a")} - {format(parseISO(booking.end_time), "h:mm a")}
+                                    {fmtTime(booking.start_time)} - {fmtTime(booking.end_time)}
                                 </p>
                             </div>
                         </div>
@@ -122,7 +122,7 @@ export default function BookingConfirmationPage() {
                     </div>
                     <div className="bg-black/40 p-4 flex justify-between items-center text-xs text-zinc-500 border-t border-zinc-800">
                         <span>{isConfirmed ? `Paid with ${booking.payment_method === 'card' ? 'Credit Card' : 'Cash'}` : `Status: ${booking.status}`}</span>
-                        <span>{format(parseISO(booking.created_at), "MMM d, h:mm a")}</span>
+                        <span>{fmtDateTime(booking.created_at)}</span>
                     </div>
                 </div>
 

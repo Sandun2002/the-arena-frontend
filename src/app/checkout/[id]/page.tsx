@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { format, formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
+import { fmtTime, fmtDateShort } from "@/lib/utils";
 import {
   Clock,
   Shield,
@@ -273,7 +274,7 @@ export default function CheckoutPage() {
                   <div>
                     <p className="text-xs text-zinc-500 uppercase mb-0.5">Date</p>
                     <p className="text-sm font-medium text-white">
-                      {format(new Date(booking.start_time), "EEE, MMM dd, yyyy")}
+                      {fmtDateShort(booking.start_time)}
                     </p>
                   </div>
                 </div>
@@ -283,8 +284,7 @@ export default function CheckoutPage() {
                   <div>
                     <p className="text-xs text-zinc-500 uppercase mb-0.5">Time</p>
                     <p className="text-sm font-medium text-white">
-                      {format(new Date(booking.start_time), "h:mm a")} –{" "}
-                      {format(new Date(booking.end_time), "h:mm a")}
+                      {fmtTime(booking.start_time)} – {fmtTime(booking.end_time)}
                     </p>
                   </div>
                 </div>

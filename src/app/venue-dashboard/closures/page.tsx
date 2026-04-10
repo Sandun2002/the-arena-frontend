@@ -13,6 +13,7 @@ import { Court } from "@/types";
 import { useToast } from "@/components/ui/Toast";
 import { useVenue } from "@/components/venue/VenueContext";
 import { format } from "date-fns";
+import { fmtTime, fmtDateShort } from "@/lib/utils";
 
 type Closure = any;
 
@@ -155,7 +156,7 @@ export default function ClosuresPage() {
                                             <span className="flex items-center gap-2">
                                                 <Calendar className="h-4 w-4 text-zinc-600" />
                                                 {closure._type === "court"
-                                                    ? `${format(new Date(closure.start_time), "MMM dd, yyyy h:mm a")} – ${format(new Date(closure.end_time), "h:mm a")}`
+                                                    ? `${fmtDateShort(closure.start_time)} ${fmtTime(closure.start_time)} – ${fmtTime(closure.end_time)}`
                                                     : (closure.closure_date ? format(new Date(closure.closure_date), "MMM dd, yyyy") : "Unknown Date")
                                                 }
                                             </span>

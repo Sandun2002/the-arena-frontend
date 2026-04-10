@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { format } from "date-fns";
+import { fmtTime, fmtDateShort, fmtDateTime } from "@/lib/utils";
 import { ArrowLeft, Calendar, Clock, MapPin, Receipt, AlertCircle, CheckCircle, Download } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
@@ -82,14 +82,14 @@ export default function BookingDetailPage() {
                                     <p className="text-xs font-bold text-zinc-500 uppercase mb-1 flex items-center gap-1.5">
                                         <Calendar className="w-3.5 h-3.5" /> Date
                                     </p>
-                                    <p className="text-white font-medium">{format(new Date(booking.start_time), "EEE, MMM dd, yyyy")}</p>
+                                    <p className="text-white font-medium">{fmtDateShort(booking.start_time)}</p>
                                 </div>
                                 <div className="text-right">
                                     <p className="text-xs font-bold text-zinc-500 uppercase mb-1 flex items-center justify-end gap-1.5">
                                         <Clock className="w-3.5 h-3.5" /> Time
                                     </p>
                                     <p className="text-white font-medium">
-                                        {format(new Date(booking.start_time), "h:mm a")} - {format(new Date(booking.end_time), "h:mm a")}
+                                        {fmtTime(booking.start_time)} - {fmtTime(booking.end_time)}
                                     </p>
                                 </div>
                             </div>
@@ -118,7 +118,7 @@ export default function BookingDetailPage() {
                                 <div className="relative">
                                     <div className="absolute -left-[31px] w-4 h-4 rounded-full bg-zinc-800 border-2 border-black"></div>
                                     <p className="text-sm font-bold text-white">Booking Created</p>
-                                    <p className="text-xs text-zinc-500">{format(new Date(booking.created_at), "MMM dd, h:mm a")}</p>
+                                    <p className="text-xs text-zinc-500">{fmtDateTime(booking.created_at)}</p>
                                 </div>
 
                                 {/* Payment */}
@@ -126,7 +126,7 @@ export default function BookingDetailPage() {
                                     <div className="relative">
                                         <div className="absolute -left-[31px] w-4 h-4 rounded-full bg-emerald-500 border-2 border-black"></div>
                                         <p className="text-sm font-bold text-white">Payment Confirmed</p>
-                                        <p className="text-xs text-zinc-500">{format(new Date(booking.paid_at), "MMM dd, h:mm a")}</p>
+                                        <p className="text-xs text-zinc-500">{fmtDateTime(booking.paid_at)}</p>
                                     </div>
                                 )}
 
@@ -136,7 +136,7 @@ export default function BookingDetailPage() {
                                         <div className="absolute -left-[31px] w-4 h-4 rounded-full bg-red-500 border-2 border-black"></div>
                                         <p className="text-sm font-bold text-red-500">Cancelled</p>
                                         <p className="text-xs text-zinc-500">Reason: {booking.cancellation_reason}</p>
-                                        <p className="text-xs text-zinc-500">{format(new Date(booking.cancelled_at), "MMM dd, h:mm a")}</p>
+                                        <p className="text-xs text-zinc-500">{fmtDateTime(booking.cancelled_at)}</p>
                                     </div>
                                 )}
                             </div>

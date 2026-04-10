@@ -10,7 +10,7 @@ import {
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
 import { playerService } from "@/services/playerService";
-import { format } from "date-fns";
+import { fmtTime, fmtMonthAbbr, fmtDayNum, fmtMonthYear } from "@/lib/utils";
 import { Booking, Challenge, UserAchievement } from "@/types";
 
 export default function ProfilePage() {
@@ -95,7 +95,7 @@ export default function ProfilePage() {
                                     <Mail className="w-3.5 h-3.5" /> {user.email}
                                 </span>
                                 <span className="flex items-center gap-1.5 bg-zinc-900/50 px-3 py-1 rounded-full border border-zinc-800">
-                                    <Calendar className="w-3.5 h-3.5" /> Joined {format(new Date(user.created_at), "MMM yyyy")}
+                                    <Calendar className="w-3.5 h-3.5" /> Joined {fmtMonthYear(user.created_at)}
                                 </span>
                                 {/* Tier Badge */}
                                 <span className="flex items-center gap-1.5 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 text-emerald-400">
@@ -201,8 +201,8 @@ export default function ProfilePage() {
                                         <Link href={`/bookings/${booking.id}`} key={booking.id} className="block group">
                                             <div className="flex items-center gap-4 p-4 rounded-2xl bg-black/40 border border-zinc-800 hover:border-emerald-500/30 hover:bg-zinc-800/50 transition-all">
                                                 <div className="w-12 h-12 bg-zinc-800 rounded-xl flex flex-col items-center justify-center shrink-0 border border-zinc-700 group-hover:border-emerald-500/30 transition-colors">
-                                                    <span className="text-[9px] font-bold text-zinc-500 uppercase">{format(new Date(booking.start_time), "MMM")}</span>
-                                                    <span className="text-lg font-black text-white leading-none">{format(new Date(booking.start_time), "dd")}</span>
+                                                    <span className="text-[9px] font-bold text-zinc-500 uppercase">{fmtMonthAbbr(booking.start_time)}</span>
+                                                    <span className="text-lg font-black text-white leading-none">{fmtDayNum(booking.start_time)}</span>
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <h4 className="text-white font-bold text-sm truncate group-hover:text-emerald-400 transition-colors">
@@ -213,7 +213,7 @@ export default function ProfilePage() {
                                                     </p>
                                                     <p className="text-xs text-zinc-400 flex items-center gap-1.5 font-mono mt-0.5">
                                                         <Clock className="w-3 h-3 flex-shrink-0" />
-                                                        {format(new Date(booking.start_time), "h:mm a")}
+                                                        {fmtTime(booking.start_time)}
                                                     </p>
                                                 </div>
                                                 <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${
@@ -276,7 +276,7 @@ export default function ProfilePage() {
                                         <Link href={`/bookings/${booking.id}`} key={booking.id} className="block">
                                             <div className="flex items-center gap-4 p-4 rounded-2xl bg-black/40 border border-zinc-800 hover:bg-zinc-800/50 transition-colors group">
                                                 <div className="w-10 h-10 bg-zinc-800 rounded-xl flex items-center justify-center text-zinc-500 text-[10px] font-bold uppercase shrink-0 group-hover:bg-zinc-700 transition-colors">
-                                                    {format(new Date(booking.start_time), "MMM dd")}
+                                                    {fmtMonthAbbr(booking.start_time)} {fmtDayNum(booking.start_time)}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <h4 className="text-white font-medium text-sm truncate group-hover:text-emerald-400 transition-colors">

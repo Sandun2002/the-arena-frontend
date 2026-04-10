@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { format } from "date-fns";
+import { fmtTime, fmtDateShort } from "@/lib/utils";
 import Link from "next/link";
 import { CheckCircle, Calendar, Clock, MapPin, ArrowRight, Download } from "lucide-react";
 import { playerService } from "@/services/playerService";
@@ -90,12 +90,12 @@ export default function BookingSuccessPage() {
             <div className="border-t border-zinc-800 pt-4 space-y-3">
               <div className="flex items-center gap-3 text-sm">
                 <Calendar className="w-4 h-4 text-zinc-500" />
-                <span className="text-white">{format(new Date(booking.start_time), "EEE, MMM dd, yyyy")}</span>
+                <span className="text-white">{fmtDateShort(booking.start_time)}</span>
               </div>
               <div className="flex items-center gap-3 text-sm">
                 <Clock className="w-4 h-4 text-zinc-500" />
                 <span className="text-white">
-                  {format(new Date(booking.start_time), "h:mm a")} – {format(new Date(booking.end_time), "h:mm a")}
+                  {fmtTime(booking.start_time)} – {fmtTime(booking.end_time)}
                 </span>
               </div>
               <div className="flex items-center gap-3 text-sm">
