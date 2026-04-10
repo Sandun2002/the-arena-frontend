@@ -172,7 +172,7 @@ export default function VenueDetailsPage() {
             </section>
           </div>
 
-          <div className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto scrollbar-hide space-y-6 pb-4">
+          <div className="sticky top-24 space-y-6 pb-4">
             <BookingWidget venue={venue} />
 
             <div className="p-6 rounded-[2rem] bg-gradient-to-br from-zinc-900 to-zinc-900/50 border border-zinc-800 text-center">
