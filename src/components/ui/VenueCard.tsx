@@ -29,8 +29,8 @@ export default function VenueCard({ venue, searchParams }: VenueCardProps) {
           src={venue.cover_image || "/sports/futsal.png"}
           alt={venue.name}
           fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
           className="object-cover transition-transform duration-700 group-hover:scale-110"
-          unoptimized
         />
         {/* Gradient Overlay for text readability */}
         <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent opacity-90" />

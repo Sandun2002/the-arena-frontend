@@ -42,16 +42,24 @@ export default function FeaturedVenues() {
           </div>
         </div>
 
-        {loading ? (
-          // Skeleton Loading State (Simple text for now)
-          <div className="text-white">Loading premium venues...</div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {venues.map((venue) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {loading ? (
+            [...Array(3)].map((_, i) => (
+              <div key={i} className="rounded-xl bg-zinc-900 border border-zinc-800 overflow-hidden animate-pulse">
+                <div className="h-64 bg-zinc-800" />
+                <div className="p-5 space-y-3">
+                  <div className="h-5 bg-zinc-800 rounded w-3/4" />
+                  <div className="h-4 bg-zinc-800 rounded w-1/2" />
+                  <div className="h-4 bg-zinc-800 rounded w-1/3 mt-4" />
+                </div>
+              </div>
+            ))
+          ) : (
+            venues.map((venue) => (
               <VenueCard key={venue.id} venue={venue} />
-            ))}
-          </div>
-        )}
+            ))
+          )}
+        </div>
 
         <div className="mt-12 text-center md:hidden">
           <Button href="/venues" variant="outline">View All Venues</Button>

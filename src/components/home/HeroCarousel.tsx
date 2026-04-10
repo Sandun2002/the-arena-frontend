@@ -30,6 +30,7 @@ export default function HeroCarousel({ venues }: HeroCarouselProps) {
   }, { scope: containerRef });
 
   const enableLoop = venues.length >= 3;
+  const initialCenterIdx = Math.floor(venues.length / 2);
 
   return (
     <div ref={containerRef} className="w-full pt-6 pb-2 md:pt-8 md:pb-4 relative">
@@ -73,7 +74,7 @@ export default function HeroCarousel({ venues }: HeroCarouselProps) {
             className="!w-[280px] md:!w-[400px] py-4"
           >
             {({ isActive }) => (
-              <HeroVenueCard venue={venue} isActive={isActive} priority={isActive} />
+              <HeroVenueCard venue={venue} isActive={isActive} priority={isActive || idx === initialCenterIdx} />
             )}
           </SwiperSlide>
         ))}
