@@ -18,7 +18,9 @@ export default function HeroVenueCard({ venue, isActive, priority }: HeroVenueCa
         h-[200px] md:h-[280px]
         w-full overflow-hidden 
         rounded-2xl cursor-pointer
-        transition-all duration-500 ease-out
+        duration-500 ease-out
+        transition-[transform,opacity,filter]
+        will-change-[transform,opacity]
         ${isActive
           ? "shadow-[0_8px_40px_-8px_rgba(80,200,120,0.5)] ring-2 ring-emerald-400/50"
           : "opacity-40 scale-[0.92] grayscale-[40%]"
@@ -33,7 +35,7 @@ export default function HeroVenueCard({ venue, isActive, priority }: HeroVenueCa
         sizes="(max-width: 768px) 280px, 400px"
         priority={priority}
         className={`
-          object-cover transition-all duration-700
+          object-cover transition-transform duration-700
           ${isActive ? "scale-105" : "scale-100"}
         `}
       />
@@ -41,7 +43,7 @@ export default function HeroVenueCard({ venue, isActive, priority }: HeroVenueCa
       {/* Premium Gradient Overlay */}
       <div
         className={`
-          absolute inset-0 transition-all duration-500
+          absolute inset-0 transition-opacity duration-500
           bg-gradient-to-t from-black via-black/20 to-transparent
           ${isActive ? "opacity-100" : "opacity-60"}
         `}
@@ -56,7 +58,7 @@ export default function HeroVenueCard({ venue, isActive, priority }: HeroVenueCa
       <div
         className={`
           absolute bottom-0 left-0 w-full p-4 md:p-5
-          transition-all duration-500 transform
+          transition-[transform,opacity] duration-500
           ${isActive ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}
         `}
       >

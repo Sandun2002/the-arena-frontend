@@ -74,7 +74,7 @@ export default function HeroCarousel({ venues }: HeroCarouselProps) {
             className="!w-[280px] md:!w-[400px] py-4"
           >
             {({ isActive }) => (
-              <HeroVenueCard venue={venue} isActive={isActive} priority={isActive || idx === initialCenterIdx} />
+              <HeroVenueCard venue={venue} isActive={isActive} priority={idx === initialCenterIdx} />
             )}
           </SwiperSlide>
         ))}

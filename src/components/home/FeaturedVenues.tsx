@@ -47,10 +47,16 @@ export default function FeaturedVenues() {
             [...Array(3)].map((_, i) => (
               <div key={i} className="rounded-xl bg-zinc-900 border border-zinc-800 overflow-hidden animate-pulse">
                 <div className="h-64 bg-zinc-800" />
-                <div className="p-5 space-y-3">
-                  <div className="h-5 bg-zinc-800 rounded w-3/4" />
-                  <div className="h-4 bg-zinc-800 rounded w-1/2" />
-                  <div className="h-4 bg-zinc-800 rounded w-1/3 mt-4" />
+                <div className="p-5">
+                  <div className="mb-3 flex items-center justify-between">
+                    <div className="h-6 bg-zinc-800 rounded w-3/4" />
+                    <div className="h-5 bg-zinc-800 rounded w-10" />
+                  </div>
+                  <div className="mb-4 h-4 bg-zinc-800 rounded w-1/2" />
+                  <div className="border-t border-zinc-800 pt-4 flex items-center justify-between">
+                    <div className="h-5 bg-zinc-800 rounded w-2/5" />
+                    <div className="h-4 bg-zinc-800 rounded w-16" />
+                  </div>
                 </div>
               </div>
             ))
