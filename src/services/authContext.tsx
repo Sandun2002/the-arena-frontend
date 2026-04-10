@@ -11,6 +11,7 @@ interface AuthContextType {
     user: User | null;
     loading: boolean;
     login: (email: string, password: string) => Promise<User>;
+    loginWithGoogle: (idToken: string) => Promise<User>;
     logout: () => void;
     // Role Helpers
     hasRole: (role: UserRole) => boolean;
@@ -66,6 +67,18 @@ export const AuthProvider: FunctionComponent<{ children: React.ReactNode }> = ({
         }
     };
 
+    const loginWithGoogle = async (idToken: string): Promise<User> => {
+        try {
+            await authService.googleLogin(idToken);
+            const userData = await authService.getMe();
+            setUser(userData);
+            return userData;
+        } catch (error) {
+            console.error("Google Login Failed", error);
+            throw error;
+        }
+    };
+
     const logout = () => {
         authService.logout();
         setUser(null);
@@ -88,6 +101,7 @@ export const AuthProvider: FunctionComponent<{ children: React.ReactNode }> = ({
                 user,
                 loading,
                 login,
+                loginWithGoogle,
                 logout,
                 hasRole,
                 isCustomer,

@@ -75,6 +75,19 @@ class AuthService {
         }
     }
 
+    async googleLogin(idToken: string): Promise<LoginResponse> {
+        try {
+            const response = await apiClient.post<LoginResponse>('/auth/google', { id_token: idToken });
+            if (response.data) {
+                this.setTokens(response.data);
+            }
+            return response.data;
+        } catch (error) {
+            console.error("Google login failed:", error);
+            throw error;
+        }
+    }
+
     // === Password Reset ===
     async requestPasswordReset(email: string): Promise<boolean> {
         await apiClient.post('/auth/forgot-password', { email });
