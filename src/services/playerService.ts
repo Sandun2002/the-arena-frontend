@@ -78,19 +78,34 @@ class PlayerService {
     async getChallenges(): Promise<{ challenges: Challenge[], achievements: UserAchievement[] }> {
         const response = await apiClient.get<any>('/player/challenges');
         const rawChallenges = response.data.challenges || [];
+
+        // Fallback: infer category from challenge_type when backend meta is null
+        const TYPE_TO_CAT: Record<string, string> = {
+            weekly_bookings: "weekly",
+            multi_sport: "explorer", multi_venue: "explorer", multi_city: "explorer",
+            venue_loyalty: "loyalty",
+            streak: "streak",
+            peak_hour: "timing", off_peak: "timing", night_owl: "timing", early_bird: "timing",
+            total_bookings: "milestone", total_hours: "milestone",
+        };
         
-        const challenges: Challenge[] = rawChallenges.map((c: any) => ({
-            id: c.id,
-            slug: c.slug || "",
-            title: c.name,
-            description: c.description,
-            xp_reward: c.xp_reward,
-            icon: c.icon || "🏆",
-            type: c.category || c.challenge_type || "general",
-            category: c.category || "general",
-            target_count: c.target_value,
-            is_permanent: c.is_permanent ?? false,
-        }));
+        const challenges: Challenge[] = rawChallenges.map((c: any) => {
+            const cat = (c.category && c.category !== "general")
+                ? c.category
+                : (TYPE_TO_CAT[c.challenge_type] || "general");
+            return {
+                id: c.id,
+                slug: c.slug || "",
+                title: c.name,
+                description: c.description,
+                xp_reward: c.xp_reward,
+                icon: c.icon || "🏆",
+                type: cat,
+                category: cat,
+                target_count: c.target_value,
+                is_permanent: c.is_permanent ?? false,
+            };
+        });
 
         const achievements: UserAchievement[] = rawChallenges.map((c: any) => ({
             id: `ach_${c.id}`,

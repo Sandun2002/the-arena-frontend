@@ -53,6 +53,19 @@ const TIER_STYLES: Record<string, { glow: string; gradient: string; icon: string
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Tier Ladder data
+// ─────────────────────────────────────────────────────────────────────────────
+const TIER_LADDER = [
+    { name: "Rookie",    minXp: 0,     nextXp: 500,   icon: "🥉", color: "#71717a" },
+    { name: "Contender", minXp: 500,   nextXp: 1200,  icon: "🥈", color: "#3b82f6" },
+    { name: "Athlete",   minXp: 1200,  nextXp: 2500,  icon: "🏅", color: "#10b981" },
+    { name: "Champion",  minXp: 2500,  nextXp: 4500,  icon: "🥇", color: "#eab308" },
+    { name: "Elite",     minXp: 4500,  nextXp: 7500,  icon: "🔥", color: "#f97316" },
+    { name: "Legend",    minXp: 7500,  nextXp: 12000, icon: "⚔️", color: "#ef4444" },
+    { name: "Icon",      minXp: 12000, nextXp: null,  icon: "👑", color: "#a855f7" },
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
 function getDaysUntilMonday(): number {
@@ -110,16 +123,6 @@ function ChallengeCard({ challenge, achievement, catConfig, animated }: {
                     style={{ boxShadow: `inset 0 0 0 1px ${rarity.border}`, opacity: 0.5 }} />
             )}
 
-            {/* OBTAINED stamp */}
-            {completed && (
-                <div className="absolute top-4 right-4 z-20 pointer-events-none">
-                    <div className="px-2.5 py-0.5 rounded text-[10px] font-black tracking-[0.15em] border-2 rotate-12 opacity-90"
-                        style={{ background: "transparent", borderColor: rarity.text, color: rarity.text }}>
-                        OBTAINED
-                    </div>
-                </div>
-            )}
-
             {/* Permanent badge */}
             {isPermanent && (
                 <div className="absolute top-3 left-3 z-20">
@@ -132,15 +135,23 @@ function ChallengeCard({ challenge, achievement, catConfig, animated }: {
             )}
 
             <div className="p-5">
-                {/* Top row: category chip + rarity + XP */}
-                <div className="flex items-center justify-between mb-4">
+                {/* Top row: category chip + rarity + OBTAINED (stacked, no overlap) */}
+                <div className="flex items-start justify-between mb-4">
                     <span className="text-[10px] font-black tracking-widest uppercase px-2 py-0.5 rounded-full"
                         style={{ background: `${catConfig.tabBg}22`, color: catConfig.tabBg, border: `1px solid ${catConfig.tabBg}55` }}>
                         {catConfig.icon} {catConfig.label}
                     </span>
-                    <span className="text-[10px] font-black tracking-widest" style={{ color: rarity.text }}>
-                        {rarity.label}
-                    </span>
+                    <div className="flex flex-col items-end gap-1">
+                        <span className="text-[10px] font-black tracking-widest" style={{ color: rarity.text }}>
+                            {rarity.label}
+                        </span>
+                        {completed && (
+                            <span className="text-[9px] font-black tracking-[0.1em] px-1.5 py-0.5 rounded border"
+                                style={{ borderColor: rarity.text, color: rarity.text, background: rarity.glow }}>
+                                ✓ OBTAINED
+                            </span>
+                        )}
+                    </div>
                 </div>
 
                 {/* Icon orb */}
@@ -222,6 +233,7 @@ export default function ChallengesPage() {
     const [stats, setStats] = useState<any>(null);
     const [selectedCategory, setSelectedCategory] = useState<Category>("all");
     const [animated, setAnimated] = useState(false);
+    const [showTierLadder, setShowTierLadder] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -232,7 +244,9 @@ export default function ChallengesPage() {
     }, [user]);
 
     useEffect(() => {
-        if (gamification && containerRef.current) {
+        // Require BOTH gamification + stats before animating — prevents XP bar
+        // snapping to 100% when stats hasn't loaded yet (nextTierMinXp = null).
+        if (gamification && stats && containerRef.current) {
             const t = setTimeout(() => setAnimated(true), 100);
             gsap.fromTo(
                 ".challenge-card",
@@ -241,7 +255,7 @@ export default function ChallengesPage() {
             );
             return () => clearTimeout(t);
         }
-    }, [gamification, selectedCategory]);
+    }, [gamification, stats, selectedCategory]);
 
     if (isAuthPending || !user) return <AuthLoadingSpinner />;
 
@@ -384,6 +398,77 @@ export default function ChallengesPage() {
                             </div>
                         </div>
                     </div>
+                </div>
+
+                {/* ── TIER LADDER ── */}
+                <div className="mb-6">
+                    <button
+                        onClick={() => setShowTierLadder(v => !v)}
+                        className="w-full flex items-center justify-between px-5 py-3 rounded-2xl transition-all duration-200 group"
+                        style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                        <div className="flex items-center gap-3">
+                            <span className="text-base">🏆</span>
+                            <span className="text-sm font-black text-white tracking-wide">Tier Ladder</span>
+                            <span className="hidden sm:inline text-xs" style={{ color: "rgba(255,255,255,0.25)" }}>all tiers & XP required</span>
+                        </div>
+                        <span className="text-xs font-bold group-hover:text-zinc-300 transition-colors" style={{ color: "rgba(255,255,255,0.3)" }}>
+                            {showTierLadder ? "▲ hide" : "▼ show"}
+                        </span>
+                    </button>
+
+                    {showTierLadder && (
+                        <div className="mt-3 overflow-x-auto scrollbar-hide -mx-4 px-4">
+                            <div className="flex gap-3 pb-2" style={{ width: "max-content" }}>
+                                {TIER_LADDER.map((t, i) => {
+                                    const isCurrent = t.name === tier;
+                                    const isUnlocked = xp >= t.minXp;
+                                    const isNext = !isUnlocked && (i === 0 || xp >= TIER_LADDER[i - 1].minXp);
+                                    return (
+                                        <div key={t.name}
+                                            className="w-28 rounded-2xl p-3 flex flex-col items-center gap-1.5 transition-all duration-300"
+                                            style={{
+                                                background: isCurrent
+                                                    ? `linear-gradient(145deg, ${t.color}28, ${t.color}0d)`
+                                                    : isUnlocked ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.3)",
+                                                border: `1px solid ${isCurrent ? t.color + "aa" : isUnlocked ? t.color + "44" : "rgba(255,255,255,0.05)"}`,
+                                                boxShadow: isCurrent ? `0 0 28px ${t.color}55` : "none",
+                                                opacity: isUnlocked ? 1 : 0.4,
+                                            }}>
+                                            <span className="text-2xl">{t.icon}</span>
+                                            <span className="text-xs font-black text-center"
+                                                style={{ color: isCurrent ? t.color : isUnlocked ? "#e4e4e7" : "#52525b" }}>
+                                                {t.name}
+                                            </span>
+                                            <span className="text-[10px] text-center font-bold"
+                                                style={{ color: isCurrent ? t.color + "cc" : "#52525b" }}>
+                                                {t.minXp.toLocaleString()} XP
+                                            </span>
+                                            {t.nextXp && (
+                                                <span className="text-[9px] text-center" style={{ color: "rgba(255,255,255,0.2)" }}>
+                                                    up to {(t.nextXp - 1).toLocaleString()}
+                                                </span>
+                                            )}
+                                            {isCurrent && (
+                                                <span className="text-[8px] font-black px-2 py-0.5 rounded-full tracking-widest mt-0.5"
+                                                    style={{ background: t.color + "33", color: t.color, border: `1px solid ${t.color}66` }}>
+                                                    YOU ARE HERE
+                                                </span>
+                                            )}
+                                            {isNext && (
+                                                <span className="text-[8px] font-black px-2 py-0.5 rounded-full tracking-widest mt-0.5"
+                                                    style={{ background: "rgba(255,255,255,0.08)", color: "#94a3b8", border: "1px solid rgba(255,255,255,0.1)" }}>
+                                                    NEXT
+                                                </span>
+                                            )}
+                                            {!isUnlocked && !isNext && (
+                                                <span className="text-[8px] mt-0.5" style={{ color: "#3f3f46" }}>🔒 locked</span>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* ── CATEGORY TABS ── */}
