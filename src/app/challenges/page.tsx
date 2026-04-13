@@ -69,7 +69,7 @@ const TIER_LADDER = [
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
 function getDaysUntilMonday(): number {
-    const day = new Date().getDay();
+    const day = new Date().getUTCDay();
     return day === 1 ? 7 : (8 - day) % 7;
 }
 
@@ -119,7 +119,7 @@ function ChallengeCard({ challenge, achievement, catConfig, animated }: {
 
             <div className="p-4 sm:p-5 flex h-full flex-col">
                 <div className="mb-4 flex items-start justify-between gap-3">
-                    <div className="flex min-w-0 items-start gap-3">
+                    <div className="flex min-w-0 flex-1 items-start gap-3">
                         <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border text-2xl"
                             style={{
                                 background: `${completed ? rarity.text : catConfig.tabBg}15`,
@@ -132,8 +132,8 @@ function ChallengeCard({ challenge, achievement, catConfig, animated }: {
                                 </div>
                             )}
                         </div>
-                        <div className="min-w-0">
-                            <div className="mb-2 flex flex-wrap items-center gap-2">
+                        <div className="min-w-0 flex-1">
+                            <div className="mb-2 flex min-h-[28px] flex-wrap items-center gap-2">
                                 <span className="rounded-full border px-2 py-0.5 text-[10px] font-black tracking-widest uppercase"
                                     style={{ background: `${catConfig.tabBg}18`, color: catConfig.tabBg, borderColor: `${catConfig.tabBg}40` }}>
                                     {catConfig.icon} {catConfig.label}
@@ -146,8 +146,8 @@ function ChallengeCard({ challenge, achievement, catConfig, animated }: {
                             </div>
                         </div>
                     </div>
-                    <div className="flex shrink-0 flex-col items-end gap-1.5 text-right">
-                        <span className="rounded-full border px-2.5 py-1 text-[11px] font-black text-white"
+                    <div className="flex w-[92px] shrink-0 flex-col items-end gap-1.5 text-right md:w-[104px]">
+                        <span className="flex min-h-8 w-full items-center justify-center rounded-full border px-2.5 py-1 text-[11px] font-black text-white"
                             style={{
                                 borderColor: `${rarity.text}44`,
                                 background: `linear-gradient(135deg, rgba(24,24,27,0.92), ${rarity.glow})`,
@@ -155,16 +155,16 @@ function ChallengeCard({ challenge, achievement, catConfig, animated }: {
                             }}>
                             +{challenge.xp_reward} XP
                         </span>
-                        <span className="rounded-full border px-2 py-0.5 text-[9px] font-black tracking-[0.22em] uppercase"
+                        <span className="flex min-h-6 w-full items-center justify-center rounded-full border px-2 py-0.5 text-[9px] font-black tracking-[0.18em] uppercase"
                             style={{ color: rarity.text, borderColor: `${rarity.text}33`, background: `${rarity.glow}` }}>
                             {rarity.label}
                         </span>
                     </div>
                 </div>
 
-                <div className="mb-5 min-h-[86px] md:min-h-[104px]">
-                    <h3 className="mb-2 min-h-[56px] text-base font-black leading-tight text-white sm:text-lg">{challenge.title}</h3>
-                    <p className="text-sm leading-relaxed text-zinc-400">{challenge.description}</p>
+                <div className="mb-5 min-h-[92px] md:min-h-[116px]">
+                    <h3 className="mb-2 min-h-[56px] text-base font-black leading-[1.05] text-white sm:text-lg md:min-h-[60px]">{challenge.title}</h3>
+                    <p className="min-h-[40px] text-sm leading-relaxed text-zinc-400">{challenge.description}</p>
                 </div>
 
                 <div className="mt-auto">
@@ -282,15 +282,17 @@ export default function ChallengesPage() {
     const xpInTier = xp - tierMinXp;
     const xpRangeForTier = nextTierMinXp ? nextTierMinXp - tierMinXp : 1;
     const tierProgress = nextTierMinXp ? Math.min(100, Math.round((xpInTier / xpRangeForTier) * 100)) : 100;
+    const xpToNextTier = stats?.xp_to_next_tier ?? 0;
+    const weeklyResetDays = getDaysUntilMonday();
+    const completedCount = gamification?.achievements.filter(a => a.is_completed).length || 0;
+    const totalCount = gamification?.challenges.length || 0;
+    const completionRate = totalCount ? Math.round((completedCount / totalCount) * 100) : 0;
 
     const getAchievement = (id: string | number) =>
         gamification?.achievements.find(a => a.challenge_id === id);
 
     const getCatConfig = (cat: string) =>
         CATEGORIES.find(c => c.key === cat) || CATEGORIES[0];
-
-    const completedCount = gamification?.achievements.filter(a => a.is_completed).length || 0;
-    const totalCount = gamification?.challenges.length || 0;
 
     const categoryCounts = (cat: string) => {
         const chs = gamification?.challenges.filter(c => c.category === cat) || [];
@@ -353,43 +355,60 @@ export default function ChallengesPage() {
                 </div>
 
                 {/* ── HERO SECTION ── */}
-                <div className="premium-hero relative mb-8 overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-900/55 p-5 md:p-8 backdrop-blur-sm">
+                <div className="premium-hero relative mb-8 overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-900/55 p-5 md:p-6 xl:p-8 backdrop-blur-sm">
                     <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent" />
+                    <div className="absolute -left-8 top-8 h-32 w-32 rounded-full blur-3xl" style={{ background: "radial-gradient(circle, rgba(16,185,129,0.12), transparent 70%)" }} />
 
-                    <div className="relative z-10 flex flex-col gap-6 md:flex-row md:items-center md:gap-8">
-                        <div className="flex items-center gap-4 md:block md:flex-shrink-0">
-                            <div className="relative h-24 w-24 rounded-3xl border border-zinc-800 bg-black/30 p-2 shadow-2xl md:h-28 md:w-28">
-                                <div className="flex h-full w-full items-center justify-center rounded-[1.25rem] text-5xl md:text-6xl"
-                                    style={{ background: tierStyle.gradient, boxShadow: `0 8px 24px ${tierStyle.glow}` }}>
-                                    {tierStyle.icon}
-                                </div>
+                    <div className="relative z-10 mb-5 flex items-start justify-between gap-4">
+                        <div>
+                            <p className="text-[11px] font-black uppercase tracking-[0.22em] text-emerald-400">Player Progression</p>
+                            <div className="mt-2 flex flex-wrap items-center gap-3">
+                                <h1 className="text-3xl font-black tracking-tight text-white md:text-4xl">{tier} Tier</h1>
+                                <span className="rounded-full border px-3 py-1 text-sm font-black text-white"
+                                    style={{ background: `${tierStyle.glow}`, borderColor: `${tierStyle.glow}` }}>
+                                    Level {level}
+                                </span>
                             </div>
+                            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-zinc-400">
+                                You&apos;ve earned {xp.toLocaleString()} XP and completed {completedCount} of {totalCount} active challenges. Every booking pushes you closer to {nextTier ?? "the top tier"}.
+                            </p>
+                        </div>
 
-                            <div className="md:hidden min-w-0">
-                                <div className="mb-2 flex flex-wrap items-center gap-2">
-                                    <span className="text-3xl font-black tracking-tight text-white">Level {level}</span>
-                                    <span className="rounded-full border px-3 py-1 text-sm font-black text-white"
-                                        style={{ background: `${tierStyle.glow}`, borderColor: `${tierStyle.glow}` }}>
-                                        {tier}
-                                    </span>
+                        <div className="hidden md:flex items-center gap-2 rounded-full border border-zinc-800 bg-black/30 px-4 py-2">
+                            <Zap className="h-3.5 w-3.5 text-yellow-400" />
+                            <span className="text-xs font-black text-white">{xp.toLocaleString()} XP banked</span>
+                        </div>
+                    </div>
+
+                    <div className="relative z-10 grid gap-4 lg:grid-cols-[220px,minmax(0,1fr),220px]">
+                        <div className="rounded-[1.75rem] border border-zinc-800 bg-black/30 p-4">
+                            <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-[1.35rem] border border-zinc-800 text-5xl shadow-2xl md:h-28 md:w-28 md:text-6xl"
+                                style={{ background: tierStyle.gradient, boxShadow: `0 8px 24px ${tierStyle.glow}` }}>
+                                {tierStyle.icon}
+                            </div>
+                            <div className="text-center">
+                                <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-zinc-500">Current standing</div>
+                                <div className="mt-2 text-3xl font-black tracking-tight text-white">Level {level}</div>
+                                <div className="mt-2 inline-flex rounded-full border px-3 py-1 text-sm font-black text-white"
+                                    style={{ background: `${tierStyle.glow}`, borderColor: `${tierStyle.glow}` }}>
+                                    {tier}
                                 </div>
-                                <p className="text-sm text-zinc-400">Keep booking and completing challenges to climb the ladder.</p>
                             </div>
                         </div>
 
-                        <div className="flex-1 w-full">
-                            <div className="hidden md:block mb-4">
-                                <div className="mb-2 flex items-center gap-3">
-                                    <span className="text-4xl font-black tracking-tight text-white">Level {level}</span>
-                                    <span className="rounded-full border px-3 py-1 text-sm font-black text-white"
-                                        style={{ background: `${tierStyle.glow}`, borderColor: `${tierStyle.glow}` }}>
-                                        {tier}
-                                    </span>
+                        <div className="rounded-[1.75rem] border border-zinc-800 bg-black/20 p-5 md:p-6">
+                            <div className="mb-4 flex items-center justify-between gap-3">
+                                <div>
+                                    <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-zinc-500">Tier progress</div>
+                                    <div className="mt-1 text-lg font-black text-white">{nextTier ? `${xpToNextTier} XP to ${nextTier}` : "Top tier reached"}</div>
                                 </div>
-                                <p className="text-sm text-zinc-400">Keep booking and completing challenges to climb the ladder.</p>
+                                <div className="text-right">
+                                    <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-zinc-500">Progress</div>
+                                    <div className="mt-1 text-xl font-black text-white">{tierProgress}%</div>
+                                </div>
                             </div>
 
-                            <div className="mb-4 max-w-2xl">
+                            <div className="mb-4 max-w-3xl">
                                 <div className="mb-2 flex justify-between text-xs font-bold text-zinc-500">
                                     <span>{tierMinXp.toLocaleString()} XP</span>
                                     <span>{nextTierMinXp ? nextTierMinXp.toLocaleString() : "MAX"} XP</span>
@@ -402,14 +421,32 @@ export default function ChallengesPage() {
                                         }} />
                                 </div>
                                 <p className="mt-2 text-xs text-zinc-500 md:text-right">
-                                    {nextTier ? <>{stats?.xp_to_next_tier} XP to <span className="font-bold text-zinc-300">{nextTier}</span></> : <span className="font-bold text-amber-400">Max tier reached</span>}
+                                    {nextTier ? <>{xpToNextTier} XP to <span className="font-bold text-zinc-300">{nextTier}</span></> : <span className="font-bold text-amber-400">Max tier reached</span>}
                                 </p>
                             </div>
 
-                            <div className="flex flex-wrap items-center gap-3">
-                                <StatPill icon="✅" value={`${completedCount} / ${totalCount}`} label="Challenges" />
-                                <StatPill icon="⚡" value={xp.toLocaleString()} label="Total XP" />
-                                <StatPill icon="⏱" value={`${getDaysUntilMonday()}d`} label="Weekly Reset" />
+                            <div className="grid gap-3 sm:grid-cols-3">
+                                <HeroStatCard icon="✅" value={`${completedCount}/${totalCount}`} label="Challenges cleared" accent="text-emerald-400" />
+                                <HeroStatCard icon="⚡" value={`${completionRate}%`} label="Completion rate" accent="text-white" />
+                                <HeroStatCard icon="🏆" value={nextTier ? nextTier : "Maxed"} label="Next chase" accent="text-amber-400" />
+                            </div>
+                        </div>
+
+                        <div className="space-y-3">
+                            <div className="rounded-[1.5rem] border border-zinc-800 bg-black/25 p-4">
+                                <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-zinc-500">Next target</div>
+                                <div className="mt-2 text-lg font-black text-white">{nextTier ?? "Top tier unlocked"}</div>
+                                <p className="mt-2 text-xs leading-relaxed text-zinc-400">
+                                    {nextTier ? `${xpToNextTier} XP left to unlock ${nextTier}.` : "You already hold the highest tier available."}
+                                </p>
+                            </div>
+
+                            <div className="rounded-[1.5rem] border border-zinc-800 bg-black/25 p-4">
+                                <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-zinc-500">Weekly reset</div>
+                                <div className="mt-2 text-lg font-black text-white">Monday</div>
+                                <p className="mt-2 text-xs leading-relaxed text-zinc-400">
+                                    Global reset for all players. {weeklyResetDays}d remaining based on the backend reset window.
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -604,6 +641,18 @@ function StatPill({ icon, value, label }: { icon: string; value: string; label: 
             <span>{icon}</span>
             <span className="font-black text-white">{value}</span>
             <span className="text-zinc-500">{label}</span>
+        </div>
+    );
+}
+
+function HeroStatCard({ icon, value, label, accent }: { icon: string; value: string; label: string; accent: string }) {
+    return (
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-950/60 p-3">
+            <div className="flex items-center justify-between gap-3">
+                <span className="text-sm">{icon}</span>
+                <span className={`text-lg font-black ${accent}`}>{value}</span>
+            </div>
+            <div className="mt-1 text-[11px] font-semibold text-zinc-500">{label}</div>
         </div>
     );
 }
