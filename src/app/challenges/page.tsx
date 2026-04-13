@@ -102,122 +102,106 @@ function ChallengeCard({ challenge, achievement, catConfig, animated }: {
 
     return (
         <div
-            className="challenge-card group relative overflow-hidden rounded-2xl transition-transform duration-300 hover:-translate-y-1 hover:scale-[1.02] cursor-default select-none"
+            className="challenge-card group relative flex h-full flex-col overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-900/70 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-zinc-700 cursor-default select-none"
             style={{
-                background: `linear-gradient(145deg, ${catConfig.gradientFrom}, ${catConfig.gradientTo})`,
-                border: `1.5px solid ${completed ? rarity.border : catConfig.borderColor}`,
                 boxShadow: completed
-                    ? `0 0 20px ${rarity.glow}, 0 4px 24px rgba(0,0,0,0.5)`
+                    ? `0 10px 30px rgba(0,0,0,0.35), 0 0 0 1px ${rarity.border}`
                     : isLegendaryPlus
-                        ? `0 0 16px ${rarity.glow}, 0 4px 20px rgba(0,0,0,0.4)`
-                        : `0 4px 20px rgba(0,0,0,0.4)`,
+                        ? `0 10px 30px rgba(0,0,0,0.35), 0 0 0 1px ${rarity.border}`
+                        : `0 10px 30px rgba(0,0,0,0.28)`,
             }}
         >
-            {/* Shimmer sweep */}
-            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                style={{ background: "linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.04) 50%, transparent 70%)", backgroundSize: "200% 100%", animation: "shimmerSweep 1.5s ease-in-out" }} />
+            <div className="absolute inset-x-0 top-0 h-px opacity-70"
+                style={{ background: `linear-gradient(90deg, transparent, ${completed ? rarity.text : catConfig.tabBg}, transparent)` }} />
 
-            {/* Legendary pulse ring */}
-            {isLegendaryPlus && !completed && (
-                <div className="absolute inset-0 rounded-2xl pointer-events-none animate-pulse"
-                    style={{ boxShadow: `inset 0 0 0 1px ${rarity.border}`, opacity: 0.5 }} />
-            )}
-
-            {/* Permanent badge */}
-            {isPermanent && (
-                <div className="absolute top-3 left-3 z-20">
-                    <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-black tracking-widest"
-                        style={{ background: "rgba(245,158,11,0.15)", border: "1px solid rgba(245,158,11,0.4)", color: "#fbbf24" }}>
-                        <InfinityIcon className="w-2.5 h-2.5" />
-                        <span>PERMANENT</span>
+            <div className="p-4 sm:p-5 flex h-full flex-col">
+                <div className="mb-4 flex items-start justify-between gap-3">
+                    <div className="flex min-w-0 items-start gap-3">
+                        <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border text-2xl"
+                            style={{
+                                background: `${completed ? rarity.text : catConfig.tabBg}15`,
+                                borderColor: completed ? rarity.border : `${catConfig.tabBg}44`,
+                            }}>
+                            {challenge.icon}
+                            {completed && (
+                                <div className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border border-zinc-900 bg-zinc-800">
+                                    <CheckCircle className="w-3.5 h-3.5" style={{ color: rarity.text }} />
+                                </div>
+                            )}
+                        </div>
+                        <div className="min-w-0">
+                            <div className="mb-2 flex flex-wrap items-center gap-2">
+                                <span className="rounded-full border px-2 py-0.5 text-[10px] font-black tracking-widest uppercase"
+                                    style={{ background: `${catConfig.tabBg}18`, color: catConfig.tabBg, borderColor: `${catConfig.tabBg}40` }}>
+                                    {catConfig.icon} {catConfig.label}
+                                </span>
+                                {isPermanent && (
+                                    <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[10px] font-black tracking-widest text-amber-300 uppercase">
+                                        <InfinityIcon className="w-2.5 h-2.5" /> Permanent
+                                    </span>
+                                )}
+                            </div>
+                            <h3 className="text-base font-bold leading-tight text-white sm:text-lg">{challenge.title}</h3>
+                        </div>
                     </div>
-                </div>
-            )}
-
-            <div className="p-5">
-                {/* Top row: category chip + rarity + OBTAINED (stacked, no overlap) */}
-                <div className="flex items-start justify-between mb-4">
-                    <span className="text-[10px] font-black tracking-widest uppercase px-2 py-0.5 rounded-full"
-                        style={{ background: `${catConfig.tabBg}22`, color: catConfig.tabBg, border: `1px solid ${catConfig.tabBg}55` }}>
-                        {catConfig.icon} {catConfig.label}
-                    </span>
-                    <div className="flex flex-col items-end gap-1">
-                        <span className="text-[10px] font-black tracking-widest" style={{ color: rarity.text }}>
+                    <div className="flex shrink-0 flex-col items-end gap-1 text-right">
+                        <span className="rounded-full border border-zinc-700 bg-black/30 px-2.5 py-1 text-[11px] font-black text-white">
+                            +{challenge.xp_reward} XP
+                        </span>
+                        <span className="text-[10px] font-black tracking-[0.16em] uppercase" style={{ color: rarity.text }}>
                             {rarity.label}
                         </span>
-                        {completed && (
-                            <span className="text-[9px] font-black tracking-[0.1em] px-1.5 py-0.5 rounded border"
-                                style={{ borderColor: rarity.text, color: rarity.text, background: rarity.glow }}>
-                                ✓ OBTAINED
-                            </span>
-                        )}
                     </div>
                 </div>
 
-                {/* Icon orb */}
-                <div className="flex justify-center mb-4">
-                    <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-4xl relative"
-                        style={{
-                            background: `radial-gradient(circle at 40% 35%, ${catConfig.tabBg}33, ${catConfig.gradientTo})`,
-                            border: `1px solid ${catConfig.borderColor}`,
-                            boxShadow: `0 0 20px ${catConfig.glowColor}`,
-                        }}>
-                        {challenge.icon}
-                        {completed && (
-                            <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center"
-                                style={{ background: rarity.bar[0] }}>
-                                <CheckCircle className="w-3.5 h-3.5 text-white" />
-                            </div>
-                        )}
-                    </div>
-                </div>
+                <p className="mb-5 text-sm leading-relaxed text-zinc-400">{challenge.description}</p>
 
-                {/* Title + description */}
-                <h3 className="text-base font-black text-white text-center mb-1 leading-tight">{challenge.title}</h3>
-                <p className="text-xs text-center mb-4 leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>{challenge.description}</p>
-
-                {/* Progress bar */}
-                <div className="mb-3">
-                    <div className="flex justify-between text-[10px] font-bold mb-1.5" style={{ color: "rgba(255,255,255,0.4)" }}>
-                        <span>{completed ? "Completed!" : "Progress"}</span>
-                        <span style={{ color: "rgba(255,255,255,0.7)" }}>{current} / {challenge.target_count}</span>
+                <div className="mt-auto">
+                    <div className="mb-2 flex items-center justify-between text-[11px] font-semibold text-zinc-500">
+                        <span>{completed ? "Completed" : "Progress"}</span>
+                        <span className="text-zinc-300">{current} / {challenge.target_count}</span>
                     </div>
-                    <div className="h-2.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
+                    <div className="h-2.5 overflow-hidden rounded-full border border-white/5 bg-black/40">
                         <div
                             className="h-full rounded-full transition-all duration-[1200ms] ease-out"
                             style={{
                                 width: animated ? `${progress}%` : "0%",
                                 background: completed
                                     ? `linear-gradient(90deg, ${rarity.bar[0]}, ${rarity.bar[1]})`
-                                    : `linear-gradient(90deg, ${catConfig.barFrom}, ${catConfig.barTo})`,
-                                boxShadow: progress > 0 ? `0 0 8px ${catConfig.glowColor}` : "none",
+                                    : `linear-gradient(90deg, #10b981, ${catConfig.tabBg})`,
+                                boxShadow: progress > 0 ? `0 0 10px ${completed ? rarity.glow : `${catConfig.tabBg}55`}` : "none",
                             }}
                         />
                     </div>
-                </div>
 
-                {/* Nudge / timer footer */}
-                {nudge && !completed && (
-                    <p className="text-[11px] font-bold text-center" style={{ color: catConfig.tabBg }}>{nudge}</p>
-                )}
-                {isWeekly && !completed && !isPermanent && (
-                    <div className="flex items-center justify-center gap-1 mt-1">
-                        <Clock className="w-3 h-3" style={{ color: daysLeft <= 2 ? "#ef4444" : "#78716c" }} />
-                        <span className="text-[10px] font-bold"
-                            style={{ color: daysLeft <= 2 ? "#ef4444" : daysLeft <= 4 ? "#f97316" : "#57534e" }}>
-                            Resets in {daysLeft}d
+                    <div className="mt-3 flex min-h-5 items-center justify-between gap-3 text-[11px] font-semibold">
+                        <div className="min-w-0 text-left">
+                            {completed && (
+                                <span className="inline-flex items-center gap-1 text-emerald-400">
+                                    <CheckCircle className="w-3.5 h-3.5" /> Obtained
+                                </span>
+                            )}
+                            {!completed && nudge && (
+                                <span style={{ color: catConfig.tabBg }}>{nudge}</span>
+                            )}
+                            {!completed && !nudge && isWeekly && !isPermanent && (
+                                <span className="inline-flex items-center gap-1"
+                                    style={{ color: daysLeft <= 2 ? "#ef4444" : daysLeft <= 4 ? "#f59e0b" : "#71717a" }}>
+                                    <Clock className="w-3.5 h-3.5" /> Resets in {daysLeft}d
+                                </span>
+                            )}
+                        </div>
+
+                        <span className="shrink-0 text-right" style={{ color: completed ? rarity.text : "#a1a1aa" }}>
+                            {completed ? `+${challenge.xp_reward} XP earned` : `${100 - progress}% left`}
                         </span>
                     </div>
-                )}
-                {completed && !nudge && (
-                    <p className="text-[11px] font-bold text-center" style={{ color: rarity.text }}>+{challenge.xp_reward} XP Earned</p>
-                )}
+                </div>
             </div>
 
-            {/* Completed shimmer overlay */}
             {completed && (
-                <div className="absolute inset-0 pointer-events-none rounded-2xl"
-                    style={{ background: `linear-gradient(135deg, ${rarity.glow} 0%, transparent 60%)` }} />
+                <div className="pointer-events-none absolute inset-0 rounded-3xl"
+                    style={{ background: `linear-gradient(180deg, ${rarity.glow} 0%, transparent 30%)` }} />
             )}
         </div>
     );
@@ -316,16 +300,15 @@ export default function ChallengesPage() {
     })();
 
     return (
-        <main className="min-h-screen pb-16 pt-20 selection:bg-purple-500/20 relative overflow-x-hidden"
-            style={{ background: "radial-gradient(ellipse at 20% 0%, rgba(30,20,60,0.8) 0%, #050508 50%), radial-gradient(ellipse at 80% 100%, rgba(20,50,30,0.5) 0%, transparent 60%)" }}>
+        <main className="min-h-screen bg-black pb-16 pt-20 selection:bg-emerald-500/20 relative overflow-x-hidden">
 
             {/* Background hex grid */}
             <div className="fixed inset-0 pointer-events-none opacity-[0.025]"
                 style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='52' viewBox='0 0 60 52' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 17.3v17.3L30 52 0 34.6V17.3L30 0z' fill='none' stroke='%23ffffff' stroke-width='1'/%3E%3C/svg%3E")`, backgroundSize: "60px 52px" }} />
 
             {/* Decorative orbs */}
-            <div className="fixed top-0 left-1/4 w-96 h-96 rounded-full pointer-events-none blur-[120px] opacity-20" style={{ background: "radial-gradient(circle, rgba(99,102,241,0.6), transparent)" }} />
-            <div className="fixed bottom-1/4 right-0 w-80 h-80 rounded-full pointer-events-none blur-[100px] opacity-15" style={{ background: "radial-gradient(circle, rgba(245,158,11,0.5), transparent)" }} />
+            <div className="fixed left-0 top-0 h-[22rem] w-[22rem] rounded-full pointer-events-none blur-[120px] opacity-20" style={{ background: "radial-gradient(circle, rgba(16,185,129,0.18), transparent)" }} />
+            <div className="fixed bottom-0 right-0 h-[20rem] w-[20rem] rounded-full pointer-events-none blur-[110px] opacity-15" style={{ background: "radial-gradient(circle, rgba(59,130,246,0.14), transparent)" }} />
 
             <div className="container mx-auto max-w-6xl px-4" ref={containerRef}>
 
@@ -341,57 +324,60 @@ export default function ChallengesPage() {
                 </div>
 
                 {/* ── HERO SECTION ── */}
-                <div className="relative rounded-3xl overflow-hidden mb-8 p-6 md:p-8"
-                    style={{ background: `linear-gradient(135deg, rgba(15,10,30,0.95), rgba(5,5,8,0.9))`, border: `1px solid rgba(255,255,255,0.06)` }}>
+                <div className="relative mb-8 overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-900/55 p-5 md:p-8 backdrop-blur-sm">
+                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent" />
 
-                    {/* Glow orb behind trophy */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full pointer-events-none blur-3xl opacity-30"
-                        style={{ background: `radial-gradient(circle, ${tierStyle.glow}, transparent)` }} />
-
-                    <div className="relative z-10 flex flex-col md:flex-row items-center gap-6 md:gap-10">
-
-                        {/* Trophy orb */}
-                        <div className="relative flex-shrink-0">
-                            <div className="w-24 h-24 md:w-28 md:h-28 rounded-3xl flex items-center justify-center text-5xl md:text-6xl shadow-2xl"
-                                style={{ background: tierStyle.gradient, boxShadow: `0 0 40px ${tierStyle.glow}, 0 8px 32px rgba(0,0,0,0.6)` }}>
-                                {tierStyle.icon}
+                    <div className="relative z-10 flex flex-col gap-6 md:flex-row md:items-center md:gap-8">
+                        <div className="flex items-center gap-4 md:block md:flex-shrink-0">
+                            <div className="relative h-24 w-24 rounded-3xl border border-zinc-800 bg-black/30 p-2 shadow-2xl md:h-28 md:w-28">
+                                <div className="flex h-full w-full items-center justify-center rounded-[1.25rem] text-5xl md:text-6xl"
+                                    style={{ background: tierStyle.gradient, boxShadow: `0 8px 24px ${tierStyle.glow}` }}>
+                                    {tierStyle.icon}
+                                </div>
                             </div>
-                            {/* Pulse ring */}
-                            <div className="absolute inset-0 rounded-3xl animate-ping opacity-20 pointer-events-none"
-                                style={{ boxShadow: `0 0 0 4px ${tierStyle.glow}` }} />
+
+                            <div className="md:hidden min-w-0">
+                                <div className="mb-2 flex flex-wrap items-center gap-2">
+                                    <span className="text-3xl font-black tracking-tight text-white">Level {level}</span>
+                                    <span className="rounded-full border px-3 py-1 text-sm font-black text-white"
+                                        style={{ background: `${tierStyle.glow}`, borderColor: `${tierStyle.glow}` }}>
+                                        {tier}
+                                    </span>
+                                </div>
+                                <p className="text-sm text-zinc-400">Keep booking and completing challenges to climb the ladder.</p>
+                            </div>
                         </div>
 
-                        {/* Info */}
-                        <div className="flex-1 text-center md:text-left w-full">
-                            <div className="flex items-center justify-center md:justify-start gap-3 mb-3">
-                                <span className="text-3xl md:text-4xl font-black text-white">Level {level}</span>
-                                <span className="px-3 py-1 rounded-full text-sm font-black"
-                                    style={{ background: `${tierStyle.glow}`, color: "white", border: `1px solid ${tierStyle.glow}` }}>
-                                    {tier}
-                                </span>
+                        <div className="flex-1 w-full">
+                            <div className="hidden md:block mb-4">
+                                <div className="mb-2 flex items-center gap-3">
+                                    <span className="text-4xl font-black tracking-tight text-white">Level {level}</span>
+                                    <span className="rounded-full border px-3 py-1 text-sm font-black text-white"
+                                        style={{ background: `${tierStyle.glow}`, borderColor: `${tierStyle.glow}` }}>
+                                        {tier}
+                                    </span>
+                                </div>
+                                <p className="text-sm text-zinc-400">Keep booking and completing challenges to climb the ladder.</p>
                             </div>
 
-                            {/* XP segmented bar */}
-                            <div className="mb-3 max-w-md mx-auto md:mx-0">
-                                <div className="flex justify-between text-xs font-bold text-zinc-500 mb-1.5">
+                            <div className="mb-4 max-w-2xl">
+                                <div className="mb-2 flex justify-between text-xs font-bold text-zinc-500">
                                     <span>{tierMinXp.toLocaleString()} XP</span>
                                     <span>{nextTierMinXp ? nextTierMinXp.toLocaleString() : "MAX"} XP</span>
                                 </div>
-                                <div className="h-3 rounded-full overflow-hidden relative" style={{ background: "rgba(255,255,255,0.06)" }}>
+                                <div className="h-3 overflow-hidden rounded-full border border-zinc-800 bg-black/40">
                                     <div className="h-full rounded-full transition-all duration-[1500ms] ease-out"
                                         style={{
                                             width: animated ? `${tierProgress}%` : "0%",
                                             background: tierStyle.gradient,
-                                            boxShadow: `0 0 12px ${tierStyle.glow}`,
                                         }} />
                                 </div>
-                                <p className="text-xs text-zinc-500 mt-1.5 text-right">
-                                    {nextTier ? <>{stats?.xp_to_next_tier} XP to <span className="text-zinc-300 font-bold">{nextTier}</span></> : <span className="text-yellow-400 font-bold">👑 Max Tier Reached</span>}
+                                <p className="mt-2 text-xs text-zinc-500 md:text-right">
+                                    {nextTier ? <>{stats?.xp_to_next_tier} XP to <span className="font-bold text-zinc-300">{nextTier}</span></> : <span className="font-bold text-amber-400">Max tier reached</span>}
                                 </p>
                             </div>
 
-                            {/* Stats strip */}
-                            <div className="flex items-center justify-center md:justify-start gap-4 flex-wrap">
+                            <div className="flex flex-wrap items-center gap-3">
                                 <StatPill icon="✅" value={`${completedCount} / ${totalCount}`} label="Challenges" />
                                 <StatPill icon="⚡" value={xp.toLocaleString()} label="Total XP" />
                                 <StatPill icon="⏱" value={`${getDaysUntilMonday()}d`} label="Weekly Reset" />
@@ -404,14 +390,13 @@ export default function ChallengesPage() {
                 <div className="mb-6">
                     <button
                         onClick={() => setShowTierLadder(v => !v)}
-                        className="w-full flex items-center justify-between px-5 py-3 rounded-2xl transition-all duration-200 group"
-                        style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                        className="w-full flex items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-900/55 px-5 py-3 transition-all duration-200 group">
                         <div className="flex items-center gap-3">
                             <span className="text-base">🏆</span>
                             <span className="text-sm font-black text-white tracking-wide">Tier Ladder</span>
                             <span className="hidden sm:inline text-xs" style={{ color: "rgba(255,255,255,0.25)" }}>all tiers & XP required</span>
                         </div>
-                        <span className="text-xs font-bold group-hover:text-zinc-300 transition-colors" style={{ color: "rgba(255,255,255,0.3)" }}>
+                        <span className="text-xs font-bold text-zinc-500 group-hover:text-zinc-300 transition-colors">
                             {showTierLadder ? "▲ hide" : "▼ show"}
                         </span>
                     </button>
@@ -425,14 +410,14 @@ export default function ChallengesPage() {
                                     const isNext = !isUnlocked && (i === 0 || xp >= TIER_LADDER[i - 1].minXp);
                                     return (
                                         <div key={t.name}
-                                            className="w-28 rounded-2xl p-3 flex flex-col items-center gap-1.5 transition-all duration-300"
+                                            className="w-28 rounded-2xl border p-3 flex flex-col items-center gap-1.5 transition-all duration-300"
                                             style={{
                                                 background: isCurrent
-                                                    ? `linear-gradient(145deg, ${t.color}28, ${t.color}0d)`
-                                                    : isUnlocked ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.3)",
-                                                border: `1px solid ${isCurrent ? t.color + "aa" : isUnlocked ? t.color + "44" : "rgba(255,255,255,0.05)"}`,
-                                                boxShadow: isCurrent ? `0 0 28px ${t.color}55` : "none",
-                                                opacity: isUnlocked ? 1 : 0.4,
+                                                    ? `linear-gradient(180deg, rgba(24,24,27,0.96), ${t.color}12)`
+                                                    : "rgba(24,24,27,0.8)",
+                                                borderColor: isCurrent ? t.color + "66" : isUnlocked ? "rgba(63,63,70,1)" : "rgba(39,39,42,1)",
+                                                boxShadow: isCurrent ? `0 0 18px ${t.color}22` : "none",
+                                                opacity: isUnlocked ? 1 : 0.5,
                                             }}>
                                             <span className="text-2xl">{t.icon}</span>
                                             <span className="text-xs font-black text-center"
@@ -479,18 +464,16 @@ export default function ChallengesPage() {
                         return (
                             <button key={cat.key}
                                 onClick={() => setSelectedCategory(cat.key)}
-                                className="flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200"
+                                className="flex-shrink-0 flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold transition-all duration-200"
                                 style={{
-                                    background: isActive ? `${cat.tabBg}` : "rgba(255,255,255,0.04)",
-                                    border: `1px solid ${isActive ? cat.tabBg : "rgba(255,255,255,0.07)"}`,
-                                    color: isActive ? "white" : "rgba(255,255,255,0.5)",
-                                    boxShadow: isActive ? `0 0 16px ${cat.glowColor}` : "none",
+                                    background: isActive ? `${cat.tabBg}22` : "rgba(24,24,27,0.7)",
+                                    borderColor: isActive ? `${cat.tabBg}55` : "rgba(63,63,70,1)",
+                                    color: isActive ? "white" : "rgba(255,255,255,0.65)",
                                 }}>
                                 <span>{cat.icon}</span>
                                 <span className="whitespace-nowrap">{cat.label}</span>
                                 {counts && (
-                                    <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full"
-                                        style={{ background: isActive ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.06)" }}>
+                                    <span className="rounded-full bg-black/30 px-1.5 py-0.5 text-[10px] font-black text-zinc-300">
                                         {counts.done}/{counts.total}
                                     </span>
                                 )}
@@ -507,21 +490,20 @@ export default function ChallengesPage() {
                             return (
                                 <div key={cat.key}>
                                     {/* Section header */}
-                                    <div className="flex items-center justify-between mb-4">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-xl flex items-center justify-center text-lg"
-                                                style={{ background: `${cat.tabBg}22`, border: `1px solid ${cat.tabBg}44` }}>
+                                    <div className="mb-4 flex items-center justify-between gap-3">
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <div className="flex h-8 w-8 items-center justify-center rounded-xl border text-lg"
+                                                style={{ background: `${cat.tabBg}14`, borderColor: `${cat.tabBg}33` }}>
                                                 {cat.icon}
                                             </div>
-                                            <h2 className="text-lg font-black text-white tracking-tight">{cat.label}</h2>
-                                            <span className="text-xs font-bold px-2 py-0.5 rounded-full"
-                                                style={{ background: `${cat.tabBg}22`, color: cat.tabBg, border: `1px solid ${cat.tabBg}44` }}>
+                                            <h2 className="truncate text-lg font-black tracking-tight text-white">{cat.label}</h2>
+                                            <span className="rounded-full border px-2 py-0.5 text-xs font-bold"
+                                                style={{ background: `${cat.tabBg}18`, color: cat.tabBg, borderColor: `${cat.tabBg}33` }}>
                                                 {counts.done}/{counts.total}
                                             </span>
                                         </div>
                                         <button onClick={() => setSelectedCategory(cat.key)}
-                                            className="text-xs font-bold transition-colors hover:text-white"
-                                            style={{ color: cat.tabBg }}>
+                                            className="text-xs font-bold text-zinc-500 transition-colors hover:text-white">
                                             See all →
                                         </button>
                                     </div>
@@ -529,7 +511,7 @@ export default function ChallengesPage() {
                                     {/* Mobile: horizontal scroll */}
                                     <div className="md:hidden flex gap-4 overflow-x-auto pb-3 scrollbar-hide -mx-4 px-4">
                                         {challenges.map(ch => (
-                                            <div key={ch.id} className="flex-shrink-0 w-52">
+                                            <div key={ch.id} className="flex-shrink-0 w-[82vw] max-w-[320px]">
                                                 <ChallengeCard challenge={ch} achievement={getAchievement(ch.id)} catConfig={cat} animated={animated} />
                                             </div>
                                         ))}
@@ -547,7 +529,7 @@ export default function ChallengesPage() {
                     </div>
                 ) : (
                     <div>
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                             {orderedChallenges.map(ch => (
                                 <ChallengeCard key={ch.id} challenge={ch} achievement={getAchievement(ch.id)}
                                     catConfig={getCatConfig(ch.category)} animated={animated} />
@@ -569,8 +551,7 @@ export default function ChallengesPage() {
 
 function StatPill({ icon, value, label }: { icon: string; value: string; label: string }) {
     return (
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs"
-            style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
+        <div className="flex items-center gap-2 rounded-full border border-zinc-800 bg-black/30 px-3 py-1.5 text-xs">
             <span>{icon}</span>
             <span className="font-black text-white">{value}</span>
             <span className="text-zinc-500">{label}</span>
