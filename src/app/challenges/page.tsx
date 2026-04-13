@@ -237,7 +237,6 @@ export default function ChallengesPage() {
     const [stats, setStats] = useState<any>(null);
     const [selectedCategory, setSelectedCategory] = useState<Category>("all");
     const [animated, setAnimated] = useState(false);
-    const [showTierLadder, setShowTierLadder] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -253,7 +252,8 @@ export default function ChallengesPage() {
             const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
             tl.fromTo(".premium-hero", { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55 })
                 .fromTo(".premium-ladder", { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45 }, "-=0.22")
-                .fromTo(".premium-tabs", { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35 }, "-=0.18")
+                .fromTo(".tier-card", { y: 14, opacity: 0, scale: 0.96 }, { y: 0, opacity: 1, scale: 1, stagger: 0.04, duration: 0.38 }, "-=0.2")
+                .fromTo(".premium-tabs", { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35 }, "-=0.1")
                 .fromTo(".section-block", { y: 24, opacity: 0 }, { y: 0, opacity: 1, stagger: 0.08, duration: 0.45 }, "-=0.1");
             return () => clearTimeout(t);
         }
@@ -268,16 +268,6 @@ export default function ChallengesPage() {
             );
         }
     }, [gamification, selectedCategory]);
-
-    useEffect(() => {
-        if (showTierLadder) {
-            gsap.fromTo(
-                ".tier-card",
-                { y: 18, opacity: 0, scale: 0.97 },
-                { y: 0, opacity: 1, scale: 1, stagger: 0.05, duration: 0.38, ease: "power3.out" }
-            );
-        }
-    }, [showTierLadder]);
 
     if (isAuthPending || !user) return <AuthLoadingSpinner />;
 
@@ -340,7 +330,7 @@ export default function ChallengesPage() {
     })();
 
     return (
-        <main className="min-h-screen bg-black pb-16 pt-20 selection:bg-emerald-500/20 relative overflow-x-hidden">
+        <main className="min-h-screen bg-black pb-16 pt-20 selection:bg-emerald-500/20 relative">
 
             {/* Background hex grid */}
             <div className="fixed inset-0 pointer-events-none opacity-[0.025]"
@@ -425,94 +415,138 @@ export default function ChallengesPage() {
                     </div>
                 </div>
 
-                {/* ── TIER LADDER ── */}
-                <div className="premium-ladder mb-6">
-                    <button
-                        onClick={() => setShowTierLadder(v => !v)}
-                        className="w-full flex items-center justify-between rounded-3xl border border-zinc-800 bg-zinc-900/70 px-5 py-4 transition-all duration-200 group shadow-[0_10px_30px_rgba(0,0,0,0.18)]">
+                {/* ── TIER ROADMAP ── always visible */}
+                <div className="premium-ladder mb-8">
+                    <div className="mb-4 flex items-center justify-between gap-4">
                         <div className="flex items-center gap-3">
-                            <div className="flex h-9 w-9 items-center justify-center rounded-2xl border border-emerald-500/20 bg-emerald-500/10 text-base shadow-[0_0_20px_rgba(16,185,129,0.12)]">🏆</div>
+                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-amber-500/20 bg-amber-500/10 text-sm">⚔️</div>
                             <div>
-                                <div className="text-sm font-black tracking-wide text-white">Tier Ladder</div>
-                                <div className="hidden sm:block text-xs text-zinc-500">See every level, the XP required, and the next target to chase.</div>
+                                <h2 className="text-sm font-black text-white">Tier Roadmap</h2>
+                                <p className="text-[11px] text-zinc-500">Every tier unlocked is permanent. Keep climbing.</p>
                             </div>
                         </div>
-                        <div className="text-right">
-                            <div className="text-xs font-black text-emerald-400">{nextTier ? `${stats?.xp_to_next_tier} XP to ${nextTier}` : "Top tier unlocked"}</div>
-                            <div className="text-[11px] font-bold text-zinc-500 group-hover:text-zinc-300 transition-colors">
-                            {showTierLadder ? "▲ hide" : "▼ show"}
+                        {nextTier && (
+                            <div className="hidden shrink-0 items-center gap-1.5 rounded-full border border-amber-500/25 bg-amber-500/10 px-3 py-1.5 sm:flex">
+                                <Zap className="h-3 w-3 text-amber-400" />
+                                <span className="text-[11px] font-black text-amber-300">{xpToNextTier} XP to {nextTier}</span>
                             </div>
-                        </div>
-                    </button>
+                        )}
+                    </div>
 
-                    {showTierLadder && (
-                        <div className="mt-3 overflow-x-auto scrollbar-hide -mx-4 px-4">
-                            <div className="relative flex gap-4 pb-3 pt-1" style={{ width: "max-content" }}>
-                                <div className="absolute left-6 right-6 top-[4.35rem] h-px bg-gradient-to-r from-zinc-800 via-zinc-700 to-zinc-800" />
-                                {TIER_LADDER.map((t, i) => {
-                                    const isCurrent = t.name === tier;
-                                    const isUnlocked = xp >= t.minXp;
-                                    const isNext = !isUnlocked && (i === 0 || xp >= TIER_LADDER[i - 1].minXp);
-                                    const tierBarWidth = isCurrent ? `${tierProgress}%` : isUnlocked ? "100%" : "0%";
-                                    return (
-                                        <div key={t.name}
-                                            className="tier-card relative w-[148px] rounded-[1.75rem] border p-4 flex flex-col items-center gap-2 transition-all duration-300"
-                                            style={{
-                                                background: isCurrent
-                                                    ? `linear-gradient(180deg, rgba(24,24,27,0.98), ${t.color}20)`
-                                                    : isNext
-                                                        ? `linear-gradient(180deg, rgba(24,24,27,0.96), ${t.color}12)`
-                                                        : "rgba(24,24,27,0.92)",
-                                                borderColor: isCurrent ? t.color + "88" : isNext ? t.color + "55" : isUnlocked ? "rgba(82,82,91,1)" : "rgba(39,39,42,1)",
-                                                boxShadow: isCurrent ? `0 0 28px ${t.color}22` : isNext ? `0 0 20px ${t.color}10` : "none",
-                                                opacity: isUnlocked || isNext ? 1 : 0.56,
-                                            }}>
-                                            <div className="absolute left-4 top-4 text-[9px] font-black tracking-[0.18em] uppercase"
-                                                style={{ color: isCurrent ? t.color : isNext ? "#eab308" : isUnlocked ? "#10b981" : "#52525b" }}>
-                                                {isCurrent ? "Current" : isNext ? "Next" : isUnlocked ? "Unlocked" : "Locked"}
-                                            </div>
-                                            <div className="mt-4 flex h-14 w-14 items-center justify-center rounded-2xl border text-3xl"
-                                                style={{ background: `${t.color}18`, borderColor: `${t.color}40`, boxShadow: `0 0 18px ${t.color}18` }}>
-                                                {t.icon}
-                                            </div>
-                                            <span className="text-sm font-black text-center"
-                                                style={{ color: isCurrent ? t.color : isUnlocked ? "#e4e4e7" : "#52525b" }}>
-                                                {t.name}
-                                            </span>
-                                            <span className="text-[11px] text-center font-black"
-                                                style={{ color: isCurrent || isNext ? t.color : isUnlocked ? "#d4d4d8" : "#52525b" }}>
-                                                {t.minXp.toLocaleString()} XP
-                                            </span>
-                                            {t.nextXp && (
-                                                <span className="text-[10px] text-center text-zinc-500">
-                                                    up to {(t.nextXp - 1).toLocaleString()}
-                                                </span>
-                                            )}
-                                            <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-black/40 border border-white/5">
-                                                <div className="h-full rounded-full transition-all duration-500"
-                                                    style={{ width: tierBarWidth, background: `linear-gradient(90deg, ${t.color}, ${t.color}aa)` }} />
-                                            </div>
+                    <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
+                        <div className="relative flex gap-3 pb-4 pt-5" style={{ width: "max-content" }}>
+                            {/* Connecting path line */}
+                            <div className="absolute left-[84px] right-[84px] top-[4.6rem] h-0.5"
+                                style={{ background: "linear-gradient(90deg, rgba(63,63,70,0.4), rgba(63,63,70,0.8) 50%, rgba(63,63,70,0.4))" }} />
+
+                            {TIER_LADDER.map((t, i) => {
+                                const isCurrent = t.name === tier;
+                                const isUnlocked = xp >= t.minXp;
+                                const isNext = !isUnlocked && (i === 0 || xp >= TIER_LADDER[i - 1].minXp);
+                                const tierBarWidth = isCurrent ? `${tierProgress}%` : isUnlocked ? "100%" : "0%";
+                                const xpNeeded = t.minXp - xp;
+                                return (
+                                    <div key={t.name}
+                                        className="tier-card relative flex w-[152px] shrink-0 flex-col items-center gap-2.5 rounded-2xl border p-4 pb-4 transition-all duration-300"
+                                        style={{
+                                            background: isCurrent
+                                                ? `linear-gradient(160deg, rgba(15,15,18,0.99) 0%, ${t.color}20 100%)`
+                                                : isNext
+                                                    ? `linear-gradient(160deg, rgba(15,15,18,0.97) 0%, ${t.color}12 100%)`
+                                                    : isUnlocked
+                                                        ? "rgba(15,15,18,0.92)"
+                                                        : "rgba(10,10,12,0.88)",
+                                            borderColor: isCurrent
+                                                ? `${t.color}aa`
+                                                : isNext
+                                                    ? `${t.color}55`
+                                                    : isUnlocked
+                                                        ? "rgba(63,63,70,0.7)"
+                                                        : "rgba(39,39,42,0.5)",
+                                            boxShadow: isCurrent
+                                                ? `0 0 36px ${t.color}30, 0 0 0 1px ${t.color}44, inset 0 1px 0 ${t.color}22`
+                                                : isNext
+                                                    ? `0 0 20px ${t.color}16`
+                                                    : "none",
+                                            transform: isCurrent ? "translateY(-4px) scale(1.04)" : "none",
+                                            opacity: isUnlocked || isCurrent || isNext ? 1 : 0.45,
+                                        }}>
+
+                                        {/* Floating status chip above card */}
+                                        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
                                             {isCurrent && (
-                                                <span className="text-[8px] font-black px-2 py-0.5 rounded-full tracking-widest mt-1"
-                                                    style={{ background: t.color + "33", color: t.color, border: `1px solid ${t.color}66` }}>
-                                                    YOU ARE HERE
+                                                <span className="whitespace-nowrap rounded-full border px-2.5 py-0.5 text-[8px] font-black tracking-widest uppercase shadow-lg"
+                                                    style={{ background: `${t.color}25`, color: t.color, borderColor: `${t.color}77`, boxShadow: `0 0 12px ${t.color}33` }}>
+                                                    ▶ YOU
                                                 </span>
                                             )}
                                             {isNext && (
-                                                <span className="text-[8px] font-black px-2 py-0.5 rounded-full tracking-widest mt-1"
-                                                    style={{ background: "rgba(234,179,8,0.12)", color: "#facc15", border: "1px solid rgba(234,179,8,0.22)" }}>
-                                                    CHASE THIS
+                                                <span className="whitespace-nowrap rounded-full border border-amber-400/40 bg-amber-400/15 px-2.5 py-0.5 text-[8px] font-black tracking-widest uppercase text-amber-300 shadow-lg">
+                                                    ⚡ NEXT
                                                 </span>
                                             )}
-                                            {!isUnlocked && !isNext && (
-                                                <span className="text-[8px] mt-1" style={{ color: "#3f3f46" }}>🔒 locked</span>
-                                            )}
                                         </div>
-                                    );
-                                })}
-                            </div>
+
+                                        {/* Icon */}
+                                        <div className="mt-1 flex h-14 w-14 items-center justify-center rounded-2xl border text-3xl"
+                                            style={{
+                                                background: `${t.color}${isCurrent ? "22" : isUnlocked ? "14" : isNext ? "10" : "06"}`,
+                                                borderColor: `${t.color}${isCurrent ? "66" : isNext ? "33" : isUnlocked ? "22" : "10"}`,
+                                                boxShadow: isCurrent
+                                                    ? `0 0 28px ${t.color}44, inset 0 0 16px ${t.color}18`
+                                                    : isNext
+                                                        ? `0 0 16px ${t.color}22`
+                                                        : "none",
+                                                filter: !isUnlocked && !isNext ? "grayscale(1) brightness(0.45)" : "none",
+                                            }}>
+                                            {t.icon}
+                                        </div>
+
+                                        {/* Name */}
+                                        <span className="text-sm font-black"
+                                            style={{ color: isCurrent ? t.color : isNext ? "#a1a1aa" : isUnlocked ? "#d4d4d8" : "#3f3f46" }}>
+                                            {t.name}
+                                        </span>
+
+                                        {/* XP */}
+                                        <span className="text-[11px] font-black"
+                                            style={{ color: isCurrent || isNext ? t.color : isUnlocked ? "#52525b" : "#27272a" }}>
+                                            {t.minXp.toLocaleString()} XP
+                                        </span>
+
+                                        {/* Progress bar */}
+                                        {(isCurrent || isUnlocked) && (
+                                            <div className="h-1 w-full overflow-hidden rounded-full border border-white/5 bg-black/50">
+                                                <div className="h-full rounded-full transition-all duration-700"
+                                                    style={{
+                                                        width: tierBarWidth,
+                                                        background: `linear-gradient(90deg, ${t.color}, ${t.color}88)`,
+                                                        boxShadow: isCurrent ? `0 0 6px ${t.color}` : "none",
+                                                    }} />
+                                            </div>
+                                        )}
+
+                                        {/* XP needed for next */}
+                                        {isNext && (
+                                            <span className="text-[9px] font-bold text-amber-400/60">
+                                                {xpNeeded.toLocaleString()} XP away
+                                            </span>
+                                        )}
+
+                                        {/* Unlocked check */}
+                                        {isUnlocked && !isCurrent && (
+                                            <span className="text-[9px] font-bold text-emerald-600">✓ unlocked</span>
+                                        )}
+
+                                        {/* Locked */}
+                                        {!isUnlocked && !isNext && (
+                                            <span className="text-[10px] text-zinc-800">🔒</span>
+                                        )}
+                                    </div>
+                                );
+                            })}
                         </div>
-                    )}
+                    </div>
                 </div>
 
                 {/* ── CATEGORY TABS ── */}
@@ -561,10 +595,7 @@ export default function ChallengesPage() {
                                                 {counts.done}/{counts.total}
                                             </span>
                                         </div>
-                                        <button onClick={() => setSelectedCategory(cat.key)}
-                                            className="text-xs font-bold text-zinc-500 transition-colors hover:text-white">
-                                            See all →
-                                        </button>
+                                        <span className="text-xs font-bold text-zinc-600">scroll →</span>
                                     </div>
 
                                     {/* Horizontal scroll — same layout on mobile and desktop */}
@@ -581,10 +612,12 @@ export default function ChallengesPage() {
                     </div>
                 ) : (
                     <div className="section-block">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        <div className="flex gap-3 overflow-x-auto pb-3 scrollbar-hide -mx-4 px-4">
                             {orderedChallenges.map(ch => (
-                                <ChallengeCard key={ch.id} challenge={ch} achievement={getAchievement(ch.id)}
-                                    catConfig={getCatConfig(ch.category)} animated={animated} />
+                                <div key={ch.id} className="flex-shrink-0 w-[76vw] max-w-[268px] sm:w-[44vw] md:w-[280px]">
+                                    <ChallengeCard challenge={ch} achievement={getAchievement(ch.id)}
+                                        catConfig={getCatConfig(ch.category)} animated={animated} />
+                                </div>
                             ))}
                         </div>
                         {orderedChallenges.length === 0 && (
