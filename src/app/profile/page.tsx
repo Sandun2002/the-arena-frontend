@@ -54,10 +54,22 @@ export default function ProfilePage() {
     const tier = stats?.tier ?? "Rookie";
     const nextTier = stats?.next_tier ?? null;
     const xpToNextTier = stats?.xp_to_next_tier ?? 0;
-    // Compute progress percent from tier thresholds embedded in stats
-    const tierXpProgress = nextTier && xpToNextTier > 0
-        ? Math.min(100, Math.round(((xp) / (xp + xpToNextTier)) * 100))
+    const tierMinXp = stats?.tier_min_xp ?? 0;
+    const nextTierMinXp = stats?.next_tier_min_xp ?? null;
+    // Compute progress percent within current tier band
+    const tierXpProgress = nextTierMinXp
+        ? Math.min(100, Math.round(((xp - tierMinXp) / (nextTierMinXp - tierMinXp)) * 100))
         : 100;
+    const TIER_COLORS: Record<string, { badge: string; bar: string; text: string }> = {
+        Rookie:    { badge: "bg-zinc-500/10 border-zinc-500/20 text-zinc-400",   bar: "from-zinc-500 to-zinc-400",    text: "text-zinc-400" },
+        Contender: { badge: "bg-blue-500/10 border-blue-500/20 text-blue-400",    bar: "from-blue-500 to-cyan-400",    text: "text-blue-400" },
+        Athlete:   { badge: "bg-emerald-500/10 border-emerald-500/20 text-emerald-400", bar: "from-emerald-500 to-cyan-400", text: "text-emerald-400" },
+        Champion:  { badge: "bg-yellow-500/10 border-yellow-500/20 text-yellow-400", bar: "from-yellow-500 to-amber-400", text: "text-yellow-400" },
+        Elite:     { badge: "bg-orange-500/10 border-orange-500/20 text-orange-400", bar: "from-orange-500 to-amber-400", text: "text-orange-400" },
+        Legend:    { badge: "bg-red-500/10 border-red-500/20 text-red-400",       bar: "from-red-500 to-rose-400",    text: "text-red-400" },
+        Icon:      { badge: "bg-purple-500/10 border-purple-500/20 text-purple-400", bar: "from-purple-500 to-violet-400", text: "text-purple-400" },
+    };
+    const tierStyle = TIER_COLORS[tier] || TIER_COLORS.Rookie;
 
     return (
         <main className="min-h-screen bg-black pt-24 pb-12 px-4 selection:bg-emerald-500/30">
@@ -100,7 +112,7 @@ export default function ProfilePage() {
                                     <Calendar className="w-3.5 h-3.5" /> Joined {fmtMonthYear(user.created_at)}
                                 </span>
                                 {/* Tier Badge */}
-                                <span className="flex items-center gap-1.5 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 text-emerald-400">
+                                <span className={`flex items-center gap-1.5 px-3 py-1 rounded-full border ${tierStyle.badge}`}>
                                     <Zap className="w-3.5 h-3.5" /> {tier}
                                 </span>
                             </div>
@@ -108,13 +120,13 @@ export default function ProfilePage() {
                             {/* XP → Next Tier Progress */}
                             <div className="max-w-md mx-auto md:mx-0">
                                 <div className="flex justify-between text-xs font-bold uppercase text-zinc-500 mb-2 tracking-wider">
-                                    <span>Level {level} · <span className="text-emerald-400">{tier}</span></span>
-                                    <span>{xp} XP</span>
+                                    <span>Level {level} · <span className={tierStyle.text}>{tier}</span></span>
+                                    <span>{xp.toLocaleString()} XP</span>
                                 </div>
                                 <div className="h-3 bg-zinc-800 rounded-full overflow-hidden p-0.5 border border-zinc-700/50">
                                     <div
-                                        className="h-full bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.3)] transition-all duration-1000 ease-out"
-                                        style={{ width: `${tierXpProgress}%` }}
+                                        className={`h-full bg-gradient-to-r ${tierStyle.bar} rounded-full transition-all duration-1000 ease-out`}
+                                        style={{ width: `${tierXpProgress}%`, boxShadow: "0 0 10px rgba(255,255,255,0.1)" }}
                                     ></div>
                                 </div>
                                 <p className="text-xs text-zinc-500 mt-2 text-right">

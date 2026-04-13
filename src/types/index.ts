@@ -420,12 +420,15 @@ export interface UpcomingBooking {
 // === Gamification ===
 export interface Challenge {
   id: string | number;
+  slug: string;
   title: string;
   description: string;
   xp_reward: number;
   icon: string;
-  type: "booking" | "review" | "scout" | "social" | string;
+  type: "weekly" | "explorer" | "loyalty" | "streak" | "timing" | "milestone" | "general" | string;
+  category: "weekly" | "explorer" | "loyalty" | "streak" | "timing" | "milestone" | "general";
   target_count: number;
+  is_permanent: boolean;
 }
 
 export interface UserAchievement {

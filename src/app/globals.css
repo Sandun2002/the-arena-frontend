@@ -126,6 +126,16 @@ body {
   }
 }
 
+/* Challenge card shimmer sweep */
+@keyframes shimmerSweep {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Hide scrollbar utility (challenges category tabs + mobile shelves) */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
 .shimmer {
   background: linear-gradient(
     90deg,

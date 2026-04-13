@@ -81,12 +81,15 @@ class PlayerService {
         
         const challenges: Challenge[] = rawChallenges.map((c: any) => ({
             id: c.id,
+            slug: c.slug || "",
             title: c.name,
             description: c.description,
             xp_reward: c.xp_reward,
             icon: c.icon || "🏆",
-            type: c.challenge_type,
-            target_count: c.target_value
+            type: c.category || c.challenge_type || "general",
+            category: c.category || "general",
+            target_count: c.target_value,
+            is_permanent: c.is_permanent ?? false,
         }));
 
         const achievements: UserAchievement[] = rawChallenges.map((c: any) => ({
