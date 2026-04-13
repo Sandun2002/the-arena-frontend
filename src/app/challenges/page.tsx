@@ -98,98 +98,113 @@ function ChallengeCard({ challenge, achievement, catConfig, animated }: {
     const daysLeft = getDaysUntilMonday();
     const isWeekly = challenge.category === "weekly";
     const isPermanent = challenge.is_permanent;
-    const isLegendaryPlus = rarity.key === "legendary" || rarity.key === "mythic";
-    const accent = completed ? rarity.text : catConfig.tabBg;
 
     return (
         <div
-            className="challenge-card group relative flex h-full min-h-[290px] flex-col overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-900/80 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-zinc-700 cursor-default select-none"
+            className="challenge-card group relative flex flex-col overflow-hidden rounded-2xl border cursor-default select-none transition-all duration-300 hover:-translate-y-0.5"
             style={{
+                background: "rgba(12,12,14,0.97)",
+                borderColor: completed ? rarity.border : `${catConfig.tabBg}50`,
                 boxShadow: completed
-                    ? `0 10px 30px rgba(0,0,0,0.35), 0 0 0 1px ${rarity.border}`
-                    : isLegendaryPlus
-                        ? `0 10px 30px rgba(0,0,0,0.35), 0 0 0 1px ${rarity.border}`
-                        : `0 10px 30px rgba(0,0,0,0.28)`,
+                    ? `0 8px 28px rgba(0,0,0,0.45), 0 0 0 1px ${rarity.border}`
+                    : `0 6px 20px rgba(0,0,0,0.35)`,
             }}
         >
-            <div className="absolute inset-0 pointer-events-none opacity-90"
-                style={{ background: `radial-gradient(circle at top right, ${completed ? rarity.glow : `${accent}20`}, transparent 34%)` }} />
-            <div className="absolute inset-x-0 top-0 h-px opacity-70"
-                style={{ background: `linear-gradient(90deg, transparent, ${completed ? rarity.text : catConfig.tabBg}, transparent)` }} />
+            {/* Top accent strip — rarity color when done, category color otherwise */}
+            <div className="h-[3px] w-full shrink-0"
+                style={{
+                    background: completed
+                        ? `linear-gradient(90deg, ${rarity.bar[0]}, ${rarity.bar[1]})`
+                        : `linear-gradient(90deg, ${catConfig.tabBg}cc, ${catConfig.tabBg}44)`,
+                    boxShadow: completed ? `0 0 10px ${rarity.glow}` : `0 0 8px ${catConfig.tabBg}44`,
+                }} />
 
-            <div className="p-4 sm:p-5 flex h-full flex-col">
-                <div className="mb-4 flex items-start justify-between gap-3">
-                    <div className="flex min-w-0 flex-1 items-start gap-3">
-                        <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border text-2xl"
-                            style={{
-                                background: `${completed ? rarity.text : catConfig.tabBg}15`,
-                                borderColor: completed ? rarity.border : `${catConfig.tabBg}44`,
-                            }}>
-                            {challenge.icon}
-                            {completed && (
-                                <div className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border border-zinc-900 bg-zinc-800">
-                                    <CheckCircle className="w-3.5 h-3.5" style={{ color: rarity.text }} />
-                                </div>
-                            )}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                            <div className="mb-2 flex min-h-[28px] flex-wrap items-center gap-2">
-                                <span className="rounded-full border px-2 py-0.5 text-[10px] font-black tracking-widest uppercase"
-                                    style={{ background: `${catConfig.tabBg}18`, color: catConfig.tabBg, borderColor: `${catConfig.tabBg}40` }}>
-                                    {catConfig.icon} {catConfig.label}
-                                </span>
-                                {isPermanent && (
-                                    <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[10px] font-black tracking-widest text-amber-300 uppercase">
-                                        <InfinityIcon className="w-2.5 h-2.5" /> Permanent
-                                    </span>
-                                )}
+            {/* Subtle glow behind icon area */}
+            <div className="pointer-events-none absolute left-0 top-0 h-24 w-24 rounded-full blur-2xl opacity-30"
+                style={{ background: completed ? rarity.glow : `${catConfig.tabBg}` }} />
+
+            <div className="relative flex flex-col gap-3 p-4">
+                {/* Row 1: icon left | XP + rarity right */}
+                <div className="flex items-start justify-between gap-3">
+                    <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border text-xl"
+                        style={{
+                            background: `${completed ? rarity.text : catConfig.tabBg}18`,
+                            borderColor: completed ? rarity.border : `${catConfig.tabBg}55`,
+                        }}>
+                        {challenge.icon}
+                        {completed && (
+                            <div className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border border-[rgba(12,12,14,1)]"
+                                style={{ background: rarity.glow, borderColor: rarity.border }}>
+                                <CheckCircle className="h-2.5 w-2.5" style={{ color: rarity.text }} />
                             </div>
-                        </div>
+                        )}
                     </div>
-                    <div className="flex w-[92px] shrink-0 flex-col items-end gap-1.5 text-right md:w-[104px]">
-                        <span className="flex min-h-8 w-full items-center justify-center rounded-full border px-2.5 py-1 text-[11px] font-black text-white"
+
+                    <div className="flex flex-col items-end gap-1">
+                        <span
+                            className="rounded-full px-2.5 py-0.5 text-[12px] font-black"
                             style={{
-                                borderColor: `${rarity.text}44`,
-                                background: `linear-gradient(135deg, rgba(24,24,27,0.92), ${rarity.glow})`,
-                                boxShadow: `0 0 18px ${rarity.glow}`,
+                                color: rarity.text,
+                                background: `${rarity.glow}`,
+                                border: `1px solid ${rarity.text}44`,
+                                boxShadow: `0 0 14px ${rarity.glow}`,
                             }}>
                             +{challenge.xp_reward} XP
                         </span>
-                        <span className="flex min-h-6 w-full items-center justify-center rounded-full border px-2 py-0.5 text-[9px] font-black tracking-[0.18em] uppercase"
-                            style={{ color: rarity.text, borderColor: `${rarity.text}33`, background: `${rarity.glow}` }}>
+                        <span
+                            className="rounded-full px-2 py-0.5 text-[9px] font-black tracking-[0.2em] uppercase"
+                            style={{
+                                color: rarity.text,
+                                background: `${rarity.glow}`,
+                                border: `1px solid ${rarity.text}33`,
+                            }}>
                             {rarity.label}
                         </span>
                     </div>
                 </div>
 
-                <div className="mb-5 min-h-[92px] md:min-h-[116px]">
-                    <h3 className="mb-2 min-h-[56px] text-base font-black leading-[1.05] text-white sm:text-lg md:min-h-[60px]">{challenge.title}</h3>
-                    <p className="min-h-[40px] text-sm leading-relaxed text-zinc-400">{challenge.description}</p>
+                {/* Row 2: category + permanent badges */}
+                <div className="flex flex-wrap items-center gap-1.5">
+                    <span className="rounded-full border px-2 py-0.5 text-[10px] font-black tracking-widest uppercase"
+                        style={{ background: `${catConfig.tabBg}18`, color: catConfig.tabBg, borderColor: `${catConfig.tabBg}44` }}>
+                        {catConfig.icon} {catConfig.label}
+                    </span>
+                    {isPermanent && (
+                        <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[10px] font-black tracking-widest text-amber-300 uppercase">
+                            <InfinityIcon className="h-2.5 w-2.5" /> Permanent
+                        </span>
+                    )}
                 </div>
 
-                <div className="mt-auto">
-                    <div className="mb-2 flex items-center justify-between text-[11px] font-semibold text-zinc-500">
-                        <span>{completed ? "Completed" : "Progress"}</span>
-                        <span className="text-zinc-300">{current} / {challenge.target_count}</span>
+                {/* Row 3: title + description */}
+                <div>
+                    <h3 className="text-sm font-black leading-snug text-white">{challenge.title}</h3>
+                    <p className="mt-1 text-xs leading-relaxed text-zinc-500">{challenge.description}</p>
+                </div>
+
+                {/* Row 4: progress */}
+                <div className="pt-1">
+                    <div className="mb-1.5 flex items-center justify-between text-[11px] font-semibold">
+                        <span className="text-zinc-600">{completed ? "Completed" : "Progress"}</span>
+                        <span className="text-zinc-400">{current} / {challenge.target_count}</span>
                     </div>
-                    <div className="h-2.5 overflow-hidden rounded-full border border-white/5 bg-black/40">
+                    <div className="h-1.5 overflow-hidden rounded-full border border-white/5 bg-black/50">
                         <div
                             className="h-full rounded-full transition-all duration-[1200ms] ease-out"
                             style={{
                                 width: animated ? `${progress}%` : "0%",
                                 background: completed
                                     ? `linear-gradient(90deg, ${rarity.bar[0]}, ${rarity.bar[1]})`
-                                    : `linear-gradient(90deg, #10b981, ${catConfig.tabBg})`,
-                                boxShadow: progress > 0 ? `0 0 10px ${completed ? rarity.glow : `${catConfig.tabBg}55`}` : "none",
+                                    : `linear-gradient(90deg, ${catConfig.tabBg}, ${catConfig.tabBg}88)`,
+                                boxShadow: progress > 0 ? `0 0 8px ${completed ? rarity.glow : `${catConfig.tabBg}66`}` : "none",
                             }}
                         />
                     </div>
-
-                    <div className="mt-3 flex min-h-9 items-end justify-between gap-3 text-[11px] font-semibold">
-                        <div className="min-w-0 text-left">
+                    <div className="mt-2 flex items-center justify-between text-[11px] font-semibold">
+                        <div>
                             {completed && (
                                 <span className="inline-flex items-center gap-1 text-emerald-400">
-                                    <CheckCircle className="w-3.5 h-3.5" /> Obtained
+                                    <CheckCircle className="h-3 w-3" /> Obtained
                                 </span>
                             )}
                             {!completed && nudge && (
@@ -197,23 +212,17 @@ function ChallengeCard({ challenge, achievement, catConfig, animated }: {
                             )}
                             {!completed && !nudge && isWeekly && !isPermanent && (
                                 <span className="inline-flex items-center gap-1"
-                                    style={{ color: daysLeft <= 2 ? "#ef4444" : daysLeft <= 4 ? "#f59e0b" : "#71717a" }}>
-                                    <Clock className="w-3.5 h-3.5" /> Resets in {daysLeft}d
+                                    style={{ color: daysLeft <= 2 ? "#ef4444" : daysLeft <= 4 ? "#f59e0b" : "#52525b" }}>
+                                    <Clock className="h-3 w-3" /> {daysLeft}d left
                                 </span>
                             )}
                         </div>
-
-                        <span className="shrink-0 text-right font-bold" style={{ color: completed ? rarity.text : "#a1a1aa" }}>
-                            {completed ? `+${challenge.xp_reward} XP earned` : `${100 - progress}% left`}
+                        <span className="font-bold" style={{ color: completed ? rarity.text : "#3f3f46" }}>
+                            {completed ? `+${challenge.xp_reward} XP` : `${progress}%`}
                         </span>
                     </div>
                 </div>
             </div>
-
-            {completed && (
-                <div className="pointer-events-none absolute inset-0 rounded-3xl"
-                    style={{ background: `linear-gradient(180deg, ${rarity.glow} 0%, transparent 30%)` }} />
-            )}
         </div>
     );
 }
@@ -354,100 +363,64 @@ export default function ChallengesPage() {
                     </div>
                 </div>
 
-                {/* ── HERO SECTION ── */}
-                <div className="premium-hero relative mb-8 overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-900/55 p-5 md:p-6 xl:p-8 backdrop-blur-sm">
-                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent" />
-                    <div className="absolute -left-8 top-8 h-32 w-32 rounded-full blur-3xl" style={{ background: "radial-gradient(circle, rgba(16,185,129,0.12), transparent 70%)" }} />
+                {/* ── COMPACT HERO ── */}
+                <div className="premium-hero relative mb-6 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/60 backdrop-blur-sm">
+                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-zinc-700 to-transparent" />
+                    <div className="pointer-events-none absolute -left-6 top-0 h-28 w-28 rounded-full blur-3xl opacity-50"
+                        style={{ background: tierStyle.glow }} />
 
-                    <div className="relative z-10 mb-5 flex items-start justify-between gap-4">
-                        <div>
-                            <p className="text-[11px] font-black uppercase tracking-[0.22em] text-emerald-400">Player Progression</p>
-                            <div className="mt-2 flex flex-wrap items-center gap-3">
-                                <h1 className="text-3xl font-black tracking-tight text-white md:text-4xl">{tier} Tier</h1>
-                                <span className="rounded-full border px-3 py-1 text-sm font-black text-white"
-                                    style={{ background: `${tierStyle.glow}`, borderColor: `${tierStyle.glow}` }}>
-                                    Level {level}
-                                </span>
-                            </div>
-                            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-zinc-400">
-                                You&apos;ve earned {xp.toLocaleString()} XP and completed {completedCount} of {totalCount} active challenges. Every booking pushes you closer to {nextTier ?? "the top tier"}.
-                            </p>
-                        </div>
+                    <div className="relative z-10 flex flex-wrap items-center gap-4 px-5 py-4">
 
-                        <div className="hidden md:flex items-center gap-2 rounded-full border border-zinc-800 bg-black/30 px-4 py-2">
-                            <Zap className="h-3.5 w-3.5 text-yellow-400" />
-                            <span className="text-xs font-black text-white">{xp.toLocaleString()} XP banked</span>
-                        </div>
-                    </div>
-
-                    <div className="relative z-10 grid gap-4 lg:grid-cols-[220px,minmax(0,1fr),220px]">
-                        <div className="rounded-[1.75rem] border border-zinc-800 bg-black/30 p-4">
-                            <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-[1.35rem] border border-zinc-800 text-5xl shadow-2xl md:h-28 md:w-28 md:text-6xl"
-                                style={{ background: tierStyle.gradient, boxShadow: `0 8px 24px ${tierStyle.glow}` }}>
+                        {/* Tier identity */}
+                        <div className="flex shrink-0 items-center gap-3">
+                            <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-zinc-800 text-2xl shadow-lg"
+                                style={{ background: tierStyle.gradient, boxShadow: `0 4px 18px ${tierStyle.glow}` }}>
                                 {tierStyle.icon}
                             </div>
-                            <div className="text-center">
-                                <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-zinc-500">Current standing</div>
-                                <div className="mt-2 text-3xl font-black tracking-tight text-white">Level {level}</div>
-                                <div className="mt-2 inline-flex rounded-full border px-3 py-1 text-sm font-black text-white"
-                                    style={{ background: `${tierStyle.glow}`, borderColor: `${tierStyle.glow}` }}>
-                                    {tier}
+                            <div>
+                                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Tier</div>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-base font-black text-white">{tier}</span>
+                                    <span className="rounded-full border px-2 py-0.5 text-[11px] font-black text-white"
+                                        style={{ background: tierStyle.glow, borderColor: `${tierStyle.glow}` }}>
+                                        Lv {level}
+                                    </span>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="rounded-[1.75rem] border border-zinc-800 bg-black/20 p-5 md:p-6">
-                            <div className="mb-4 flex items-center justify-between gap-3">
-                                <div>
-                                    <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-zinc-500">Tier progress</div>
-                                    <div className="mt-1 text-lg font-black text-white">{nextTier ? `${xpToNextTier} XP to ${nextTier}` : "Top tier reached"}</div>
-                                </div>
-                                <div className="text-right">
-                                    <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-zinc-500">Progress</div>
-                                    <div className="mt-1 text-xl font-black text-white">{tierProgress}%</div>
-                                </div>
-                            </div>
+                        <div className="hidden h-8 w-px shrink-0 bg-zinc-800 sm:block" />
 
-                            <div className="mb-4 max-w-3xl">
-                                <div className="mb-2 flex justify-between text-xs font-bold text-zinc-500">
-                                    <span>{tierMinXp.toLocaleString()} XP</span>
-                                    <span>{nextTierMinXp ? nextTierMinXp.toLocaleString() : "MAX"} XP</span>
-                                </div>
-                                <div className="h-3 overflow-hidden rounded-full border border-zinc-800 bg-black/40">
-                                    <div className="h-full rounded-full transition-all duration-[1500ms] ease-out"
-                                        style={{
-                                            width: animated ? `${tierProgress}%` : "0%",
-                                            background: tierStyle.gradient,
-                                        }} />
-                                </div>
-                                <p className="mt-2 text-xs text-zinc-500 md:text-right">
-                                    {nextTier ? <>{xpToNextTier} XP to <span className="font-bold text-zinc-300">{nextTier}</span></> : <span className="font-bold text-amber-400">Max tier reached</span>}
-                                </p>
+                        {/* XP bar */}
+                        <div className="min-w-[160px] flex-1">
+                            <div className="mb-1.5 flex justify-between text-[10px] font-bold text-zinc-600">
+                                <span>{tierMinXp.toLocaleString()} XP</span>
+                                <span>{nextTierMinXp ? nextTierMinXp.toLocaleString() : "MAX"} XP</span>
                             </div>
-
-                            <div className="grid gap-3 sm:grid-cols-3">
-                                <HeroStatCard icon="✅" value={`${completedCount}/${totalCount}`} label="Challenges cleared" accent="text-emerald-400" />
-                                <HeroStatCard icon="⚡" value={`${completionRate}%`} label="Completion rate" accent="text-white" />
-                                <HeroStatCard icon="🏆" value={nextTier ? nextTier : "Maxed"} label="Next chase" accent="text-amber-400" />
+                            <div className="h-2 overflow-hidden rounded-full border border-zinc-800 bg-black/50">
+                                <div className="h-full rounded-full transition-all duration-[1400ms] ease-out"
+                                    style={{ width: animated ? `${tierProgress}%` : "0%", background: tierStyle.gradient, boxShadow: `0 0 8px ${tierStyle.glow}` }} />
+                            </div>
+                            <div className="mt-1.5 text-[11px] text-zinc-500">
+                                {nextTier
+                                    ? <>{xpToNextTier} XP to <span className="font-bold text-zinc-300">{nextTier}</span></>
+                                    : <span className="font-bold text-amber-400">Max tier reached</span>}
                             </div>
                         </div>
 
-                        <div className="space-y-3">
-                            <div className="rounded-[1.5rem] border border-zinc-800 bg-black/25 p-4">
-                                <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-zinc-500">Next target</div>
-                                <div className="mt-2 text-lg font-black text-white">{nextTier ?? "Top tier unlocked"}</div>
-                                <p className="mt-2 text-xs leading-relaxed text-zinc-400">
-                                    {nextTier ? `${xpToNextTier} XP left to unlock ${nextTier}.` : "You already hold the highest tier available."}
-                                </p>
-                            </div>
+                        <div className="hidden h-8 w-px shrink-0 bg-zinc-800 md:block" />
 
-                            <div className="rounded-[1.5rem] border border-zinc-800 bg-black/25 p-4">
-                                <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-zinc-500">Weekly reset</div>
-                                <div className="mt-2 text-lg font-black text-white">Monday</div>
-                                <p className="mt-2 text-xs leading-relaxed text-zinc-400">
-                                    Global reset for all players. {weeklyResetDays}d remaining based on the backend reset window.
-                                </p>
-                            </div>
+                        {/* Stats pills */}
+                        <div className="hidden shrink-0 items-center gap-2 md:flex">
+                            <StatPill icon="✅" value={`${completedCount}/${totalCount}`} label="done" />
+                            <StatPill icon="⚡" value={xp.toLocaleString()} label="XP" />
+                            <StatPill icon="↩" value={`${weeklyResetDays}d`} label="reset Mon" />
+                        </div>
+
+                        {/* Mobile stats row */}
+                        <div className="flex w-full items-center gap-2 md:hidden">
+                            <StatPill icon="✅" value={`${completedCount}/${totalCount}`} label="done" />
+                            <StatPill icon="⚡" value={xp.toLocaleString()} label="XP" />
                         </div>
                     </div>
                 </div>
@@ -594,19 +567,12 @@ export default function ChallengesPage() {
                                         </button>
                                     </div>
 
-                                    {/* Mobile: horizontal scroll */}
-                                    <div className="md:hidden flex gap-4 overflow-x-auto pb-3 scrollbar-hide -mx-4 px-4">
+                                    {/* Horizontal scroll — same layout on mobile and desktop */}
+                                    <div className="flex gap-3 overflow-x-auto pb-3 scrollbar-hide -mx-4 px-4">
                                         {challenges.map(ch => (
-                                            <div key={ch.id} className="flex-shrink-0 w-[82vw] max-w-[320px]">
+                                            <div key={ch.id} className="flex-shrink-0 w-[76vw] max-w-[268px] sm:w-[44vw] md:w-[280px]">
                                                 <ChallengeCard challenge={ch} achievement={getAchievement(ch.id)} catConfig={cat} animated={animated} />
                                             </div>
-                                        ))}
-                                    </div>
-
-                                    {/* Desktop: grid */}
-                                    <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                                        {challenges.map(ch => (
-                                            <ChallengeCard key={ch.id} challenge={ch} achievement={getAchievement(ch.id)} catConfig={cat} animated={animated} />
                                         ))}
                                     </div>
                                 </div>
@@ -645,14 +611,3 @@ function StatPill({ icon, value, label }: { icon: string; value: string; label: 
     );
 }
 
-function HeroStatCard({ icon, value, label, accent }: { icon: string; value: string; label: string; accent: string }) {
-    return (
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-950/60 p-3">
-            <div className="flex items-center justify-between gap-3">
-                <span className="text-sm">{icon}</span>
-                <span className={`text-lg font-black ${accent}`}>{value}</span>
-            </div>
-            <div className="mt-1 text-[11px] font-semibold text-zinc-500">{label}</div>
-        </div>
-    );
-}
