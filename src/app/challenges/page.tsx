@@ -99,10 +99,11 @@ function ChallengeCard({ challenge, achievement, catConfig, animated }: {
     const isWeekly = challenge.category === "weekly";
     const isPermanent = challenge.is_permanent;
     const isLegendaryPlus = rarity.key === "legendary" || rarity.key === "mythic";
+    const accent = completed ? rarity.text : catConfig.tabBg;
 
     return (
         <div
-            className="challenge-card group relative flex h-full flex-col overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-900/70 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-zinc-700 cursor-default select-none"
+            className="challenge-card group relative flex h-full min-h-[290px] flex-col overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-900/80 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-zinc-700 cursor-default select-none"
             style={{
                 boxShadow: completed
                     ? `0 10px 30px rgba(0,0,0,0.35), 0 0 0 1px ${rarity.border}`
@@ -111,6 +112,8 @@ function ChallengeCard({ challenge, achievement, catConfig, animated }: {
                         : `0 10px 30px rgba(0,0,0,0.28)`,
             }}
         >
+            <div className="absolute inset-0 pointer-events-none opacity-90"
+                style={{ background: `radial-gradient(circle at top right, ${completed ? rarity.glow : `${accent}20`}, transparent 34%)` }} />
             <div className="absolute inset-x-0 top-0 h-px opacity-70"
                 style={{ background: `linear-gradient(90deg, transparent, ${completed ? rarity.text : catConfig.tabBg}, transparent)` }} />
 
@@ -141,20 +144,28 @@ function ChallengeCard({ challenge, achievement, catConfig, animated }: {
                                     </span>
                                 )}
                             </div>
-                            <h3 className="text-base font-bold leading-tight text-white sm:text-lg">{challenge.title}</h3>
                         </div>
                     </div>
-                    <div className="flex shrink-0 flex-col items-end gap-1 text-right">
-                        <span className="rounded-full border border-zinc-700 bg-black/30 px-2.5 py-1 text-[11px] font-black text-white">
+                    <div className="flex shrink-0 flex-col items-end gap-1.5 text-right">
+                        <span className="rounded-full border px-2.5 py-1 text-[11px] font-black text-white"
+                            style={{
+                                borderColor: `${rarity.text}44`,
+                                background: `linear-gradient(135deg, rgba(24,24,27,0.92), ${rarity.glow})`,
+                                boxShadow: `0 0 18px ${rarity.glow}`,
+                            }}>
                             +{challenge.xp_reward} XP
                         </span>
-                        <span className="text-[10px] font-black tracking-[0.16em] uppercase" style={{ color: rarity.text }}>
+                        <span className="rounded-full border px-2 py-0.5 text-[9px] font-black tracking-[0.22em] uppercase"
+                            style={{ color: rarity.text, borderColor: `${rarity.text}33`, background: `${rarity.glow}` }}>
                             {rarity.label}
                         </span>
                     </div>
                 </div>
 
-                <p className="mb-5 text-sm leading-relaxed text-zinc-400">{challenge.description}</p>
+                <div className="mb-5 min-h-[86px] md:min-h-[104px]">
+                    <h3 className="mb-2 min-h-[56px] text-base font-black leading-tight text-white sm:text-lg">{challenge.title}</h3>
+                    <p className="text-sm leading-relaxed text-zinc-400">{challenge.description}</p>
+                </div>
 
                 <div className="mt-auto">
                     <div className="mb-2 flex items-center justify-between text-[11px] font-semibold text-zinc-500">
@@ -174,7 +185,7 @@ function ChallengeCard({ challenge, achievement, catConfig, animated }: {
                         />
                     </div>
 
-                    <div className="mt-3 flex min-h-5 items-center justify-between gap-3 text-[11px] font-semibold">
+                    <div className="mt-3 flex min-h-9 items-end justify-between gap-3 text-[11px] font-semibold">
                         <div className="min-w-0 text-left">
                             {completed && (
                                 <span className="inline-flex items-center gap-1 text-emerald-400">
@@ -192,7 +203,7 @@ function ChallengeCard({ challenge, achievement, catConfig, animated }: {
                             )}
                         </div>
 
-                        <span className="shrink-0 text-right" style={{ color: completed ? rarity.text : "#a1a1aa" }}>
+                        <span className="shrink-0 text-right font-bold" style={{ color: completed ? rarity.text : "#a1a1aa" }}>
                             {completed ? `+${challenge.xp_reward} XP earned` : `${100 - progress}% left`}
                         </span>
                     </div>
@@ -228,18 +239,36 @@ export default function ChallengesPage() {
     }, [user]);
 
     useEffect(() => {
-        // Require BOTH gamification + stats before animating — prevents XP bar
-        // snapping to 100% when stats hasn't loaded yet (nextTierMinXp = null).
         if (gamification && stats && containerRef.current) {
-            const t = setTimeout(() => setAnimated(true), 100);
-            gsap.fromTo(
-                ".challenge-card",
-                { y: 40, opacity: 0 },
-                { y: 0, opacity: 1, stagger: 0.06, duration: 0.5, ease: "power3.out" }
-            );
+            const t = setTimeout(() => setAnimated(true), 120);
+            const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+            tl.fromTo(".premium-hero", { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55 })
+                .fromTo(".premium-ladder", { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45 }, "-=0.22")
+                .fromTo(".premium-tabs", { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35 }, "-=0.18")
+                .fromTo(".section-block", { y: 24, opacity: 0 }, { y: 0, opacity: 1, stagger: 0.08, duration: 0.45 }, "-=0.1");
             return () => clearTimeout(t);
         }
-    }, [gamification, stats, selectedCategory]);
+    }, [gamification, stats]);
+
+    useEffect(() => {
+        if (gamification && containerRef.current) {
+            gsap.fromTo(
+                ".challenge-card",
+                { y: 26, opacity: 0 },
+                { y: 0, opacity: 1, stagger: 0.05, duration: 0.42, ease: "power3.out" }
+            );
+        }
+    }, [gamification, selectedCategory]);
+
+    useEffect(() => {
+        if (showTierLadder) {
+            gsap.fromTo(
+                ".tier-card",
+                { y: 18, opacity: 0, scale: 0.97 },
+                { y: 0, opacity: 1, scale: 1, stagger: 0.05, duration: 0.38, ease: "power3.out" }
+            );
+        }
+    }, [showTierLadder]);
 
     if (isAuthPending || !user) return <AuthLoadingSpinner />;
 
@@ -324,7 +353,7 @@ export default function ChallengesPage() {
                 </div>
 
                 {/* ── HERO SECTION ── */}
-                <div className="relative mb-8 overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-900/55 p-5 md:p-8 backdrop-blur-sm">
+                <div className="premium-hero relative mb-8 overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-900/55 p-5 md:p-8 backdrop-blur-sm">
                     <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent" />
 
                     <div className="relative z-10 flex flex-col gap-6 md:flex-row md:items-center md:gap-8">
@@ -387,66 +416,86 @@ export default function ChallengesPage() {
                 </div>
 
                 {/* ── TIER LADDER ── */}
-                <div className="mb-6">
+                <div className="premium-ladder mb-6">
                     <button
                         onClick={() => setShowTierLadder(v => !v)}
-                        className="w-full flex items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-900/55 px-5 py-3 transition-all duration-200 group">
+                        className="w-full flex items-center justify-between rounded-3xl border border-zinc-800 bg-zinc-900/70 px-5 py-4 transition-all duration-200 group shadow-[0_10px_30px_rgba(0,0,0,0.18)]">
                         <div className="flex items-center gap-3">
-                            <span className="text-base">🏆</span>
-                            <span className="text-sm font-black text-white tracking-wide">Tier Ladder</span>
-                            <span className="hidden sm:inline text-xs" style={{ color: "rgba(255,255,255,0.25)" }}>all tiers & XP required</span>
+                            <div className="flex h-9 w-9 items-center justify-center rounded-2xl border border-emerald-500/20 bg-emerald-500/10 text-base shadow-[0_0_20px_rgba(16,185,129,0.12)]">🏆</div>
+                            <div>
+                                <div className="text-sm font-black tracking-wide text-white">Tier Ladder</div>
+                                <div className="hidden sm:block text-xs text-zinc-500">See every level, the XP required, and the next target to chase.</div>
+                            </div>
                         </div>
-                        <span className="text-xs font-bold text-zinc-500 group-hover:text-zinc-300 transition-colors">
+                        <div className="text-right">
+                            <div className="text-xs font-black text-emerald-400">{nextTier ? `${stats?.xp_to_next_tier} XP to ${nextTier}` : "Top tier unlocked"}</div>
+                            <div className="text-[11px] font-bold text-zinc-500 group-hover:text-zinc-300 transition-colors">
                             {showTierLadder ? "▲ hide" : "▼ show"}
-                        </span>
+                            </div>
+                        </div>
                     </button>
 
                     {showTierLadder && (
                         <div className="mt-3 overflow-x-auto scrollbar-hide -mx-4 px-4">
-                            <div className="flex gap-3 pb-2" style={{ width: "max-content" }}>
+                            <div className="relative flex gap-4 pb-3 pt-1" style={{ width: "max-content" }}>
+                                <div className="absolute left-6 right-6 top-[4.35rem] h-px bg-gradient-to-r from-zinc-800 via-zinc-700 to-zinc-800" />
                                 {TIER_LADDER.map((t, i) => {
                                     const isCurrent = t.name === tier;
                                     const isUnlocked = xp >= t.minXp;
                                     const isNext = !isUnlocked && (i === 0 || xp >= TIER_LADDER[i - 1].minXp);
+                                    const tierBarWidth = isCurrent ? `${tierProgress}%` : isUnlocked ? "100%" : "0%";
                                     return (
                                         <div key={t.name}
-                                            className="w-28 rounded-2xl border p-3 flex flex-col items-center gap-1.5 transition-all duration-300"
+                                            className="tier-card relative w-[148px] rounded-[1.75rem] border p-4 flex flex-col items-center gap-2 transition-all duration-300"
                                             style={{
                                                 background: isCurrent
-                                                    ? `linear-gradient(180deg, rgba(24,24,27,0.96), ${t.color}12)`
-                                                    : "rgba(24,24,27,0.8)",
-                                                borderColor: isCurrent ? t.color + "66" : isUnlocked ? "rgba(63,63,70,1)" : "rgba(39,39,42,1)",
-                                                boxShadow: isCurrent ? `0 0 18px ${t.color}22` : "none",
-                                                opacity: isUnlocked ? 1 : 0.5,
+                                                    ? `linear-gradient(180deg, rgba(24,24,27,0.98), ${t.color}20)`
+                                                    : isNext
+                                                        ? `linear-gradient(180deg, rgba(24,24,27,0.96), ${t.color}12)`
+                                                        : "rgba(24,24,27,0.92)",
+                                                borderColor: isCurrent ? t.color + "88" : isNext ? t.color + "55" : isUnlocked ? "rgba(82,82,91,1)" : "rgba(39,39,42,1)",
+                                                boxShadow: isCurrent ? `0 0 28px ${t.color}22` : isNext ? `0 0 20px ${t.color}10` : "none",
+                                                opacity: isUnlocked || isNext ? 1 : 0.56,
                                             }}>
-                                            <span className="text-2xl">{t.icon}</span>
-                                            <span className="text-xs font-black text-center"
+                                            <div className="absolute left-4 top-4 text-[9px] font-black tracking-[0.18em] uppercase"
+                                                style={{ color: isCurrent ? t.color : isNext ? "#eab308" : isUnlocked ? "#10b981" : "#52525b" }}>
+                                                {isCurrent ? "Current" : isNext ? "Next" : isUnlocked ? "Unlocked" : "Locked"}
+                                            </div>
+                                            <div className="mt-4 flex h-14 w-14 items-center justify-center rounded-2xl border text-3xl"
+                                                style={{ background: `${t.color}18`, borderColor: `${t.color}40`, boxShadow: `0 0 18px ${t.color}18` }}>
+                                                {t.icon}
+                                            </div>
+                                            <span className="text-sm font-black text-center"
                                                 style={{ color: isCurrent ? t.color : isUnlocked ? "#e4e4e7" : "#52525b" }}>
                                                 {t.name}
                                             </span>
-                                            <span className="text-[10px] text-center font-bold"
-                                                style={{ color: isCurrent ? t.color + "cc" : "#52525b" }}>
+                                            <span className="text-[11px] text-center font-black"
+                                                style={{ color: isCurrent || isNext ? t.color : isUnlocked ? "#d4d4d8" : "#52525b" }}>
                                                 {t.minXp.toLocaleString()} XP
                                             </span>
                                             {t.nextXp && (
-                                                <span className="text-[9px] text-center" style={{ color: "rgba(255,255,255,0.2)" }}>
+                                                <span className="text-[10px] text-center text-zinc-500">
                                                     up to {(t.nextXp - 1).toLocaleString()}
                                                 </span>
                                             )}
+                                            <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-black/40 border border-white/5">
+                                                <div className="h-full rounded-full transition-all duration-500"
+                                                    style={{ width: tierBarWidth, background: `linear-gradient(90deg, ${t.color}, ${t.color}aa)` }} />
+                                            </div>
                                             {isCurrent && (
-                                                <span className="text-[8px] font-black px-2 py-0.5 rounded-full tracking-widest mt-0.5"
+                                                <span className="text-[8px] font-black px-2 py-0.5 rounded-full tracking-widest mt-1"
                                                     style={{ background: t.color + "33", color: t.color, border: `1px solid ${t.color}66` }}>
                                                     YOU ARE HERE
                                                 </span>
                                             )}
                                             {isNext && (
-                                                <span className="text-[8px] font-black px-2 py-0.5 rounded-full tracking-widest mt-0.5"
-                                                    style={{ background: "rgba(255,255,255,0.08)", color: "#94a3b8", border: "1px solid rgba(255,255,255,0.1)" }}>
-                                                    NEXT
+                                                <span className="text-[8px] font-black px-2 py-0.5 rounded-full tracking-widest mt-1"
+                                                    style={{ background: "rgba(234,179,8,0.12)", color: "#facc15", border: "1px solid rgba(234,179,8,0.22)" }}>
+                                                    CHASE THIS
                                                 </span>
                                             )}
                                             {!isUnlocked && !isNext && (
-                                                <span className="text-[8px] mt-0.5" style={{ color: "#3f3f46" }}>🔒 locked</span>
+                                                <span className="text-[8px] mt-1" style={{ color: "#3f3f46" }}>🔒 locked</span>
                                             )}
                                         </div>
                                     );
@@ -457,7 +506,7 @@ export default function ChallengesPage() {
                 </div>
 
                 {/* ── CATEGORY TABS ── */}
-                <div className="flex gap-2 overflow-x-auto pb-2 mb-8 scrollbar-hide">
+                <div className="premium-tabs flex gap-2 overflow-x-auto pb-2 mb-8 scrollbar-hide">
                     {CATEGORIES.map(cat => {
                         const counts = cat.key !== "all" ? categoryCounts(cat.key) : null;
                         const isActive = selectedCategory === cat.key;
@@ -488,7 +537,7 @@ export default function ChallengesPage() {
                         {groupedByCategory.map(({ cat, challenges }) => {
                             const counts = categoryCounts(cat.key);
                             return (
-                                <div key={cat.key}>
+                                <div key={cat.key} className="section-block">
                                     {/* Section header */}
                                     <div className="mb-4 flex items-center justify-between gap-3">
                                         <div className="flex items-center gap-3 min-w-0">
@@ -518,7 +567,7 @@ export default function ChallengesPage() {
                                     </div>
 
                                     {/* Desktop: grid */}
-                                    <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                    <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                                         {challenges.map(ch => (
                                             <ChallengeCard key={ch.id} challenge={ch} achievement={getAchievement(ch.id)} catConfig={cat} animated={animated} />
                                         ))}
@@ -528,7 +577,7 @@ export default function ChallengesPage() {
                         })}
                     </div>
                 ) : (
-                    <div>
+                    <div className="section-block">
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                             {orderedChallenges.map(ch => (
                                 <ChallengeCard key={ch.id} challenge={ch} achievement={getAchievement(ch.id)}
