@@ -8,6 +8,7 @@ import { playerService } from "@/services/playerService";
 import { Challenge, UserAchievement } from "@/types";
 import { gsap } from "gsap";
 import { useRequireAuth, AuthLoadingSpinner } from "@/components/auth/RequireAuth";
+import HScrollArea from "@/components/ui/HScrollArea";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Category Configuration
@@ -433,7 +434,7 @@ export default function ChallengesPage() {
                         )}
                     </div>
 
-                    <div className="overflow-x-auto scrollbar-hide -mx-4 px-4" data-lenis-prevent>
+                    <HScrollArea className="overflow-x-auto scrollbar-hide -mx-4 px-4">
                         <div className="relative flex gap-3 pb-4 pt-5" style={{ width: "max-content" }}>
                             {/* Connecting path line */}
                             <div className="absolute left-[84px] right-[84px] top-[4.6rem] h-0.5"
@@ -546,11 +547,11 @@ export default function ChallengesPage() {
                                 );
                             })}
                         </div>
-                    </div>
+                    </HScrollArea>
                 </div>
 
                 {/* ── CATEGORY TABS ── */}
-                <div className="premium-tabs flex gap-2 overflow-x-auto pb-2 mb-8 scrollbar-hide" data-lenis-prevent>
+                <HScrollArea className="premium-tabs flex gap-2 overflow-x-auto pb-2 mb-8 scrollbar-hide">
                     {CATEGORIES.map(cat => {
                         const counts = cat.key !== "all" ? categoryCounts(cat.key) : null;
                         const isActive = selectedCategory === cat.key;
@@ -573,7 +574,7 @@ export default function ChallengesPage() {
                             </button>
                         );
                     })}
-                </div>
+                </HScrollArea>
 
                 {/* ── CHALLENGE GRID ── */}
                 {selectedCategory === "all" && groupedByCategory ? (
@@ -599,27 +600,27 @@ export default function ChallengesPage() {
                                     </div>
 
                                     {/* Horizontal scroll — same layout on mobile and desktop */}
-                                    <div className="flex gap-3 overflow-x-auto pb-3 scrollbar-hide -mx-4 px-4" data-lenis-prevent>
+                                    <HScrollArea className="flex gap-3 overflow-x-auto pb-3 scrollbar-hide -mx-4 px-4">
                                         {challenges.map(ch => (
                                             <div key={ch.id} className="flex-shrink-0 w-[76vw] max-w-[268px] sm:w-[44vw] md:w-[280px]">
                                                 <ChallengeCard challenge={ch} achievement={getAchievement(ch.id)} catConfig={cat} animated={animated} />
                                             </div>
                                         ))}
-                                    </div>
+                                    </HScrollArea>
                                 </div>
                             );
                         })}
                     </div>
                 ) : (
                     <div className="section-block">
-                        <div className="flex gap-3 overflow-x-auto pb-3 scrollbar-hide -mx-4 px-4" data-lenis-prevent>
+                        <HScrollArea className="flex gap-3 overflow-x-auto pb-3 scrollbar-hide -mx-4 px-4">
                             {orderedChallenges.map(ch => (
                                 <div key={ch.id} className="flex-shrink-0 w-[76vw] max-w-[268px] sm:w-[44vw] md:w-[280px]">
                                     <ChallengeCard challenge={ch} achievement={getAchievement(ch.id)}
                                         catConfig={getCatConfig(ch.category)} animated={animated} />
                                 </div>
                             ))}
-                        </div>
+                        </HScrollArea>
                         {orderedChallenges.length === 0 && (
                             <div className="text-center py-20 text-zinc-600">
                                 <Trophy className="w-12 h-12 mx-auto mb-3 opacity-30" />
