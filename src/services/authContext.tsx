@@ -4,6 +4,7 @@
 import { createContext, useContext, useEffect, useState, FunctionComponent } from "react";
 import { User, UserRole } from "@/types";
 import { authService } from "./authService";
+import { playerService } from "./playerService";
 import { useRouter } from "next/navigation";
 
 interface AuthContextType {
@@ -31,6 +32,18 @@ export const AuthProvider: FunctionComponent<{ children: React.ReactNode }> = ({
     const [loading, setLoading] = useState(true);
     const router = useRouter();
 
+    const fetchAndApplyStats = async (baseUser: User): Promise<User> => {
+        try {
+            const stats = await playerService.getStats();
+            if (stats?.xp !== undefined) {
+                const updated = { ...baseUser, xp: stats.xp, level: stats.level ?? baseUser.level };
+                setUser(updated);
+                return updated;
+            }
+        } catch (_) {}
+        return baseUser;
+    };
+
     // Load user from stored token on mount
     useEffect(() => {
         const initAuth = async () => {
@@ -39,6 +52,7 @@ export const AuthProvider: FunctionComponent<{ children: React.ReactNode }> = ({
                 try {
                     const userData = await authService.getMe(accessToken);
                     setUser(userData);
+                    fetchAndApplyStats(userData);
                 } catch (error) {
                     console.error("Session expired or invalid token", error);
                     authService.logout();
@@ -49,6 +63,7 @@ export const AuthProvider: FunctionComponent<{ children: React.ReactNode }> = ({
         };
 
         initAuth();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const login = async (email: string, password: string): Promise<User> => {
@@ -58,9 +73,11 @@ export const AuthProvider: FunctionComponent<{ children: React.ReactNode }> = ({
 
             // 2. Get User Profile
             const userData = await authService.getMe(tokenResponse.access_token);
-
             setUser(userData);
-            return userData;
+
+            // 3. Hydrate xp/level from stats
+            const hydrated = await fetchAndApplyStats(userData);
+            return hydrated;
 
         } catch (error) {
             console.error("Login Failed", error);
@@ -73,7 +90,8 @@ export const AuthProvider: FunctionComponent<{ children: React.ReactNode }> = ({
             await authService.googleLogin(idToken);
             const userData = await authService.getMe();
             setUser(userData);
-            return userData;
+            const hydrated = await fetchAndApplyStats(userData);
+            return hydrated;
         } catch (error) {
             console.error("Google Login Failed", error);
             throw error;
