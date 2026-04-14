@@ -8,56 +8,81 @@ interface HScrollAreaProps {
     style?: CSSProperties;
 }
 
+const FRICTION = 0.93; // higher = longer coast, lower = quicker stop
+
 /**
- * Horizontal scroll container that:
- * - Converts vertical mouse-wheel delta to horizontal scroll (non-passive wheel listener)
- * - Enables click-drag scrolling with a grab cursor
- * - Carries data-lenis-prevent so Lenis doesn't swallow wheel events
+ * Horizontal scroll container with click-drag + momentum inertia.
+ * data-lenis-prevent stops Lenis from interfering.
  */
 export default function HScrollArea({ children, className, style }: HScrollAreaProps) {
     const ref = useRef<HTMLDivElement>(null);
     const dragging = useRef(false);
     const startX = useRef(0);
     const startScroll = useRef(0);
+    const velX = useRef(0);
+    const lastX = useRef(0);
+    const lastT = useRef(0);
+    const rafId = useRef<number | null>(null);
 
-    useEffect(() => {
-        const el = ref.current;
-        if (!el) return;
+    const cancelMomentum = () => {
+        if (rafId.current !== null) {
+            cancelAnimationFrame(rafId.current);
+            rafId.current = null;
+        }
+    };
 
-        const onWheel = (e: WheelEvent) => {
-            // If the user is scrolling more horizontally already, let it pass
-            if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
-            e.preventDefault();
-            el.scrollLeft += e.deltaY;
-        };
+    const coast = () => {
+        if (!ref.current || Math.abs(velX.current) < 0.4) {
+            velX.current = 0;
+            return;
+        }
+        ref.current.scrollLeft -= velX.current;
+        velX.current *= FRICTION;
+        rafId.current = requestAnimationFrame(coast);
+    };
 
-        el.addEventListener("wheel", onWheel, { passive: false });
-        return () => el.removeEventListener("wheel", onWheel);
-    }, []);
+    useEffect(() => () => cancelMomentum(), []);
 
     const onMouseDown = (e: React.MouseEvent) => {
+        // only main button
+        if (e.button !== 0) return;
+        cancelMomentum();
         dragging.current = true;
         startX.current = e.pageX;
         startScroll.current = ref.current!.scrollLeft;
+        lastX.current = e.pageX;
+        lastT.current = performance.now();
+        velX.current = 0;
         if (ref.current) ref.current.style.cursor = "grabbing";
+        e.preventDefault(); // prevent text selection
     };
 
     const onMouseMove = (e: React.MouseEvent) => {
         if (!dragging.current) return;
-        const dx = e.pageX - startX.current;
-        if (ref.current) ref.current.scrollLeft = startScroll.current - dx;
+        const now = performance.now();
+        const dt = now - lastT.current;
+        if (dt > 0) {
+            // velocity in px/frame (normalized to 16ms)
+            velX.current = ((e.pageX - lastX.current) / dt) * 16;
+        }
+        lastX.current = e.pageX;
+        lastT.current = now;
+        ref.current!.scrollLeft = startScroll.current - (e.pageX - startX.current);
     };
 
     const stopDrag = () => {
+        if (!dragging.current) return;
         dragging.current = false;
         if (ref.current) ref.current.style.cursor = "grab";
+        // kick off inertia coast
+        rafId.current = requestAnimationFrame(coast);
     };
 
     return (
         <div
             ref={ref}
             className={className}
-            style={{ cursor: "grab", ...style }}
+            style={{ cursor: "grab", userSelect: "none", ...style }}
             data-lenis-prevent
             onMouseDown={onMouseDown}
             onMouseMove={onMouseMove}
