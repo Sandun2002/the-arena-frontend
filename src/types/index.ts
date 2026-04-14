@@ -306,6 +306,8 @@ export interface Review {
   user_id: string;
   user_name: string;
   user_avatar: string | null;
+  user_xp?: number;
+  user_level?: number;
   rating: number;
   title?: string | null;
   comment: string;

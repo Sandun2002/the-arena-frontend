@@ -10,6 +10,8 @@ import { Review, Venue } from "@/types";
 import BookingWidget from "@/components/venues/BookingWidget";
 import { CheckCircle, MapPin, Star, Trophy } from "lucide-react";
 import RequireAuth from "@/components/auth/RequireAuth";
+import TierFrame from "@/components/ui/TierFrame";
+import { getTierFromXp } from "@/lib/tierUtils";
 
 export default function VenueDetailsPage() {
   const params = useParams();
@@ -133,7 +135,13 @@ export default function VenueDetailsPage() {
                   <div key={review.id} className="p-6 rounded-[2rem] bg-zinc-900/40 border border-zinc-800 backdrop-blur-sm">
                     <div className="flex justify-between items-start mb-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center font-bold text-zinc-500">{review.user_name.charAt(0)}</div>
+                        <TierFrame
+                            tier={getTierFromXp(review.user_xp ?? 0)}
+                            level={review.user_level ?? 1}
+                            src={review.user_avatar}
+                            size="sm"
+                            alt={review.user_name}
+                        />
                         <div>
                           <p className="font-bold text-white text-sm">{review.user_name}</p>
                           <p className="text-xs text-zinc-500">{formatDistanceToNow(new Date(review.created_at), { addSuffix: true })}</p>
