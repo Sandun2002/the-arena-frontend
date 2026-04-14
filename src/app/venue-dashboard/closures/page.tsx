@@ -94,13 +94,12 @@ export default function ClosuresPage() {
         }
     };
 
-    const getIcon = (type: string) => {
-        switch (type) {
-            case "maintenance": return <Hammer className="h-5 w-5 text-orange-500" />;
-            case "weather": return <CloudRain className="h-5 w-5 text-blue-500" />;
-            case "holiday": return <Calendar className="h-5 w-5 text-purple-500" />;
-            default: return <AlertTriangle className="h-5 w-5 text-yellow-500" />;
-        }
+    const getIcon = (closure: any) => {
+        if (closure._type === "court") return <Hammer className="h-5 w-5 text-amber-500" />;
+        const reason = (closure.reason || "").toLowerCase();
+        if (reason.includes("holiday") || reason.includes("public")) return <Calendar className="h-5 w-5 text-purple-500" />;
+        if (reason.includes("weather") || reason.includes("rain")) return <CloudRain className="h-5 w-5 text-blue-500" />;
+        return <AlertTriangle className="h-5 w-5 text-red-500" />;
     }
 
     if (!user) return null;
@@ -148,7 +147,7 @@ export default function ClosuresPage() {
                             <div key={closure.id} className="closure-card bg-zinc-900/40 border border-zinc-800 rounded-2xl p-6 backdrop-blur-sm flex flex-col md:flex-row items-center justify-between gap-6 group hover:border-orange-500/30 transition-all">
                                 <div className="flex items-center gap-6 w-full md:w-auto">
                                     <div className={`w-14 h-14 rounded-xl flex items-center justify-center shrink-0 bg-zinc-800/50`}>
-                                        {getIcon(closure.type)}
+                                        {getIcon(closure)}
                                     </div>
                                     <div>
                                         <h3 className="font-bold text-white text-lg mb-1">{closure.displayTitle}</h3>

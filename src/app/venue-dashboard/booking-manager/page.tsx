@@ -13,7 +13,7 @@ import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
 
 function getBookingType(booking: Booking): "platform" | "walkin" | "maintenance" {
-    if (booking.status === "blocked" || booking.status === "maintenance") return "maintenance";
+    if (booking.is_blocked) return "maintenance";
     if (booking.is_manual) return "walkin";
     return "platform";
 }
@@ -33,6 +33,7 @@ export default function BookingManagerPage() {
     
     const [operatingSchedule, setOperatingSchedule] = useState<any[]>([]);
     const [isVenueClosed, setIsVenueClosed] = useState(false);
+    const [closureReason, setClosureReason] = useState<string | null>(null);
 
     const prevBookingIdsRef = useRef<Set<string>>(new Set());
 
@@ -101,14 +102,15 @@ export default function BookingManagerPage() {
 
             // Check closure from schedule data or manual closure list
             const isClosedFromSchedule = scheduleData.isClosed;
-            const isClosedFromList = closuresData.some((c: any) => {
+            const matchedClosure = closuresData.find((c: any) => {
                 const start = new Date(c.start_date ?? c.closure_date);
                 start.setHours(0, 0, 0, 0);
                 const end = c.end_date ? new Date(c.end_date) : new Date(start);
                 end.setHours(23, 59, 59, 999);
                 return selectedDate >= start && selectedDate <= end;
             });
-            setIsVenueClosed(isClosedFromSchedule || isClosedFromList);
+            setIsVenueClosed(isClosedFromSchedule || !!matchedClosure);
+            setClosureReason(scheduleData.closureReason || matchedClosure?.reason || null);
 
         } catch (error) {
             console.error("Failed to load calendar data", error);
@@ -335,7 +337,7 @@ export default function BookingManagerPage() {
                     <div className="flex flex-col items-center justify-center h-full text-red-500/80 py-20 border border-red-500/10 rounded-2xl bg-red-500/5">
                         <CalendarIcon className="w-12 h-12 mb-4 text-red-500/60" />
                         <h2 className="text-xl font-bold mb-2 text-red-400">Venue Closed</h2>
-                        <p className="text-red-400/80">The venue is not operating on {format(selectedDate, "MMM dd, yyyy")}.</p>
+                        <p className="text-red-400/80">{closureReason || `The venue is not operating on ${format(selectedDate, "MMM dd, yyyy")}.`}</p>
                     </div>
                 ) : !activeCourtId ? (
                     <div className="flex flex-col items-center justify-center h-full text-zinc-500 py-20">

@@ -50,7 +50,7 @@ export default function ClosureFormModal({ venueId, courts, onClose, onSuccess }
                 await centerService.createClosure({
                     closure_date: data.start_date,
                     ...(data.end_date ? { end_date: data.end_date } : {}),
-                    reason: data.reason || "Venue Closed",
+                    reason: [data.title, data.reason].filter(Boolean).join(" — ") || "Venue Closed",
                 }, venueId);
             } else {
                 if (selectedSlots.length === 0) {

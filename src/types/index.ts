@@ -163,6 +163,8 @@ export interface Booking {
   is_manual: boolean;
   is_paid: boolean;
   is_no_show: boolean;
+  is_blocked: boolean;
+  block_reason: string | null;
   customer_name: string | null;
   customer_phone: string | null;
   start_time: string;
@@ -276,6 +278,7 @@ export interface VenueSlotsResponse {
   venue_name: string;
   date: string;
   is_closed: boolean;
+  closure_reason: string | null;
   operating_hours: {
     opening: string | null;
     closing: string | null;
@@ -287,11 +290,12 @@ export interface VenueSlotsResponse {
     hourly_rate: number;
     is_indoor: boolean;
     description: string | null;
+    is_active: boolean;
     slots: Array<{
       start: string;
       end: string;
       date: string;
-      status: "available" | "booked" | "held" | "closed" | "recurring";
+      status: "available" | "booked" | "held" | "closed" | "recurring" | "maintenance";
     }>;
   }>;
 }

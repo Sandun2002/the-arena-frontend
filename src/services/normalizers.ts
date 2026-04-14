@@ -152,6 +152,8 @@ export const normalizeBooking = (raw: any): Booking => ({
   is_manual: Boolean(raw.is_manual ?? false),
   is_paid: Boolean(raw.is_paid ?? raw.payment_status === "paid"),
   is_no_show: Boolean(raw.is_no_show ?? false),
+  is_blocked: Boolean(raw.is_blocked ?? false),
+  block_reason: raw.block_reason ?? null,
   customer_name: raw.customer_name ?? null,
   customer_phone: raw.customer_phone ?? null,
   start_time: raw.start_time,

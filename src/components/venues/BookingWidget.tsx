@@ -3,7 +3,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { Venue } from "@/types";
 import Button from "@/components/ui/Button";
 import DatePicker from "@/components/ui/DatePicker";
-import { Check, LogIn, Loader2, Calendar } from "lucide-react";
+import { Check, LogIn, Loader2, Calendar, Hammer } from "lucide-react";
 import { useAuth } from "@/services/authContext";
 import { api } from "@/services/api";
 import { bookingService } from "@/services/bookingService";
@@ -30,6 +30,8 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
   const [selectedCourtId, setSelectedCourtId] = useState<string>("");
   const [selectedSlots, setSelectedSlots] = useState<{ start: string, end: string }[]>([]);
   const [isVenueClosed, setIsVenueClosed] = useState(false);
+  const [closureReason, setClosureReason] = useState<string | null>(null);
+  const [maintenanceCourts, setMaintenanceCourts] = useState<any[]>([]);
   const [hasAutoSelected, setHasAutoSelected] = useState(false);
 
   const [loadingSlots, setLoadingSlots] = useState(false);
@@ -52,7 +54,15 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
     api.getVenueSlots(venue.id, date)
       .then((res: any) => {
         setIsVenueClosed(res.is_closed || false);
-        const data = (res.courts || []).map((court: any) => ({
+        setClosureReason(res.closure_reason || null);
+        
+        // Separate active and maintenance courts
+        const allCourts = res.courts || [];
+        const activeCourts = allCourts.filter((c: any) => c.is_active !== false);
+        const maintenance = allCourts.filter((c: any) => c.is_active === false);
+        setMaintenanceCourts(maintenance);
+        
+        const data = activeCourts.map((court: any) => ({
           court: {
             id: court.court_id,
             name: court.court_name,
@@ -302,8 +312,39 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
           <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(80,200,120,0.6)]"></span> Selected</div>
           <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500/50"></span> Booked</div>
           <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-indigo-500/60"></span> Reserved</div>
+          <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-zinc-600/70 border border-zinc-500/40"></span> Maintenance</div>
           <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full border border-zinc-600 bg-zinc-800/50"></span> Past/Closed</div>
           <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-zinc-600"></span> Available</div>
+        </div>
+      )}
+
+      {/* Maintenance Courts Section - shown when venue is open but some courts are under maintenance */}
+      {!isVenueClosed && maintenanceCourts.length > 0 && (
+        <div className="mb-6 p-4 rounded-xl border border-amber-500/20 bg-amber-500/5">
+          <div className="flex items-center gap-2 mb-3">
+            <Hammer className="w-4 h-4 text-amber-500" />
+            <h4 className="text-amber-500 font-bold text-sm uppercase tracking-wider">
+              Courts Under Maintenance
+            </h4>
+          </div>
+          <div className="flex flex-wrap gap-2 mb-2">
+            {maintenanceCourts.map((court) => (
+              <div
+                key={court.court_id}
+                className="flex items-center gap-2 px-3 py-2 bg-amber-500/10 border border-amber-500/20 rounded-lg"
+              >
+                <span className="text-amber-400 text-xs font-medium line-through opacity-60">
+                  {court.court_name}
+                </span>
+                <span className="text-[10px] text-amber-500/70 uppercase tracking-wider">
+                  Maintenance
+                </span>
+              </div>
+            ))}
+          </div>
+          <p className="text-amber-500/60 text-xs">
+            These courts are temporarily unavailable. Check back later.
+          </p>
         </div>
       )}
 
@@ -312,7 +353,9 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
         <div className="mb-8 p-6 rounded-xl border border-red-500/20 bg-red-500/5 text-center">
           <Calendar className="w-8 h-8 text-red-500/50 mx-auto mb-3" />
           <h4 className="text-red-400 font-bold mb-1">Venue Closed</h4>
-          <p className="text-zinc-400 text-sm">This venue is closed on the selected date. Please choose another date.</p>
+          <p className="text-zinc-400 text-sm">
+            {closureReason || "This venue is closed on the selected date. Please choose another date."}
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-4 gap-2 mb-8 min-h-[120px]">
@@ -329,30 +372,33 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
               const isBooked = slot.status === "booked";
               const isClosed = slot.status === "closed";
               const isRecurring = slot.status === "recurring";
+              const isMaintenance = slot.status === "maintenance";
               
-              const isUnavailable = isBooked || isClosed || isPast || isRecurring;
+              const isUnavailable = isBooked || isClosed || isPast || isRecurring || isMaintenance;
 
               return (
                 <button
                   key={slot.start}
                   disabled={isUnavailable}
-                  title={isRecurring ? "Reserved — recurring booking" : undefined}
+                  title={isMaintenance ? "Under maintenance — unavailable" : isRecurring ? "Reserved — recurring booking" : undefined}
                   onClick={() => toggleSlot({ start: slot.start, end: slot.end })}
                   className={`
                       py-2 rounded-lg text-xs font-medium border transition-all duration-200
-                      ${isBooked
-                        ? "bg-red-900/20 border-red-900/50 text-red-500 cursor-not-allowed opacity-60"
-                        : isRecurring
-                          ? "bg-indigo-900/30 border-indigo-700/50 text-indigo-400 cursor-not-allowed"
-                          : isClosed || isPast
-                            ? "bg-black/20 border-zinc-800/50 text-zinc-600 cursor-not-allowed"
-                            : isSelected
-                              ? "bg-emerald-500 border-emerald-500 text-black shadow-[0_0_10px_rgba(80,200,120,0.4)] scale-105"
-                              : "bg-zinc-800 border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:bg-zinc-700"
+                      ${isMaintenance
+                        ? "bg-zinc-700/30 border-zinc-600/50 text-zinc-400 cursor-not-allowed"
+                        : isBooked
+                          ? "bg-red-900/20 border-red-900/50 text-red-500 cursor-not-allowed opacity-60"
+                          : isRecurring
+                            ? "bg-indigo-900/30 border-indigo-700/50 text-indigo-400 cursor-not-allowed"
+                            : isClosed || isPast
+                              ? "bg-black/20 border-zinc-800/50 text-zinc-600 cursor-not-allowed"
+                              : isSelected
+                                ? "bg-emerald-500 border-emerald-500 text-black shadow-[0_0_10px_rgba(80,200,120,0.4)] scale-105"
+                                : "bg-zinc-800 border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:bg-zinc-700"
                     }
                   `}
                 >
-                  {isBooked ? "Booked" : isRecurring ? "Reserved" : isClosed ? "Closed" : isPast ? "Past" : format(slotTime, "HH:mm")}
+                  {isMaintenance ? "Maint." : isBooked ? "Booked" : isRecurring ? "Reserved" : isClosed ? "Closed" : isPast ? "Past" : format(slotTime, "HH:mm")}
                 </button>
               );
             })
