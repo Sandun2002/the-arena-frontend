@@ -99,7 +99,7 @@ function TopAccent({ type, color, size }: { type: string; color: string; size: n
     </svg>
   );
   if (type === "trident") return (
-    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ filter: `drop-shadow(0 0 5px ${color}) drop-shadow(0 0 10px #dc262688)` }}>
+    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ filter: `drop-shadow(0 0 5px ${color}) drop-shadow(0 0 10px #7dd3fc88)` }}>
       {/* Center prong */}
       <line x1="12" y1="2" x2="12" y2="18" />
       {/* Left prong */}

@@ -52,7 +52,7 @@ const TIER_STYLES: Record<string, { glow: string; gradient: string; icon: string
     Elite:     { glow: "rgba(249,115,22,0.55)",  gradient: "linear-gradient(135deg,#f97316,#ea580c)",  icon: "🔥" },
     Legend:    { glow: "rgba(239,68,68,0.55)",   gradient: "linear-gradient(135deg,#ef4444,#dc2626)",  icon: "⚔️" },
     Icon:      { glow: "rgba(168,85,247,0.6)",   gradient: "linear-gradient(135deg,#a855f7,#7c3aed)",  icon: "👑" },
-    Titan:     { glow: "rgba(251,191,36,0.7)",    gradient: "linear-gradient(135deg,#92400e,#d97706,#fde68a,#ffffff,#fde68a,#d97706)", icon: "👑" },
+    Titan:     { glow: "rgba(125,211,252,0.65)",   gradient: "linear-gradient(135deg,#0c4a6e,#38bdf8,#e0f2fe,#ffffff,#e0f2fe,#38bdf8)", icon: "⚡" },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -66,7 +66,7 @@ const TIER_LADDER = [
     { name: "Elite",     minXp: 4500,  nextXp: 7500,  icon: "🔥", color: "#f97316" },
     { name: "Legend",    minXp: 7500,  nextXp: 12000, icon: "⚔️", color: "#ef4444" },
     { name: "Icon",      minXp: 12000, nextXp: 25000, icon: "👑", color: "#a855f7" },
-    { name: "Titan",     minXp: 25000, nextXp: null,  icon: "⚡",   color: "#e2e8f0" },
+    { name: "Titan",     minXp: 25000, nextXp: null,  icon: "⚡",   color: "#7dd3fc" },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
