@@ -12,6 +12,8 @@ interface TierFrameProps {
   size?: FrameSize;
   className?: string;
   alt?: string;
+  hideBadge?: boolean;
+  placeholder?: React.ReactNode;
 }
 
 // ─── Size table ───────────────────────────────────────────────────────────────
@@ -107,6 +109,8 @@ export default function TierFrame({
   size = "lg",
   className = "",
   alt = "Avatar",
+  hideBadge = false,
+  placeholder,
 }: TierFrameProps) {
   const s = SIZES[size];
   const cfg = getTierConfig(tier);
@@ -145,6 +149,8 @@ export default function TierFrame({
         >
           {src ? (
             <img src={src} alt={alt} className="w-full h-full object-cover" draggable={false} />
+          ) : placeholder ? (
+            <>{placeholder}</>
           ) : (
             <UserIcon
               style={{ width: s.avatar * 0.45, height: s.avatar * 0.45, color: "#71717a" }}
@@ -153,8 +159,9 @@ export default function TierFrame({
         </div>
       </div>
 
-      {/* ── Ornament dots ── */}
+      {/* ── Ornament dots (skip bottom-center when badge visible to avoid overlap) ── */}
       {s.showOrn && orn.map((pos, i) => {
+        if (!hideBadge && s.showBadge && pos.top > 90 && pos.left > 40 && pos.left < 60) return null;
         const isDiamond = cfg.ornamentShape === "diamond";
         const isStar    = cfg.ornamentShape === "star";
         const ds = s.dotSize;
@@ -194,13 +201,14 @@ export default function TierFrame({
         </div>
       )}
 
-      {/* ── Level badge ── */}
-      {s.showBadge && (
+      {/* ── Level badge — centered at bottom, embedded in ring ── */}
+      {!hideBadge && s.showBadge && (
         <div
           className="absolute z-20"
           style={{
-            bottom: size === "sm" ? -2 : -2,
-            right: size === "sm" ? -2 : -2,
+            bottom: 0,
+            left: "50%",
+            transform: "translate(-50%, 40%)",
             width: s.badge,
             height: s.badge,
             ...badgeStyle(cfg.badgeShape, cfg.badgeBg, cfg.badgeBorder, cfg.badgeGlow),

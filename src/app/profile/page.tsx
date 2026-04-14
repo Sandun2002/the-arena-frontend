@@ -16,7 +16,7 @@ import { Booking, Challenge, UserAchievement } from "@/types";
 import TierFrame from "@/components/ui/TierFrame";
 
 export default function ProfilePage() {
-    const { user, logout, isVenueOwner, isVenueManager } = useAuth();
+    const { user, logout, isVenueOwner, isVenueManager, updateUser } = useAuth();
     const isAuthPending = useRequireAuth();
     const [stats, setStats] = useState<any>(null);
     const [bookings, setBookings] = useState<Booking[]>([]);
@@ -25,7 +25,10 @@ export default function ProfilePage() {
 
     useEffect(() => {
         if (user) {
-            playerService.getStats().then(setStats);
+            playerService.getStats().then(s => {
+                setStats(s);
+                if (s?.xp !== undefined) updateUser({ xp: s.xp, level: s.level });
+            });
             playerService.getBookings().then(all => {
                 // Sort newest first for recent activity
                 const sorted = [...all].sort(

@@ -13,6 +13,7 @@ interface AuthContextType {
     login: (email: string, password: string) => Promise<User>;
     loginWithGoogle: (idToken: string) => Promise<User>;
     logout: () => void;
+    updateUser: (fields: Partial<User>) => void;
     // Role Helpers
     hasRole: (role: UserRole) => boolean;
     isCustomer: boolean;
@@ -79,6 +80,10 @@ export const AuthProvider: FunctionComponent<{ children: React.ReactNode }> = ({
         }
     };
 
+    const updateUser = (fields: Partial<User>) => {
+        setUser(prev => prev ? { ...prev, ...fields } : null);
+    };
+
     const logout = () => {
         authService.logout();
         setUser(null);
@@ -103,6 +108,7 @@ export const AuthProvider: FunctionComponent<{ children: React.ReactNode }> = ({
                 login,
                 loginWithGoogle,
                 logout,
+                updateUser,
                 hasRole,
                 isCustomer,
                 isVenueOwner,

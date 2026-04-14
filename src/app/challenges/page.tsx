@@ -9,6 +9,7 @@ import { Challenge, UserAchievement } from "@/types";
 import { gsap } from "gsap";
 import { useRequireAuth, AuthLoadingSpinner } from "@/components/auth/RequireAuth";
 import HScrollArea from "@/components/ui/HScrollArea";
+import TierFrame from "@/components/ui/TierFrame";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Category Configuration
@@ -232,7 +233,7 @@ function ChallengeCard({ challenge, achievement, catConfig, animated }: {
 // Main Page
 // ─────────────────────────────────────────────────────────────────────────────
 export default function ChallengesPage() {
-    const { user } = useAuth();
+    const { user, updateUser } = useAuth();
     const isAuthPending = useRequireAuth();
     const [gamification, setGamification] = useState<{ challenges: Challenge[], achievements: UserAchievement[] } | null>(null);
     const [stats, setStats] = useState<any>(null);
@@ -243,7 +244,10 @@ export default function ChallengesPage() {
     useEffect(() => {
         if (user) {
             playerService.getChallenges().then(setGamification);
-            playerService.getStats().then(setStats);
+            playerService.getStats().then(s => {
+                setStats(s);
+                if (s?.xp !== undefined) updateUser({ xp: s.xp, level: s.level });
+            });
         }
     }, [user]);
 
@@ -488,19 +492,19 @@ export default function ChallengesPage() {
                                             )}
                                         </div>
 
-                                        {/* Icon */}
-                                        <div className="mt-1 flex h-14 w-14 items-center justify-center rounded-2xl border text-3xl"
-                                            style={{
-                                                background: `${t.color}${isCurrent ? "22" : isUnlocked ? "14" : isNext ? "10" : "06"}`,
-                                                borderColor: `${t.color}${isCurrent ? "66" : isNext ? "33" : isUnlocked ? "22" : "10"}`,
-                                                boxShadow: isCurrent
-                                                    ? `0 0 28px ${t.color}44, inset 0 0 16px ${t.color}18`
-                                                    : isNext
-                                                        ? `0 0 16px ${t.color}22`
-                                                        : "none",
-                                                filter: !isUnlocked && !isNext ? "grayscale(1) brightness(0.45)" : "none",
-                                            }}>
-                                            {t.icon}
+                                        {/* Tier Frame Preview */}
+                                        <div className="mt-1" style={{
+                                            filter: !isUnlocked && !isNext ? "grayscale(0.85) brightness(0.45)" : "none",
+                                            opacity: !isUnlocked && !isNext ? 0.6 : 1,
+                                        }}>
+                                            <TierFrame
+                                                tier={t.name}
+                                                level={t.minXp === 0 ? 1 : Math.floor(t.minXp / 100)}
+                                                src={null}
+                                                size="md"
+                                                hideBadge
+                                                placeholder={<span style={{ fontSize: 22 }}>{t.icon}</span>}
+                                            />
                                         </div>
 
                                         {/* Name */}
