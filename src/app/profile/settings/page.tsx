@@ -8,6 +8,8 @@ import { ArrowLeft, Save, Loader2, Camera, Upload, X } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
 import { playerService } from "@/services/playerService";
+import TierFrame from "@/components/ui/TierFrame";
+import { getTierFromXp } from "@/lib/tierUtils";
 import { useToast } from "@/components/ui/Toast";
 
 type FormData = {
@@ -91,21 +93,19 @@ export default function ProfileSettingsPage() {
                             className="relative group cursor-pointer"
                             onClick={() => fileInputRef.current?.click()}
                         >
-                            <div className="w-24 h-24 rounded-full border-4 border-zinc-800 overflow-hidden shadow-lg transition-transform group-hover:scale-105">
-                                {previewImage ? (
-                                    <img src={previewImage} alt="Avatar" className="w-full h-full object-cover" />
-                                ) : (
-                                    <div className="w-full h-full bg-zinc-800 flex items-center justify-center text-zinc-500">
-                                        <Camera className="w-8 h-8" />
-                                    </div>
-                                )}
-                                {uploadingAvatar && (
-                                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                                        <Loader2 className="w-6 h-6 text-emerald-500 animate-spin" />
-                                    </div>
-                                )}
-                            </div>
-                            <div className="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <TierFrame
+                                tier={getTierFromXp(user.xp ?? 0)}
+                                level={user.level ?? 1}
+                                src={previewImage}
+                                size="lg"
+                                alt="Avatar"
+                            />
+                            {uploadingAvatar && (
+                                <div className="absolute inset-0 rounded-full bg-black/60 flex items-center justify-center z-30">
+                                    <Loader2 className="w-6 h-6 text-emerald-500 animate-spin" />
+                                </div>
+                            )}
+                            <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-30">
                                 <Upload className="w-8 h-8 text-white" />
                             </div>
                             <input

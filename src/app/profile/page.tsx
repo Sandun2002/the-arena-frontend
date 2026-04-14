@@ -13,6 +13,7 @@ import { useAuth } from "@/services/authContext";
 import { playerService } from "@/services/playerService";
 import { fmtTime, fmtMonthAbbr, fmtDayNum, fmtMonthYear } from "@/lib/utils";
 import { Booking, Challenge, UserAchievement } from "@/types";
+import TierFrame from "@/components/ui/TierFrame";
 
 export default function ProfilePage() {
     const { user, logout, isVenueOwner, isVenueManager } = useAuth();
@@ -85,20 +86,12 @@ export default function ProfilePage() {
                 <div className="relative -mt-32 px-4 md:px-8 mb-12">
                     <div className="flex flex-col md:flex-row items-end md:items-center gap-6">
 
-                        {/* Avatar & Level */}
-                        <div className="relative">
-                            <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-black bg-zinc-800 overflow-hidden shadow-2xl relative z-10">
-                                {user.profile_image ? (
-                                    <img src={user.profile_image} alt={user.full_name} className="w-full h-full object-cover" />
-                                ) : (
-                                    <UserIcon className="w-16 h-16 text-zinc-500 m-auto mt-8 md:mt-10" />
-                                )}
-                            </div>
-                            <div className="absolute -bottom-2 -right-2 md:bottom-2 md:right-0 z-20 bg-black rounded-full p-1.5">
-                                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 border-2 border-zinc-800 text-black font-extrabold text-sm shadow-[0_0_15px_rgba(16,185,129,0.4)]">
-                                    {level}
-                                </div>
-                            </div>
+                        {/* Avatar & Tier Frame */}
+                        <div className="block md:hidden">
+                            <TierFrame tier={tier} level={level} src={user.profile_image} size="lg" alt={user.full_name} />
+                        </div>
+                        <div className="hidden md:block">
+                            <TierFrame tier={tier} level={level} src={user.profile_image} size="xl" alt={user.full_name} />
                         </div>
 
                         {/* Info */}

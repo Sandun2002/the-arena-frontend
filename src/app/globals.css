@@ -183,6 +183,67 @@ select option {
 }
 
 select:focus {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2350C878' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2020/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2350C878' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
 }
+
+/* ─── Tier Frame Animations ─────────────────────────────────────────────────── */
+
+@property --frame-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes tier-frame-rotate {
+  to { --frame-angle: 360deg; }
+}
+
+/* Elite — fire conic ring */
+.tier-ring-elite {
+  background: conic-gradient(
+    from var(--frame-angle),
+    #ef4444 0%, #f97316 20%, #fbbf24 38%, #f97316 56%, #dc2626 78%, #ef4444 100%
+  );
+  animation: tier-frame-rotate 4s linear infinite;
+}
+
+/* Legend — arcane conic ring */
+.tier-ring-legend {
+  background: conic-gradient(
+    from var(--frame-angle),
+    #8b5cf6 0%, #3b82f6 22%, #a78bfa 44%, #60a5fa 66%, #c4b5fd 84%, #8b5cf6 100%
+  );
+  animation: tier-frame-rotate 3s linear infinite;
+}
+
+/* Icon — celestial rainbow conic ring */
+.tier-ring-icon {
+  background: conic-gradient(
+    from var(--frame-angle),
+    #f59e0b 0%, #fde68a 12%, #ffffff 25%, #fbbf24 38%,
+    #a78bfa 50%, #fbbf24 62%, #ffffff 75%, #fde68a 88%, #f59e0b 100%
+  );
+  animation: tier-frame-rotate 2s linear infinite;
+}
+
+/* Glow pulse — Elite */
+@keyframes tier-pulse-fire {
+  0%, 100% { box-shadow: 0 0 32px #ef4444aa, 0 0 64px #f9731644; }
+  50%       { box-shadow: 0 0 52px #ef4444cc, 0 0 96px #f9731666, 0 0 8px #fbbf2455; }
+}
+.tier-glow-elite { animation: tier-pulse-fire 2s ease-in-out infinite; }
+
+/* Glow pulse — Legend */
+@keyframes tier-pulse-arcane {
+  0%, 100% { box-shadow: 0 0 40px #8b5cf6cc, 0 0 80px #3b82f644; }
+  50%       { box-shadow: 0 0 64px #8b5cf6ff, 0 0 120px #3b82f666, 0 0 10px #c4b5fd55; }
+}
+.tier-glow-legend { animation: tier-pulse-arcane 2.5s ease-in-out infinite; }
+
+/* Glow pulse — Icon */
+@keyframes tier-pulse-celestial {
+  0%, 100% { box-shadow: 0 0 20px #f59e0bcc, 0 0 60px #f59e0b55, 0 0 100px #ffffff22; }
+  50%       { box-shadow: 0 0 36px #f59e0bff, 0 0 90px #f59e0b77, 0 0 150px #ffffff33, 0 0 8px #fde68a; }
+}
+.tier-glow-icon { animation: tier-pulse-celestial 3s ease-in-out infinite; }
 

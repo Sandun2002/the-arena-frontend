@@ -9,6 +9,8 @@ import Button from "../ui/Button";
 import { Menu, X, User, LogOut, Calendar, Settings, Shield } from "lucide-react";
 import { useAuth } from "@/services/authContext";
 import VenueSwitcher from "@/components/venue/VenueSwitcher";
+import TierFrame from "@/components/ui/TierFrame";
+import { getTierFromXp } from "@/lib/tierUtils";
 
 export default function Header() {
   const pathname = usePathname();
@@ -20,7 +22,6 @@ export default function Header() {
   // Determine Context
   const isVenueContext = pathname?.startsWith("/venue-dashboard");
   const showVenueSwitcher = isVenueContext && (isVenueOwner || isVenueManager);
-
 
   const navLinks = [
     { name: "Home", path: "/" },
@@ -89,13 +90,13 @@ export default function Header() {
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                   className="flex items-center gap-3 hover:bg-white/5 pr-3 pl-2 py-1.5 rounded-full transition-colors border border-transparent hover:border-white/10"
                 >
-                  <div className="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center overflow-hidden">
-                    {user?.profile_image ? (
-                      <img src={user.profile_image} alt="Profile" className="w-full h-full object-cover" />
-                    ) : (
-                      <User className="h-4 w-4 text-zinc-400" />
-                    )}
-                  </div>
+                  <TierFrame
+                    tier={getTierFromXp(user?.xp ?? 0)}
+                    level={user?.level ?? 1}
+                    src={user?.profile_image}
+                    size="sm"
+                    alt="Profile"
+                  />
                   <span className="text-sm font-medium text-white max-w-[100px] truncate">{user?.full_name?.split(' ')[0]}</span>
                 </button>
 
@@ -159,13 +160,13 @@ export default function Header() {
 
           {isLoggedIn && (
             <div className="flex items-center gap-4 pb-6 border-b border-zinc-800">
-              <div className="w-12 h-12 rounded-full bg-zinc-800 border border-zinc-700 overflow-hidden">
-                {user?.profile_image ? (
-                  <img src={user.profile_image} alt="Profile" className="w-full h-full object-cover" />
-                ) : (
-                  <User className="h-6 w-6 text-zinc-400 m-auto mt-3" />
-                )}
-              </div>
+              <TierFrame
+                tier={getTierFromXp(user?.xp ?? 0)}
+                level={user?.level ?? 1}
+                src={user?.profile_image}
+                size="md"
+                alt="Profile"
+              />
               <div>
                 <p className="text-lg font-bold text-white">{user?.full_name}</p>
                 <p className="text-sm text-zinc-500">{user?.email}</p>
