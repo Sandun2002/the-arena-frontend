@@ -47,7 +47,8 @@ export default function ProfilePage() {
             });
             playerService.getChallenges().then(setGamification);
         }
-    }, [user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user?.id]);
 
     if (isAuthPending || !user) return <AuthLoadingSpinner />;
 

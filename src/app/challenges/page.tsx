@@ -249,7 +249,8 @@ export default function ChallengesPage() {
                 if (s?.xp !== undefined) updateUser({ xp: s.xp, level: s.level });
             });
         }
-    }, [user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user?.id]);
 
     useEffect(() => {
         if (gamification && stats && containerRef.current) {
