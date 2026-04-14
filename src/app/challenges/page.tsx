@@ -52,7 +52,7 @@ const TIER_STYLES: Record<string, { glow: string; gradient: string; icon: string
     Elite:     { glow: "rgba(249,115,22,0.55)",  gradient: "linear-gradient(135deg,#f97316,#ea580c)",  icon: "🔥" },
     Legend:    { glow: "rgba(239,68,68,0.55)",   gradient: "linear-gradient(135deg,#ef4444,#dc2626)",  icon: "⚔️" },
     Icon:      { glow: "rgba(168,85,247,0.6)",   gradient: "linear-gradient(135deg,#a855f7,#7c3aed)",  icon: "👑" },
-    Titan:     { glow: "rgba(220,38,38,0.7)",     gradient: "linear-gradient(135deg,#0a0a0a,#e2e8f0,#dc2626)", icon: "⚡" },
+    Titan:     { glow: "rgba(251,191,36,0.7)",    gradient: "linear-gradient(135deg,#92400e,#d97706,#fde68a,#ffffff,#fde68a,#d97706)", icon: "👑" },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

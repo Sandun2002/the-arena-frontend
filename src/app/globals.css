@@ -247,24 +247,22 @@ select:focus {
 }
 .tier-glow-icon { animation: tier-pulse-celestial 3s ease-in-out infinite; }
 
-/* Titan — void collapse conic ring: obsidian black with white-hot plasma + crimson arcs */
+/* Titan — molten gold / platinum prestige ring */
 .tier-ring-titan {
   background: conic-gradient(
     from var(--frame-angle),
-    #0a0a0a 0%, #e2e8f0 8%, #ffffff 15%, #dc2626 22%,
-    #0a0a0a 30%, #e2e8f0 38%, #ffffff 44%, #7f1d1d 50%,
-    #0a0a0a 58%, #ffffff 65%, #dc2626 72%,
-    #0a0a0a 80%, #e2e8f0 88%, #ffffff 94%, #0a0a0a 100%
+    #92400e 0%, #d97706 10%, #fbbf24 20%, #fde68a 28%,
+    #ffffff 35%, #fde68a 42%, #fbbf24 50%,
+    #f59e0b 58%, #fde68a 65%, #ffffff 72%,
+    #fde68a 80%, #d97706 90%, #92400e 100%
   );
-  animation: tier-frame-rotate 1.2s linear infinite;
+  animation: tier-frame-rotate 2.5s linear infinite;
 }
 
 /* Glow pulse — Titan */
-@keyframes tier-pulse-void {
-  0%   { box-shadow: 0 0 48px #dc2626cc, 0 0 96px #e2e8f033, 0 0 140px #dc262622; }
-  33%  { box-shadow: 0 0 64px #ffffffcc, 0 0 120px #dc262666, 0 0 180px #ffffff11, 0 0 12px #dc2626; }
-  66%  { box-shadow: 0 0 56px #dc2626ff, 0 0 100px #ffffff44, 0 0 160px #7f1d1d55; }
-  100% { box-shadow: 0 0 48px #dc2626cc, 0 0 96px #e2e8f033, 0 0 140px #dc262622; }
+@keyframes tier-pulse-titan {
+  0%, 100% { box-shadow: 0 0 40px #fbbf24cc, 0 0 80px #f59e0b55, 0 0 120px #fde68a22; }
+  50%       { box-shadow: 0 0 60px #fde68aff, 0 0 110px #fbbf2477, 0 0 160px #f59e0b33, 0 0 12px #ffffff88; }
 }
-.tier-glow-titan { animation: tier-pulse-void 1.8s ease-in-out infinite; }
+.tier-glow-titan { animation: tier-pulse-titan 2.5s ease-in-out infinite; }
 
