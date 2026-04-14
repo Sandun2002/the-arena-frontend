@@ -52,6 +52,7 @@ const TIER_STYLES: Record<string, { glow: string; gradient: string; icon: string
     Elite:     { glow: "rgba(249,115,22,0.55)",  gradient: "linear-gradient(135deg,#f97316,#ea580c)",  icon: "🔥" },
     Legend:    { glow: "rgba(239,68,68,0.55)",   gradient: "linear-gradient(135deg,#ef4444,#dc2626)",  icon: "⚔️" },
     Icon:      { glow: "rgba(168,85,247,0.6)",   gradient: "linear-gradient(135deg,#a855f7,#7c3aed)",  icon: "👑" },
+    Titan:     { glow: "rgba(220,38,38,0.7)",     gradient: "linear-gradient(135deg,#0a0a0a,#e2e8f0,#dc2626)", icon: "⚡" },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -64,7 +65,8 @@ const TIER_LADDER = [
     { name: "Champion",  minXp: 2500,  nextXp: 4500,  icon: "🥇", color: "#eab308" },
     { name: "Elite",     minXp: 4500,  nextXp: 7500,  icon: "🔥", color: "#f97316" },
     { name: "Legend",    minXp: 7500,  nextXp: 12000, icon: "⚔️", color: "#ef4444" },
-    { name: "Icon",      minXp: 12000, nextXp: null,  icon: "👑", color: "#a855f7" },
+    { name: "Icon",      minXp: 12000, nextXp: 25000, icon: "👑", color: "#a855f7" },
+    { name: "Titan",     minXp: 25000, nextXp: null,  icon: "⚡",   color: "#e2e8f0" },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────

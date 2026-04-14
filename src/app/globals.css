@@ -247,3 +247,24 @@ select:focus {
 }
 .tier-glow-icon { animation: tier-pulse-celestial 3s ease-in-out infinite; }
 
+/* Titan — void collapse conic ring: obsidian black with white-hot plasma + crimson arcs */
+.tier-ring-titan {
+  background: conic-gradient(
+    from var(--frame-angle),
+    #0a0a0a 0%, #e2e8f0 8%, #ffffff 15%, #dc2626 22%,
+    #0a0a0a 30%, #e2e8f0 38%, #ffffff 44%, #7f1d1d 50%,
+    #0a0a0a 58%, #ffffff 65%, #dc2626 72%,
+    #0a0a0a 80%, #e2e8f0 88%, #ffffff 94%, #0a0a0a 100%
+  );
+  animation: tier-frame-rotate 1.2s linear infinite;
+}
+
+/* Glow pulse — Titan */
+@keyframes tier-pulse-void {
+  0%   { box-shadow: 0 0 48px #dc2626cc, 0 0 96px #e2e8f033, 0 0 140px #dc262622; }
+  33%  { box-shadow: 0 0 64px #ffffffcc, 0 0 120px #dc262666, 0 0 180px #ffffff11, 0 0 12px #dc2626; }
+  66%  { box-shadow: 0 0 56px #dc2626ff, 0 0 100px #ffffff44, 0 0 160px #7f1d1d55; }
+  100% { box-shadow: 0 0 48px #dc2626cc, 0 0 96px #e2e8f033, 0 0 140px #dc262622; }
+}
+.tier-glow-titan { animation: tier-pulse-void 1.8s ease-in-out infinite; }
+

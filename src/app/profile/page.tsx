@@ -73,6 +73,7 @@ export default function ProfilePage() {
         Elite:     { badge: "bg-orange-500/10 border-orange-500/20 text-orange-400", bar: "from-orange-500 to-amber-400", text: "text-orange-400" },
         Legend:    { badge: "bg-red-500/10 border-red-500/20 text-red-400",       bar: "from-red-500 to-rose-400",    text: "text-red-400" },
         Icon:      { badge: "bg-purple-500/10 border-purple-500/20 text-purple-400", bar: "from-purple-500 to-violet-400", text: "text-purple-400" },
+        Titan:     { badge: "bg-red-900/20 border-slate-300/30 text-slate-200",     bar: "from-slate-200 via-red-500 to-slate-300", text: "text-slate-200" },
     };
     const tierStyle = TIER_COLORS[tier] || TIER_COLORS.Rookie;
 

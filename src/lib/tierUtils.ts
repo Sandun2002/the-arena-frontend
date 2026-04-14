@@ -5,7 +5,8 @@ export type TierName =
   | "Champion"
   | "Elite"
   | "Legend"
-  | "Icon";
+  | "Icon"
+  | "Titan";
 
 const XP_THRESHOLDS: [TierName, number][] = [
   ["Rookie",    0],
@@ -15,6 +16,7 @@ const XP_THRESHOLDS: [TierName, number][] = [
   ["Elite",     4500],
   ["Legend",    7500],
   ["Icon",      12000],
+  ["Titan",     25000],
 ];
 
 export function getTierFromXp(xp: number): TierName {
@@ -42,7 +44,7 @@ export interface TierFrameConfig {
   ornamentGlow: string;
   ornamentShape: "dot" | "diamond" | "star";
   ornamentPositions: "compass4" | "clock6" | "clock8" | "none";
-  topAccent: "none" | "crown" | "swords" | "flame";
+  topAccent: "none" | "crown" | "swords" | "flame" | "trident";
   icon: string;
 }
 
@@ -166,6 +168,24 @@ export const TIER_FRAME_CONFIG: Record<TierName, TierFrameConfig> = {
     ornamentPositions: "clock8",
     topAccent: "crown",
     icon: "👑",
+  },
+  Titan: {
+    color: "#e2e8f0",
+    colorAlt: "#dc2626",
+    ringClass: "tier-ring-titan",
+    glowClass: "tier-glow-titan",
+    staticGlow: "0 0 48px #dc2626cc, 0 0 96px #e2e8f044, 0 0 140px #dc262622, 0 0 12px #ffffff66",
+    innerShadow: "inset 0 0 24px #dc262644, inset 0 0 10px #e2e8f022",
+    badgeBg: "#060606",
+    badgeBorder: "#e2e8f0",
+    badgeGlow: "0 0 20px #e2e8f0cc, 0 0 8px #dc2626aa, 0 0 32px #dc262666",
+    badgeShape: "hexagon",
+    ornamentColor: "#e2e8f0",
+    ornamentGlow: "#dc2626",
+    ornamentShape: "star",
+    ornamentPositions: "clock8",
+    topAccent: "trident",
+    icon: "⚡",
   },
 };
 

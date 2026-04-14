@@ -98,6 +98,19 @@ function TopAccent({ type, color, size }: { type: string; color: string; size: n
       <path d="M12 2C8 8 8 12 12 14c-2-1-3-3-2-5 0 0 1 3 3 4 0-3 2-5 2-8 1 2 1 6-1 8 4-2 5-7 3-11z" />
     </svg>
   );
+  if (type === "trident") return (
+    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ filter: `drop-shadow(0 0 5px ${color}) drop-shadow(0 0 10px #dc262688)` }}>
+      {/* Center prong */}
+      <line x1="12" y1="2" x2="12" y2="18" />
+      {/* Left prong */}
+      <path d="M12 6 L7 2 L7 8" />
+      {/* Right prong */}
+      <path d="M12 6 L17 2 L17 8" />
+      {/* Handle base */}
+      <line x1="12" y1="18" x2="12" y2="22" />
+      <line x1="10" y1="22" x2="14" y2="22" />
+    </svg>
+  );
   return null;
 }
 
