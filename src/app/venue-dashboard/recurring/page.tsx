@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Plus, Repeat, Calendar, Clock, MoreVertical, Edit2, Play, Pause, Trash2, Layers } from "lucide-react";
+import { Plus, Repeat, Calendar, Clock, Edit2, Play, Pause, Trash2, Layers, Phone, ArrowRight, CalendarRange } from "lucide-react";
 import gsap from "gsap";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
@@ -12,6 +12,13 @@ import { centerService } from "@/services/centerService";
 import { RecurringBooking, Court } from "@/types";
 import { useVenue } from "@/components/venue/VenueContext";
 import { useToast } from "@/components/ui/Toast";
+
+function formatDateShort(iso: string) {
+    if (!iso) return "—";
+    const [y, m, d] = iso.split("-");
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return `${d} ${months[parseInt(m, 10) - 1]} ${y}`;
+}
 
 export default function RecurringPage() {
     const { user, isVenueOwner } = useAuth();
@@ -99,6 +106,13 @@ export default function RecurringPage() {
 
     const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
+    const statusConfig = {
+        active: { label: "Active", dot: "bg-emerald-400", text: "text-emerald-400", border: "border-emerald-500/20", card: "border-zinc-800 hover:border-emerald-500/30" },
+        paused: { label: "Paused", dot: "bg-amber-400", text: "text-amber-400", border: "border-amber-500/20", card: "border-amber-500/20 bg-amber-500/[0.03] hover:border-amber-400/40" },
+        expired: { label: "Expired", dot: "bg-zinc-500", text: "text-zinc-500", border: "border-zinc-700/40", card: "border-zinc-800 opacity-60 hover:border-zinc-700" },
+        cancelled: { label: "Cancelled", dot: "bg-red-500", text: "text-red-500", border: "border-red-500/20", card: "border-zinc-800 opacity-60 hover:border-zinc-700" },
+    };
+
     return (
         <main className="min-h-screen bg-black pt-24 pb-20 relative overflow-hidden" ref={containerRef}>
             {/* Background Effects */}
@@ -120,9 +134,9 @@ export default function RecurringPage() {
                     </Button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     {isLoading ? (
-                        [1, 2].map(i => <div key={i} className="h-64 bg-zinc-900/30 rounded-[2rem] animate-pulse" />)
+                        [1, 2].map(i => <div key={i} className="h-64 bg-zinc-900/30 rounded-2xl animate-pulse" />)
                     ) : bookings.length === 0 ? (
                         <div className="col-span-1 md:col-span-2 text-center py-16 bg-zinc-900/20 rounded-3xl border border-zinc-800 border-dashed">
                             <Repeat className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
@@ -131,72 +145,108 @@ export default function RecurringPage() {
                             <Button onClick={handleCreate}>Create Booking</Button>
                         </div>
                     ) : (
-                        bookings.map(booking => (
-                            <div key={booking.id} className={`recurring-card bg-zinc-900/40 border ${booking.status === 'paused' ? 'border-amber-500/20 bg-amber-500/5' : 'border-zinc-800'} rounded-[2rem] p-8 backdrop-blur-sm group hover:border-emerald-500/30 transition-all relative`}>
+                        bookings.map(booking => {
+                            const sc = statusConfig[booking.status] ?? statusConfig.cancelled;
+                            const dayLabel = typeof booking.day_of_week === 'number' ? days[booking.day_of_week] : booking.day_of_week;
+                            return (
+                                <div key={booking.id} className={`recurring-card bg-zinc-900/50 border ${sc.card} rounded-2xl overflow-hidden backdrop-blur-sm transition-all`}>
 
-                                <div className="absolute top-6 right-6 flex gap-2 transition-opacity">
-                                    <button onClick={() => handleTogglePause(booking)} className="p-2 rounded-full bg-zinc-800/50 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors" title={booking.status === 'paused' ? "Resume" : "Pause"}>
-                                        {booking.status === 'paused' ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
-                                    </button>
-                                    <button onClick={() => handleEdit(booking)} className="p-2 rounded-full bg-zinc-800/50 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors" title="Edit">
-                                        <Edit2 className="h-4 w-4" />
-                                    </button>
-                                    {isVenueOwner && (
-                                        <button onClick={() => handleDelete(booking.id)} className="p-2 rounded-full bg-zinc-800/50 hover:bg-red-500/20 text-zinc-400 hover:text-red-500 transition-colors" title="Delete">
-                                            <Trash2 className="h-4 w-4" />
-                                        </button>
-                                    )}
-                                </div>
+                                    {/* Card header */}
+                                    <div className="px-5 pt-5 pb-4 flex items-start justify-between gap-4">
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <div className="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center shrink-0">
+                                                <Repeat className="h-5 w-5 text-emerald-500" />
+                                            </div>
+                                            <div className="min-w-0">
+                                                <h3 className="font-bold text-white text-lg leading-tight truncate">{booking.client_name}</h3>
+                                                {booking.client_phone && (
+                                                    <span className="text-xs text-zinc-500 flex items-center gap-1 mt-0.5">
+                                                        <Phone className="h-3 w-3" />{booking.client_phone}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-1.5 shrink-0">
+                                            <span className={`flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full border ${sc.text} ${sc.border} bg-zinc-900`}>
+                                                <span className={`w-1.5 h-1.5 rounded-full ${sc.dot}`} />
+                                                {sc.label}
+                                            </span>
+                                        </div>
+                                    </div>
 
-                                <div className="flex items-center gap-4 mb-6">
-                                    <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
-                                        <Repeat className="h-6 w-6" />
+                                    {/* Key info grid */}
+                                    <div className="grid grid-cols-2 gap-px bg-zinc-800/40 border-t border-b border-zinc-800/60">
+                                        <div className="bg-zinc-900/80 px-4 py-3">
+                                            <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                                                <Calendar className="h-3 w-3" /> Day
+                                            </p>
+                                            <p className="text-white font-semibold text-sm">Every {dayLabel}</p>
+                                        </div>
+                                        <div className="bg-zinc-900/80 px-4 py-3">
+                                            <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                                                <Clock className="h-3 w-3" /> Time
+                                            </p>
+                                            <p className="text-white font-semibold text-sm">{booking.start_time} – {booking.end_time}</p>
+                                        </div>
+                                        <div className="bg-zinc-900/80 px-4 py-3">
+                                            <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                                                <Layers className="h-3 w-3" /> Court
+                                            </p>
+                                            <p className="text-white font-semibold text-sm">{booking.court_name || "—"}</p>
+                                        </div>
+                                        <div className="bg-zinc-900/80 px-4 py-3">
+                                            <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                                                <CalendarRange className="h-3 w-3" /> Valid Period
+                                            </p>
+                                            <p className="text-white font-semibold text-sm flex items-center gap-1 flex-wrap">
+                                                {formatDateShort(booking.start_date)}
+                                                <ArrowRight className="h-3 w-3 text-zinc-500 shrink-0" />
+                                                {formatDateShort(booking.end_date)}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <h3 className="font-bold text-white text-xl">{booking.client_name}</h3>
-                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded border uppercase tracking-wider ${booking.status === 'active' ? 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20' :
-                                                booking.status === 'paused' ? 'text-amber-500 bg-amber-500/10 border-amber-500/20' :
-                                                    'text-red-500 bg-red-500/10 border-red-500/20'
-                                            }`}>
-                                            {booking.status}
-                                        </span>
-                                    </div>
-                                </div>
 
-                                <div className="space-y-4 mb-6">
-                                    <div className="flex justify-between py-2 border-b border-zinc-800/50">
-                                        <span className="text-zinc-500 text-sm flex items-center gap-2"><Calendar className="h-4 w-4" /> Frequency</span>
-                                        <span className="text-white font-medium text-sm">
-                                            Every {typeof booking.day_of_week === 'number' ? days[booking.day_of_week] : booking.day_of_week}
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between py-2 border-b border-zinc-800/50">
-                                        <span className="text-zinc-500 text-sm flex items-center gap-2"><Clock className="h-4 w-4" /> Time</span>
-                                        <span className="text-white font-medium text-sm">{booking.start_time} - {booking.end_time}</span>
-                                    </div>
-                                    <div className="flex justify-between py-2 border-b border-zinc-800/50">
-                                        <span className="text-zinc-500 text-sm flex items-center gap-2"><Layers className="h-4 w-4" /> Court</span>
-                                        <span className="text-white font-medium text-sm">{booking.court_name}</span>
-                                    </div>
-                                    <div className="flex justify-between py-2 border-b border-zinc-800/50">
-                                        <span className="text-zinc-500 text-sm">Valid Period</span>
-                                        <span className="text-white font-medium text-sm text-right">
-                                            {booking.start_date} <br /> <span className="text-zinc-500 text-xs">to</span> {booking.end_date}
-                                        </span>
+                                    {/* Footer: next session + actions */}
+                                    <div className="px-5 py-3 flex items-center justify-between gap-3">
+                                        {booking.next_booking_date ? (
+                                            <div className="flex items-center gap-2">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                                                <span className="text-xs text-zinc-400">
+                                                    Next: <strong className="text-white font-semibold">{formatDateShort(booking.next_booking_date)}</strong>
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            <span className="text-xs text-zinc-600 italic">No upcoming sessions</span>
+                                        )}
+                                        <div className="flex items-center gap-1">
+                                            <button
+                                                onClick={() => handleTogglePause(booking)}
+                                                className="p-1.5 rounded-lg bg-zinc-800/60 hover:bg-zinc-700 text-zinc-400 hover:text-white transition-colors"
+                                                title={booking.status === 'paused' ? "Resume" : "Pause"}
+                                            >
+                                                {booking.status === 'paused' ? <Play className="h-3.5 w-3.5" /> : <Pause className="h-3.5 w-3.5" />}
+                                            </button>
+                                            <button
+                                                onClick={() => handleEdit(booking)}
+                                                className="p-1.5 rounded-lg bg-zinc-800/60 hover:bg-zinc-700 text-zinc-400 hover:text-white transition-colors"
+                                                title="Edit"
+                                            >
+                                                <Edit2 className="h-3.5 w-3.5" />
+                                            </button>
+                                            {isVenueOwner && (
+                                                <button
+                                                    onClick={() => handleDelete(booking.id)}
+                                                    className="p-1.5 rounded-lg bg-zinc-800/60 hover:bg-red-500/20 text-zinc-400 hover:text-red-400 transition-colors"
+                                                    title="Delete"
+                                                >
+                                                    <Trash2 className="h-3.5 w-3.5" />
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
-
-                                <div className="flex items-center justify-between">
-                                    {booking.next_booking_date ? (
-                                        <span className="text-xs text-zinc-500">
-                                            Next Session: <strong className="text-white">{booking.next_booking_date}</strong>
-                                        </span>
-                                    ) : (
-                                        <span className="text-xs text-zinc-500">No upcoming sessions</span>
-                                    )}
-                                </div>
-                            </div>
-                        ))
+                            );
+                        })
                     )}
                 </div>
             </div>
