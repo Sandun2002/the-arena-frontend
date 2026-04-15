@@ -35,7 +35,7 @@ export default function FeaturedVenues() {
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">
               Trending <span className="text-emerald-500">Arenas</span>
             </h2>
-            <p className="text-zinc-400">Hand-picked premium venues near you.</p>
+            <p className="text-zinc-400">Most booked arenas in the last two weeks.</p>
           </div>
           <div className="hidden md:block">
             <Button href="/venues" variant="ghost">View All Venues</Button>

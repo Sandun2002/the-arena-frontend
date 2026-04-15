@@ -54,13 +54,15 @@ export const api = {
   },
 
   getTrendingVenues: async (): Promise<Venue[]> => {
-    // The backend returns a bare List[Venue], so response.data is the array itself
-    const response = await apiClient.get<any[]>('/venues/featured/list');
+    // Booking-activity-based trending venues (last 14 days, time-decayed score)
+    const response = await apiClient.get<any[]>('/venues/trending/list');
     return (Array.isArray(response.data) ? response.data : []).map(normalizeVenue);
   },
 
   getFeaturedVenues: async (): Promise<Venue[]> => {
-    return api.getTrendingVenues();
+    // Admin-curated featured venues — used by the Hero carousel only
+    const response = await apiClient.get<any[]>('/venues/featured/list');
+    return (Array.isArray(response.data) ? response.data : []).map(normalizeVenue);
   },
 
   getVenueById: async (id: string): Promise<Venue> => {
