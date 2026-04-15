@@ -170,8 +170,8 @@ export default function RecurringFormModal({ venueId, courts, existingBooking, o
 
             <Button
                 type="submit"
-                disabled={isSubmitting}
-                className="w-full py-3.5 bg-emerald-500 hover:bg-emerald-400 text-black font-bold rounded-xl mt-4"
+                disabled={isSubmitting || (!existingBooking && (!watch("court_id") || !watch("start_date") || !watch("end_date") || !watch("client_name") || endTime <= startTime))}
+                className="w-full py-3.5 bg-emerald-500 hover:bg-emerald-400 text-black font-bold rounded-xl mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : (existingBooking ? "Update Booking" : "Create Booking")}
             </Button>
