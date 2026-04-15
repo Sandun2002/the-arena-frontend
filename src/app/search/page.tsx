@@ -93,12 +93,22 @@ function SearchContent() {
         }
     };
 
+    // Load filters first, then run search once sports are available
     useEffect(() => {
-        Promise.all([loadFilters(), loadResults()]).catch(() => {
-            setResults([]);
+        loadFilters().catch(() => {
             setLoading(false);
         });
     }, []);
+
+    // Run search when sports data is loaded (or already available)
+    useEffect(() => {
+        if (sports.length > 0) {
+            loadResults().catch(() => {
+                setResults([]);
+                setLoading(false);
+            });
+        }
+    }, [sports]);
 
     const sportOptions = useMemo(() => ["All", ...sports.map((sport) => sport.name)], [sports]);
 
