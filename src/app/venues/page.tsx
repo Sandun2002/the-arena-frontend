@@ -14,7 +14,7 @@ export default function VenuesPage() {
     const [searchResults, setSearchResults] = useState<VenueSearchResult[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const [hasSearched, setHasSearched] = useState(false);
-    const [selectedSport, setSelectedSport] = useState("All");
+    const [selectedSport] = useState("All");
     const [lastSearchParams, setLastSearchParams] = useState<SearchParams | null>(null);
 
     // Filter Logic
@@ -25,11 +25,6 @@ export default function VenuesPage() {
         try {
             const response = await api.searchVenues(params);
             setSearchResults(response.results);
-            if (params.sport) {
-                // Keep selected sport in sync if it was passed in params
-                const sportObj = await api.getSports().then(sports => sports.find(s => s.slug === params.sport));
-                if (sportObj) setSelectedSport(sportObj.name);
-            }
         } catch (error: any) {
             console.error("Search failed:", error);
             const errorMessage = error.response?.data?.detail 
