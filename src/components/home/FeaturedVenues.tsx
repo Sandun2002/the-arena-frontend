@@ -62,7 +62,15 @@ export default function FeaturedVenues() {
             ))
           ) : (
             venues.map((venue) => (
-              <VenueCard key={venue.id} venue={venue} />
+              <div key={venue.id} className="relative">
+                {/* Trending Badge */}
+                <div className="absolute top-3 left-3 z-10">
+                  <span className="inline-flex items-center gap-1.5 bg-orange-500/90 backdrop-blur-sm text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-lg">
+                    <span>🔥</span> Trending
+                  </span>
+                </div>
+                <VenueCard venue={venue} />
+              </div>
             ))
           )}
         </div>

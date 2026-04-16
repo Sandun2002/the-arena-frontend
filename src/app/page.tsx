@@ -2,27 +2,32 @@
 "use client";
 
 import Hero from "@/components/home/Hero";
+import SportExplorer from "@/components/home/SportExplorer";
 import FeaturedVenues from "@/components/home/FeaturedVenues";
+import ReviewsTeaser from "@/components/home/ReviewsTeaser";
+import GamificationTeaser from "@/components/home/GamificationTeaser";
+import PWAInstallGuide from "@/components/home/PWAInstallGuide";
+import PartnerCTA from "@/components/home/PartnerCTA";
 import Link from "next/link";
-import { ArrowRight, Search, Calendar, Trophy, ChevronRight } from "lucide-react";
+import { ArrowRight, PhoneOff, Lock, Gamepad2, ChevronRight } from "lucide-react";
 
 const STEPS = [
   {
-    icon: Search,
-    title: "Find a Court",
-    desc: "Browse top-rated venues near you. Filter by sport, date, and amenities.",
+    icon: PhoneOff,
+    title: "Skip the Phone Calls",
+    desc: "No more calling venues to check availability. Browse real-time court availability in seconds.",
     color: "emerald"
   },
   {
-    icon: Calendar,
-    title: "Book Your Slot",
-    desc: "Real-time availability. Secure your spot instantly with online payment.",
+    icon: Lock,
+    title: "Lock It In",
+    desc: "Found your slot? Secure it instantly before someone else does. Pay securely online.",
     color: "blue"
   },
   {
-    icon: Trophy,
-    title: "Play & Compete",
-    desc: "Show up, play your game, and track your stats to level up.",
+    icon: Gamepad2,
+    title: "Show Up & Play",
+    desc: "No surprises. Your court is confirmed and waiting. Just bring your A-game.",
     color: "yellow"
   },
 ];
@@ -30,11 +35,22 @@ const STEPS = [
 export default function Home() {
   return (
     <main className="w-full bg-black overflow-x-hidden relative">
+      {/* 1. Hero + Quick Search */}
       <Hero />
 
+      {/* 2. Sport Category Explorer */}
+      <SportExplorer />
+
+      {/* 3. Trending Arenas */}
       <FeaturedVenues />
 
-      {/* -- How it Works Section -- */}
+      {/* 4. Reviews Trust Section */}
+      <ReviewsTeaser />
+
+      {/* 5. Gamification Teaser */}
+      <GamificationTeaser />
+
+      {/* 6. How it Works - Rewritten */}
       <section className="py-24 relative bg-zinc-900/20 border-y border-zinc-800/50">
         <div className="container mx-auto px-4 max-w-7xl relative z-10">
           <div className="text-center mb-16">
@@ -79,6 +95,12 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* 7. PWA Install Guide */}
+      <PWAInstallGuide />
+
+      {/* 8. Partner CTA (hidden by default) */}
+      <PartnerCTA />
     </main>
   );
 }
