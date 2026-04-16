@@ -22,9 +22,10 @@ import {
 interface CourtFinderPanelProps {
     onSearch: (params: SearchParams) => void;
     initialSport?: string;
+    initialCity?: string;
 }
 
-export default function CourtFinderPanel({ onSearch, initialSport = "All" }: CourtFinderPanelProps) {
+export default function CourtFinderPanel({ onSearch, initialSport = "All", initialCity = "" }: CourtFinderPanelProps) {
     const { addToast } = useToast();
     // Dynamic sports from API
     const [sports, setSports] = useState<Sport[]>([]);
@@ -34,7 +35,7 @@ export default function CourtFinderPanel({ onSearch, initialSport = "All" }: Cou
     const [selectedDate, setSelectedDate] = useState("");
     const [startTime, setStartTime] = useState("10:00");
     const [endTime, setEndTime] = useState("11:00");
-    const [location, setLocation] = useState("");
+    const [location, setLocation] = useState(initialCity);
     const [useMyLocation, setUseMyLocation] = useState(false);
     const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
 
@@ -69,8 +70,8 @@ export default function CourtFinderPanel({ onSearch, initialSport = "All" }: Cou
                 ]);
                 setSports(sportsData);
                 setAvailableCities(citiesData);
-                // Default to first city
-                if (citiesData.length > 0) {
+                // Default to first city only if no initial city provided
+                if (!initialCity && citiesData.length > 0) {
                     setLocation(citiesData[0].name);
                 }
             } catch (error) {
@@ -81,7 +82,7 @@ export default function CourtFinderPanel({ onSearch, initialSport = "All" }: Cou
             }
         };
         loadInitialData();
-    }, []);
+    }, [initialCity]);
 
     // Sync location context → panel state
     useEffect(() => {

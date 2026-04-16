@@ -22,7 +22,7 @@ export default function SportExplorer() {
     const loadSports = async () => {
       try {
         const data = await api.getSports();
-        setSports(data.slice(0, 8)); // Show max 8 sports
+        setSports(data); // Show all sports dynamically
       } catch (error) {
         console.error("Failed to load sports:", error);
       } finally {

@@ -134,7 +134,7 @@ export default function Hero() {
                   disabled={filtersLoading}
                   className="w-full bg-zinc-900 border border-zinc-700/50 rounded-xl pl-10 pr-10 py-3 text-white text-sm appearance-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30 transition-all cursor-pointer hover:border-zinc-600"
                 >
-                  <option value="">All Sports</option>
+                  <option value="">Select Sport</option>
                   {sports.map((sport) => (
                     <option key={sport.id} value={sport.slug}>
                       {sport.name}
@@ -157,7 +157,7 @@ export default function Hero() {
                   disabled={filtersLoading}
                   className="w-full bg-zinc-900 border border-zinc-700/50 rounded-xl pl-10 pr-10 py-3 text-white text-sm appearance-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30 transition-all cursor-pointer hover:border-zinc-600"
                 >
-                  <option value="">All Cities</option>
+                  <option value="">Select City</option>
                   {cities.map((city) => (
                     <option key={city.name} value={city.name}>
                       {city.name}
@@ -172,7 +172,7 @@ export default function Hero() {
               {/* Search Button */}
               <button
                 onClick={handleSearch}
-                disabled={filtersLoading}
+                disabled={filtersLoading || !selectedSport || !selectedCity}
                 className="group relative overflow-hidden bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-500 text-black font-bold text-sm px-6 py-3 rounded-xl flex items-center justify-center gap-2 hover:shadow-[0_0_20px_rgba(80,200,120,0.4)] hover:scale-[1.02] transition-all duration-300 before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/0 before:via-white/30 before:to-white/0 before:translate-x-[-200%] hover:before:translate-x-[200%] before:transition-transform before:duration-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <span className="relative z-10 flex items-center gap-2">

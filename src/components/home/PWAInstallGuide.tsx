@@ -200,7 +200,6 @@ export default function PWAInstallGuide() {
         {/* Feature Pills */}
         <div className="flex flex-wrap justify-center gap-3">
           <FeaturePill>✓ Instant loading</FeaturePill>
-          <FeaturePill>✓ Works offline</FeaturePill>
           <FeaturePill>✓ Push notifications</FeaturePill>
           <FeaturePill>✓ No storage used</FeaturePill>
         </div>

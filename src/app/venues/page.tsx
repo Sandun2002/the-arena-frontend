@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { api } from "@/services/api";
-import { VenueSearchResult, SearchParams } from "@/types";
+import { VenueSearchResult, SearchParams, Sport, City } from "@/types";
 import VenueCard from "@/components/ui/VenueCard";
 import CourtFinderPanel from "@/components/venues/CourtFinderPanel";
 import { Search } from "lucide-react";
@@ -11,11 +12,51 @@ import RequireAuth from "@/components/auth/RequireAuth";
 
 export default function VenuesPage() {
     const { addToast } = useToast();
+    const searchParams = useSearchParams();
     const [searchResults, setSearchResults] = useState<VenueSearchResult[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const [hasSearched, setHasSearched] = useState(false);
-    const [selectedSport] = useState("All");
     const [lastSearchParams, setLastSearchParams] = useState<SearchParams | null>(null);
+    
+    // For auto-selecting from URL params
+    const [sports, setSports] = useState<Sport[]>([]);
+    const [initialSport, setInitialSport] = useState<string>("All");
+    const [initialCity, setInitialCity] = useState<string>("");
+    const [isLoadingInit, setIsLoadingInit] = useState(true);
+    
+    // Load sports and cities to map slugs to names
+    useEffect(() => {
+        const loadInitialData = async () => {
+            try {
+                const [sportsData, citiesData] = await Promise.all([
+                    api.getSports(),
+                    api.getCities()
+                ]);
+                setSports(sportsData);
+                
+                // Read URL params
+                const sportTypeSlug = searchParams.get("sport_type");
+                const cityName = searchParams.get("city");
+                
+                // Convert sport slug to sport name for CourtFinderPanel
+                if (sportTypeSlug) {
+                    const sport = sportsData.find(s => s.slug === sportTypeSlug);
+                    if (sport) {
+                        setInitialSport(sport.name);
+                    }
+                }
+                
+                if (cityName) {
+                    setInitialCity(cityName);
+                }
+            } catch (error) {
+                console.error("Failed to load initial data:", error);
+            } finally {
+                setIsLoadingInit(false);
+            }
+        };
+        loadInitialData();
+    }, [searchParams]);
 
     // Filter Logic
     const handleSearch = async (params: SearchParams) => {
@@ -72,10 +113,13 @@ export default function VenuesPage() {
                 {/* Court Finder Panel - Compact layout, straight to action */}
                 <section className="pt-24 md:pt-28 pb-8 md:pb-12">
                     <div className="max-w-5xl mx-auto mb-16 px-4">
-                        <CourtFinderPanel 
-                            onSearch={handleSearch}
-                            initialSport={selectedSport}
-                        />
+                        {!isLoadingInit && (
+                            <CourtFinderPanel 
+                                onSearch={handleSearch}
+                                initialSport={initialSport}
+                                initialCity={initialCity}
+                            />
+                        )}
                     </div>
                 </section>
 
