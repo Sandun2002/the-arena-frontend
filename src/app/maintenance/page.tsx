@@ -134,11 +134,11 @@ export default function MaintenancePage() {
                   <Clock className="w-4 h-4 text-emerald-400" />
                 </div>
                 <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-zinc-400">
-                  Estimated
+                  Status
                 </span>
               </div>
               <p className="text-white font-bold text-sm md:text-base">
-                Under 30 minutes
+                In Progress
               </p>
             </div>
 
