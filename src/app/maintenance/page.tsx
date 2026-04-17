@@ -122,8 +122,7 @@ export default function MaintenancePage() {
           {/* Body */}
           <p className="m-body text-zinc-500 text-sm md:text-base max-w-xl mx-auto mb-10 md:mb-14 leading-relaxed">
             Our team is upgrading the arena&apos;s infrastructure to bring you an
-            even smoother booking experience. Thanks for your patience &mdash;
-            game time resumes soon.
+            even smoother booking experience. Thanks for your patience. Game time resumes soon.
           </p>
 
           {/* Info cards */}
@@ -165,8 +164,7 @@ export default function MaintenancePage() {
       {/* Footer */}
       <div className="m-footer relative z-10 w-full px-6 md:px-10 pb-6 md:pb-8 text-center">
         <p className="text-zinc-600 text-[10px] md:text-xs uppercase tracking-[0.25em]">
-          &copy; {new Date().getFullYear()} The Arena &mdash; Sri Lanka&apos;s
-          Premium Sports Booking
+          &copy; {new Date().getFullYear()} The Arena. Sri Lanka&apos;s Premium Sports Booking
         </p>
       </div>
     </div>
