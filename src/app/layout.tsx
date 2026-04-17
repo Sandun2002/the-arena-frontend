@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { headers } from "next/headers";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -33,11 +34,17 @@ export const viewport = {
   viewportFit: "cover",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Read pathname forwarded from middleware so we can skip Header/Footer
+  // on the standalone /maintenance page (which renders its own full-screen UI).
+  const headersList = await headers();
+  const pathname = headersList.get("x-pathname") ?? "";
+  const isStandalone = pathname === "/maintenance";
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -57,15 +64,19 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <Providers>
-          <SmoothScrolling>
-            <Header />
-            <MobileTopBar />
-            <MobileMainWrapper>
-              {children}
-            </MobileMainWrapper>
-            <Footer />
-            <MobileBottomNav />
-          </SmoothScrolling>
+          {isStandalone ? (
+            children
+          ) : (
+            <SmoothScrolling>
+              <Header />
+              <MobileTopBar />
+              <MobileMainWrapper>
+                {children}
+              </MobileMainWrapper>
+              <Footer />
+              <MobileBottomNav />
+            </SmoothScrolling>
+          )}
           <PWARegister />
         </Providers>
       </body>
