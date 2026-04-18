@@ -119,7 +119,17 @@ export default function HeroCarousel({ venues }: HeroCarouselProps) {
   if (n === 0) return null;
 
   const offsetPx = isMobile ? OFFSET_MOBILE : OFFSET_DESKTOP;
-  const positions = [-2, -1, 0, 1, 2];
+  // Render a sliding window of virtual indices around `active`. Keying each
+  // card by its virtual index (instead of by slot position) is what makes the
+  // slide animation work: when `active` increments, surviving keys keep their
+  // DOM node and only their `transform` changes → CSS transition interpolates.
+  // Cards at the edges (|offset| > 2) are rendered off-screen at 0 opacity so
+  // the incoming card at ±3 is already mounted and slides in to ±2 smoothly.
+  const VIS_RADIUS = 3;
+  const virtualIndices: number[] = [];
+  for (let i = active - VIS_RADIUS; i <= active + VIS_RADIUS; i++) {
+    virtualIndices.push(i);
+  }
 
   return (
     <div
@@ -143,24 +153,26 @@ export default function HeroCarousel({ venues }: HeroCarouselProps) {
         onPointerCancel={onPointerCancel}
         onClickCapture={onClickCapture}
       >
-        {positions.map((offset) => {
-          const realIdx = mod(active + offset);
+        {virtualIndices.map((virtualIdx) => {
+          const offset = virtualIdx - active; // -3..+3
+          const realIdx = mod(virtualIdx);
           const venue = venues[realIdx];
           const abs = Math.abs(offset);
-          const scale = abs === 0 ? 1 : abs === 1 ? 0.88 : 0.74;
-          const opacity = abs === 0 ? 1 : abs === 1 ? 0.8 : 0.35;
+          const scale = abs === 0 ? 1 : abs === 1 ? 0.88 : abs === 2 ? 0.74 : 0.62;
+          const opacity = abs === 0 ? 1 : abs === 1 ? 0.8 : abs === 2 ? 0.35 : 0;
           const blur = abs >= 2 ? 1.5 : 0;
           const zIndex = 10 - abs;
 
           return (
             <div
-              key={`slot-${offset}`}
+              key={virtualIdx}
               className="absolute top-0 left-1/2 w-[min(400px,82vw)]"
               style={{
                 transform: `translateX(-50%) translateX(${offset * offsetPx}px) scale(${scale})`,
                 opacity,
                 filter: blur ? `blur(${blur}px)` : undefined,
                 zIndex,
+                pointerEvents: abs > 2 ? "none" : "auto",
                 transition:
                   "transform 600ms cubic-bezier(0.22, 1, 0.36, 1), opacity 500ms ease, filter 500ms ease",
                 willChange: "transform, opacity",
