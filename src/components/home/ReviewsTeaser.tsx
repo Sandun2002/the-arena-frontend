@@ -9,6 +9,7 @@ import { api } from "@/services/api";
 import type { Review } from "@/types";
 import TierFrame from "@/components/ui/TierFrame";
 import { getTierFromXp } from "@/lib/tierUtils";
+import MarqueeRow from "@/components/ui/MarqueeRow";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -83,11 +84,6 @@ export default function ReviewsTeaser() {
     return () => ctx.revert();
   }, [loading, reviews.length]);
 
-  // Duplicate 4x so the marquee is always wider than the viewport —
-  // `marquee-left` animates translateX 0 → -50%, so the second half of
-  // the track seamlessly replaces the first.
-  const marqueeReviews = reviews.length > 0 ? [...reviews, ...reviews, ...reviews, ...reviews] : [];
-
   // Hide whole section if nothing to show (avoids awkward empty state)
   if (!loading && reviews.length === 0) return null;
 
@@ -116,19 +112,10 @@ export default function ReviewsTeaser() {
           </p>
         </div>
 
-        {/* Reviews marquee — single row, slow auto-scroll, full-bleed */}
-        <div
-          ref={gridRef}
-          className="relative -mx-4 mb-10 overflow-hidden"
-          style={{
-            maskImage:
-              "linear-gradient(to right, transparent, #000 8%, #000 92%, transparent)",
-            WebkitMaskImage:
-              "linear-gradient(to right, transparent, #000 8%, #000 92%, transparent)",
-          }}
-        >
+        {/* Reviews marquee — single row, slow auto-scroll, drag + click. */}
+        <div ref={gridRef} className="-mx-4 mb-10">
           {loading ? (
-            <div className="flex gap-4 px-4">
+            <div className="flex gap-4 px-4 overflow-hidden">
               {Array.from({ length: 5 }).map((_, i) => (
                 <div
                   key={i}
@@ -137,12 +124,12 @@ export default function ReviewsTeaser() {
               ))}
             </div>
           ) : (
-            <div className="marquee-track marquee-reviews flex gap-4 md:gap-5">
-              {marqueeReviews.map((r, idx) => (
+            <MarqueeRow speed={30}>
+              {reviews.map((r) => (
                 <Link
-                  key={`${r.id}-${idx}`}
+                  key={r.id}
                   href={`/venues/${r.venue_id}`}
-                  className="review-card group relative flex w-[300px] md:w-[340px] flex-shrink-0 flex-col gap-3 p-5 rounded-2xl bg-zinc-900/60 border border-zinc-800 hover:border-emerald-500/40 hover:bg-zinc-900/80 transition-colors duration-300"
+                  className="review-card group relative flex w-[300px] md:w-[340px] flex-col gap-3 p-5 mx-2 md:mx-2.5 rounded-2xl bg-zinc-900/60 border border-zinc-800 hover:border-emerald-500/40 hover:bg-zinc-900/80 transition-colors duration-300"
                 >
                   {/* Header row: stars + time */}
                   <div className="flex items-center justify-between">
@@ -200,7 +187,7 @@ export default function ReviewsTeaser() {
                   </div>
                 </Link>
               ))}
-            </div>
+            </MarqueeRow>
           )}
         </div>
 

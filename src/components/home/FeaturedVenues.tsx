@@ -5,6 +5,7 @@ import { Venue } from "@/types";
 import { api } from "@/services/api";
 import VenueCard from "@/components/ui/VenueCard";
 import Button from "@/components/ui/Button";
+import MarqueeRow from "@/components/ui/MarqueeRow";
 
 export default function FeaturedVenues() {
   const [venues, setVenues] = useState<Venue[]>([]);
@@ -42,20 +43,11 @@ export default function FeaturedVenues() {
           </div>
         </div>
 
-        {/* Single-row auto-sliding marquee of trending venues. Duplicate the
-            list 4× so the track always exceeds the viewport and the 0 → -50%
-            CSS animation wraps seamlessly. Pauses on card hover. */}
-        <div
-          className="relative -mx-4 min-h-[440px] overflow-hidden"
-          style={{
-            maskImage:
-              "linear-gradient(to right, transparent, #000 6%, #000 94%, transparent)",
-            WebkitMaskImage:
-              "linear-gradient(to right, transparent, #000 6%, #000 94%, transparent)",
-          }}
-        >
+        {/* Auto-sliding marquee with manual drag/swipe. Clicks on cards still
+            navigate; drags beyond 5 px cancel the click and scrub the row. */}
+        <div className="-mx-4 min-h-[440px]">
           {loading ? (
-            <div className="flex gap-6 px-4">
+            <div className="flex gap-6 px-4 overflow-hidden">
               {[...Array(4)].map((_, i) => (
                 <div key={i} className="w-[320px] md:w-[360px] flex-shrink-0 rounded-xl bg-zinc-900 border border-zinc-800 overflow-hidden animate-pulse">
                   <div className="h-64 bg-zinc-800" />
@@ -74,13 +66,13 @@ export default function FeaturedVenues() {
               ))}
             </div>
           ) : venues.length > 0 ? (
-            <div className="marquee-track marquee-trending flex gap-6">
-              {[...venues, ...venues, ...venues, ...venues].map((venue, idx) => (
-                <div key={`${venue.id}-${idx}`} className="trending-card w-[320px] md:w-[360px] flex-shrink-0">
+            <MarqueeRow speed={45}>
+              {venues.map((venue) => (
+                <div key={venue.id} className="w-[320px] md:w-[360px] px-3">
                   <VenueCard venue={venue} />
                 </div>
               ))}
-            </div>
+            </MarqueeRow>
           ) : null}
         </div>
 

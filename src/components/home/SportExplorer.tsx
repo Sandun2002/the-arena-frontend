@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { api } from "@/services/api";
 import { Sport } from "@/types";
 import SportCard from "./SportCard";
+import MarqueeRow from "@/components/ui/MarqueeRow";
 
 // Register ScrollTrigger
 gsap.registerPlugin(ScrollTrigger);
@@ -96,12 +97,8 @@ export default function SportExplorer() {
   const topRow = sortedSports.slice(0, mid);
   const bottomRow = sortedSports.slice(mid);
 
-  // Duplicate content 4x so the row always exceeds viewport width → no visible
-  // seam/gap even on ultra-wide screens. Animation still runs 0 → -50%, which
-  // equals two copies sliding off (the remaining two match the starting state).
-  const topRowDuped = [...topRow, ...topRow, ...topRow, ...topRow];
-  const bottomRowDuped = [...bottomRow, ...bottomRow, ...bottomRow, ...bottomRow];
-  const mobileRowDuped = [...sortedSports, ...sortedSports, ...sortedSports, ...sortedSports];
+  // MarqueeRow duplicates children internally for the seamless loop, so we
+  // pass the single copy of each row straight through.
 
   return (
     <section ref={sectionRef} className="py-10 md:py-14 bg-black overflow-hidden">
@@ -132,42 +129,40 @@ export default function SportExplorer() {
         </div>
       ) : sports.length === 0 ? null : (
         <div className="flex flex-col gap-3 md:gap-4">
-          {/* Mobile: single row with all sports scrolling right → left */}
+          {/* Mobile: single row, all sports scrolling right → left */}
           <div className="marquee-row relative md:hidden">
-            <div className="marquee-track marquee-left">
-              {mobileRowDuped.map((sport, idx) => (
+            <MarqueeRow speed={55} fadeEdges={false}>
+              {sortedSports.map((sport, idx) => (
                 <SportCard
-                  key={`m-${sport.id}-${idx}`}
+                  key={`m-${sport.id}`}
                   sport={sport}
                   priority={idx < 2}
                 />
               ))}
-            </div>
+            </MarqueeRow>
           </div>
 
-          {/* Desktop/tablet: dual rows in opposite directions */}
+          {/* Desktop/tablet: dual rows in opposite directions (different
+              speeds so they feel alive). Positive speed = left, negative = right. */}
           <div className="marquee-row relative hidden md:block">
-            <div className="marquee-track marquee-left">
-              {topRowDuped.map((sport, idx) => (
+            <MarqueeRow speed={50} fadeEdges={false}>
+              {topRow.map((sport, idx) => (
                 <SportCard
-                  key={`top-${sport.id}-${idx}`}
+                  key={`top-${sport.id}`}
                   sport={sport}
                   priority={idx < 2}
                 />
               ))}
-            </div>
+            </MarqueeRow>
           </div>
 
           {bottomRow.length > 0 && (
             <div className="marquee-row relative hidden md:block">
-              <div className="marquee-track marquee-right">
-                {bottomRowDuped.map((sport, idx) => (
-                  <SportCard
-                    key={`bot-${sport.id}-${idx}`}
-                    sport={sport}
-                  />
+              <MarqueeRow speed={-40} fadeEdges={false}>
+                {bottomRow.map((sport) => (
+                  <SportCard key={`bot-${sport.id}`} sport={sport} />
                 ))}
-              </div>
+              </MarqueeRow>
             </div>
           )}
         </div>
