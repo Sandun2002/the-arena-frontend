@@ -46,7 +46,7 @@ export default function ReviewsTeaser() {
     let cancelled = false;
     (async () => {
       try {
-        const data = await api.getFeaturedReviews(9, 5);
+        const data = await api.getFeaturedReviews(10, 5);
         if (!cancelled) setReviews(data);
       } catch (err) {
         console.error("Failed to load featured reviews:", err);
@@ -59,18 +59,18 @@ export default function ReviewsTeaser() {
     };
   }, []);
 
+  // Fade-in the whole marquee row once reviews are loaded (animating every
+  // clone with stagger would fight the continuous CSS translate).
   useEffect(() => {
     if (loading || !gridRef.current || reviews.length === 0) return;
-    const cards = gridRef.current.querySelectorAll(".review-card");
     const ctx = gsap.context(() => {
       gsap.fromTo(
-        cards,
+        gridRef.current,
         { y: 24, opacity: 0 },
         {
           y: 0,
           opacity: 1,
-          duration: 0.55,
-          stagger: 0.08,
+          duration: 0.7,
           ease: "power3.out",
           scrollTrigger: {
             trigger: sectionRef.current,
@@ -82,6 +82,11 @@ export default function ReviewsTeaser() {
     }, sectionRef);
     return () => ctx.revert();
   }, [loading, reviews.length]);
+
+  // Duplicate 4x so the marquee is always wider than the viewport —
+  // `marquee-left` animates translateX 0 → -50%, so the second half of
+  // the track seamlessly replaces the first.
+  const marqueeReviews = reviews.length > 0 ? [...reviews, ...reviews, ...reviews, ...reviews] : [];
 
   // Hide whole section if nothing to show (avoids awkward empty state)
   if (!loading && reviews.length === 0) return null;
@@ -111,23 +116,33 @@ export default function ReviewsTeaser() {
           </p>
         </div>
 
-        {/* Reviews Grid */}
+        {/* Reviews marquee — single row, slow auto-scroll, full-bleed */}
         <div
           ref={gridRef}
-          className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-10"
+          className="relative -mx-4 mb-10 overflow-hidden"
+          style={{
+            maskImage:
+              "linear-gradient(to right, transparent, #000 8%, #000 92%, transparent)",
+            WebkitMaskImage:
+              "linear-gradient(to right, transparent, #000 8%, #000 92%, transparent)",
+          }}
         >
-          {loading
-            ? Array.from({ length: 6 }).map((_, i) => (
+          {loading ? (
+            <div className="flex gap-4 px-4">
+              {Array.from({ length: 5 }).map((_, i) => (
                 <div
                   key={i}
-                  className="h-48 rounded-2xl bg-zinc-900/50 border border-zinc-800 animate-pulse"
+                  className="h-48 w-[320px] flex-shrink-0 rounded-2xl bg-zinc-900/50 border border-zinc-800 animate-pulse"
                 />
-              ))
-            : reviews.map((r) => (
+              ))}
+            </div>
+          ) : (
+            <div className="marquee-track marquee-reviews flex gap-4 md:gap-5">
+              {marqueeReviews.map((r, idx) => (
                 <Link
-                  key={r.id}
+                  key={`${r.id}-${idx}`}
                   href={`/venues/${r.venue_id}`}
-                  className="review-card group relative flex flex-col gap-3 p-5 rounded-2xl bg-zinc-900/60 border border-zinc-800 hover:border-emerald-500/40 hover:bg-zinc-900/80 transition-all duration-300"
+                  className="review-card group relative flex w-[300px] md:w-[340px] flex-shrink-0 flex-col gap-3 p-5 rounded-2xl bg-zinc-900/60 border border-zinc-800 hover:border-emerald-500/40 hover:bg-zinc-900/80 transition-colors duration-300"
                 >
                   {/* Header row: stars + time */}
                   <div className="flex items-center justify-between">
@@ -185,6 +200,8 @@ export default function ReviewsTeaser() {
                   </div>
                 </Link>
               ))}
+            </div>
+          )}
         </div>
 
         {/* CTA */}

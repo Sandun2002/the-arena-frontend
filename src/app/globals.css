@@ -214,6 +214,10 @@ select:focus {
 .marquee-left  { animation-name: marquee-left;  animation-duration: 40s; }
 .marquee-right { animation-name: marquee-right; animation-duration: 50s; }
 
+/* Reviews marquee — slower than sports, single row, pauses on card hover */
+.marquee-reviews { animation-name: marquee-left; animation-duration: 80s; }
+.marquee-track:has(.review-card:hover) { animation-play-state: paused; }
+
 @media (max-width: 767px) {
   .marquee-left  { animation-duration: 35s; }
   .marquee-right { animation-duration: 45s; }
