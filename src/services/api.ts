@@ -105,5 +105,12 @@ export const api = {
   getVenueReviewStats: async (venueId: string) => {
     const response = await apiClient.get(`/venues/${venueId}/reviews/stats`);
     return normalizeReviewStats(response.data);
-  }
+  },
+
+  getFeaturedReviews: async (limit = 9, minRating = 5): Promise<ReturnType<typeof normalizeReview>[]> => {
+    const response = await apiClient.get(`/reviews/featured`, {
+      params: { limit, min_rating: minRating },
+    });
+    return (response.data.reviews || []).map((review: any) => normalizeReview(review));
+  },
 };

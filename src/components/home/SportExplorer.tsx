@@ -103,17 +103,17 @@ export default function SportExplorer() {
   const mobileRowDuped = [...sortedSports, ...sortedSports];
 
   return (
-    <section ref={sectionRef} className="py-16 md:py-20 bg-black overflow-hidden">
+    <section ref={sectionRef} className="py-10 md:py-14 bg-black overflow-hidden">
       <div className="container mx-auto px-4 max-w-7xl">
         {/* Header — unchanged, clean */}
-        <div className="sport-header mb-8 md:mb-12">
-          <h2 className="text-2xl md:text-4xl font-bold text-white mb-2">
+        <div className="sport-header mb-6 md:mb-8">
+          <h2 className="text-xl md:text-3xl font-bold text-white mb-1.5">
             Explore by{" "}
             <span className="text-transparent bg-gradient-to-r from-emerald-400 to-emerald-500 bg-clip-text">
               Sport
             </span>
           </h2>
-          <p className="text-zinc-400 text-sm">
+          <p className="text-zinc-400 text-xs md:text-sm">
             Find courts for your favorite game
           </p>
         </div>
@@ -121,16 +121,16 @@ export default function SportExplorer() {
 
       {/* Marquee rows — full-bleed (escape container max-width for cinematic feel) */}
       {loading ? (
-        <div className="px-4 flex gap-3 md:gap-4 overflow-hidden">
+        <div className="px-4 flex gap-3 overflow-hidden">
           {[...Array(6)].map((_, i) => (
             <div
               key={i}
-              className="w-[220px] h-[280px] md:w-[280px] md:h-[360px] rounded-2xl bg-zinc-900/50 border border-zinc-800 animate-pulse flex-shrink-0"
+              className="w-[150px] h-[190px] md:w-[200px] md:h-[260px] rounded-xl bg-zinc-900/50 border border-zinc-800 animate-pulse flex-shrink-0"
             />
           ))}
         </div>
       ) : sports.length === 0 ? null : (
-        <div className="flex flex-col gap-4 md:gap-6">
+        <div className="flex flex-col gap-3 md:gap-4">
           {/* Mobile: single row with all sports scrolling right → left */}
           <div className="marquee-row relative md:hidden">
             <div className="marquee-track marquee-left">

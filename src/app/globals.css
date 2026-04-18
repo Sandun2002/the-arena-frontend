@@ -230,9 +230,9 @@ select:focus {
 }
 
 .sport-card:hover {
-  transform: translateY(-12px) scale(1.08);
+  transform: translateY(-6px) scale(1.04);
   filter: grayscale(0%) brightness(1);
-  box-shadow: 0 24px 60px -12px rgba(80, 200, 120, 0.45), 0 0 0 1px rgba(80, 200, 120, 0.8) inset;
+  box-shadow: 0 16px 40px -12px rgba(80, 200, 120, 0.35), 0 0 0 1px rgba(80, 200, 120, 0.5) inset;
   z-index: 10;
 }
 

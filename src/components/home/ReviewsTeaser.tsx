@@ -1,123 +1,199 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ShieldCheck, Users, Star, ArrowRight } from "lucide-react";
+import { Star, ArrowRight, BadgeCheck, Quote } from "lucide-react";
+import { api } from "@/services/api";
+import type { Review } from "@/types";
 
-// Register ScrollTrigger
 gsap.registerPlugin(ScrollTrigger);
 
-const TRUST_PILLARS = [
-  {
-    icon: ShieldCheck,
-    title: "Verified Bookings",
-    description: "Only guests who actually played at the venue can leave a review.",
-  },
-  {
-    icon: Users,
-    title: "Players Only",
-    description: "No fake or incentivized reviews. Every rating comes from real experiences.",
-  },
-  {
-    icon: Star,
-    title: "Honest Ratings",
-    description: "Star ratings that reflect genuine player experiences at every venue.",
-  },
-];
+function timeAgo(iso: string): string {
+  const then = new Date(iso).getTime();
+  if (isNaN(then)) return "";
+  const diff = Math.max(0, Date.now() - then);
+  const d = Math.floor(diff / 86_400_000);
+  if (d < 1) return "today";
+  if (d < 7) return `${d}d ago`;
+  const w = Math.floor(d / 7);
+  if (w < 5) return `${w}w ago`;
+  const m = Math.floor(d / 30);
+  if (m < 12) return `${m}mo ago`;
+  const y = Math.floor(d / 365);
+  return `${y}y ago`;
+}
+
+function initials(name: string): string {
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase() ?? "")
+    .join("") || "P";
+}
 
 export default function ReviewsTeaser() {
   const sectionRef = useRef<HTMLElement>(null);
-  const cardsRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (cardsRef.current) {
-      const cards = cardsRef.current.querySelectorAll(".trust-pillar");
-      const ctx = gsap.context(() => {
-        gsap.fromTo(
-          cards,
-          { y: 24, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.5,
-            stagger: 0.1,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: "top 75%",
-              toggleActions: "play none none none",
-            },
-          }
-        );
-      }, sectionRef);
-
-      return () => ctx.revert();
-    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await api.getFeaturedReviews(9, 5);
+        if (!cancelled) setReviews(data);
+      } catch (err) {
+        console.error("Failed to load featured reviews:", err);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  useEffect(() => {
+    if (loading || !gridRef.current || reviews.length === 0) return;
+    const cards = gridRef.current.querySelectorAll(".review-card");
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        cards,
+        { y: 24, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.55,
+          stagger: 0.08,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 80%",
+            toggleActions: "play none none none",
+          },
+        }
+      );
+    }, sectionRef);
+    return () => ctx.revert();
+  }, [loading, reviews.length]);
+
+  // Hide whole section if nothing to show (avoids awkward empty state)
+  if (!loading && reviews.length === 0) return null;
 
   return (
     <section
       ref={sectionRef}
-      className="py-20 bg-zinc-900/20 border-y border-zinc-800/50"
+      className="py-16 md:py-20 bg-zinc-900/20 border-y border-zinc-800/50"
     >
       <div className="container mx-auto px-4 max-w-7xl">
         {/* Header */}
-        <div className="text-center mb-12 md:mb-16">
-          <div className="inline-flex items-center gap-2 mb-4">
-            <span className="text-2xl">⭐</span>
-            <span className="text-xs font-black tracking-[0.2em] uppercase text-zinc-500">
-              Trust & Transparency
+        <div className="text-center mb-10 md:mb-14">
+          <div className="inline-flex items-center gap-2 mb-3">
+            <Star className="w-4 h-4 text-emerald-400 fill-emerald-400" />
+            <span className="text-[11px] font-black tracking-[0.2em] uppercase text-zinc-500">
+              5-Star Verified Reviews
             </span>
           </div>
-          <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tight mb-4">
+          <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tight mb-3">
             What Players{" "}
             <span className="text-transparent bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text">
               Say
             </span>
           </h2>
-          <p className="text-zinc-400 max-w-xl mx-auto">
-            Every review on The Arena comes from verified players who actually
-            booked and played. No exceptions.
+          <p className="text-zinc-400 max-w-xl mx-auto text-sm md:text-base">
+            Real words from verified players who actually booked and played.
           </p>
         </div>
 
-        {/* Trust Pillars Grid */}
+        {/* Reviews Grid */}
         <div
-          ref={cardsRef}
-          className="grid md:grid-cols-3 gap-6 md:gap-8 mb-12"
+          ref={gridRef}
+          className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-10"
         >
-          {TRUST_PILLARS.map((pillar, idx) => (
-            <div
-              key={idx}
-              className="trust-pillar bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 text-center hover:border-emerald-500/30 hover:shadow-[0_0_20px_rgba(80,200,120,0.1)] transition-all duration-300 group"
-            >
-              {/* Icon */}
-              <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                <pillar.icon className="w-6 h-6 text-emerald-500" />
-              </div>
+          {loading
+            ? Array.from({ length: 6 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-48 rounded-2xl bg-zinc-900/50 border border-zinc-800 animate-pulse"
+                />
+              ))
+            : reviews.map((r) => (
+                <Link
+                  key={r.id}
+                  href={`/venues/${r.venue_id}`}
+                  className="review-card group relative flex flex-col gap-3 p-5 rounded-2xl bg-zinc-900/60 border border-zinc-800 hover:border-emerald-500/40 hover:bg-zinc-900/80 transition-all duration-300"
+                >
+                  {/* Header row: stars + time */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-0.5">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`w-3.5 h-3.5 ${
+                            i < r.rating
+                              ? "text-emerald-400 fill-emerald-400"
+                              : "text-zinc-700"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-[11px] text-zinc-500">
+                      {timeAgo(r.created_at)}
+                    </span>
+                  </div>
 
-              {/* Title */}
-              <h3 className="text-base font-bold text-white mb-2">
-                {pillar.title}
-              </h3>
+                  {/* Comment */}
+                  <div className="relative">
+                    <Quote className="absolute -top-1 -left-1 w-4 h-4 text-emerald-500/20" />
+                    <p className="text-sm text-zinc-200 leading-relaxed line-clamp-4 pl-5">
+                      {r.comment}
+                    </p>
+                  </div>
 
-              {/* Description */}
-              <p className="text-sm text-zinc-400 leading-relaxed">
-                {pillar.description}
-              </p>
-            </div>
-          ))}
+                  {/* Footer: user + venue */}
+                  <div className="mt-auto flex items-center gap-3 pt-3 border-t border-zinc-800/70">
+                    {r.user_avatar ? (
+                      <Image
+                        src={r.user_avatar}
+                        alt={r.user_name}
+                        width={36}
+                        height={36}
+                        className="w-9 h-9 rounded-full object-cover flex-shrink-0"
+                      />
+                    ) : (
+                      <div className="w-9 h-9 rounded-full bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center text-[11px] font-bold text-emerald-300 flex-shrink-0">
+                        {initials(r.user_name)}
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1 text-sm text-white font-semibold truncate">
+                        <span className="truncate">{r.user_name}</span>
+                        {r.is_verified && (
+                          <BadgeCheck className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                        )}
+                      </div>
+                      <div className="text-[11px] text-zinc-400 truncate group-hover:text-emerald-400 transition-colors">
+                        {r.venue_name}
+                      </div>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-zinc-600 group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                  </div>
+                </Link>
+              ))}
         </div>
 
         {/* CTA */}
         <div className="text-center">
           <Link
             href="/venues"
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-black font-bold hover:shadow-[0_0_30px_rgba(80,200,120,0.4)] hover:scale-105 transition-all duration-300 group"
+            className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-black font-bold hover:shadow-[0_0_30px_rgba(80,200,120,0.4)] hover:scale-[1.03] transition-all duration-300 group"
           >
-            Book Your First Game & Be the First to Review
+            Book Your Game & Add Your Review
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>

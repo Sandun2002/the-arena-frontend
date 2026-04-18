@@ -47,7 +47,7 @@ export default function HeroVenueCard({ venue, isActive, priority }: HeroVenueCa
         transition-[transform,opacity,filter,box-shadow]
         will-change-[transform,opacity]
         ${isActive
-          ? "shadow-[0_20px_60px_-12px_rgba(80,200,120,0.55)] ring-2 ring-emerald-400/70"
+          ? "shadow-[0_20px_60px_-12px_rgba(80,200,120,0.35)] ring-1 ring-emerald-400/30"
           : "opacity-45 scale-[0.92] grayscale brightness-[0.6]"
         }
       `}
@@ -80,23 +80,10 @@ export default function HeroVenueCard({ venue, isActive, priority }: HeroVenueCa
         </div>
       )}
 
-      {/* Corner accent brackets — only on active */}
-      {isActive && (
-        <>
-          <span className="absolute top-0 left-0 w-5 h-5 md:w-6 md:h-6 border-t-2 border-l-2 border-emerald-400 rounded-tl-2xl pointer-events-none" />
-          <span className="absolute top-0 right-0 w-5 h-5 md:w-6 md:h-6 border-t-2 border-r-2 border-emerald-400 rounded-tr-2xl pointer-events-none" />
-          <span className="absolute bottom-0 left-0 w-5 h-5 md:w-6 md:h-6 border-b-2 border-l-2 border-emerald-400 rounded-bl-2xl pointer-events-none" />
-          <span className="absolute bottom-0 right-0 w-5 h-5 md:w-6 md:h-6 border-b-2 border-r-2 border-emerald-400 rounded-br-2xl pointer-events-none" />
-        </>
-      )}
 
       {/* FEATURED badge — top-left, honest replacement for unfair numbering */}
       <div
-        className={`
-          absolute top-3 left-3 md:top-4 md:left-4
-          transition-[opacity,transform] duration-500
-          ${isActive ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"}
-        `}
+        className={`absolute top-3 left-3 md:top-4 md:left-4 transition-[opacity,transform] duration-500 ${isActive ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"}`}
       >
         <span className="inline-flex items-center gap-1 bg-emerald-500 text-black text-[10px] md:text-xs font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-md shadow-lg">
           <Sparkles className="w-3 h-3" />
