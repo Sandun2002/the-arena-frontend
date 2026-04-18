@@ -1,28 +1,39 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import Link from "next/link";
-import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { api } from "@/services/api";
 import { Sport } from "@/types";
-import { getSportImage } from "@/services/normalizers";
+import SportCard from "./SportCard";
 
 // Register ScrollTrigger
 gsap.registerPlugin(ScrollTrigger);
 
+/**
+ * SportExplorer — dual infinite marquee.
+ *
+ * Desktop/tablet: two rows scroll in opposite directions at different speeds
+ *   (asymmetric = alive). Each row's content is duplicated inline to create
+ *   the seamless loop (translateX 0 → -50% over the row width).
+ *
+ * Mobile: single row. No hover states; tap navigates.
+ *
+ * Hover on any card pauses the row that contains it (CSS :has()); opposite
+ * row keeps scrolling → psychological contrast draws eye to the paused card.
+ *
+ * Respects prefers-reduced-motion (see globals.css).
+ */
 export default function SportExplorer() {
   const [sports, setSports] = useState<Sport[]>([]);
   const [loading, setLoading] = useState(true);
   const sectionRef = useRef<HTMLElement>(null);
-  const cardsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const loadSports = async () => {
       try {
         const data = await api.getSports();
-        setSports(data); // Show all sports dynamically
+        setSports(data);
       } catch (error) {
         console.error("Failed to load sports:", error);
       } finally {
@@ -32,39 +43,70 @@ export default function SportExplorer() {
     loadSports();
   }, []);
 
-  // GSAP tile reveal animation
+  // GSAP section reveal on scroll-in
   useEffect(() => {
-    if (!loading && cardsRef.current && sports.length > 0) {
-      const cards = cardsRef.current.querySelectorAll(".sport-card");
+    if (!loading && sectionRef.current && sports.length > 0) {
+      const header = sectionRef.current.querySelector(".sport-header");
+      const marquees = sectionRef.current.querySelectorAll(".marquee-row");
       const ctx = gsap.context(() => {
-        gsap.fromTo(
-          cards,
-          { y: 30, opacity: 0, scale: 0.95 },
-          {
-            y: 0,
-            opacity: 1,
-            scale: 1,
-            duration: 0.5,
-            stagger: 0.08,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: "top 80%",
-              toggleActions: "play none none none",
-            },
-          }
-        );
+        if (header) {
+          gsap.fromTo(
+            header,
+            { y: 30, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.7,
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: sectionRef.current,
+                start: "top 85%",
+                toggleActions: "play none none none",
+              },
+            }
+          );
+        }
+        if (marquees.length > 0) {
+          gsap.fromTo(
+            marquees,
+            { y: 40, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.8,
+              stagger: 0.15,
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: sectionRef.current,
+                start: "top 80%",
+                toggleActions: "play none none none",
+              },
+            }
+          );
+        }
       }, sectionRef);
 
       return () => ctx.revert();
     }
   }, [loading, sports.length]);
 
+  // Split sports alphabetically: first half top row, second half bottom row
+  const sortedSports = [...sports].sort((a, b) => a.name.localeCompare(b.name));
+  const mid = Math.ceil(sortedSports.length / 2);
+  const topRow = sortedSports.slice(0, mid);
+  const bottomRow = sortedSports.slice(mid);
+
+  // Duplicate content for seamless marquee loop (translateX 0 → -50%)
+  const topRowDuped = [...topRow, ...topRow];
+  const bottomRowDuped = [...bottomRow, ...bottomRow];
+  // Mobile: all sports in a single row
+  const mobileRowDuped = [...sortedSports, ...sortedSports];
+
   return (
-    <section ref={sectionRef} className="py-16 md:py-20 bg-black">
+    <section ref={sectionRef} className="py-16 md:py-20 bg-black overflow-hidden">
       <div className="container mx-auto px-4 max-w-7xl">
-        {/* Header */}
-        <div className="mb-8 md:mb-10">
+        {/* Header — unchanged, clean */}
+        <div className="sport-header mb-8 md:mb-12">
           <h2 className="text-2xl md:text-4xl font-bold text-white mb-2">
             Explore by{" "}
             <span className="text-transparent bg-gradient-to-r from-emerald-400 to-emerald-500 bg-clip-text">
@@ -75,57 +117,60 @@ export default function SportExplorer() {
             Find courts for your favorite game
           </p>
         </div>
-
-        {/* Sports Grid - Horizontal scroll on mobile, grid on desktop */}
-        {loading ? (
-          <div className="flex md:grid md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4 overflow-x-auto scrollbar-hide pb-2">
-            {[...Array(5)].map((_, i) => (
-              <div
-                key={i}
-                className="w-[140px] md:w-auto h-[120px] md:h-[140px] rounded-2xl bg-zinc-900/50 border border-zinc-800 animate-pulse flex-shrink-0"
-              />
-            ))}
-          </div>
-        ) : (
-          <div
-            ref={cardsRef}
-            className="flex md:grid md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2"
-          >
-            {sports.map((sport) => (
-              <Link
-                key={sport.id}
-                href={`/venues?sport_type=${sport.slug}`}
-                className="sport-card group relative w-[140px] md:w-auto h-[120px] md:h-[140px] rounded-2xl overflow-hidden flex-shrink-0 snap-start"
-              >
-                {/* Background Image */}
-                <Image
-                  src={sport.imageUrl || getSportImage(sport.slug || "")}
-                  alt={sport.name}
-                  fill
-                  sizes="(max-width: 768px) 140px, 200px"
-                  className="object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-
-                {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-
-                {/* Active Border */}
-                <div className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-emerald-500/50 transition-all duration-300 group-hover:shadow-[0_0_20px_rgba(80,200,120,0.35)]" />
-
-                {/* Sport Name */}
-                <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4">
-                  <h3 className="text-sm md:text-base font-bold text-white drop-shadow-lg">
-                    {sport.name}
-                  </h3>
-                </div>
-
-                {/* Hover Scale Effect */}
-                <div className="absolute inset-0 transition-transform duration-300 group-hover:scale-[1.03] pointer-events-none" />
-              </Link>
-            ))}
-          </div>
-        )}
       </div>
+
+      {/* Marquee rows — full-bleed (escape container max-width for cinematic feel) */}
+      {loading ? (
+        <div className="px-4 flex gap-3 md:gap-4 overflow-hidden">
+          {[...Array(6)].map((_, i) => (
+            <div
+              key={i}
+              className="w-[220px] h-[280px] md:w-[280px] md:h-[360px] rounded-2xl bg-zinc-900/50 border border-zinc-800 animate-pulse flex-shrink-0"
+            />
+          ))}
+        </div>
+      ) : sports.length === 0 ? null : (
+        <div className="flex flex-col gap-4 md:gap-6">
+          {/* Mobile: single row with all sports scrolling right → left */}
+          <div className="marquee-row relative md:hidden">
+            <div className="marquee-track marquee-left">
+              {mobileRowDuped.map((sport, idx) => (
+                <SportCard
+                  key={`m-${sport.id}-${idx}`}
+                  sport={sport}
+                  priority={idx < 2}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Desktop/tablet: dual rows in opposite directions */}
+          <div className="marquee-row relative hidden md:block">
+            <div className="marquee-track marquee-left">
+              {topRowDuped.map((sport, idx) => (
+                <SportCard
+                  key={`top-${sport.id}-${idx}`}
+                  sport={sport}
+                  priority={idx < 2}
+                />
+              ))}
+            </div>
+          </div>
+
+          {bottomRow.length > 0 && (
+            <div className="marquee-row relative hidden md:block">
+              <div className="marquee-track marquee-right">
+                {bottomRowDuped.map((sport, idx) => (
+                  <SportCard
+                    key={`bot-${sport.id}-${idx}`}
+                    sport={sport}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </section>
   );
 }

@@ -2,10 +2,17 @@
 
 import { Venue } from "@/types";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { EffectCoverflow, Autoplay, Pagination } from "swiper/modules";
+import {
+  EffectCoverflow,
+  Autoplay,
+  Pagination,
+  Navigation,
+  Keyboard,
+} from "swiper/modules";
 import "swiper/css";
 import "swiper/css/effect-coverflow";
 import "swiper/css/pagination";
+import "swiper/css/navigation";
 import HeroVenueCard from "./HeroVenueCard";
 import { useState, useRef } from "react";
 import { useGSAP } from "@gsap/react";
@@ -14,6 +21,8 @@ import gsap from "gsap";
 interface HeroCarouselProps {
   venues: Venue[];
 }
+
+const AUTOPLAY_DELAY = 4500; // ms
 
 export default function HeroCarousel({ venues }: HeroCarouselProps) {
   const [, setActiveIndex] = useState(0);
@@ -29,8 +38,25 @@ export default function HeroCarousel({ venues }: HeroCarouselProps) {
     }
   }, { scope: containerRef });
 
+  // Infinite loop needs at least a few slides; Swiper docs recommend >= slidesPerView*2
   const enableLoop = venues.length >= 3;
-  const initialCenterIdx = Math.floor(venues.length / 2);
+  const initialCenterIdx = venues.length > 0 ? Math.floor(venues.length / 2) : 0;
+
+  // Wire the autoplay progress bar: Swiper reports remaining time each tick,
+  // we convert to a 0→1 "filled" ratio and set a CSS var on the active slide.
+  const handleAutoplayTimeLeft = (
+    _swiper: unknown,
+    _time: number,
+    progress: number
+  ) => {
+    if (!containerRef.current) return;
+    const activeSlide = containerRef.current.querySelector<HTMLElement>(
+      ".swiper-slide-active"
+    );
+    if (!activeSlide) return;
+    // progress is 1 → 0 as the slide elapses; flip it so the bar fills left→right
+    activeSlide.style.setProperty("--hero-progress", String(1 - progress));
+  };
 
   return (
     <div ref={containerRef} className="w-full pt-6 pb-2 md:pt-8 md:pb-4 relative">
@@ -45,17 +71,17 @@ export default function HeroCarousel({ venues }: HeroCarouselProps) {
         centeredSlides={true}
         loop={enableLoop}
         slidesPerView={"auto"}
-        initialSlide={Math.floor(venues.length / 2)}
-        loopAdditionalSlides={2}
+        initialSlide={initialCenterIdx}
+        loopAdditionalSlides={3}
         coverflowEffect={{
           rotate: 0,
-          stretch: 50,
-          depth: 100,
-          modifier: 1,
+          stretch: 60,
+          depth: 140,
+          modifier: 1.1,
           slideShadows: false,
         }}
         autoplay={{
-          delay: 3500,
+          delay: AUTOPLAY_DELAY,
           disableOnInteraction: false,
           pauseOnMouseEnter: true,
         }}
@@ -63,9 +89,12 @@ export default function HeroCarousel({ venues }: HeroCarouselProps) {
           clickable: true,
           dynamicBullets: true,
         }}
-        speed={500}
+        navigation={enableLoop}
+        keyboard={{ enabled: true, onlyInViewport: true }}
+        speed={600}
         onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
-        modules={[EffectCoverflow, Autoplay, Pagination]}
+        onAutoplayTimeLeft={handleAutoplayTimeLeft}
+        modules={[EffectCoverflow, Autoplay, Pagination, Navigation, Keyboard]}
         className="hero-carousel touch-pan-y w-full"
       >
         {venues.map((venue, idx) => (
@@ -74,7 +103,11 @@ export default function HeroCarousel({ venues }: HeroCarouselProps) {
             className="!w-[280px] md:!w-[400px] py-4"
           >
             {({ isActive }) => (
-              <HeroVenueCard venue={venue} isActive={isActive} priority={idx === initialCenterIdx} />
+              <HeroVenueCard
+                venue={venue}
+                isActive={isActive}
+                priority={idx === initialCenterIdx}
+              />
             )}
           </SwiperSlide>
         ))}

@@ -1,6 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin } from "lucide-react";
+import { MapPin, ArrowRight, Sparkles } from "lucide-react";
+import { useRef } from "react";
 import { Venue } from "@/types";
 
 interface HeroVenueCardProps {
@@ -10,49 +13,96 @@ interface HeroVenueCardProps {
 }
 
 export default function HeroVenueCard({ venue, isActive, priority }: HeroVenueCardProps) {
+  const cardRef = useRef<HTMLAnchorElement>(null);
+
+  // Desktop-only mouse-follow tilt on active card (subtle, ±5°)
+  const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!isActive || !cardRef.current) return;
+    // Skip on touch/no-hover devices
+    if (window.matchMedia("(hover: none)").matches) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    cardRef.current.style.transform =
+      `perspective(1000px) rotateY(${x * 6}deg) rotateX(${-y * 6}deg) translateZ(0)`;
+  };
+
+  const handleMouseLeave = () => {
+    if (cardRef.current) cardRef.current.style.transform = "";
+  };
+
   return (
     <Link
+      ref={cardRef}
       href={`/venues/${venue.id}`}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
       className={`
+        ${isActive ? "hero-active" : ""}
         group relative block
-        h-[200px] md:h-[280px]
-        w-full overflow-hidden 
+        h-[220px] md:h-[320px]
+        w-full overflow-hidden
         rounded-2xl cursor-pointer
         duration-500 ease-out
-        transition-[transform,opacity,filter]
+        transition-[transform,opacity,filter,box-shadow]
         will-change-[transform,opacity]
         ${isActive
-          ? "shadow-[0_8px_40px_-8px_rgba(80,200,120,0.5)] ring-2 ring-emerald-400/50"
-          : "opacity-40 scale-[0.92] grayscale-[40%]"
+          ? "shadow-[0_20px_60px_-12px_rgba(80,200,120,0.55)] ring-2 ring-emerald-400/70"
+          : "opacity-45 scale-[0.92] grayscale brightness-[0.6]"
         }
       `}
     >
-      {/* Image */}
-      <Image
-        src={venue.cover_image || "/images/placeholder.jpg"}
-        alt={venue.name}
-        fill
-        sizes="(max-width: 768px) 280px, 400px"
-        priority={priority}
-        className={`
-          object-cover transition-transform duration-700
-          ${isActive ? "scale-105" : "scale-100"}
-        `}
-      />
+      {/* Background image with Ken Burns drift on active */}
+      <div className={`absolute inset-0 ${isActive ? "hero-kenburns" : ""}`}>
+        <Image
+          src={venue.cover_image || "/images/placeholder.jpg"}
+          alt={venue.name}
+          fill
+          sizes="(max-width: 768px) 280px, 400px"
+          priority={priority}
+          className="object-cover"
+        />
+      </div>
 
-      {/* Premium Gradient Overlay */}
+      {/* Premium gradient overlay */}
       <div
         className={`
-          absolute inset-0 transition-opacity duration-500
-          bg-gradient-to-t from-black via-black/20 to-transparent
-          ${isActive ? "opacity-100" : "opacity-60"}
+          absolute inset-0 transition-opacity duration-500 pointer-events-none
+          bg-gradient-to-t from-black via-black/30 to-transparent
+          ${isActive ? "opacity-100" : "opacity-70"}
         `}
       />
 
-      {/* Shine Effect on Active */}
+      {/* Shine sweep — only on active */}
       {isActive && (
-        <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="hero-shine absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/25 to-transparent" />
+        </div>
       )}
+
+      {/* Corner accent brackets — only on active */}
+      {isActive && (
+        <>
+          <span className="absolute top-0 left-0 w-5 h-5 md:w-6 md:h-6 border-t-2 border-l-2 border-emerald-400 rounded-tl-2xl pointer-events-none" />
+          <span className="absolute top-0 right-0 w-5 h-5 md:w-6 md:h-6 border-t-2 border-r-2 border-emerald-400 rounded-tr-2xl pointer-events-none" />
+          <span className="absolute bottom-0 left-0 w-5 h-5 md:w-6 md:h-6 border-b-2 border-l-2 border-emerald-400 rounded-bl-2xl pointer-events-none" />
+          <span className="absolute bottom-0 right-0 w-5 h-5 md:w-6 md:h-6 border-b-2 border-r-2 border-emerald-400 rounded-br-2xl pointer-events-none" />
+        </>
+      )}
+
+      {/* FEATURED badge — top-left, honest replacement for unfair numbering */}
+      <div
+        className={`
+          absolute top-3 left-3 md:top-4 md:left-4
+          transition-[opacity,transform] duration-500
+          ${isActive ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"}
+        `}
+      >
+        <span className="inline-flex items-center gap-1 bg-emerald-500 text-black text-[10px] md:text-xs font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-md shadow-lg">
+          <Sparkles className="w-3 h-3" />
+          Featured
+        </span>
+      </div>
 
       {/* Content */}
       <div
@@ -62,30 +112,33 @@ export default function HeroVenueCard({ venue, isActive, priority }: HeroVenueCa
           ${isActive ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}
         `}
       >
-        {/* Sport Badge */}
-        <div className="flex items-center gap-2 mb-2">
-          <span
-            className="
-              bg-emerald-500 
-              text-black text-[10px] md:text-xs font-bold uppercase tracking-wide
-              px-2.5 py-1 rounded-md
-            "
-          >
-            {"Sports Venue"}
-          </span>
-        </div>
-
-        {/* Venue Name */}
-        <h3 className="text-base md:text-xl font-bold text-white tracking-tight leading-tight line-clamp-2">
+        {/* Venue name */}
+        <h3 className="text-base md:text-xl font-bold text-white tracking-tight leading-tight line-clamp-2 drop-shadow-lg">
           {venue.name}
         </h3>
 
-        {/* Location */}
-        <div className="flex items-center gap-1.5 text-zinc-400 text-xs md:text-sm mt-1.5">
-          <MapPin className="w-3 h-3 md:w-3.5 md:h-3.5 text-emerald-400 flex-shrink-0" />
-          <span className="truncate">{venue.city}</span>
+        {/* Animated underline */}
+        <div className="hero-underline mt-1.5 md:mt-2 h-[2px] w-16 md:w-20 bg-gradient-to-r from-emerald-400 via-emerald-500 to-transparent rounded-full" />
+
+        {/* Location + CTA */}
+        <div className="mt-2 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 text-zinc-300 text-xs md:text-sm min-w-0">
+            <MapPin className="w-3 h-3 md:w-3.5 md:h-3.5 text-emerald-400 flex-shrink-0" />
+            <span className="truncate">{venue.city}</span>
+          </div>
+          <div className="hero-cta flex items-center gap-1 text-emerald-400 text-xs md:text-sm font-semibold flex-shrink-0">
+            <span className="hidden sm:inline">View</span>
+            <ArrowRight className="w-3.5 h-3.5 md:w-4 md:h-4" />
+          </div>
         </div>
       </div>
+
+      {/* Autoplay progress bar — only shown on active card */}
+      {isActive && (
+        <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-white/10 pointer-events-none">
+          <div className="hero-progress-bar h-full bg-gradient-to-r from-emerald-400 to-emerald-500" />
+        </div>
+      )}
     </Link>
   );
 }
