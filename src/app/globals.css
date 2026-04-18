@@ -218,6 +218,10 @@ select:focus {
 .marquee-reviews { animation-name: marquee-left; animation-duration: 80s; }
 .marquee-track:has(.review-card:hover) { animation-play-state: paused; }
 
+/* Trending Arenas marquee — slow auto-scroll, pauses on card hover */
+.marquee-trending { animation-name: marquee-left; animation-duration: 70s; }
+.marquee-track:has(.trending-card:hover) { animation-play-state: paused; }
+
 @media (max-width: 767px) {
   .marquee-left  { animation-duration: 35s; }
   .marquee-right { animation-duration: 45s; }

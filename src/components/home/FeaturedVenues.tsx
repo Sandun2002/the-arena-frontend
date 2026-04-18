@@ -42,29 +42,46 @@ export default function FeaturedVenues() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 min-h-[420px] md:min-h-[440px]">
+        {/* Single-row auto-sliding marquee of trending venues. Duplicate the
+            list 4× so the track always exceeds the viewport and the 0 → -50%
+            CSS animation wraps seamlessly. Pauses on card hover. */}
+        <div
+          className="relative -mx-4 min-h-[440px] overflow-hidden"
+          style={{
+            maskImage:
+              "linear-gradient(to right, transparent, #000 6%, #000 94%, transparent)",
+            WebkitMaskImage:
+              "linear-gradient(to right, transparent, #000 6%, #000 94%, transparent)",
+          }}
+        >
           {loading ? (
-            [...Array(3)].map((_, i) => (
-              <div key={i} className="rounded-xl bg-zinc-900 border border-zinc-800 overflow-hidden animate-pulse">
-                <div className="h-64 bg-zinc-800" />
-                <div className="p-5">
-                  <div className="mb-3 flex items-center justify-between">
-                    <div className="h-6 bg-zinc-800 rounded w-3/4" />
-                    <div className="h-5 bg-zinc-800 rounded w-10" />
-                  </div>
-                  <div className="mb-4 h-4 bg-zinc-800 rounded w-1/2" />
-                  <div className="border-t border-zinc-800 pt-4 flex items-center justify-between">
-                    <div className="h-5 bg-zinc-800 rounded w-2/5" />
-                    <div className="h-4 bg-zinc-800 rounded w-16" />
+            <div className="flex gap-6 px-4">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="w-[320px] md:w-[360px] flex-shrink-0 rounded-xl bg-zinc-900 border border-zinc-800 overflow-hidden animate-pulse">
+                  <div className="h-64 bg-zinc-800" />
+                  <div className="p-5">
+                    <div className="mb-3 flex items-center justify-between">
+                      <div className="h-6 bg-zinc-800 rounded w-3/4" />
+                      <div className="h-5 bg-zinc-800 rounded w-10" />
+                    </div>
+                    <div className="mb-4 h-4 bg-zinc-800 rounded w-1/2" />
+                    <div className="border-t border-zinc-800 pt-4 flex items-center justify-between">
+                      <div className="h-5 bg-zinc-800 rounded w-2/5" />
+                      <div className="h-4 bg-zinc-800 rounded w-16" />
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))
-          ) : (
-            venues.map((venue) => (
-              <VenueCard key={venue.id} venue={venue} />
-            ))
-          )}
+              ))}
+            </div>
+          ) : venues.length > 0 ? (
+            <div className="marquee-track marquee-trending flex gap-6">
+              {[...venues, ...venues, ...venues, ...venues].map((venue, idx) => (
+                <div key={`${venue.id}-${idx}`} className="trending-card w-[320px] md:w-[360px] flex-shrink-0">
+                  <VenueCard venue={venue} />
+                </div>
+              ))}
+            </div>
+          ) : null}
         </div>
 
         <div className="mt-12 text-center md:hidden">
