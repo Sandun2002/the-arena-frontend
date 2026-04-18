@@ -1,137 +1,198 @@
 "use client";
 
 import { Venue } from "@/types";
-import { Swiper, SwiperSlide } from "swiper/react";
-import {
-  EffectCoverflow,
-  Autoplay,
-  Pagination,
-  Keyboard,
-} from "swiper/modules";
-import "swiper/css";
-import "swiper/css/effect-coverflow";
-import "swiper/css/pagination";
-import HeroVenueCard from "./HeroVenueCard";
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+import HeroVenueCard from "./HeroVenueCard";
 
 interface HeroCarouselProps {
   venues: Venue[];
 }
 
-const AUTOPLAY_DELAY = 4500; // ms
-// Swiper's loop mode clones slides on both edges. Coverflow + centeredSlides
-// need enough real slides to clone cleanly — we pad up to this count when
-// the venue list is smaller, otherwise loop fails silently (autoplay stalls
-// after the last slide with only 2 venues).
-const MIN_SLIDES_FOR_LOOP = 6;
+const AUTOPLAY_MS = 4500;
+const DRAG_COMMIT_PX = 60; // horizontal distance to commit a slide change
+const DRAG_NAV_SUPPRESS_PX = 5; // above this, cancel the click-through to the card
+// Side-card offsets (distance from center, per screen size)
+const OFFSET_MOBILE = 150;
+const OFFSET_DESKTOP = 210;
 
+/**
+ * Custom hero carousel — no Swiper. Uses modular arithmetic so it's
+ * genuinely infinite regardless of venue count (works with 1, 2, 20…).
+ *
+ * Layout: 5 absolutely-positioned cards (−2, −1, 0, +1, +2). Each render
+ * picks `venues[(active + offset + N) % N]`, so there's never an "end".
+ * Auto-advance every AUTOPLAY_MS; pointer drag anywhere on the track
+ * changes `active`; short taps still bubble to the card's <Link>.
+ */
 export default function HeroCarousel({ venues }: HeroCarouselProps) {
-  const [, setActiveIndex] = useState(0);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-  useGSAP(() => {
-    if (containerRef.current) {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const dragRef = useRef<{ startX: number; moved: boolean; pointerId: number } | null>(null);
+  const suppressNextClickRef = useRef(false);
+
+  const n = venues.length;
+  const mod = useCallback((i: number) => ((i % n) + n) % n, [n]);
+
+  // Entry animation
+  useGSAP(
+    () => {
+      if (!wrapRef.current) return;
       gsap.fromTo(
-        containerRef.current,
+        wrapRef.current,
         { y: 20, opacity: 0 },
         { y: 0, opacity: 1, duration: 0.8, ease: "power3.out", delay: 0.1 }
       );
+    },
+    { scope: wrapRef }
+  );
+
+  // Track viewport size for responsive offset / card width
+  useEffect(() => {
+    const check = () => setIsMobile(window.matchMedia("(max-width: 767px)").matches);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  // Autoplay — setInterval handles both single-venue no-op (useEffect
+  // early-returns) and many-venue infinite advance.
+  useEffect(() => {
+    if (n < 2 || paused) return;
+    const id = window.setInterval(() => setActive((i) => i + 1), AUTOPLAY_MS);
+    return () => window.clearInterval(id);
+  }, [n, paused]);
+
+  const goTo = useCallback((idx: number) => setActive(idx), []);
+
+  // ── Pointer drag (mouse + touch unified via Pointer Events) ────────────────
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    // Ignore right-click, pen-eraser, etc. Also ignore when not primary button.
+    if (e.button !== 0 && e.pointerType === "mouse") return;
+    dragRef.current = { startX: e.clientX, moved: false, pointerId: e.pointerId };
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      // Some browsers throw if capture isn't supported — drag still works.
     }
-  }, { scope: containerRef });
-
-  // If there aren't enough real venues for Swiper's loop to clone, repeat
-  // the list so the track always has >= MIN_SLIDES_FOR_LOOP slides. Each
-  // copy still links to the same venue (clicking either works), and the
-  // loop wraps seamlessly so autoplay never stops.
-  const loopVenues = useMemo(() => {
-    if (venues.length === 0) return venues;
-    if (venues.length >= MIN_SLIDES_FOR_LOOP) return venues;
-    const copies = Math.ceil(MIN_SLIDES_FOR_LOOP / venues.length);
-    return Array.from({ length: copies }, () => venues).flat();
-  }, [venues]);
-
-  const enableLoop = loopVenues.length >= 2;
-  const initialCenterIdx = loopVenues.length > 0 ? Math.floor(loopVenues.length / 2) : 0;
-
-  // Wire the autoplay progress bar: Swiper reports remaining time each tick,
-  // we convert to a 0→1 "filled" ratio and set a CSS var on the active slide.
-  const handleAutoplayTimeLeft = (
-    _swiper: unknown,
-    _time: number,
-    progress: number
-  ) => {
-    if (!containerRef.current) return;
-    const activeSlide = containerRef.current.querySelector<HTMLElement>(
-      ".swiper-slide-active"
-    );
-    if (!activeSlide) return;
-    // progress is 1 → 0 as the slide elapses; flip it so the bar fills left→right
-    activeSlide.style.setProperty("--hero-progress", String(1 - progress));
   };
 
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const d = dragRef.current;
+    if (!d) return;
+    if (Math.abs(e.clientX - d.startX) > DRAG_NAV_SUPPRESS_PX) d.moved = true;
+  };
+
+  const endDrag = (clientX: number | null) => {
+    const d = dragRef.current;
+    if (!d) return;
+    dragRef.current = null;
+    if (clientX == null) return;
+    const dx = clientX - d.startX;
+    if (Math.abs(dx) > DRAG_COMMIT_PX) {
+      setActive((i) => (dx < 0 ? i + 1 : i - 1));
+    }
+    if (d.moved) {
+      // Cancel the click that browsers fire after pointerup, so a drag
+      // doesn't accidentally navigate to the centered card's venue page.
+      suppressNextClickRef.current = true;
+      window.setTimeout(() => {
+        suppressNextClickRef.current = false;
+      }, 0);
+    }
+  };
+
+  const onPointerUp = (e: React.PointerEvent<HTMLDivElement>) => endDrag(e.clientX);
+  const onPointerCancel = () => endDrag(null);
+
+  const onClickCapture = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (suppressNextClickRef.current) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  };
+
+  if (n === 0) return null;
+
+  const offsetPx = isMobile ? OFFSET_MOBILE : OFFSET_DESKTOP;
+  const positions = [-2, -1, 0, 1, 2];
+
   return (
-    <div ref={containerRef} className="w-full pt-6 pb-2 md:pt-8 md:pb-4 relative">
+    <div
+      ref={wrapRef}
+      className="relative w-full pt-6 pb-2 md:pt-8 md:pb-4 select-none"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
       {/* Subtle background glow */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[250px] bg-emerald-500/10 rounded-full blur-[80px]" />
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 h-[250px] w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-500/10 blur-[80px]" />
       </div>
 
-      <Swiper
-        effect={"coverflow"}
-        grabCursor={true}
-        centeredSlides={true}
-        loop={enableLoop}
-        slidesPerView={"auto"}
-        initialSlide={initialCenterIdx}
-        loopAdditionalSlides={4}
-        // Drag anywhere on the card: lower threshold so a small press-and-drag
-        // triggers a swipe instead of a click. Swiper's default preventClicks
-        // cancels the <Link> click when movement exceeds threshold, so quick
-        // taps still navigate to the venue page.
-        threshold={6}
-        touchRatio={1.2}
-        touchStartPreventDefault={false}
-        simulateTouch
-        coverflowEffect={{
-          rotate: 0,
-          stretch: 60,
-          depth: 140,
-          modifier: 1.1,
-          slideShadows: false,
-        }}
-        autoplay={{
-          delay: AUTOPLAY_DELAY,
-          disableOnInteraction: false,
-          pauseOnMouseEnter: true,
-        }}
-        pagination={{
-          clickable: true,
-          dynamicBullets: true,
-        }}
-        keyboard={{ enabled: true, onlyInViewport: true }}
-        speed={600}
-        onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
-        onAutoplayTimeLeft={handleAutoplayTimeLeft}
-        modules={[EffectCoverflow, Autoplay, Pagination, Keyboard]}
-        className="hero-carousel touch-pan-y w-full"
+      {/* Track — absolute-positioned cards, modular indexing = true infinite */}
+      <div
+        className="relative mx-auto h-[240px] w-full max-w-[1100px] touch-pan-y md:h-[340px]"
+        style={{ perspective: 1200, cursor: "grab" }}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerCancel}
+        onClickCapture={onClickCapture}
       >
-        {loopVenues.map((venue, idx) => (
-          <SwiperSlide
-            key={`${venue.id}-${idx}`}
-            className="!w-[280px] md:!w-[400px] py-4"
-          >
-            {({ isActive }) => (
-              <HeroVenueCard
-                venue={venue}
-                isActive={isActive}
-                priority={idx === initialCenterIdx}
+        {positions.map((offset) => {
+          const realIdx = mod(active + offset);
+          const venue = venues[realIdx];
+          const abs = Math.abs(offset);
+          const scale = abs === 0 ? 1 : abs === 1 ? 0.88 : 0.74;
+          const opacity = abs === 0 ? 1 : abs === 1 ? 0.8 : 0.35;
+          const blur = abs >= 2 ? 1.5 : 0;
+          const zIndex = 10 - abs;
+
+          return (
+            <div
+              key={`slot-${offset}`}
+              className="absolute top-0 left-1/2 w-[min(400px,82vw)]"
+              style={{
+                transform: `translateX(-50%) translateX(${offset * offsetPx}px) scale(${scale})`,
+                opacity,
+                filter: blur ? `blur(${blur}px)` : undefined,
+                zIndex,
+                transition:
+                  "transform 600ms cubic-bezier(0.22, 1, 0.36, 1), opacity 500ms ease, filter 500ms ease",
+                willChange: "transform, opacity",
+              }}
+            >
+              <HeroVenueCard venue={venue} isActive={offset === 0} priority={offset === 0} />
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Dots */}
+      {n > 1 && (
+        <div className="mt-4 flex items-center justify-center gap-2">
+          {venues.map((_, i) => {
+            const activeDot = mod(active) === i;
+            return (
+              <button
+                key={i}
+                type="button"
+                aria-label={`Show venue ${i + 1}`}
+                onClick={() => goTo(i)}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  activeDot
+                    ? "w-6 bg-emerald-500 shadow-[0_0_10px_rgba(80,200,120,0.6)]"
+                    : "w-1.5 bg-zinc-600 hover:bg-zinc-400"
+                }`}
               />
-            )}
-          </SwiperSlide>
-        ))}
-      </Swiper>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
