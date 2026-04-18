@@ -194,6 +194,10 @@ export default function MarqueeRow({
       onPointerUp={endDrag}
       onPointerCancel={endDrag}
       onClickCapture={onClickCapture}
+      // Suppress native HTML5 drag on <a> / <img> children — without this,
+      // desktop browsers start their built-in "drag link ghost" on mousedown,
+      // which steals pointer events and makes the marquee feel frozen.
+      onDragStart={(e) => e.preventDefault()}
     >
       <div
         ref={trackRef}
