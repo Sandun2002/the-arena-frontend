@@ -35,8 +35,10 @@ export default function HeroVenueCard({ venue, isActive, priority }: HeroVenueCa
     <Link
       ref={cardRef}
       href={`/venues/${venue.id}`}
+      draggable={false}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      onDragStart={(e) => e.preventDefault()}
       className={`
         ${isActive ? "hero-active" : ""}
         group relative block

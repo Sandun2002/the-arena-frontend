@@ -6,15 +6,13 @@ import {
   EffectCoverflow,
   Autoplay,
   Pagination,
-  Navigation,
   Keyboard,
 } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/effect-coverflow";
 import "swiper/css/pagination";
-import "swiper/css/navigation";
 import HeroVenueCard from "./HeroVenueCard";
-import { useState, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 
@@ -23,6 +21,11 @@ interface HeroCarouselProps {
 }
 
 const AUTOPLAY_DELAY = 4500; // ms
+// Swiper's loop mode clones slides on both edges. Coverflow + centeredSlides
+// need enough real slides to clone cleanly — we pad up to this count when
+// the venue list is smaller, otherwise loop fails silently (autoplay stalls
+// after the last slide with only 2 venues).
+const MIN_SLIDES_FOR_LOOP = 6;
 
 export default function HeroCarousel({ venues }: HeroCarouselProps) {
   const [, setActiveIndex] = useState(0);
@@ -38,12 +41,19 @@ export default function HeroCarousel({ venues }: HeroCarouselProps) {
     }
   }, { scope: containerRef });
 
-  // Infinite loop (manual + autoplay): Swiper clones slides around the edges
-  // so wrapping from last → first is seamless. Enable as soon as we have
-  // enough slides to clone (>= 2). loopAdditionalSlides raises the clone
-  // count so fast drags never hit a visible gap.
-  const enableLoop = venues.length >= 2;
-  const initialCenterIdx = venues.length > 0 ? Math.floor(venues.length / 2) : 0;
+  // If there aren't enough real venues for Swiper's loop to clone, repeat
+  // the list so the track always has >= MIN_SLIDES_FOR_LOOP slides. Each
+  // copy still links to the same venue (clicking either works), and the
+  // loop wraps seamlessly so autoplay never stops.
+  const loopVenues = useMemo(() => {
+    if (venues.length === 0) return venues;
+    if (venues.length >= MIN_SLIDES_FOR_LOOP) return venues;
+    const copies = Math.ceil(MIN_SLIDES_FOR_LOOP / venues.length);
+    return Array.from({ length: copies }, () => venues).flat();
+  }, [venues]);
+
+  const enableLoop = loopVenues.length >= 2;
+  const initialCenterIdx = loopVenues.length > 0 ? Math.floor(loopVenues.length / 2) : 0;
 
   // Wire the autoplay progress bar: Swiper reports remaining time each tick,
   // we convert to a 0→1 "filled" ratio and set a CSS var on the active slide.
@@ -75,7 +85,15 @@ export default function HeroCarousel({ venues }: HeroCarouselProps) {
         loop={enableLoop}
         slidesPerView={"auto"}
         initialSlide={initialCenterIdx}
-        loopAdditionalSlides={3}
+        loopAdditionalSlides={4}
+        // Drag anywhere on the card: lower threshold so a small press-and-drag
+        // triggers a swipe instead of a click. Swiper's default preventClicks
+        // cancels the <Link> click when movement exceeds threshold, so quick
+        // taps still navigate to the venue page.
+        threshold={6}
+        touchRatio={1.2}
+        touchStartPreventDefault={false}
+        simulateTouch
         coverflowEffect={{
           rotate: 0,
           stretch: 60,
@@ -92,15 +110,14 @@ export default function HeroCarousel({ venues }: HeroCarouselProps) {
           clickable: true,
           dynamicBullets: true,
         }}
-        navigation={enableLoop}
         keyboard={{ enabled: true, onlyInViewport: true }}
         speed={600}
         onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
         onAutoplayTimeLeft={handleAutoplayTimeLeft}
-        modules={[EffectCoverflow, Autoplay, Pagination, Navigation, Keyboard]}
+        modules={[EffectCoverflow, Autoplay, Pagination, Keyboard]}
         className="hero-carousel touch-pan-y w-full"
       >
-        {venues.map((venue, idx) => (
+        {loopVenues.map((venue, idx) => (
           <SwiperSlide
             key={`${venue.id}-${idx}`}
             className="!w-[280px] md:!w-[400px] py-4"
