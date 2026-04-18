@@ -32,7 +32,12 @@ export default function HeroCarousel({ venues }: HeroCarouselProps) {
   const [isMobile, setIsMobile] = useState(false);
 
   const wrapRef = useRef<HTMLDivElement>(null);
-  const dragRef = useRef<{ startX: number; moved: boolean; pointerId: number } | null>(null);
+  const dragRef = useRef<{
+    startX: number;
+    moved: boolean;
+    pointerId: number;
+    captured: boolean;
+  } | null>(null);
   const suppressNextClickRef = useRef(false);
 
   const n = venues.length;
@@ -73,18 +78,34 @@ export default function HeroCarousel({ venues }: HeroCarouselProps) {
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     // Ignore right-click, pen-eraser, etc. Also ignore when not primary button.
     if (e.button !== 0 && e.pointerType === "mouse") return;
-    dragRef.current = { startX: e.clientX, moved: false, pointerId: e.pointerId };
-    try {
-      e.currentTarget.setPointerCapture(e.pointerId);
-    } catch {
-      // Some browsers throw if capture isn't supported — drag still works.
-    }
+    // Do NOT call setPointerCapture here — on desktop it can swallow the
+    // click event that should reach the inner <Link>. We only capture once
+    // real drag movement is detected (see onPointerMove below).
+    dragRef.current = {
+      startX: e.clientX,
+      moved: false,
+      pointerId: e.pointerId,
+      captured: false,
+    };
   };
 
   const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     const d = dragRef.current;
     if (!d) return;
-    if (Math.abs(e.clientX - d.startX) > DRAG_NAV_SUPPRESS_PX) d.moved = true;
+    if (Math.abs(e.clientX - d.startX) > DRAG_NAV_SUPPRESS_PX) {
+      d.moved = true;
+      // Lazily capture the pointer only once we're sure the user is dragging,
+      // so the remaining pointermove/up events go to the track even if the
+      // cursor leaves it. Normal taps never hit this branch → click fires.
+      if (!d.captured) {
+        try {
+          e.currentTarget.setPointerCapture(d.pointerId);
+          d.captured = true;
+        } catch {
+          // Capture not supported — drag still functions without it.
+        }
+      }
+    }
   };
 
   const endDrag = (clientX: number | null) => {
