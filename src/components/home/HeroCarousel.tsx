@@ -38,8 +38,11 @@ export default function HeroCarousel({ venues }: HeroCarouselProps) {
     }
   }, { scope: containerRef });
 
-  // Infinite loop needs at least a few slides; Swiper docs recommend >= slidesPerView*2
-  const enableLoop = venues.length >= 3;
+  // Infinite loop (manual + autoplay): Swiper clones slides around the edges
+  // so wrapping from last → first is seamless. Enable as soon as we have
+  // enough slides to clone (>= 2). loopAdditionalSlides raises the clone
+  // count so fast drags never hit a visible gap.
+  const enableLoop = venues.length >= 2;
   const initialCenterIdx = venues.length > 0 ? Math.floor(venues.length / 2) : 0;
 
   // Wire the autoplay progress bar: Swiper reports remaining time each tick,

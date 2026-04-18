@@ -217,8 +217,18 @@ export const normalizeReview = (raw: any, venue?: Venue | null): Review => ({
   user_id: String(raw.user_id ?? raw.user?.id ?? ""),
   user_name: raw.user?.full_name ?? raw.user_name ?? "Player",
   user_avatar: raw.user?.profile_image ?? raw.user_avatar ?? null,
-  user_xp: raw.user?.xp !== undefined ? Number(raw.user.xp) : undefined,
-  user_level: raw.user?.level !== undefined ? Number(raw.user.level) : undefined,
+  user_xp:
+    raw.user?.xp !== undefined
+      ? Number(raw.user.xp)
+      : raw.user_xp !== undefined
+        ? Number(raw.user_xp)
+        : undefined,
+  user_level:
+    raw.user?.level !== undefined
+      ? Number(raw.user.level)
+      : raw.user_level !== undefined
+        ? Number(raw.user_level)
+        : undefined,
   rating: Number(raw.rating ?? 0),
   title: raw.title ?? null,
   comment: raw.comment,

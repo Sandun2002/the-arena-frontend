@@ -96,11 +96,12 @@ export default function SportExplorer() {
   const topRow = sortedSports.slice(0, mid);
   const bottomRow = sortedSports.slice(mid);
 
-  // Duplicate content for seamless marquee loop (translateX 0 → -50%)
-  const topRowDuped = [...topRow, ...topRow];
-  const bottomRowDuped = [...bottomRow, ...bottomRow];
-  // Mobile: all sports in a single row
-  const mobileRowDuped = [...sortedSports, ...sortedSports];
+  // Duplicate content 4x so the row always exceeds viewport width → no visible
+  // seam/gap even on ultra-wide screens. Animation still runs 0 → -50%, which
+  // equals two copies sliding off (the remaining two match the starting state).
+  const topRowDuped = [...topRow, ...topRow, ...topRow, ...topRow];
+  const bottomRowDuped = [...bottomRow, ...bottomRow, ...bottomRow, ...bottomRow];
+  const mobileRowDuped = [...sortedSports, ...sortedSports, ...sortedSports, ...sortedSports];
 
   return (
     <section ref={sectionRef} className="py-10 md:py-14 bg-black overflow-hidden">

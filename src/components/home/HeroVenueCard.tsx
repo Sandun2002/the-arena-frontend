@@ -44,16 +44,18 @@ export default function HeroVenueCard({ venue, isActive, priority }: HeroVenueCa
         w-full overflow-hidden
         rounded-2xl cursor-pointer
         duration-500 ease-out
-        transition-[transform,opacity,filter,box-shadow]
+        transition-[transform,opacity,box-shadow]
         will-change-[transform,opacity]
+        shadow-[0_14px_40px_-16px_rgba(80,200,120,0.4)]
+        ring-1 ring-emerald-400/20
         ${isActive
-          ? "shadow-[0_20px_60px_-12px_rgba(80,200,120,0.35)] ring-1 ring-emerald-400/30"
-          : "opacity-45 scale-[0.92] grayscale brightness-[0.6]"
+          ? "shadow-[0_20px_60px_-12px_rgba(80,200,120,0.55)] ring-emerald-400/45"
+          : "opacity-80 scale-[0.95]"
         }
       `}
     >
-      {/* Background image with Ken Burns drift on active */}
-      <div className={`absolute inset-0 ${isActive ? "hero-kenburns" : ""}`}>
+      {/* Background image with Ken Burns drift — always on so transitions don't stall */}
+      <div className="absolute inset-0 hero-kenburns">
         <Image
           src={venue.cover_image || "/images/placeholder.jpg"}
           alt={venue.name}
@@ -64,26 +66,17 @@ export default function HeroVenueCard({ venue, isActive, priority }: HeroVenueCa
         />
       </div>
 
-      {/* Premium gradient overlay */}
+      {/* Premium gradient overlay — consistent on all cards */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent pointer-events-none" />
+
+      {/* Shine sweep — always running so it never "catches up" when a card becomes active */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="hero-shine absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+      </div>
+
+      {/* FEATURED badge — always visible, slightly dimmed on inactive */}
       <div
-        className={`
-          absolute inset-0 transition-opacity duration-500 pointer-events-none
-          bg-gradient-to-t from-black via-black/30 to-transparent
-          ${isActive ? "opacity-100" : "opacity-70"}
-        `}
-      />
-
-      {/* Shine sweep — only on active */}
-      {isActive && (
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="hero-shine absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/25 to-transparent" />
-        </div>
-      )}
-
-
-      {/* FEATURED badge — top-left, honest replacement for unfair numbering */}
-      <div
-        className={`absolute top-3 left-3 md:top-4 md:left-4 transition-[opacity,transform] duration-500 ${isActive ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"}`}
+        className={`absolute top-3 left-3 md:top-4 md:left-4 transition-opacity duration-500 ${isActive ? "opacity-100" : "opacity-80"}`}
       >
         <span className="inline-flex items-center gap-1 bg-emerald-500 text-black text-[10px] md:text-xs font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-md shadow-lg">
           <Sparkles className="w-3 h-3" />
@@ -91,14 +84,8 @@ export default function HeroVenueCard({ venue, isActive, priority }: HeroVenueCa
         </span>
       </div>
 
-      {/* Content */}
-      <div
-        className={`
-          absolute bottom-0 left-0 w-full p-4 md:p-5
-          transition-[transform,opacity] duration-500
-          ${isActive ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}
-        `}
-      >
+      {/* Content — always visible for smooth transitions */}
+      <div className="absolute bottom-0 left-0 w-full p-4 md:p-5">
         {/* Venue name */}
         <h3 className="text-base md:text-xl font-bold text-white tracking-tight leading-tight line-clamp-2 drop-shadow-lg">
           {venue.name}

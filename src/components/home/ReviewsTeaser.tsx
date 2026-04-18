@@ -2,12 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Star, ArrowRight, BadgeCheck, Quote } from "lucide-react";
 import { api } from "@/services/api";
 import type { Review } from "@/types";
+import TierFrame from "@/components/ui/TierFrame";
+import { getTierFromXp } from "@/lib/tierUtils";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -96,7 +97,7 @@ export default function ReviewsTeaser() {
           <div className="inline-flex items-center gap-2 mb-3">
             <Star className="w-4 h-4 text-emerald-400 fill-emerald-400" />
             <span className="text-[11px] font-black tracking-[0.2em] uppercase text-zinc-500">
-              5-Star Verified Reviews
+              Loved by Players
             </span>
           </div>
           <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tight mb-3">
@@ -157,19 +158,18 @@ export default function ReviewsTeaser() {
 
                   {/* Footer: user + venue */}
                   <div className="mt-auto flex items-center gap-3 pt-3 border-t border-zinc-800/70">
-                    {r.user_avatar ? (
-                      <Image
-                        src={r.user_avatar}
-                        alt={r.user_name}
-                        width={36}
-                        height={36}
-                        className="w-9 h-9 rounded-full object-cover flex-shrink-0"
-                      />
-                    ) : (
-                      <div className="w-9 h-9 rounded-full bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center text-[11px] font-bold text-emerald-300 flex-shrink-0">
-                        {initials(r.user_name)}
-                      </div>
-                    )}
+                    <TierFrame
+                      tier={getTierFromXp(r.user_xp ?? 0)}
+                      level={r.user_level ?? 1}
+                      src={r.user_avatar}
+                      size="sm"
+                      alt={r.user_name}
+                      placeholder={
+                        <span className="text-[10px] font-bold text-emerald-300">
+                          {initials(r.user_name)}
+                        </span>
+                      }
+                    />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1 text-sm text-white font-semibold truncate">
                         <span className="truncate">{r.user_name}</span>
