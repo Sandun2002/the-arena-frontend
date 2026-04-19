@@ -5,18 +5,12 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { useRouter } from "next/navigation";
 import { api } from "@/services/api";
-import { Venue, Sport, City } from "@/types";
+import { Venue } from "@/types";
 import HeroCarousel from "./HeroCarousel";
-import { ChevronDown, Search } from "lucide-react";
 
 export default function Hero() {
   const [venues, setVenues] = useState<Venue[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [sports, setSports] = useState<Sport[]>([]);
-  const [cities, setCities] = useState<City[]>([]);
-  const [filtersLoading, setFiltersLoading] = useState(true);
-  const [selectedSport, setSelectedSport] = useState<string>("");
-  const [selectedCity, setSelectedCity] = useState<string>("");
   const textRef = useRef<HTMLDivElement>(null);
   const searchBarRef = useRef<HTMLDivElement>(null);
   const scrollIndicatorRef = useRef<HTMLDivElement>(null);
@@ -25,33 +19,19 @@ export default function Hero() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [venueData, sportsData, citiesData] = await Promise.all([
-          api.getFeaturedVenues(),
-          api.getSports(),
-          api.getCities(),
-        ]);
+        const venueData = await api.getFeaturedVenues();
         setVenues(venueData);
-        setSports(sportsData);
-        setCities(citiesData);
       } catch (error) {
         console.error("Failed to load data:", error);
       } finally {
         setIsLoading(false);
-        setFiltersLoading(false);
       }
     };
     loadData();
   }, []);
 
   const handleSearch = () => {
-    if (!selectedSport && !selectedCity) {
-      router.push("/venues");
-      return;
-    }
-    const params = new URLSearchParams();
-    if (selectedSport) params.set("sport_type", selectedSport);
-    if (selectedCity) params.set("city", selectedCity);
-    router.push(`/venues?${params.toString()}`);
+    router.push("/venues");
   };
 
   useGSAP(() => {
@@ -119,70 +99,21 @@ export default function Hero() {
           </p>
         </div>
 
-        {/* 3. QUICK SEARCH BAR (Bottom) */}
-        <div ref={searchBarRef} className="w-full max-w-2xl mt-6 md:mt-8 opacity-0">
-          <div className="bg-zinc-900/60 backdrop-blur-xl border border-zinc-800/50 rounded-2xl p-3 md:p-4">
-            <div className="flex flex-col md:flex-row gap-2 md:gap-3">
-              {/* Sport Dropdown */}
-              <div className="relative flex-1">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-500">
-                  <span className="text-lg">⚽</span>
-                </div>
-                <select
-                  value={selectedSport}
-                  onChange={(e) => setSelectedSport(e.target.value)}
-                  disabled={filtersLoading}
-                  className="w-full bg-zinc-900 border border-zinc-700/50 rounded-xl pl-10 pr-10 py-3 text-white text-sm appearance-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30 transition-all cursor-pointer hover:border-zinc-600"
-                >
-                  <option value="">Select Sport</option>
-                  {sports.map((sport) => (
-                    <option key={sport.id} value={sport.slug}>
-                      {sport.name}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none">
-                  <ChevronDown className="w-4 h-4" />
-                </div>
-              </div>
-
-              {/* City Dropdown */}
-              <div className="relative flex-1">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-500">
-                  <span className="text-lg">🏙</span>
-                </div>
-                <select
-                  value={selectedCity}
-                  onChange={(e) => setSelectedCity(e.target.value)}
-                  disabled={filtersLoading}
-                  className="w-full bg-zinc-900 border border-zinc-700/50 rounded-xl pl-10 pr-10 py-3 text-white text-sm appearance-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30 transition-all cursor-pointer hover:border-zinc-600"
-                >
-                  <option value="">Select City</option>
-                  {cities.map((city) => (
-                    <option key={city.name} value={city.name}>
-                      {city.name}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none">
-                  <ChevronDown className="w-4 h-4" />
-                </div>
-              </div>
-
-              {/* Search Button */}
-              <button
-                onClick={handleSearch}
-                disabled={filtersLoading || !selectedSport || !selectedCity}
-                className="group relative overflow-hidden bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-500 text-black font-bold text-sm px-6 py-3 rounded-xl flex items-center justify-center gap-2 hover:shadow-[0_0_20px_rgba(80,200,120,0.4)] hover:scale-[1.02] transition-all duration-300 before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/0 before:via-white/30 before:to-white/0 before:translate-x-[-200%] hover:before:translate-x-[200%] before:transition-transform before:duration-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <span className="relative z-10 flex items-center gap-2">
-                  <Search className="w-4 h-4" />
-                  <span className="hidden sm:inline">Find Courts</span>
-                  <span className="sm:hidden">Search</span>
-                </span>
-              </button>
-            </div>
-          </div>
+        {/* 3. PREMIUM CTA (Bottom) */}
+        <div ref={searchBarRef} className="w-full mt-8 md:mt-12 flex justify-center opacity-0 px-4">
+          <button
+            onClick={handleSearch}
+            className="group relative overflow-hidden bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-500 text-black font-extrabold text-lg md:text-xl px-10 py-5 rounded-full flex items-center justify-center gap-3 shadow-[0_0_40px_rgba(16,185,129,0.4)] hover:shadow-[0_0_60px_rgba(16,185,129,0.6)] hover:scale-[1.05] transition-all duration-300 before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/0 before:via-white/30 before:to-white/0 before:translate-x-[-200%] hover:before:translate-x-[200%] before:transition-transform before:duration-700"
+          >
+            <span className="relative z-10 flex items-center gap-2">
+              <span>Book Your Court Now</span>
+              <svg className="w-6 h-6 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </span>
+            {/* Subtle inner glow / border effect */}
+            <div className="absolute inset-0 rounded-full border border-white/20"></div>
+          </button>
         </div>
 
       </div>

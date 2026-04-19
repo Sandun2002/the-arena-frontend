@@ -5,7 +5,6 @@ import { Venue } from "@/types";
 import { api } from "@/services/api";
 import VenueCard from "@/components/ui/VenueCard";
 import Button from "@/components/ui/Button";
-import MarqueeRow from "@/components/ui/MarqueeRow";
 
 export default function FeaturedVenues() {
   const [venues, setVenues] = useState<Venue[]>([]);
@@ -43,13 +42,11 @@ export default function FeaturedVenues() {
           </div>
         </div>
 
-        {/* Auto-sliding marquee with manual drag/swipe. Clicks on cards still
-            navigate; drags beyond 5 px cancel the click and scrub the row. */}
-        <div className="-mx-4 min-h-[440px]">
+        <div className="min-h-[440px]">
           {loading ? (
-            <div className="flex gap-6 px-4 overflow-hidden">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="w-[320px] md:w-[360px] flex-shrink-0 rounded-xl bg-zinc-900 border border-zinc-800 overflow-hidden animate-pulse">
+                <div key={i} className="w-full rounded-xl bg-zinc-900 border border-zinc-800 overflow-hidden animate-pulse">
                   <div className="h-64 bg-zinc-800" />
                   <div className="p-5">
                     <div className="mb-3 flex items-center justify-between">
@@ -66,14 +63,18 @@ export default function FeaturedVenues() {
               ))}
             </div>
           ) : venues.length > 0 ? (
-            <MarqueeRow speed={45}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {venues.map((venue) => (
-                <div key={venue.id} className="w-[320px] md:w-[360px] px-3">
+                <div key={venue.id} className="w-full">
                   <VenueCard venue={venue} />
                 </div>
               ))}
-            </MarqueeRow>
-          ) : null}
+            </div>
+          ) : (
+            <div className="text-center text-zinc-500 py-10">
+              No trending venues found.
+            </div>
+          )}
         </div>
 
         <div className="mt-12 text-center md:hidden">
