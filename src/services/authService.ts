@@ -1,23 +1,22 @@
 
+import axios from 'axios';
 import { LoginResponse, Session, User } from "@/types";
-import apiClient from "./apiClient";
+import apiClient, { setAccessToken, clearAccessToken } from "./apiClient";
 import { normalizeSession, normalizeUser } from "./normalizers";
 
-// Local storage key for tokens
-const ACCESS_TOKEN_KEY = "arena_access_token";
-const REFRESH_TOKEN_KEY = "arena_refresh_token";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 
 class AuthService {
     async login(email: string, password: string): Promise<LoginResponse> {
         try {
             const formData = new FormData();
-            formData.append('username', email); // OAuth2 password flow standard
+            formData.append('username', email);
             formData.append('password', password);
 
             const response = await apiClient.post<LoginResponse>('/auth/login', formData);
 
             if (response.data) {
-                this.setTokens(response.data);
+                setAccessToken(response.data.access_token);
             }
             return response.data;
         } catch (error) {
@@ -26,13 +25,11 @@ class AuthService {
         }
     }
 
-    // 2. Initializing User Session
-    async getMe(token?: string): Promise<User> {
+    async getMe(): Promise<User> {
         const response = await apiClient.get<User>('/auth/me');
         return normalizeUser(response.data);
     }
 
-    // 3. Signup
     async signup(data: {
         email: string;
         full_name: string;
@@ -46,32 +43,26 @@ class AuthService {
 
     async logout() {
         try {
-            const { refreshToken } = this.getTokens();
-            if (refreshToken) {
-                await apiClient.post('/auth/logout', { refresh_token: refreshToken });
-            }
+            await apiClient.post('/auth/logout', {});
         } catch (e) {
             console.error("Logout API call failed", e);
         } finally {
-            if (typeof window !== "undefined") {
-                localStorage.removeItem(ACCESS_TOKEN_KEY);
-                localStorage.removeItem(REFRESH_TOKEN_KEY);
-            }
+            clearAccessToken();
         }
     }
 
-    getTokens(): { accessToken: string | null; refreshToken: string | null } {
-        if (typeof window === "undefined") return { accessToken: null, refreshToken: null };
-        return {
-            accessToken: localStorage.getItem(ACCESS_TOKEN_KEY),
-            refreshToken: localStorage.getItem(REFRESH_TOKEN_KEY),
-        };
-    }
-
-    private setTokens(tokens: LoginResponse) {
-        if (typeof window !== "undefined") {
-            localStorage.setItem(ACCESS_TOKEN_KEY, tokens.access_token);
-            localStorage.setItem(REFRESH_TOKEN_KEY, tokens.refresh_token);
+    async silentRefresh(): Promise<string | null> {
+        try {
+            const { data } = await axios.post<LoginResponse>(
+                `${API_URL}/auth/cookie-refresh`,
+                {},
+                { withCredentials: true }
+            );
+            setAccessToken(data.access_token);
+            return data.access_token;
+        } catch {
+            clearAccessToken();
+            return null;
         }
     }
 
@@ -79,7 +70,7 @@ class AuthService {
         try {
             const response = await apiClient.post<LoginResponse>('/auth/google', { id_token: idToken });
             if (response.data) {
-                this.setTokens(response.data);
+                setAccessToken(response.data.access_token);
             }
             return response.data;
         } catch (error) {
@@ -128,6 +119,7 @@ class AuthService {
 
     async logoutAllDevices(): Promise<void> {
         await apiClient.post('/auth/logout', { all_devices: true });
+        clearAccessToken();
     }
 }
 

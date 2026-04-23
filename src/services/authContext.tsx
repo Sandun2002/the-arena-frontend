@@ -44,20 +44,19 @@ export const AuthProvider: FunctionComponent<{ children: React.ReactNode }> = ({
         return baseUser;
     };
 
-    // Load user from stored token on mount
+    // Restore session on mount via silent cookie-based refresh (no localStorage)
     useEffect(() => {
         const initAuth = async () => {
-            const { accessToken } = authService.getTokens();
-            if (accessToken) {
-                try {
-                    const userData = await authService.getMe(accessToken);
+            try {
+                const token = await authService.silentRefresh();
+                if (token) {
+                    const userData = await authService.getMe();
                     setUser(userData);
                     fetchAndApplyStats(userData);
-                } catch (error) {
-                    console.error("Session expired or invalid token", error);
-                    authService.logout();
-                    setUser(null);
                 }
+            } catch (error) {
+                console.error("Session restore failed", error);
+                setUser(null);
             }
             setLoading(false);
         };
@@ -68,11 +67,11 @@ export const AuthProvider: FunctionComponent<{ children: React.ReactNode }> = ({
 
     const login = async (email: string, password: string): Promise<User> => {
         try {
-            // 1. Get Tokens
-            const tokenResponse = await authService.login(email, password);
+            // 1. Get Tokens (sets in-memory access token + httpOnly cookie for refresh)
+            await authService.login(email, password);
 
             // 2. Get User Profile
-            const userData = await authService.getMe(tokenResponse.access_token);
+            const userData = await authService.getMe();
             setUser(userData);
 
             // 3. Hydrate xp/level from stats
