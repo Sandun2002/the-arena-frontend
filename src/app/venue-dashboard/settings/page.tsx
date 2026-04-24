@@ -14,6 +14,7 @@ import { useVenue } from "@/components/venue/VenueContext";
 import { api } from "@/services/api";
 import { Venue, VenueProfile, City } from "@/types";
 import CityCombobox from "@/components/ui/CityCombobox";
+import TimePicker from "@/components/ui/TimePicker";
 
 export default function VenueSettingsPage() {
     const { user } = useAuth();
@@ -45,7 +46,6 @@ export default function VenueSettingsPage() {
     const [peakSaving, setPeakSaving] = useState(false);
     const [peakLoading, setPeakLoading] = useState(false);
     const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-    const isOwner = currentVenue && user && currentVenue.owner_id === user.id;
 
     const { register, handleSubmit, setValue, watch, control, formState: { errors } } = useForm({
         defaultValues: {
@@ -531,120 +531,153 @@ export default function VenueSettingsPage() {
                             {peakLoading && <Loader2 className="w-4 h-4 animate-spin text-zinc-500" />}
                         </div>
 
-                        <p className="text-sm text-zinc-400 mb-4">Configure peak hours to automatically apply higher rates during busy times. Courts with a peak rate set will use it during these hours.</p>
+                        <p className="text-sm text-zinc-400 mb-6">Set peak hours when demand is high. Courts with a peak rate configured will automatically charge that rate during these hours. Leave peak days empty to apply every day.</p>
 
-                        {!isOwner ? (
-                            <div className="p-4 rounded-2xl bg-zinc-800/30 border border-zinc-700">
-                                {peakHours.has_peak_config ? (
-                                    <div className="space-y-3">
+                        {peakEdit ? (
+                            <div className="space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <TimePicker
+                                        label="Peak Start Time"
+                                        value={peakForm.start}
+                                        onChange={(v) => setPeakForm(prev => ({ ...prev, start: v }))}
+                                    />
+                                    <TimePicker
+                                        label="Peak End Time"
+                                        value={peakForm.end}
+                                        onChange={(v) => setPeakForm(prev => ({ ...prev, end: v }))}
+                                    />
+                                </div>
+
+                                {peakForm.start && peakForm.end && peakForm.start === peakForm.end && (
+                                    <p className="text-red-500 text-xs font-bold">Start and end time cannot be the same</p>
+                                )}
+
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-between">
+                                        <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Peak Days</label>
+                                        <div className="flex gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => setPeakForm(prev => ({ ...prev, days: [] }))}
+                                                className="text-[10px] font-bold text-emerald-500 hover:text-emerald-400 uppercase tracking-wider"
+                                            >
+                                                All days
+                                            </button>
+                                            <span className="text-zinc-700">|</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => setPeakForm(prev => ({ ...prev, days: [0, 1, 2, 3, 4] }))}
+                                                className="text-[10px] font-bold text-emerald-500 hover:text-emerald-400 uppercase tracking-wider"
+                                            >
+                                                Weekdays
+                                            </button>
+                                            <span className="text-zinc-700">|</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => setPeakForm(prev => ({ ...prev, days: [5, 6] }))}
+                                                className="text-[10px] font-bold text-emerald-500 hover:text-emerald-400 uppercase tracking-wider"
+                                            >
+                                                Weekends
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-7 gap-2">
+                                        {DAY_LABELS.map((label, i) => {
+                                            const isSelected = peakForm.days.includes(i);
+                                            return (
+                                                <button
+                                                    key={i}
+                                                    type="button"
+                                                    onClick={() => togglePeakDay(i)}
+                                                    className={`relative py-3 rounded-xl text-sm font-bold border transition-all ${
+                                                        isSelected
+                                                            ? 'bg-amber-500/20 border-amber-500/40 text-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.15)]'
+                                                            : 'bg-black/40 border-zinc-700 text-zinc-500 hover:text-zinc-300 hover:border-zinc-500'
+                                                    }`}
+                                                >
+                                                    {label}
+                                                    {isSelected && (
+                                                        <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-amber-400" />
+                                                    )}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                    <p className="text-[11px] text-zinc-600">
+                                        {peakForm.days.length === 0
+                                            ? "Peak pricing applies every day of the week."
+                                            : `Peak pricing applies on ${peakForm.days.length} selected day${peakForm.days.length > 1 ? 's' : ''}.`}
+                                    </p>
+                                </div>
+
+                                <div className="flex items-center gap-3 pt-2 border-t border-zinc-800">
+                                    <Button
+                                        type="button"
+                                        onClick={savePeakHours}
+                                        disabled={peakSaving || !peakForm.start || !peakForm.end || peakForm.start === peakForm.end}
+                                        className="bg-amber-500 hover:bg-amber-400 text-black font-bold px-6 h-11 rounded-xl disabled:opacity-50"
+                                    >
+                                        {peakSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save Peak Hours'}
+                                    </Button>
+                                    {peakHours.has_peak_config && (
+                                        <button type="button" onClick={clearPeakHours} disabled={peakSaving} className="px-4 h-11 text-sm text-red-400 hover:text-red-300 font-bold">
+                                            Clear All
+                                        </button>
+                                    )}
+                                    <button type="button" onClick={() => setPeakEdit(false)} className="px-4 h-11 text-sm text-zinc-500 hover:text-white font-medium">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        ) : peakHours.has_peak_config ? (
+                            <div className="space-y-4">
+                                <div className="flex items-start justify-between gap-4 p-5 rounded-2xl bg-gradient-to-br from-amber-500/10 to-amber-500/5 border border-amber-500/20">
+                                    <div className="space-y-3 min-w-0 flex-1">
                                         <div className="flex items-center gap-2 text-sm">
                                             <Sun className="w-4 h-4 text-amber-400" />
-                                            <span className="text-white font-medium">{peakHours.peak_start_time} &ndash; {peakHours.peak_end_time}</span>
+                                            <span className="text-amber-400 text-xs font-bold uppercase tracking-wider">Active</span>
+                                            <span className="text-white font-bold">
+                                                {peakHours.peak_start_time} &ndash; {peakHours.peak_end_time}
+                                            </span>
                                         </div>
                                         <div className="flex gap-1.5 flex-wrap">
                                             {DAY_LABELS.map((label, i) => {
                                                 const isActive = !peakHours.peak_days || peakHours.peak_days.split(",").map(Number).includes(i);
                                                 return (
-                                                    <span key={i} className={`px-2.5 py-1 rounded-lg text-xs font-bold ${isActive ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-zinc-800 text-zinc-600 border border-zinc-700'}`}>
+                                                    <span
+                                                        key={i}
+                                                        className={`px-2.5 py-1 rounded-lg text-[11px] font-bold ${
+                                                            isActive
+                                                                ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                                                                : 'bg-zinc-800/60 text-zinc-600 border border-zinc-800'
+                                                        }`}
+                                                    >
                                                         {label}
                                                     </span>
                                                 );
                                             })}
                                         </div>
                                     </div>
-                                ) : (
-                                    <p className="text-sm text-zinc-500">No peak hours configured. Contact the venue owner to set this up.</p>
-                                )}
-                                <p className="text-xs text-zinc-600 mt-3">Only the venue owner can modify peak hour settings.</p>
-                            </div>
-                        ) : peakEdit ? (
-                            <div className="space-y-5">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Start Time</label>
-                                        <input
-                                            type="time"
-                                            value={peakForm.start}
-                                            onChange={e => setPeakForm(prev => ({ ...prev, start: e.target.value }))}
-                                            className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-amber-500 focus:outline-none transition-colors"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">End Time</label>
-                                        <input
-                                            type="time"
-                                            value={peakForm.end}
-                                            onChange={e => setPeakForm(prev => ({ ...prev, end: e.target.value }))}
-                                            className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-amber-500 focus:outline-none transition-colors"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Peak Days (leave empty = every day)</label>
-                                    <div className="flex gap-2 flex-wrap">
-                                        {DAY_LABELS.map((label, i) => (
-                                            <button
-                                                key={i}
-                                                type="button"
-                                                onClick={() => togglePeakDay(i)}
-                                                className={`px-4 py-2 rounded-xl text-sm font-bold border transition-all ${
-                                                    peakForm.days.includes(i)
-                                                        ? 'bg-amber-500/20 border-amber-500/40 text-amber-400'
-                                                        : 'bg-black/40 border-zinc-700 text-zinc-500 hover:text-zinc-300 hover:border-zinc-500'
-                                                }`}
-                                            >
-                                                {label}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-3 pt-2">
-                                    <Button
+                                    <button
                                         type="button"
-                                        onClick={savePeakHours}
-                                        disabled={peakSaving || !peakForm.start || !peakForm.end}
-                                        className="bg-amber-500 hover:bg-amber-400 text-black font-bold px-6 h-10 rounded-xl disabled:opacity-50"
+                                        onClick={openPeakEdit}
+                                        className="text-xs font-bold bg-amber-500/10 hover:bg-amber-500 text-amber-400 hover:text-black px-4 py-2 rounded-lg transition-all border border-amber-500/20"
                                     >
-                                        {peakSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save Peak Hours'}
-                                    </Button>
-                                    {peakHours.has_peak_config && (
-                                        <button type="button" onClick={clearPeakHours} disabled={peakSaving} className="text-sm text-red-400 hover:text-red-300 font-medium">
-                                            Clear
-                                        </button>
-                                    )}
-                                    <button type="button" onClick={() => setPeakEdit(false)} className="text-sm text-zinc-500 hover:text-white">
-                                        Cancel
-                                    </button>
-                                </div>
-                            </div>
-                        ) : peakHours.has_peak_config ? (
-                            <div className="space-y-3">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2 text-sm">
-                                        <Sun className="w-4 h-4 text-amber-400" />
-                                        <span className="text-white font-medium">{peakHours.peak_start_time} &ndash; {peakHours.peak_end_time}</span>
-                                    </div>
-                                    <button type="button" onClick={openPeakEdit} className="text-xs text-emerald-500 hover:text-emerald-400 font-bold">
                                         Edit
                                     </button>
                                 </div>
-                                <div className="flex gap-1.5 flex-wrap">
-                                    {DAY_LABELS.map((label, i) => {
-                                        const isActive = !peakHours.peak_days || peakHours.peak_days.split(",").map(Number).includes(i);
-                                        return (
-                                            <span key={i} className={`px-2.5 py-1 rounded-lg text-xs font-bold ${isActive ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-zinc-800 text-zinc-600 border border-zinc-700'}`}>
-                                                {label}
-                                            </span>
-                                        );
-                                    })}
-                                </div>
                             </div>
                         ) : (
-                            <div className="flex items-center justify-between p-4 bg-zinc-800/30 rounded-2xl border border-zinc-700">
-                                <p className="text-sm text-zinc-500">No peak hours set. All courts use their base hourly rate.</p>
-                                <button type="button" onClick={openPeakEdit} className="text-sm text-amber-500 hover:text-amber-400 font-bold">
+                            <div className="flex items-center justify-between gap-4 p-5 bg-zinc-800/20 rounded-2xl border border-dashed border-zinc-700">
+                                <div>
+                                    <p className="text-sm text-zinc-400 font-medium">No peak hours configured</p>
+                                    <p className="text-xs text-zinc-600 mt-1">All courts use their base hourly rate for every booking.</p>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={openPeakEdit}
+                                    className="text-sm font-bold bg-amber-500 hover:bg-amber-400 text-black px-5 py-2 rounded-lg transition-all whitespace-nowrap"
+                                >
                                     Configure
                                 </button>
                             </div>

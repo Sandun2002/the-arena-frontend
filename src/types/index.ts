@@ -283,11 +283,18 @@ export interface VenueSlotsResponse {
     opening: string | null;
     closing: string | null;
   } | null;
+  peak_hours?: {
+    peak_start_time: string | null;
+    peak_end_time: string | null;
+    peak_days: string | null;
+    has_peak_config: boolean;
+  };
   courts: Array<{
     court_id: string;
     court_name: string;
     sport_type: string;
     hourly_rate: number;
+    peak_hourly_rate: number | null;
     is_indoor: boolean;
     description: string | null;
     is_active: boolean;
@@ -296,6 +303,8 @@ export interface VenueSlotsResponse {
       end: string;
       date: string;
       status: "available" | "booked" | "held" | "closed" | "recurring" | "maintenance";
+      is_peak: boolean;
+      effective_rate: number;
     }>;
   }>;
 }

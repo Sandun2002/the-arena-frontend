@@ -3,7 +3,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { Venue } from "@/types";
 import Button from "@/components/ui/Button";
 import DatePicker from "@/components/ui/DatePicker";
-import { Check, LogIn, Loader2, Calendar, Hammer } from "lucide-react";
+import { Check, LogIn, Loader2, Calendar, Hammer, Zap } from "lucide-react";
 import { useAuth } from "@/services/authContext";
 import { api } from "@/services/api";
 import { bookingService } from "@/services/bookingService";
@@ -33,6 +33,12 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
   const [closureReason, setClosureReason] = useState<string | null>(null);
   const [maintenanceCourts, setMaintenanceCourts] = useState<any[]>([]);
   const [hasAutoSelected, setHasAutoSelected] = useState(false);
+  const [peakConfig, setPeakConfig] = useState<{
+    peak_start_time: string | null;
+    peak_end_time: string | null;
+    peak_days: string | null;
+    has_peak_config: boolean;
+  } | null>(null);
 
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [pricing, setPricing] = useState<any>(null);
@@ -55,27 +61,32 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
       .then((res: any) => {
         setIsVenueClosed(res.is_closed || false);
         setClosureReason(res.closure_reason || null);
-        
+        setPeakConfig(res.peak_hours || null);
+
         // Separate active and maintenance courts
         const allCourts = res.courts || [];
         const activeCourts = allCourts.filter((c: any) => c.is_active !== false);
         const maintenance = allCourts.filter((c: any) => c.is_active === false);
         setMaintenanceCourts(maintenance);
-        
+
         const data = activeCourts.map((court: any) => ({
           court: {
             id: court.court_id,
             name: court.court_name,
             sport: court.sport_type,
+            hourly_rate: court.hourly_rate,
+            peak_hourly_rate: court.peak_hourly_rate,
           },
           slots: court.slots.map((slot: any) => ({
             start: `${slot.date}T${slot.start}`,
             end: `${slot.date}T${slot.end}`,
             status: slot.status,
+            is_peak: !!slot.is_peak,
+            effective_rate: slot.effective_rate ?? court.hourly_rate,
           })),
         }));
         setCourtsData(data);
-        
+
         let targetCourtId = selectedCourtId;
 
         // Auto-select court logic 
@@ -265,6 +276,18 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
       <h3 className="text-xl font-bold text-white mb-1">Confirm Booking</h3>
       <p className="text-xs text-zinc-400 mb-6">Select your date, court, and time slots.</p>
 
+      {/* Peak Hours Banner */}
+      {peakConfig?.has_peak_config && (
+        <div className="mb-4 p-3 rounded-xl bg-gradient-to-r from-amber-500/10 to-amber-500/5 border border-amber-500/20 flex items-center gap-2">
+          <Zap className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
+          <p className="text-[11px] text-amber-400/90 leading-snug">
+            <span className="font-bold">Peak hours {peakConfig.peak_start_time}&ndash;{peakConfig.peak_end_time}</span>
+            {peakConfig.peak_days ? ` on selected days` : ` (every day)`}
+            {` `}may cost more.
+          </p>
+        </div>
+      )}
+
       {/* Date Picker */}
       <div className="mb-6">
         <DatePicker
@@ -315,6 +338,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
           <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-zinc-600/70 border border-zinc-500/40"></span> Maintenance</div>
           <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full border border-zinc-600 bg-zinc-800/50"></span> Past/Closed</div>
           <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-zinc-600"></span> Available</div>
+          <div className="flex items-center gap-1"><Zap className="w-2.5 h-2.5 text-amber-400" /> Peak</div>
         </div>
       )}
 
@@ -376,14 +400,24 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
               
               const isUnavailable = isBooked || isClosed || isPast || isRecurring || isMaintenance;
 
+              const isPeak = !!slot.is_peak;
+              const showPeakBadge = isPeak && !isUnavailable;
+              const peakTooltip = isPeak && slot.effective_rate
+                ? `Peak hour · LKR ${slot.effective_rate.toLocaleString()}/hr`
+                : undefined;
+
               return (
                 <button
                   key={slot.start}
                   disabled={isUnavailable}
-                  title={isMaintenance ? "Under maintenance — unavailable" : isRecurring ? "Reserved — recurring booking" : undefined}
+                  title={
+                    isMaintenance ? "Under maintenance — unavailable"
+                    : isRecurring ? "Reserved — recurring booking"
+                    : peakTooltip
+                  }
                   onClick={() => toggleSlot({ start: slot.start, end: slot.end })}
                   className={`
-                      py-2 rounded-lg text-xs font-medium border transition-all duration-200
+                      relative py-2 rounded-lg text-xs font-medium border transition-all duration-200
                       ${isMaintenance
                         ? "bg-zinc-700/30 border-zinc-600/50 text-zinc-400 cursor-not-allowed"
                         : isBooked
@@ -394,10 +428,19 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
                               ? "bg-black/20 border-zinc-800/50 text-zinc-600 cursor-not-allowed"
                               : isSelected
                                 ? "bg-emerald-500 border-emerald-500 text-black shadow-[0_0_10px_rgba(80,200,120,0.4)] scale-105"
-                                : "bg-zinc-800 border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:bg-zinc-700"
+                                : isPeak
+                                  ? "bg-amber-500/10 border-amber-500/30 text-amber-300 hover:border-amber-500/60 hover:bg-amber-500/20"
+                                  : "bg-zinc-800 border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:bg-zinc-700"
                     }
                   `}
                 >
+                  {showPeakBadge && (
+                    <Zap
+                      className={`absolute top-1 right-1 w-2.5 h-2.5 ${
+                        isSelected ? "text-black/80" : "text-amber-400"
+                      }`}
+                    />
+                  )}
                   {isMaintenance ? "Maint." : isBooked ? "Booked" : isRecurring ? "Reserved" : isClosed ? "Closed" : isPast ? "Past" : format(slotTime, "HH:mm")}
                 </button>
               );
