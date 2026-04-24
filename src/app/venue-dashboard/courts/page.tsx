@@ -151,6 +151,15 @@ export default function CourtsPage() {
                                         </span>
                                         <span className="text-white font-bold bg-zinc-800/50 px-2 py-1 rounded-lg">LKR {court.hourly_rate.toLocaleString()}</span>
                                     </div>
+                                    {court.peak_hourly_rate != null && (
+                                        <div className="flex justify-between items-center text-sm">
+                                            <span className="text-zinc-500 font-medium flex items-center gap-2">
+                                                <div className="p-1 bg-amber-500/10 rounded"><DollarSign className="w-3 h-3 text-amber-500" /></div>
+                                                Peak Rate
+                                            </span>
+                                            <span className="text-amber-400 font-bold bg-zinc-800/50 px-2 py-1 rounded-lg">LKR {court.peak_hourly_rate.toLocaleString()}</span>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>

@@ -37,6 +37,7 @@ export default function CourtFormModal({ venueId, existingCourt, onClose, onSucc
             sport_type_id: existingCourt?.sport_type?.id || "",
             is_indoor: existingCourt?.is_indoor || false,
             hourly_rate: existingCourt?.hourly_rate || 1500,
+            peak_hourly_rate: existingCourt?.peak_hourly_rate ?? "",
             imageFile: undefined as unknown as FileList
         }
     });
@@ -61,7 +62,11 @@ export default function CourtFormModal({ venueId, existingCourt, onClose, onSucc
     const onSubmit = async (data: any) => {
         setIsSubmitting(true);
         try {
-            const { imageFile, ...payload } = data;
+            const { imageFile, peak_hourly_rate, ...rest } = data;
+            const payload = {
+                ...rest,
+                peak_hourly_rate: peak_hourly_rate !== "" && peak_hourly_rate != null ? Number(peak_hourly_rate) : null,
+            };
             let courtId = existingCourt?.id;
 
             if (existingCourt) {
@@ -146,6 +151,17 @@ export default function CourtFormModal({ venueId, existingCourt, onClose, onSucc
                         className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
                     />
                 </div>
+            </div>
+
+            <div className="space-y-2">
+                <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Peak Hourly Rate (LKR)</label>
+                <input
+                    type="number"
+                    {...register("peak_hourly_rate", { min: 0 })}
+                    className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
+                    placeholder="Optional — higher rate during peak hours"
+                />
+                <p className="text-zinc-600 text-xs">Leave blank to use base rate for all hours. Peak hours are set in venue settings.</p>
             </div>
 
             <div className="space-y-2">
