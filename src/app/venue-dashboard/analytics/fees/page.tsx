@@ -125,19 +125,19 @@ export default function FeesAnalyticsPage() {
                             </div>
                             <h3 className="text-2xl font-bold text-white mb-1">LKR {(data?.total_platform_revenue || 0).toLocaleString()}</h3>
                             <p className="text-zinc-500 text-sm">Platform Booking Revenue ({period})</p>
-                            <p className="text-zinc-600 text-xs mt-1">Total court value from online bookings before commission</p>
+                            <p className="text-zinc-600 text-xs mt-1">Total court value from online bookings before deductions</p>
                         </div>
 
-                        {/* Player Platform Fees collected */}
+                        {/* Arena commission deducted from venue */}
                         <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-8 backdrop-blur-sm">
                             <div className="flex items-start justify-between mb-4">
                                 <div className="p-3 bg-red-500/10 rounded-xl">
                                     <Receipt className="w-6 h-6 text-red-500" />
                                 </div>
                             </div>
-                            <h3 className="text-2xl font-bold text-white mb-1">LKR {(data?.total_platform_fees || 0).toLocaleString()}</h3>
-                            <p className="text-zinc-500 text-sm">Player Platform Fees ({period})</p>
-                            <p className="text-zinc-600 text-xs mt-1">1% player fee collected on online bookings</p>
+                            <h3 className="text-2xl font-bold text-white mb-1">LKR {(data?.venue_commission || 0).toLocaleString()}</h3>
+                            <p className="text-zinc-500 text-sm">Arena Commission ({period})</p>
+                            <p className="text-zinc-600 text-xs mt-1">Platform commission deducted from your payout</p>
                         </div>
 
                         {/* Pending Payout — online paid but not yet settled */}
@@ -166,8 +166,8 @@ export default function FeesAnalyticsPage() {
                                         </span>
                                     </div>
                                     <p className="text-xs text-zinc-500 mb-2">Booked via player app/website (card payment)</p>
-                                    <div className="flex justify-between text-xs text-zinc-400">
-                                        <span>Platform Fee: LKR {(data?.breakdown?.platform_bookings?.platform_fees || 0).toLocaleString()}</span>
+                                    <div className="flex justify-between text-xs text-zinc-400 mb-1">
+                                        <span>Arena Commission: LKR {(data?.venue_commission || 0).toLocaleString()}</span>
                                         <span>Net Payout: LKR {(data?.breakdown?.platform_bookings?.venue_payout || 0).toLocaleString()}</span>
                                     </div>
                                 </div>
