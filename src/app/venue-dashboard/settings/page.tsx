@@ -528,7 +528,7 @@ export default function VenueSettingsPage() {
                             <h2 className="text-lg font-bold text-primary flex items-center gap-2">
                                 <Zap className="w-5 h-5 text-amber-500" /> Peak Hours & Pricing
                             </h2>
-                            {peakLoading && <Loader2 className="w-4 h-4 animate-spin text-muted" />}
+                            {peakLoading && <div className="h-2 w-16 rounded-full bg-surface-overlay animate-pulse" />}
                         </div>
 
                         <p className="text-sm text-secondary mb-6">Set peak hours when demand is high. Courts with a peak rate configured will automatically charge that rate during these hours. Leave peak days empty to apply every day.</p>
@@ -690,7 +690,7 @@ export default function VenueSettingsPage() {
                             <h2 className="text-lg font-bold text-primary flex items-center gap-2">
                                 <Calendar className="w-5 h-5 text-purple-500" /> Weekly Schedule
                             </h2>
-                            {isLoadingProfile && <Loader2 className="w-4 h-4 animate-spin text-muted" />}
+                            {isLoadingProfile && <div className="h-2 w-16 rounded-full bg-surface-overlay animate-pulse" />}
                         </div>
 
                         <div className="space-y-4">

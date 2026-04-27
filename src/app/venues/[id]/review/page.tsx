@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Star, Send, Loader2 } from "lucide-react";
+import { ArrowLeft, Star, Send, Loader2 } from "lucide-react"; 
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
 import { api } from "@/services/api";
@@ -56,7 +56,27 @@ export default function ReviewPage() {
         }
     };
 
-    if (!venue) return <div className="min-h-screen bg-surface-base flex items-center justify-center text-emerald-500"><Loader2 className="w-8 h-8 animate-spin" /></div>;
+    if (!venue) return (
+        <div className="min-h-screen bg-surface-base pt-24 pb-12 px-4 animate-pulse">
+            <div className="container mx-auto max-w-2xl space-y-6">
+                <div className="h-4 w-24 rounded bg-surface-raised" />
+                <div className="rounded-3xl bg-surface-raised border border-default/30 p-8 space-y-8">
+                    <div className="flex flex-col items-center gap-3">
+                        <div className="h-6 w-48 rounded-lg bg-surface-overlay" />
+                        <div className="h-4 w-64 rounded bg-surface-overlay/60" />
+                    </div>
+                    <div className="flex justify-center gap-3">
+                        {[1,2,3,4,5].map(i => <div key={i} className="w-10 h-10 rounded-full bg-surface-overlay" />)}
+                    </div>
+                    <div className="space-y-2">
+                        <div className="h-3 w-20 rounded bg-surface-overlay" />
+                        <div className="h-32 rounded-xl bg-surface-overlay/60" />
+                    </div>
+                    <div className="h-14 rounded-xl bg-surface-overlay" />
+                </div>
+            </div>
+        </div>
+    );
 
     return (
         <main className="min-h-screen bg-surface-base pt-24 pb-12 px-4 selection:bg-emerald-500/30">

@@ -330,6 +330,13 @@ select:focus-visible {
   }
 }
 
+/* Indeterminate progress bar (verify-email) */
+@keyframes progress {
+  0%   { transform: translateX(-100%); }
+  50%  { transform: translateX(0%); }
+  100% { transform: translateX(100%); }
+}
+
 /* Challenge card shimmer sweep */
 @keyframes shimmerSweep {
   0% { background-position: -200% 0; }

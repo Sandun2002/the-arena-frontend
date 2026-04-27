@@ -114,9 +114,8 @@ export default function CourtFormModal({ venueId, existingCourt, onClose, onSucc
                     <label className="text-xs font-bold text-muted uppercase tracking-wider">Sport</label>
                     <div className="relative">
                         {loadingSports ? (
-                            <div className="w-full bg-surface-base/40 border border-subtle rounded-xl px-4 py-3 text-muted flex items-center gap-2">
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                                <span className="text-sm">Loading sports...</span>
+                            <div className="w-full bg-surface-base/40 border border-subtle rounded-xl px-4 py-3 animate-pulse">
+                                <div className="h-4 w-28 rounded bg-surface-overlay" />
                             </div>
                         ) : (
                             <select

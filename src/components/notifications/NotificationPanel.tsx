@@ -201,9 +201,16 @@ export function NotificationPanel() {
       {/* Body */}
       <div className="flex-1 overflow-y-auto overscroll-contain">
         {loading && filteredNotifications.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 gap-3 text-faint">
-            <div className="w-5 h-5 rounded-full border-2 border-muted border-t-emerald-500 animate-spin" />
-            <span className="text-xs">Loading...</span>
+          <div className="flex flex-col gap-1 p-2 animate-pulse">
+            {[1,2,3,4].map(i => (
+              <div key={i} className="flex items-start gap-3 p-3 rounded-xl">
+                <div className="w-8 h-8 rounded-full bg-surface-raised flex-shrink-0 mt-0.5" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-3 w-3/4 rounded bg-surface-raised" />
+                  <div className="h-2.5 w-1/2 rounded bg-surface-raised/60" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : filteredNotifications.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 gap-3 text-faint">

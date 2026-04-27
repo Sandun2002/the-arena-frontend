@@ -42,7 +42,40 @@ export default function VenueDetailsPage() {
   }, [venue]);
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-surface-base"><div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-emerald-500" /></div>;
+    return (
+      <div className="min-h-screen bg-surface-base text-primary pb-20 pt-24 animate-pulse">
+        <div className="container mx-auto px-4 mb-8">
+          <div className="h-3 w-48 rounded bg-surface-raised mb-6" />
+          <div className="h-10 w-2/3 rounded-lg bg-surface-raised mb-4" />
+          <div className="h-4 w-40 rounded bg-surface-raised/60" />
+        </div>
+        <div className="container mx-auto px-4 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 h-[400px] md:h-[500px]">
+            <div className="md:col-span-3 rounded-[2rem] bg-surface-raised border border-default/40" />
+            <div className="hidden md:flex flex-col gap-4">
+              <div className="flex-1 rounded-[2rem] bg-surface-raised border border-default/30" />
+              <div className="flex-1 rounded-[2rem] bg-surface-raised border border-default/30" />
+            </div>
+          </div>
+        </div>
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div className="lg:col-span-2 space-y-10">
+              <div className="h-5 w-32 rounded bg-surface-raised" />
+              <div className="rounded-[2rem] bg-surface-raised border border-default/40 h-28" />
+              <div className="h-5 w-28 rounded bg-surface-raised" />
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {[1,2,3,4,5,6].map(i => <div key={i} className="h-16 rounded-[2rem] bg-surface-raised border border-default/30" />)}
+              </div>
+            </div>
+            <div className="space-y-6">
+              <div className="rounded-2xl bg-surface-raised border border-default/40 h-[420px]" />
+              <div className="rounded-2xl bg-surface-raised border border-default/30 h-24" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (!venue) {

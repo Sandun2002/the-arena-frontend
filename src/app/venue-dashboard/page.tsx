@@ -53,7 +53,24 @@ export default function VenueDashboardPage() {
         }
     };
 
-    if (isVenueLoading) return <div className="min-h-screen bg-surface-base flex items-center justify-center"><div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" /></div>;
+    if (isVenueLoading) return (
+        <div className="space-y-8 animate-pulse">
+            <div className="flex justify-between items-center">
+                <div className="space-y-2">
+                    <div className="h-8 w-40 rounded-lg bg-surface-raised" />
+                    <div className="h-4 w-28 rounded bg-surface-raised/60" />
+                </div>
+                <div className="h-10 w-28 rounded-xl bg-surface-raised" />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {[1,2,3,4].map(i => <div key={i} className="rounded-3xl bg-surface-raised border border-default/30 h-32" />)}
+            </div>
+            <div className="grid lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-2 rounded-3xl bg-surface-raised border border-default/30 h-64" />
+                <div className="rounded-3xl bg-surface-raised border border-default/30 h-64" />
+            </div>
+        </div>
+    );
 
     // If no venue selected (and not loading), show empty state or create prompt
     if (!currentVenue && !isVenueLoading) {

@@ -82,7 +82,18 @@ export default function EditVenuePage() {
     if (isLoading) {
         return (
             <main className="min-h-screen bg-surface-base pt-24 pb-12 px-4 flex items-center justify-center">
-                <Loader2 className="w-8 h-8 animate-spin text-muted" />
+                <div className="w-full max-w-2xl space-y-6 animate-pulse">
+                    <div className="h-8 w-48 rounded-lg bg-surface-raised" />
+                    <div className="rounded-2xl bg-surface-raised border border-default/30 p-8 space-y-4">
+                        {[1,2,3,4].map(i => (
+                            <div key={i} className="space-y-2">
+                                <div className="h-3 w-24 rounded bg-surface-overlay" />
+                                <div className="h-11 rounded-xl bg-surface-overlay/60" />
+                            </div>
+                        ))}
+                        <div className="h-10 w-full rounded-xl bg-surface-overlay mt-4" />
+                    </div>
+                </div>
             </main>
         );
     }

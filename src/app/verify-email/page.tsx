@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { CheckCircle, XCircle } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 
 function VerifyEmailContent() {
@@ -72,11 +72,14 @@ function VerifyEmailContent() {
           {/* Loading */}
           {status === "loading" && (
             <>
-              <div className="w-20 h-20 bg-surface-overlay rounded-full flex items-center justify-center mx-auto mb-6">
-                <Loader2 className="w-10 h-10 text-emerald-500 animate-spin" />
+              <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-6">
+                <svg className="w-8 h-8 text-emerald-400" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeWidth="2" strokeLinecap="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8"/><rect x="2" y="6" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="2" fill="none"/></svg>
               </div>
-              <h1 className="text-2xl font-bold text-primary mb-3">Verifying Your Email</h1>
-              <p className="text-secondary text-sm">Please wait a moment...</p>
+              <h1 className="text-2xl font-bold text-primary mb-2">Verifying Your Email</h1>
+              <p className="text-secondary text-sm mb-6">Please wait a moment...</p>
+              <div className="w-full bg-surface-overlay rounded-full h-1.5 overflow-hidden">
+                <div className="h-full w-2/3 bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full [animation:progress_2s_ease-in-out_infinite]" />
+              </div>
             </>
           )}
 
@@ -131,8 +134,15 @@ function VerifyEmailContent() {
 export default function VerifyEmailPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-surface-base flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-surface-base flex items-center justify-center p-4 animate-pulse">
+        <div className="w-full max-w-md bg-surface-raised/60 border border-default rounded-3xl p-8 space-y-6">
+          <div className="w-16 h-16 rounded-full bg-surface-overlay mx-auto" />
+          <div className="space-y-3">
+            <div className="h-6 w-48 rounded-lg bg-surface-overlay mx-auto" />
+            <div className="h-4 w-64 rounded bg-surface-overlay/60 mx-auto" />
+          </div>
+          <div className="h-2 rounded-full bg-surface-overlay" />
+        </div>
       </div>
     }>
       <VerifyEmailContent />

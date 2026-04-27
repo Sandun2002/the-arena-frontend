@@ -71,7 +71,18 @@ export default function ReviewFormModal({ venueId, bookingId, onClose, onSuccess
     };
 
     if (isChecking) {
-        return <div className="p-8 text-center text-muted"><Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" />Checking eligibility...</div>;
+        return (
+            <div className="p-8 space-y-4 animate-pulse">
+                <div className="flex justify-center gap-2">
+                    {[1,2,3,4,5].map(i => <div key={i} className="w-9 h-9 rounded-full bg-surface-raised" />)}
+                </div>
+                <div className="space-y-2">
+                    <div className="h-3 w-40 rounded bg-surface-raised mx-auto" />
+                    <div className="h-24 rounded-xl bg-surface-raised/60" />
+                </div>
+                <div className="h-12 rounded-xl bg-surface-raised" />
+            </div>
+        );
     }
 
     if (error) {
