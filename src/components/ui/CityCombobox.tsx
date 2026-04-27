@@ -178,10 +178,10 @@ export default function CityCombobox({
       role="listbox"
       style={dropdownStyle}
       data-lenis-prevent="true"
-      className="bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl shadow-black/80 overflow-y-auto max-h-56 py-1"
+      className="bg-surface-raised border border-subtle rounded-xl shadow-2xl shadow-[var(--shadow-elevation)] overflow-y-auto max-h-56 py-1"
     >
       {options.length === 0 ? (
-        <li className="px-4 py-3 text-sm text-zinc-500 text-center">
+        <li className="px-4 py-3 text-sm text-muted text-center">
           No cities found.
         </li>
       ) : (
@@ -201,8 +201,8 @@ export default function CityCombobox({
               className={`
                 flex items-center justify-between px-4 py-2.5 text-sm cursor-pointer transition-colors
                 ${isHighlighted
-                  ? "bg-zinc-800 text-white"
-                  : "text-zinc-300 hover:bg-zinc-800/60 hover:text-white"
+                  ? "bg-surface-overlay text-primary"
+                  : "text-secondary hover:bg-surface-overlay/60 hover:text-primary"
                 }
                 ${isSelected ? "text-emerald-400 font-medium" : ""}
               `}
@@ -230,19 +230,19 @@ export default function CityCombobox({
         className={`
           relative flex items-center gap-2
           border rounded-xl px-4 py-3 cursor-text transition-all duration-200
-          bg-black/50
+          bg-surface-inset
           ${!isActive ? "opacity-50 cursor-not-allowed" : ""}
           ${error
             ? "border-red-500/60 focus-within:border-red-500"
             : isOpen
             ? "border-emerald-500 ring-1 ring-emerald-500/20"
-            : "border-zinc-700 hover:border-zinc-600 focus-within:border-emerald-500"
+            : "border-subtle hover:border-emerald-500/40 focus-within:border-emerald-500"
           }
         `}
       >
         <MapPin
           className={`w-4 h-4 flex-shrink-0 transition-colors ${
-            isOpen || value ? "text-emerald-500" : "text-zinc-500"
+            isOpen || value ? "text-emerald-500" : "text-muted"
           }`}
         />
 
@@ -262,7 +262,7 @@ export default function CityCombobox({
           onKeyDown={handleKeyDown}
           disabled={!isActive}
           placeholder={loading ? "Loading cities..." : placeholder}
-          className="flex-1 bg-transparent text-white text-sm outline-none placeholder:text-zinc-500 min-w-0"
+          className="flex-1 bg-transparent text-primary text-sm outline-none placeholder:text-muted min-w-0"
           autoComplete="off"
           spellCheck={false}
           role="combobox"
@@ -273,7 +273,7 @@ export default function CityCombobox({
 
         <div className="flex items-center gap-1 flex-shrink-0">
           {loading ? (
-            <Loader2 className="w-4 h-4 text-zinc-500 animate-spin" />
+            <Loader2 className="w-4 h-4 text-muted animate-spin" />
           ) : (
             <>
               {isActive && value && !(allowAll && value === "") && (
@@ -282,13 +282,13 @@ export default function CityCombobox({
                   onClick={handleClear}
                   tabIndex={-1}
                   aria-label="Clear selection"
-                  className="w-5 h-5 flex items-center justify-center rounded-full text-zinc-500 hover:text-white hover:bg-zinc-700/60 transition-colors"
+                  className="w-5 h-5 flex items-center justify-center rounded-full text-muted hover:text-primary hover:bg-surface-overlay transition-colors"
                 >
                   <X className="w-3 h-3" />
                 </button>
               )}
               <ChevronDown
-                className={`w-4 h-4 text-zinc-400 transition-transform duration-200 ${
+                className={`w-4 h-4 text-secondary transition-transform duration-200 ${
                   isOpen ? "rotate-180" : ""
                 }`}
               />

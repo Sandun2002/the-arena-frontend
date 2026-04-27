@@ -30,8 +30,9 @@ export const metadata: Metadata = {
 export const viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#000000",
   viewportFit: "cover",
+  // themeColor intentionally omitted — it is managed dynamically by the
+  // theme bootstrap script + ThemeContext (light/dark aware).
 };
 
 export default async function RootLayout({
@@ -45,9 +46,21 @@ export default async function RootLayout({
   const pathname = headersList.get("x-pathname") ?? "";
   const isStandalone = pathname === "/maintenance";
 
+  // FOUC-prevention: resolve theme synchronously before first paint.
+  // Reads `arena-theme` from localStorage; falls back to OS preference.
+  const themeBootstrap = `(function(){try{var s=localStorage.getItem('arena-theme');var t=(s==='light'||s==='dark')?s:(window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');var r=document.documentElement;r.classList.remove('light','dark');r.classList.add(t);var m=document.querySelector('meta[name="theme-color"]');if(!m){m=document.createElement('meta');m.name='theme-color';document.head.appendChild(m);}m.content=(t==='light')?'#ffffff':'#050505';}catch(e){document.documentElement.classList.add('dark');}})();`;
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Bootstrap MUST be the first child of <head> so it executes
+            before any paint and before any other script touches the DOM. */}
+        <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
+        {/* theme-color meta: rendered dark by default; bootstrap script
+            updates `content` to #ffffff when light mode is resolved.
+            suppressHydrationWarning silences the attribute mismatch React
+            would otherwise log when content has been mutated pre-hydration. */}
+        <meta name="theme-color" content="#050505" suppressHydrationWarning />
         <link rel="preconnect" href="https://api.thearena.lk" />
         {/* PWA / iOS */}
         <meta name="apple-mobile-web-app-capable" content="yes" />

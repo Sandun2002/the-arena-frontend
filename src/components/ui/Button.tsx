@@ -69,8 +69,8 @@ export default function Button({
 
   const variants = {
     primary: "bg-emerald-500 text-black hover:bg-emerald-400 border border-transparent",
-    outline: "border border-zinc-700 text-white hover:border-emerald-500 hover:text-emerald-500 bg-transparent",
-    ghost: "text-zinc-400 hover:text-white bg-transparent border border-transparent"
+    outline: "border border-subtle text-primary hover:border-emerald-500 hover:text-emerald-500 bg-transparent",
+    ghost: "text-secondary hover:text-primary bg-transparent border border-transparent"
   };
 
   const spanContent = (

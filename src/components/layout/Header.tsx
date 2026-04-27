@@ -11,6 +11,7 @@ import { useAuth } from "@/services/authContext";
 import VenueSwitcher from "@/components/venue/VenueSwitcher";
 import TierFrame from "@/components/ui/TierFrame";
 import { getTierFromXp } from "@/lib/tierUtils";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 
 export default function Header() {
   const pathname = usePathname();
@@ -31,7 +32,7 @@ export default function Header() {
   ];
 
   return (
-    <header className={`fixed top-0 left-0 w-full z-50 bg-black/50 backdrop-blur-lg border-b border-white/5 overflow-visible${isVenueContext ? "" : " hidden md:block"}`}>
+    <header className={`fixed top-0 left-0 w-full z-50 bg-glass-bg backdrop-blur-lg border-b border-glass-border overflow-visible${isVenueContext ? "" : " hidden md:block"}`}>
       <div className="max-w-7xl w-full mx-auto px-4 h-20 flex items-center justify-between min-w-0">
 
         {/* Logo Area */}
@@ -55,8 +56,8 @@ export default function Header() {
             <Link
               key={link.name}
               href={link.path}
-              className={`text-sm font-medium transition-colors hover:text-white relative
-                ${pathname === link.path ? "text-white" : "text-zinc-400"}
+              className={`text-sm font-medium transition-colors hover:text-primary relative
+                ${pathname === link.path ? "text-primary" : "text-secondary"}
               `}
             >
               {link.name}
@@ -75,12 +76,12 @@ export default function Header() {
               {/* Context Switcher Link */}
               {!isVenueContext && (isVenueOwner || isVenueManager) && (
                 <Link href="/venue-dashboard">
-                  <span className="text-xs font-bold text-zinc-500 hover:text-white transition-colors cursor-pointer mr-2 uppercase tracking-wide">Manager View</span>
+                  <span className="text-xs font-bold text-muted hover:text-primary transition-colors cursor-pointer mr-2 uppercase tracking-wide">Manager View</span>
                 </Link>
               )}
               {isVenueContext && (
                 <Link href="/">
-                  <span className="text-xs font-bold text-zinc-500 hover:text-white transition-colors cursor-pointer mr-2 uppercase tracking-wide">Player View</span>
+                  <span className="text-xs font-bold text-muted hover:text-primary transition-colors cursor-pointer mr-2 uppercase tracking-wide">Player View</span>
                 </Link>
               )}
 
@@ -88,7 +89,7 @@ export default function Header() {
               <div className="relative">
                 <button
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className="flex items-center gap-3 hover:bg-white/5 pr-3 pl-2 py-1.5 rounded-full transition-colors border border-transparent hover:border-white/10"
+                  className="flex items-center gap-3 hover:bg-surface-overlay/30 pr-3 pl-2 py-1.5 rounded-full transition-colors border border-transparent hover:border-default"
                 >
                   <TierFrame
                     tier={getTierFromXp(user?.xp ?? 0)}
@@ -97,29 +98,29 @@ export default function Header() {
                     size="sm"
                     alt="Profile"
                   />
-                  <span className="text-sm font-medium text-white max-w-[100px] truncate">{user?.full_name?.split(' ')[0]}</span>
+                  <span className="text-sm font-medium text-primary max-w-[100px] truncate">{user?.full_name?.split(' ')[0]}</span>
                 </button>
 
                 {isUserMenuOpen && (
                   <>
                     <div className="fixed inset-0 z-30" onClick={() => setIsUserMenuOpen(false)} />
-                    <div className="absolute top-full right-0 mt-2 w-56 bg-zinc-900 border border-zinc-800 rounded-xl shadow-xl z-40 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                      <div className="p-3 border-b border-zinc-800">
-                        <p className="text-sm font-bold text-white truncate">{user?.full_name}</p>
-                        <p className="text-xs text-zinc-500 truncate">{user?.email}</p>
+                    <div className="absolute top-full right-0 mt-2 w-56 bg-surface-raised border border-default rounded-xl shadow-xl z-40 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                      <div className="p-3 border-b border-default">
+                        <p className="text-sm font-bold text-primary truncate">{user?.full_name}</p>
+                        <p className="text-xs text-muted truncate">{user?.email}</p>
                       </div>
                       <div className="p-2">
-                        <Link href="/profile" className="flex items-center gap-2 px-3 py-2 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors">
+                        <Link href="/profile" className="flex items-center gap-2 px-3 py-2 text-sm text-secondary hover:text-primary hover:bg-surface-overlay rounded-lg transition-colors">
                           <User className="w-4 h-4" /> My Profile
                         </Link>
-                        <Link href="/bookings" className="flex items-center gap-2 px-3 py-2 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors">
+                        <Link href="/bookings" className="flex items-center gap-2 px-3 py-2 text-sm text-secondary hover:text-primary hover:bg-surface-overlay rounded-lg transition-colors">
                           <Calendar className="w-4 h-4" /> My Bookings
                         </Link>
-                        <Link href="/settings/sessions" className="flex items-center gap-2 px-3 py-2 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors">
+                        <Link href="/settings/sessions" className="flex items-center gap-2 px-3 py-2 text-sm text-secondary hover:text-primary hover:bg-surface-overlay rounded-lg transition-colors">
                           <Shield className="w-4 h-4" /> Security
                         </Link>
                       </div>
-                      <div className="p-2 border-t border-zinc-800">
+                      <div className="p-2 border-t border-default">
                         <button
                           onClick={logout}
                           className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors"
@@ -134,19 +135,21 @@ export default function Header() {
             </div>
           ) : (
             <>
-              <Link href="/login" className="text-sm font-bold text-white hover:text-emerald-400 transition-colors">
+              <Link href="/login" className="text-sm font-bold text-primary hover:text-emerald-400 transition-colors">
                 Log In
               </Link>
               <Link href="/signup">
-                <Button className="bg-white text-black hover:bg-zinc-200 font-bold">Sign Up</Button>
+                <Button className="bg-primary text-inverted hover:opacity-90 font-bold">Sign Up</Button>
               </Link>
             </>
           )}
+          {/* Theme toggle */}
+          <ThemeToggle />
         </div>
 
         {/* Mobile Menu Toggle */}
         <button
-          className="md:hidden text-white p-2"
+          className="md:hidden text-primary p-2"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           aria-label="Toggle mobile menu"
         >
@@ -156,10 +159,10 @@ export default function Header() {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden fixed top-20 left-0 w-full h-[calc(100vh-80px)] bg-black/95 backdrop-blur-xl border-t border-zinc-800 p-6 flex flex-col gap-6 animate-fade-in z-40 overflow-y-auto">
+        <div className="md:hidden fixed top-20 left-0 w-full h-[calc(100vh-80px)] bg-surface-base/95 backdrop-blur-xl border-t border-default p-6 flex flex-col gap-6 animate-fade-in z-40 overflow-y-auto">
 
           {isLoggedIn && (
-            <div className="flex items-center gap-4 pb-6 border-b border-zinc-800">
+            <div className="flex items-center gap-4 pb-6 border-b border-default">
               <TierFrame
                 tier={getTierFromXp(user?.xp ?? 0)}
                 level={user?.level ?? 1}
@@ -168,8 +171,8 @@ export default function Header() {
                 alt="Profile"
               />
               <div>
-                <p className="text-lg font-bold text-white">{user?.full_name}</p>
-                <p className="text-sm text-zinc-500">{user?.email}</p>
+                <p className="text-lg font-bold text-primary">{user?.full_name}</p>
+                <p className="text-sm text-muted">{user?.email}</p>
               </div>
             </div>
           )}
@@ -181,7 +184,7 @@ export default function Header() {
               <Link
                 key={link.path}
                 href={link.path}
-                className={`text-2xl font-black uppercase tracking-tight transition-colors ${pathname === link.path ? "text-emerald-500" : "text-zinc-400 hover:text-white"
+                className={`text-2xl font-black uppercase tracking-tight transition-colors ${pathname === link.path ? "text-emerald-500" : "text-secondary hover:text-primary"
                   }`}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
@@ -192,7 +195,12 @@ export default function Header() {
 
           </div>
 
-          <div className="mt-auto pt-6 border-t border-zinc-800 flex flex-col gap-3">
+          <div className="mt-auto pt-6 border-t border-default flex flex-col gap-3">
+            {/* Theme toggle row */}
+            <div className="flex items-center justify-between px-1 pb-2">
+              <span className="text-sm font-medium text-secondary">Theme</span>
+              <ThemeToggle />
+            </div>
             {isLoggedIn ? (
               <>
                 <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)}>
@@ -205,7 +213,7 @@ export default function Header() {
             ) : (
               <>
                 <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                  <Button variant="outline" className="w-full justify-center text-white border-zinc-700">Log In</Button>
+                  <Button variant="outline" className="w-full justify-center">Log In</Button>
                 </Link>
                 <Link href="/signup" onClick={() => setIsMobileMenuOpen(false)}>
                   <Button className="w-full justify-center bg-emerald-500 text-black hover:bg-emerald-400">Sign Up</Button>

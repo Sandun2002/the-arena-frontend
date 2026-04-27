@@ -17,7 +17,7 @@ import TierFrame from "@/components/ui/TierFrame";
 type Category = "all" | "weekly" | "explorer" | "loyalty" | "streak" | "timing" | "milestone";
 
 const CATEGORIES: { key: Category; label: string; icon: string; accentColor: string; gradientFrom: string; gradientTo: string; borderColor: string; glowColor: string; tabBg: string; barFrom: string; barTo: string }[] = [
-    { key: "all",       label: "All",               icon: "✨", accentColor: "text-white",       gradientFrom: "#0a0a0f", gradientTo: "#111118",   borderColor: "rgba(255,255,255,0.1)",  glowColor: "rgba(255,255,255,0.1)", tabBg: "#374151", barFrom: "#10b981", barTo: "#06b6d4" },
+    { key: "all",       label: "All",               icon: "✨", accentColor: "text-primary",       gradientFrom: "#0a0a0f", gradientTo: "#111118",   borderColor: "rgba(255,255,255,0.1)",  glowColor: "rgba(255,255,255,0.1)", tabBg: "#374151", barFrom: "#10b981", barTo: "#06b6d4" },
     { key: "weekly",    label: "Weekly Grind",       icon: "🔥", accentColor: "text-blue-400",    gradientFrom: "#030720", gradientTo: "#0a1a4a",   borderColor: "rgba(59,130,246,0.35)",  glowColor: "rgba(59,130,246,0.3)", tabBg: "#2563eb", barFrom: "#3b82f6", barTo: "#06b6d4" },
     { key: "explorer",  label: "Explorer",           icon: "🌍", accentColor: "text-purple-400",  gradientFrom: "#0d0520", gradientTo: "#1a0a40",   borderColor: "rgba(168,85,247,0.35)",  glowColor: "rgba(168,85,247,0.3)", tabBg: "#7c3aed", barFrom: "#a855f7", barTo: "#818cf8" },
     { key: "loyalty",   label: "Loyalty",            icon: "❤️", accentColor: "text-rose-400",   gradientFrom: "#200510", gradientTo: "#3d0a1a",   borderColor: "rgba(244,63,94,0.35)",   glowColor: "rgba(244,63,94,0.3)",  tabBg: "#e11d48", barFrom: "#f43f5e", barTo: "#fb7185" },
@@ -107,11 +107,11 @@ function ChallengeCard({ challenge, achievement, catConfig, animated }: {
         <div
             className="challenge-card group relative flex flex-col overflow-hidden rounded-2xl border cursor-default select-none transition-all duration-300 hover:-translate-y-0.5"
             style={{
-                background: "rgba(12,12,14,0.97)",
+                background: "var(--surface-raised)",
                 borderColor: completed ? rarity.border : `${catConfig.tabBg}50`,
                 boxShadow: completed
-                    ? `0 8px 28px rgba(0,0,0,0.45), 0 0 0 1px ${rarity.border}`
-                    : `0 6px 20px rgba(0,0,0,0.35)`,
+                    ? `0 8px 28px var(--shadow-elevation), 0 0 0 1px ${rarity.border}`
+                    : `0 6px 20px var(--shadow-elevation)`,
             }}
         >
             {/* Top accent strip — rarity color when done, category color otherwise */}
@@ -137,7 +137,7 @@ function ChallengeCard({ challenge, achievement, catConfig, animated }: {
                         }}>
                         {challenge.icon}
                         {completed && (
-                            <div className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border border-[rgba(12,12,14,1)]"
+                            <div className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border border-[color:var(--surface-raised)]"
                                 style={{ background: rarity.glow, borderColor: rarity.border }}>
                                 <CheckCircle className="h-2.5 w-2.5" style={{ color: rarity.text }} />
                             </div>
@@ -182,17 +182,17 @@ function ChallengeCard({ challenge, achievement, catConfig, animated }: {
 
                 {/* Row 3: title + description */}
                 <div>
-                    <h3 className="text-sm font-black leading-snug text-white">{challenge.title}</h3>
-                    <p className="mt-1 text-xs leading-relaxed text-zinc-500">{challenge.description}</p>
+                    <h3 className="text-sm font-black leading-snug text-primary">{challenge.title}</h3>
+                    <p className="mt-1 text-xs leading-relaxed text-muted">{challenge.description}</p>
                 </div>
 
                 {/* Row 4: progress */}
                 <div className="pt-1">
                     <div className="mb-1.5 flex items-center justify-between text-[11px] font-semibold">
-                        <span className="text-zinc-600">{completed ? "Completed" : "Progress"}</span>
-                        <span className="text-zinc-400">{current} / {challenge.target_count}</span>
+                        <span className="text-faint">{completed ? "Completed" : "Progress"}</span>
+                        <span className="text-secondary">{current} / {challenge.target_count}</span>
                     </div>
-                    <div className="h-1.5 overflow-hidden rounded-full border border-white/5 bg-black/50">
+                    <div className="h-1.5 overflow-hidden rounded-full border border-glass-border bg-surface-base/50">
                         <div
                             className="h-full rounded-full transition-all duration-[1200ms] ease-out"
                             style={{
@@ -338,11 +338,11 @@ export default function ChallengesPage() {
     })();
 
     return (
-        <main className="min-h-screen bg-black pb-16 pt-20 selection:bg-emerald-500/20 relative">
+        <main className="min-h-screen bg-surface-base pb-16 pt-20 selection:bg-emerald-500/20 relative">
 
             {/* Background hex grid */}
-            <div className="fixed inset-0 pointer-events-none opacity-[0.025]"
-                style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='52' viewBox='0 0 60 52' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 17.3v17.3L30 52 0 34.6V17.3L30 0z' fill='none' stroke='%23ffffff' stroke-width='1'/%3E%3C/svg%3E")`, backgroundSize: "60px 52px" }} />
+            <div className="fixed inset-0 pointer-events-none opacity-[0.07]"
+                style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='52' viewBox='0 0 60 52' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 17.3v17.3L30 52 0 34.6V17.3L30 0z' fill='none' stroke='%2371717a' stroke-width='1'/%3E%3C/svg%3E")`, backgroundSize: "60px 52px" }} />
 
             {/* Decorative orbs */}
             <div className="fixed left-0 top-0 h-[22rem] w-[22rem] rounded-full pointer-events-none blur-[120px] opacity-20" style={{ background: "radial-gradient(circle, rgba(16,185,129,0.18), transparent)" }} />
@@ -352,18 +352,18 @@ export default function ChallengesPage() {
 
                 {/* Nav */}
                 <div className="flex items-center justify-between mb-8">
-                    <Link href="/profile" className="inline-flex items-center text-sm font-medium text-zinc-500 hover:text-white transition-colors group">
+                    <Link href="/profile" className="inline-flex items-center text-sm font-medium text-muted hover:text-primary transition-colors group">
                         <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" /> Profile
                     </Link>
-                    <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-zinc-800 bg-zinc-900/80 backdrop-blur-sm">
+                    <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-default bg-surface-raised/80 backdrop-blur-sm">
                         <Zap className="w-3.5 h-3.5 text-yellow-400" />
-                        <span className="text-xs font-black text-white">{xp.toLocaleString()} XP</span>
+                        <span className="text-xs font-black text-primary">{xp.toLocaleString()} XP</span>
                     </div>
                 </div>
 
                 {/* ── COMPACT HERO ── */}
-                <div className="premium-hero relative mb-6 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/60 backdrop-blur-sm">
-                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-zinc-700 to-transparent" />
+                <div className="premium-hero relative mb-6 overflow-hidden rounded-2xl border border-default bg-surface-raised/60 backdrop-blur-sm">
+                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-subtle to-transparent" />
                     <div className="pointer-events-none absolute -left-6 top-0 h-28 w-28 rounded-full blur-3xl opacity-50"
                         style={{ background: tierStyle.glow }} />
 
@@ -371,15 +371,15 @@ export default function ChallengesPage() {
 
                         {/* Tier identity */}
                         <div className="flex shrink-0 items-center gap-3">
-                            <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-zinc-800 text-2xl shadow-lg"
+                            <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-default text-2xl shadow-lg"
                                 style={{ background: tierStyle.gradient, boxShadow: `0 4px 18px ${tierStyle.glow}` }}>
                                 {tierStyle.icon}
                             </div>
                             <div>
-                                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Tier</div>
+                                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-muted">Tier</div>
                                 <div className="flex items-center gap-2">
-                                    <span className="text-base font-black text-white">{tier}</span>
-                                    <span className="rounded-full border px-2 py-0.5 text-[11px] font-black text-white"
+                                    <span className="text-base font-black text-primary">{tier}</span>
+                                    <span className="rounded-full border px-2 py-0.5 text-[11px] font-black text-primary"
                                         style={{ background: tierStyle.glow, borderColor: `${tierStyle.glow}` }}>
                                         Lv {level}
                                     </span>
@@ -387,26 +387,26 @@ export default function ChallengesPage() {
                             </div>
                         </div>
 
-                        <div className="hidden h-8 w-px shrink-0 bg-zinc-800 sm:block" />
+                        <div className="hidden h-8 w-px shrink-0 bg-surface-overlay sm:block" />
 
                         {/* XP bar */}
                         <div className="min-w-[160px] flex-1">
-                            <div className="mb-1.5 flex justify-between text-[10px] font-bold text-zinc-600">
+                            <div className="mb-1.5 flex justify-between text-[10px] font-bold text-faint">
                                 <span>{tierMinXp.toLocaleString()} XP</span>
                                 <span>{nextTierMinXp ? nextTierMinXp.toLocaleString() : "MAX"} XP</span>
                             </div>
-                            <div className="h-2 overflow-hidden rounded-full border border-zinc-800 bg-black/50">
+                            <div className="h-2 overflow-hidden rounded-full border border-default bg-surface-base/50">
                                 <div className="h-full rounded-full transition-all duration-[1400ms] ease-out"
                                     style={{ width: animated ? `${tierProgress}%` : "0%", background: tierStyle.gradient, boxShadow: `0 0 8px ${tierStyle.glow}` }} />
                             </div>
-                            <div className="mt-1.5 text-[11px] text-zinc-500">
+                            <div className="mt-1.5 text-[11px] text-muted">
                                 {nextTier
-                                    ? <>{xpToNextTier} XP to <span className="font-bold text-zinc-300">{nextTier}</span></>
+                                    ? <>{xpToNextTier} XP to <span className="font-bold text-secondary">{nextTier}</span></>
                                     : <span className="font-bold text-amber-400">Max tier reached</span>}
                             </div>
                         </div>
 
-                        <div className="hidden h-8 w-px shrink-0 bg-zinc-800 md:block" />
+                        <div className="hidden h-8 w-px shrink-0 bg-surface-overlay md:block" />
 
                         {/* Stats pills */}
                         <div className="hidden shrink-0 items-center gap-2 md:flex">
@@ -429,8 +429,8 @@ export default function ChallengesPage() {
                         <div className="flex items-center gap-3">
                             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-amber-500/20 bg-amber-500/10 text-sm">⚔️</div>
                             <div>
-                                <h2 className="text-sm font-black text-white">Tier Roadmap</h2>
-                                <p className="text-[11px] text-zinc-500">Every tier unlocked is permanent. Keep climbing.</p>
+                                <h2 className="text-sm font-black text-primary">Tier Roadmap</h2>
+                                <p className="text-[11px] text-muted">Every tier unlocked is permanent. Keep climbing.</p>
                             </div>
                         </div>
                         {nextTier && (
@@ -458,12 +458,12 @@ export default function ChallengesPage() {
                                         className="tier-card relative flex w-[152px] shrink-0 flex-col items-center gap-2.5 rounded-2xl border p-4 pb-4 transition-all duration-300"
                                         style={{
                                             background: isCurrent
-                                                ? `linear-gradient(160deg, rgba(15,15,18,0.99) 0%, ${t.color}20 100%)`
+                                                ? `linear-gradient(160deg, var(--surface-raised) 0%, ${t.color}20 100%)`
                                                 : isNext
-                                                    ? `linear-gradient(160deg, rgba(15,15,18,0.97) 0%, ${t.color}12 100%)`
+                                                    ? `linear-gradient(160deg, var(--surface-raised) 0%, ${t.color}12 100%)`
                                                     : isUnlocked
-                                                        ? "rgba(15,15,18,0.92)"
-                                                        : "rgba(10,10,12,0.88)",
+                                                        ? "var(--surface-raised)"
+                                                        : "var(--surface-sunken)",
                                             borderColor: isCurrent
                                                 ? `${t.color}aa`
                                                 : isNext
@@ -524,7 +524,7 @@ export default function ChallengesPage() {
 
                                         {/* Progress bar */}
                                         {(isCurrent || isUnlocked) && (
-                                            <div className="h-1 w-full overflow-hidden rounded-full border border-white/5 bg-black/50">
+                                            <div className="h-1 w-full overflow-hidden rounded-full border border-glass-border bg-surface-base/50">
                                                 <div className="h-full rounded-full transition-all duration-700"
                                                     style={{
                                                         width: tierBarWidth,
@@ -574,7 +574,7 @@ export default function ChallengesPage() {
                                 <span>{cat.icon}</span>
                                 <span className="whitespace-nowrap">{cat.label}</span>
                                 {counts && (
-                                    <span className="rounded-full bg-black/30 px-1.5 py-0.5 text-[10px] font-black text-zinc-300">
+                                    <span className="rounded-full bg-surface-base/30 px-1.5 py-0.5 text-[10px] font-black text-secondary">
                                         {counts.done}/{counts.total}
                                     </span>
                                 )}
@@ -597,13 +597,13 @@ export default function ChallengesPage() {
                                                 style={{ background: `${cat.tabBg}14`, borderColor: `${cat.tabBg}33` }}>
                                                 {cat.icon}
                                             </div>
-                                            <h2 className="truncate text-lg font-black tracking-tight text-white">{cat.label}</h2>
+                                            <h2 className="truncate text-lg font-black tracking-tight text-primary">{cat.label}</h2>
                                             <span className="rounded-full border px-2 py-0.5 text-xs font-bold"
                                                 style={{ background: `${cat.tabBg}18`, color: cat.tabBg, borderColor: `${cat.tabBg}33` }}>
                                                 {counts.done}/{counts.total}
                                             </span>
                                         </div>
-                                        <span className="text-xs font-bold text-zinc-600">scroll →</span>
+                                        <span className="text-xs font-bold text-faint">scroll →</span>
                                     </div>
 
                                     {/* Horizontal scroll — same layout on mobile and desktop */}
@@ -629,7 +629,7 @@ export default function ChallengesPage() {
                             ))}
                         </HScrollArea>
                         {orderedChallenges.length === 0 && (
-                            <div className="text-center py-20 text-zinc-600">
+                            <div className="text-center py-20 text-faint">
                                 <Trophy className="w-12 h-12 mx-auto mb-3 opacity-30" />
                                 <p className="text-sm">No challenges in this category yet.</p>
                             </div>
@@ -644,10 +644,10 @@ export default function ChallengesPage() {
 
 function StatPill({ icon, value, label }: { icon: string; value: string; label: string }) {
     return (
-        <div className="flex items-center gap-2 rounded-full border border-zinc-800 bg-black/30 px-3 py-1.5 text-xs">
+        <div className="flex items-center gap-2 rounded-full border border-default bg-surface-base/30 px-3 py-1.5 text-xs">
             <span>{icon}</span>
-            <span className="font-black text-white">{value}</span>
-            <span className="text-zinc-500">{label}</span>
+            <span className="font-black text-primary">{value}</span>
+            <span className="text-muted">{label}</span>
         </div>
     );
 }

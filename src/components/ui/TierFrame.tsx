@@ -153,7 +153,7 @@ export default function TierFrame({
         style={{ width: s.total - s.ring * 2, height: s.total - s.ring * 2 }}
       >
         <div
-          className="rounded-full overflow-hidden bg-zinc-900 flex items-center justify-center"
+          className="rounded-full overflow-hidden bg-surface-raised flex items-center justify-center"
           style={{
             width: s.avatar,
             height: s.avatar,

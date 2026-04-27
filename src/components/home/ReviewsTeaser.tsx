@@ -90,24 +90,24 @@ export default function ReviewsTeaser() {
   return (
     <section
       ref={sectionRef}
-      className="py-16 md:py-20 bg-zinc-900/20 border-y border-zinc-800/50"
+      className="py-16 md:py-20 bg-surface-raised/30 border-y border-default/50"
     >
       <div className="container mx-auto px-4 max-w-7xl">
         {/* Header */}
         <div className="text-center mb-10 md:mb-14">
           <div className="inline-flex items-center gap-2 mb-3">
             <Star className="w-4 h-4 text-emerald-400 fill-emerald-400" />
-            <span className="text-[11px] font-black tracking-[0.2em] uppercase text-zinc-500">
+            <span className="text-[11px] font-black tracking-[0.2em] uppercase text-muted">
               Loved by Players
             </span>
           </div>
-          <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tight mb-3">
+          <h2 className="text-3xl md:text-5xl font-black text-primary uppercase tracking-tight mb-3">
             What Players{" "}
             <span className="text-transparent bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text">
               Say
             </span>
           </h2>
-          <p className="text-zinc-400 max-w-xl mx-auto text-sm md:text-base">
+          <p className="text-secondary max-w-xl mx-auto text-sm md:text-base">
             Real words from verified players who actually booked and played.
           </p>
         </div>
@@ -119,7 +119,7 @@ export default function ReviewsTeaser() {
               {Array.from({ length: 5 }).map((_, i) => (
                 <div
                   key={i}
-                  className="h-48 w-[320px] flex-shrink-0 rounded-2xl bg-zinc-900/50 border border-zinc-800 animate-pulse"
+                  className="h-48 w-[320px] flex-shrink-0 rounded-2xl bg-surface-raised/50 border border-default animate-pulse"
                 />
               ))}
             </div>
@@ -129,7 +129,7 @@ export default function ReviewsTeaser() {
                 <Link
                   key={r.id}
                   href={`/venues/${r.venue_id}`}
-                  className="review-card group relative flex w-[300px] md:w-[340px] flex-col gap-3 p-5 mx-2 md:mx-2.5 rounded-2xl bg-zinc-900/60 border border-zinc-800 hover:border-emerald-500/40 hover:bg-zinc-900/80 transition-colors duration-300"
+                  className="review-card group relative flex w-[300px] md:w-[340px] flex-col gap-3 p-5 mx-2 md:mx-2.5 rounded-2xl bg-surface-raised/60 border border-default hover:border-emerald-500/40 hover:bg-surface-raised/80 transition-colors duration-300"
                 >
                   {/* Header row: stars + time */}
                   <div className="flex items-center justify-between">
@@ -140,12 +140,12 @@ export default function ReviewsTeaser() {
                           className={`w-3.5 h-3.5 ${
                             i < r.rating
                               ? "text-emerald-400 fill-emerald-400"
-                              : "text-zinc-700"
+                              : "text-faint"
                           }`}
                         />
                       ))}
                     </div>
-                    <span className="text-[11px] text-zinc-500">
+                    <span className="text-[11px] text-muted">
                       {timeAgo(r.created_at)}
                     </span>
                   </div>
@@ -153,13 +153,13 @@ export default function ReviewsTeaser() {
                   {/* Comment */}
                   <div className="relative">
                     <Quote className="absolute -top-1 -left-1 w-4 h-4 text-emerald-500/20" />
-                    <p className="text-sm text-zinc-200 leading-relaxed line-clamp-4 pl-5">
+                    <p className="text-sm text-primary leading-relaxed line-clamp-4 pl-5">
                       {r.comment}
                     </p>
                   </div>
 
                   {/* Footer: user + venue */}
-                  <div className="mt-auto flex items-center gap-3 pt-3 border-t border-zinc-800/70">
+                  <div className="mt-auto flex items-center gap-3 pt-3 border-t border-default/70">
                     <TierFrame
                       tier={getTierFromXp(r.user_xp ?? 0)}
                       level={r.user_level ?? 1}
@@ -173,17 +173,17 @@ export default function ReviewsTeaser() {
                       }
                     />
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1 text-sm text-white font-semibold truncate">
+                      <div className="flex items-center gap-1 text-sm text-primary font-semibold truncate">
                         <span className="truncate">{r.user_name}</span>
                         {r.is_verified && (
                           <BadgeCheck className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
                         )}
                       </div>
-                      <div className="text-[11px] text-zinc-400 truncate group-hover:text-emerald-400 transition-colors">
+                      <div className="text-[11px] text-secondary truncate group-hover:text-emerald-400 transition-colors">
                         {r.venue_name}
                       </div>
                     </div>
-                    <ArrowRight className="w-4 h-4 text-zinc-600 group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                    <ArrowRight className="w-4 h-4 text-muted group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
                   </div>
                 </Link>
               ))}

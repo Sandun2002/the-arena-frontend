@@ -26,14 +26,14 @@ function NavItem({
     >
       <div
         className={`flex items-center justify-center w-10 h-8 rounded-xl transition-all duration-300 ${
-          isActive ? "bg-emerald-500/15" : "group-hover:bg-white/5"
+          isActive ? "bg-emerald-500/15" : "group-hover:bg-surface-overlay/40"
         }`}
       >
         <Icon
           className={`transition-all duration-300 ${
             isActive
               ? "w-[19px] h-[19px] text-emerald-400"
-              : "w-[18px] h-[18px] text-zinc-500 group-hover:text-zinc-400"
+              : "w-[18px] h-[18px] text-muted group-hover:text-secondary"
           }`}
         />
       </div>
@@ -41,7 +41,7 @@ function NavItem({
         className={`text-[9.5px] font-semibold tracking-tight transition-colors duration-300 leading-none ${
           isActive
             ? "text-emerald-400"
-            : "text-zinc-600 group-hover:text-zinc-500"
+            : "text-faint group-hover:text-muted"
         }`}
       >
         {label}
@@ -67,7 +67,7 @@ export default function MobileBottomNav() {
       {isManager && (
         <Link
           href="/venue-dashboard"
-          className="fixed bottom-[5.5rem] right-4 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full bg-zinc-950/90 backdrop-blur-xl border border-blue-500/40 text-blue-400 text-xs font-bold shadow-lg hover:border-blue-400/60 hover:text-blue-300 active:scale-95 transition-all md:hidden"
+          className="fixed bottom-[5.5rem] right-4 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full bg-glass-bg backdrop-blur-xl border border-blue-500/40 text-blue-400 text-xs font-bold shadow-lg hover:border-blue-400/60 hover:text-blue-300 active:scale-95 transition-all md:hidden"
         >
           <LayoutDashboard className="w-3.5 h-3.5" />
           Manager Dashboard
@@ -76,7 +76,7 @@ export default function MobileBottomNav() {
 
       {/* Floating Island Nav */}
       <nav className="fixed bottom-4 left-4 right-4 z-50 md:hidden">
-        <div className="relative bg-zinc-950/95 backdrop-blur-2xl rounded-2xl border border-white/[0.07] shadow-[0_8px_32px_rgba(0,0,0,0.85),inset_0_1px_0_rgba(255,255,255,0.04)]">
+        <div className="relative bg-glass-bg backdrop-blur-2xl rounded-2xl border border-glass-border shadow-[0_8px_32px_var(--shadow-elevation),inset_0_1px_0_var(--glass-highlight)]">
 
           {/* Center Explore Button — breaks through the top */}
           <div className="absolute -top-6 left-1/2 -translate-x-1/2">
@@ -93,7 +93,7 @@ export default function MobileBottomNav() {
                 }`}
               />
               <div
-                className={`relative w-[52px] h-[52px] rounded-full flex items-center justify-center border-[3px] border-zinc-950 transition-all duration-300 ${
+                className={`relative w-[52px] h-[52px] rounded-full flex items-center justify-center border-[3px] border-surface-base transition-all duration-300 ${
                   exploreActive
                     ? "bg-gradient-to-br from-emerald-300 via-emerald-500 to-emerald-700 shadow-[0_0_28px_rgba(16,185,129,0.95)]"
                     : "bg-gradient-to-br from-emerald-400 via-emerald-500 to-emerald-700 shadow-[0_0_18px_rgba(16,185,129,0.65)]"
@@ -117,7 +117,7 @@ export default function MobileBottomNav() {
             <div className="flex flex-col items-center justify-end pb-2">
               <span
                 className={`text-[9.5px] font-semibold tracking-tight leading-none transition-colors duration-300 ${
-                  exploreActive ? "text-emerald-400" : "text-zinc-600"
+                  exploreActive ? "text-emerald-400" : "text-faint"
                 }`}
               >
                 Explore

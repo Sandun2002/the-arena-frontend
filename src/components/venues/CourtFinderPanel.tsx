@@ -189,35 +189,35 @@ export default function CourtFinderPanel({ onSearch, initialSport = "All", initi
             {/* Main Panel */}
             <div className="relative px-3 md:px-0">
                 <div
-                    className="relative overflow-hidden rounded-[24px] border border-zinc-700/30 bg-zinc-900/80 backdrop-blur-2xl p-5 md:p-8"
+                    className="relative overflow-hidden rounded-[24px] border border-subtle/30 bg-surface-raised/80 backdrop-blur-2xl p-5 md:p-8"
                     style={{
-                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 80px -20px rgba(80, 200, 120, 0.12)'
+                        boxShadow: '0 25px 50px -12px var(--shadow-elevation), 0 0 80px -20px rgba(80, 200, 120, 0.12)'
                     }}
                 >
                     {/* Top emerald accent stripe */}
                     <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-emerald-500/60 via-teal-400/40 to-emerald-600/60" />
 
                     {/* Subtle inner gradient overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-zinc-800/20 via-transparent to-emerald-950/5 pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-surface-overlay/20 via-transparent to-emerald-950/5 pointer-events-none" />
 
                     {/* Content */}
                     <div className="relative z-10 space-y-6 md:space-y-8">
 
                         {/* Header */}
-                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-zinc-800/40">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-default/40">
                             <div className="flex flex-col gap-1">
                                 <div className="flex items-center gap-3">
                                     <div className="p-2.5 rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 border border-emerald-500/20 shadow-[0_0_15px_rgba(80,200,120,0.2)]">
                                         <Sparkles className="w-5 h-5 text-emerald-400" />
                                     </div>
-                                    <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
+                                    <h1 className="text-2xl md:text-3xl font-extrabold text-primary tracking-tight">
                                         Find Your{' '}
                                         <span className="bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-400 bg-clip-text text-transparent animate-gradient">
                                             Court
                                         </span>
                                     </h1>
                                 </div>
-                                <p className="text-sm text-zinc-400 ml-1 mt-1 font-medium">
+                                <p className="text-sm text-secondary ml-1 mt-1 font-medium">
                                     Select • Pick time • Book instantly
                                 </p>
                             </div>
@@ -225,14 +225,14 @@ export default function CourtFinderPanel({ onSearch, initialSport = "All", initi
                             {/* Progress Dots */}
                             <div className="flex items-center gap-1.5 ml-1 md:ml-0">
                                 <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(80,200,120,0.6)]" />
-                                <div className="w-2 h-2 rounded-full bg-zinc-700" />
-                                <div className="w-2 h-2 rounded-full bg-zinc-700" />
+                                <div className="w-2 h-2 rounded-full bg-surface-overlay" />
+                                <div className="w-2 h-2 rounded-full bg-surface-overlay" />
                             </div>
                         </div>
 
                         {/* Section 1: SELECT SPORT */}
                         <div className="space-y-4">
-                            <h3 className="text-xs font-bold text-zinc-400 tracking-[0.2em] uppercase flex items-center gap-2.5">
+                            <h3 className="text-xs font-bold text-secondary tracking-[0.2em] uppercase flex items-center gap-2.5">
                                 <span className="w-6 h-6 rounded-full bg-gradient-to-br from-emerald-500/30 to-emerald-600/15 text-emerald-400 flex items-center justify-center text-[11px] font-bold shadow-inner shadow-emerald-500/20">1</span>
                                 SELECT SPORT
                             </h3>
@@ -256,7 +256,7 @@ export default function CourtFinderPanel({ onSearch, initialSport = "All", initi
                                                     transform active:scale-95
                                                     ${isSelected
                                                         ? 'border-2 border-emerald-500 shadow-[0_0_20px_rgba(80,200,120,0.35)]'
-                                                        : 'border border-zinc-700/50 hover:border-zinc-500/60 hover:scale-[1.03] shadow-lg shadow-black/20'
+                                                        : 'border border-subtle/50 hover:border-subtle/60 hover:scale-[1.03] shadow-lg shadow-[var(--shadow-elevation)]'
                                                     }
                                                 `}
                                                 style={{
@@ -297,7 +297,7 @@ export default function CourtFinderPanel({ onSearch, initialSport = "All", initi
                                                 <span
                                                     className={`
                                                         relative z-10 px-3 pb-2.5 text-xs md:text-sm font-bold transition-all duration-300 leading-tight truncate w-full text-shadow-sm
-                                                        ${isSelected ? 'text-emerald-300' : 'text-white'}
+                                                        ${isSelected ? 'text-emerald-300' : 'text-primary'}
                                                     `}
                                                 >
                                                     {sport.name}
@@ -310,14 +310,14 @@ export default function CourtFinderPanel({ onSearch, initialSport = "All", initi
                         </div>
 
                         {/* Section 2: DATE & TIME */}
-                        <div className="space-y-4 pt-5 border-t border-zinc-800/40">
-                            <h3 className="text-xs font-bold text-zinc-400 tracking-[0.2em] uppercase flex items-center gap-2.5">
+                        <div className="space-y-4 pt-5 border-t border-default/40">
+                            <h3 className="text-xs font-bold text-secondary tracking-[0.2em] uppercase flex items-center gap-2.5">
                                 <span className="w-6 h-6 rounded-full bg-gradient-to-br from-emerald-500/30 to-emerald-600/15 text-emerald-400 flex items-center justify-center text-[11px] font-bold shadow-inner shadow-emerald-500/20">2</span>
                                 DATE & TIME
                             </h3>
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
-                                <div className="shadow-inner shadow-black/20 rounded-xl">
+                                <div className="shadow-inner shadow-[var(--shadow-elevation)] rounded-xl">
                                     <DatePicker
                                         value={selectedDate}
                                         onChange={setSelectedDate}
@@ -332,7 +332,7 @@ export default function CourtFinderPanel({ onSearch, initialSport = "All", initi
                                         const isToday = selectedDate === today;
                                         return (
                                             <>
-                                                <div className="shadow-inner shadow-black/20 rounded-xl">
+                                                <div className="shadow-inner shadow-[var(--shadow-elevation)] rounded-xl">
                                                     <TimePicker
                                                         value={startTime}
                                                         onChange={setStartTime}
@@ -340,7 +340,7 @@ export default function CourtFinderPanel({ onSearch, initialSport = "All", initi
                                                         sameDay={isToday}
                                                     />
                                                 </div>
-                                                <div className="shadow-inner shadow-black/20 rounded-xl">
+                                                <div className="shadow-inner shadow-[var(--shadow-elevation)] rounded-xl">
                                                     <TimePicker
                                                         value={endTime}
                                                         onChange={setEndTime}
@@ -356,8 +356,8 @@ export default function CourtFinderPanel({ onSearch, initialSport = "All", initi
                         </div>
 
                         {/* Section 3: LOCATION */}
-                        <div className="space-y-4 pt-5 border-t border-zinc-800/40">
-                            <h3 className="text-xs font-bold text-zinc-400 tracking-[0.2em] uppercase flex items-center gap-2.5">
+                        <div className="space-y-4 pt-5 border-t border-default/40">
+                            <h3 className="text-xs font-bold text-secondary tracking-[0.2em] uppercase flex items-center gap-2.5">
                                 <span className="w-6 h-6 rounded-full bg-gradient-to-br from-emerald-500/30 to-emerald-600/15 text-emerald-400 flex items-center justify-center text-[11px] font-bold shadow-inner shadow-emerald-500/20">3</span>
                                 LOCATION
                             </h3>
@@ -383,10 +383,10 @@ export default function CourtFinderPanel({ onSearch, initialSport = "All", initi
                                         flex items-center justify-center gap-2 px-5 py-4 md:py-3.5 rounded-xl border transition-all duration-300
                                         transform active:scale-95 min-w-[56px] shadow-lg
                                         ${fetchingLocation
-                                            ? 'bg-zinc-800/80 border-zinc-700/50 text-zinc-400 cursor-wait'
+                                            ? 'bg-surface-overlay/80 border-subtle/50 text-secondary cursor-wait'
                                             : useMyLocation
                                                 ? 'bg-gradient-to-br from-emerald-500/25 to-teal-500/15 border-emerald-500/50 text-emerald-400 shadow-emerald-500/10'
-                                                : 'bg-zinc-800/80 border-zinc-700/50 text-zinc-400 hover:border-emerald-500/30 hover:text-emerald-400 hover:bg-zinc-800'
+                                                : 'bg-surface-overlay/80 border-subtle/50 text-secondary hover:border-emerald-500/30 hover:text-emerald-400 hover:bg-surface-overlay'
                                         }
                                     `}
                                 >
@@ -404,7 +404,7 @@ export default function CourtFinderPanel({ onSearch, initialSport = "All", initi
                             {/* Radius selector — visible when live location is active */}
                             {useMyLocation && userLocation && (
                                 <div className="flex items-center gap-3 animate-fade-in">
-                                    <span className="text-xs text-zinc-400 font-medium">Radius:</span>
+                                    <span className="text-xs text-secondary font-medium">Radius:</span>
                                     <div className="flex gap-2">
                                         {[2, 5, 10].map(r => (
                                             <button
@@ -414,7 +414,7 @@ export default function CourtFinderPanel({ onSearch, initialSport = "All", initi
                                                     px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-200
                                                     ${searchRadius === r
                                                         ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-[0_0_10px_rgba(80,200,120,0.15)]'
-                                                        : 'bg-zinc-800/60 text-zinc-400 border border-zinc-700/40 hover:text-white hover:border-zinc-600'
+                                                        : 'bg-surface-overlay/60 text-secondary border border-subtle/40 hover:text-primary hover:border-subtle'
                                                     }
                                                 `}
                                             >
@@ -422,7 +422,7 @@ export default function CourtFinderPanel({ onSearch, initialSport = "All", initi
                                             </button>
                                         ))}
                                     </div>
-                                    <span className="text-[11px] text-zinc-500 ml-auto hidden md:block">
+                                    <span className="text-[11px] text-muted ml-auto hidden md:block">
                                         📍 {userLocation.lat.toFixed(4)}, {userLocation.lng.toFixed(4)}
                                     </span>
                                 </div>
@@ -430,7 +430,7 @@ export default function CourtFinderPanel({ onSearch, initialSport = "All", initi
                         </div>
 
                         {/* Search Action */}
-                        <div className="pt-6 mt-2 border-t border-zinc-800/30">
+                        <div className="pt-6 mt-2 border-t border-default/30">
                             <button
                                 onClick={handleSearch}
                                 disabled={isSearching}

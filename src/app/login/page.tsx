@@ -119,12 +119,12 @@ function LoginContent() {
   };
 
   return (
-    <main className="min-h-screen bg-black flex items-center justify-center p-4 relative overflow-hidden" ref={containerRef}>
+    <main className="min-h-screen bg-surface-base flex items-center justify-center p-4 relative overflow-hidden" ref={containerRef}>
       {/* Background Elements */}
       <div className="absolute inset-0 z-0">
         <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-emerald-900/20 to-transparent pointer-events-none" />
         <div className="absolute -top-[200px] -right-[200px] w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-full h-[300px] bg-gradient-to-t from-black to-transparent pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-full h-[300px] bg-gradient-to-t from-surface-base to-transparent pointer-events-none" />
       </div>
 
       <div className="login-card w-full max-w-md relative z-10">
@@ -132,22 +132,22 @@ function LoginContent() {
           <Link href="/" className="inline-block mb-6 group">
             <img src="/logo-full.png" alt="The Arena" className="h-20 w-auto mx-auto object-contain drop-shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-transform group-hover:scale-105" />
           </Link>
-          <h1 className="text-2xl font-bold text-white mb-2">Welcome Back</h1>
-          <p className="text-zinc-400 text-sm">Sign in to access your account</p>
+          <h1 className="text-2xl font-bold text-primary mb-2">Welcome Back</h1>
+          <p className="text-secondary text-sm">Sign in to access your account</p>
         </div>
 
-        <div className="bg-zinc-900/50 backdrop-blur-xl border border-zinc-800 rounded-3xl p-8 shadow-2xl">
+        <div className="bg-surface-raised/50 backdrop-blur-xl border border-default rounded-3xl p-8 shadow-2xl">
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <label className="text-xs font-bold text-zinc-500 uppercase ml-1">Email Address</label>
+              <label className="text-xs font-bold text-muted uppercase ml-1">Email Address</label>
               <div className="relative group">
-                <Mail className="absolute left-4 top-3.5 h-5 w-5 text-zinc-500 group-focus-within:text-emerald-500 transition-colors" />
+                <Mail className="absolute left-4 top-3.5 h-5 w-5 text-muted group-focus-within:text-emerald-500 transition-colors" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-black/40 border border-zinc-700 rounded-xl pl-12 pr-4 py-3 text-white placeholder-zinc-600 focus:border-emerald-500 focus:outline-none transition-all"
+                  className="w-full bg-surface-base/40 border border-subtle rounded-xl pl-12 pr-4 py-3 text-primary placeholder-muted focus:border-emerald-500 focus:outline-none transition-all"
                   placeholder="john@example.com"
                   required
                 />
@@ -156,18 +156,18 @@ function LoginContent() {
 
             <div className="space-y-2">
               <div className="flex justify-between items-center ml-1">
-                <label className="text-xs font-bold text-zinc-500 uppercase">Password</label>
+                <label className="text-xs font-bold text-muted uppercase">Password</label>
                 <Link href="/forgot-password" className="text-xs text-emerald-500 hover:text-emerald-400 font-medium">
                   Forgot password?
                 </Link>
               </div>
               <div className="relative group">
-                <Lock className="absolute left-4 top-3.5 h-5 w-5 text-zinc-500 group-focus-within:text-emerald-500 transition-colors" />
+                <Lock className="absolute left-4 top-3.5 h-5 w-5 text-muted group-focus-within:text-emerald-500 transition-colors" />
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-black/40 border border-zinc-700 rounded-xl pl-12 pr-4 py-3 text-white placeholder-zinc-600 focus:border-emerald-500 focus:outline-none transition-all"
+                  className="w-full bg-surface-base/40 border border-subtle rounded-xl pl-12 pr-4 py-3 text-primary placeholder-muted focus:border-emerald-500 focus:outline-none transition-all"
                   placeholder="••••••••"
                   required
                 />
@@ -198,10 +198,10 @@ function LoginContent() {
               {/* Divider */}
               <div className="relative my-6">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-zinc-800" />
+                  <div className="w-full border-t border-default" />
                 </div>
                 <div className="relative flex justify-center">
-                  <span className="bg-zinc-900 px-3 text-xs text-zinc-500">or continue with</span>
+                  <span className="bg-surface-raised px-3 text-xs text-muted">or continue with</span>
                 </div>
               </div>
 
@@ -210,10 +210,10 @@ function LoginContent() {
                 type="button"
                 onClick={() => handleGoogleLogin()}
                 disabled={isGoogleLoading}
-                className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl border border-zinc-700 bg-black/30 hover:bg-zinc-800 hover:border-zinc-600 text-white text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl border border-subtle bg-surface-base/30 hover:bg-surface-overlay hover:border-subtle text-primary text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isGoogleLoading ? (
-                  <div className="w-4 h-4 border-2 border-zinc-600 border-t-white rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-subtle border-t-white rounded-full animate-spin" />
                 ) : (
                   <svg className="w-4 h-4" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -234,7 +234,7 @@ function LoginContent() {
                 <Mail className="w-5 h-5 text-amber-400 mt-0.5 flex-shrink-0" />
                 <div className="flex-1">
                   <p className="text-amber-300 text-sm font-semibold mb-1">Email Not Verified</p>
-                  <p className="text-zinc-400 text-xs leading-relaxed mb-3">
+                  <p className="text-secondary text-xs leading-relaxed mb-3">
                     Please verify your email address before logging in.
                     Check your inbox or click below to resend the link.
                   </p>
@@ -250,9 +250,9 @@ function LoginContent() {
             </div>
           )}
 
-          <p className="mt-8 text-center text-zinc-500 text-sm">
+          <p className="mt-8 text-center text-muted text-sm">
             Don&apos;t have an account?{" "}
-            <Link href="/signup" className="text-white font-bold hover:text-emerald-500 transition-colors">
+            <Link href="/signup" className="text-primary font-bold hover:text-emerald-500 transition-colors">
               Sign Up
             </Link>
           </p>
@@ -260,10 +260,10 @@ function LoginContent() {
 
         {/* Security Badge */}
         <div className="mt-8 flex justify-center gap-6 opacity-50">
-          <div className="flex items-center gap-2 text-zinc-600 text-xs">
+          <div className="flex items-center gap-2 text-faint text-xs">
             <Shield className="w-3 h-3" /> Secure SSL
           </div>
-          <div className="flex items-center gap-2 text-zinc-600 text-xs">
+          <div className="flex items-center gap-2 text-faint text-xs">
             <Lock className="w-3 h-3" /> Encrypted
           </div>
         </div>

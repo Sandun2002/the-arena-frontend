@@ -38,15 +38,15 @@ export default function BookingSuccessPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-black flex flex-col items-center justify-center gap-4">
+      <main className="min-h-screen bg-surface-base flex flex-col items-center justify-center gap-4">
         <div className="animate-spin w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full" />
-        <p className="text-zinc-400 text-sm">Confirming your booking…</p>
+        <p className="text-secondary text-sm">Confirming your booking…</p>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-black flex items-center justify-center p-4 pt-24">
+    <main className="min-h-screen bg-surface-base flex items-center justify-center p-4 pt-24">
       <div className="max-w-md w-full">
 
         {/* Success Icon */}
@@ -58,8 +58,8 @@ export default function BookingSuccessPage() {
               </div>
             </div>
           </div>
-          <h1 className="text-3xl font-black text-white mt-5 mb-2">Payment Successful!</h1>
-          <p className="text-zinc-400">
+          <h1 className="text-3xl font-black text-primary mt-5 mb-2">Payment Successful!</h1>
+          <p className="text-secondary">
             {booking?.status === "confirmed"
               ? "Your court is confirmed. See you on the court!"
               : "Your payment was received. Booking confirmation is on the way."}
@@ -68,43 +68,43 @@ export default function BookingSuccessPage() {
 
         {/* Booking Card */}
         {booking && (
-          <div className="bg-zinc-900/70 border border-zinc-800 rounded-2xl p-6 mb-6 space-y-4">
+          <div className="bg-surface-raised/70 border border-default rounded-2xl p-6 mb-6 space-y-4">
             <div className="flex justify-between items-start">
               <div>
                 <span className="inline-block px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full mb-2">
                   {booking.status === "confirmed" ? "Confirmed" : "Processing"}
                 </span>
-                <h2 className="text-lg font-bold text-white">
+                <h2 className="text-lg font-bold text-primary">
                   {booking.sport || booking.court?.sport_type?.name} at {booking.court?.venue_name}
                 </h2>
-                <p className="text-sm text-zinc-400">{booking.court?.name}</p>
+                <p className="text-sm text-secondary">{booking.court?.name}</p>
               </div>
               <div className="text-right">
-                <p className="text-xs text-zinc-500 mb-0.5">Total Paid</p>
+                <p className="text-xs text-muted mb-0.5">Total Paid</p>
                 <p className="text-lg font-bold text-emerald-400">
                   LKR {booking.total_price.toLocaleString()}
                 </p>
               </div>
             </div>
 
-            <div className="border-t border-zinc-800 pt-4 space-y-3">
+            <div className="border-t border-default pt-4 space-y-3">
               <div className="flex items-center gap-3 text-sm">
-                <Calendar className="w-4 h-4 text-zinc-500" />
-                <span className="text-white">{fmtDateShort(booking.start_time)}</span>
+                <Calendar className="w-4 h-4 text-muted" />
+                <span className="text-primary">{fmtDateShort(booking.start_time)}</span>
               </div>
               <div className="flex items-center gap-3 text-sm">
-                <Clock className="w-4 h-4 text-zinc-500" />
-                <span className="text-white">
+                <Clock className="w-4 h-4 text-muted" />
+                <span className="text-primary">
                   {fmtTime(booking.start_time)} – {fmtTime(booking.end_time)}
                 </span>
               </div>
               <div className="flex items-center gap-3 text-sm">
-                <MapPin className="w-4 h-4 text-zinc-500" />
-                <span className="text-white">{booking.court?.name}</span>
+                <MapPin className="w-4 h-4 text-muted" />
+                <span className="text-primary">{booking.court?.name}</span>
               </div>
             </div>
 
-            <div className="pt-2 text-[10px] font-mono text-zinc-600 border-t border-zinc-800">
+            <div className="pt-2 text-[10px] font-mono text-faint border-t border-default">
               REF: {booking.booking_reference}
             </div>
           </div>
@@ -120,7 +120,7 @@ export default function BookingSuccessPage() {
           </Link>
           <Link
             href="/bookings"
-            className="w-full py-3 text-sm text-zinc-400 text-center hover:text-white transition"
+            className="w-full py-3 text-sm text-secondary text-center hover:text-primary transition"
           >
             View All Bookings
           </Link>

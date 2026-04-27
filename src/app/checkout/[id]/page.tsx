@@ -183,7 +183,7 @@ export default function CheckoutPage() {
   // ---- Render states -----------------------------------------------------
   if (loading) {
     return (
-      <main className="min-h-screen bg-black flex items-center justify-center">
+      <main className="min-h-screen bg-surface-base flex items-center justify-center">
         <div className="animate-spin w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full" />
       </main>
     );
@@ -191,11 +191,11 @@ export default function CheckoutPage() {
 
   if (error || !booking || !checkoutData) {
     return (
-      <main className="min-h-screen bg-black flex items-center justify-center p-4">
-        <div className="max-w-md w-full text-center bg-zinc-900/80 border border-red-900/40 rounded-3xl p-10">
+      <main className="min-h-screen bg-surface-base flex items-center justify-center p-4">
+        <div className="max-w-md w-full text-center bg-surface-raised/80 border border-red-900/40 rounded-3xl p-10">
           <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-white mb-2">Checkout Unavailable</h2>
-          <p className="text-zinc-400 mb-6">{error ?? "Something went wrong."}</p>
+          <h2 className="text-2xl font-bold text-primary mb-2">Checkout Unavailable</h2>
+          <p className="text-secondary mb-6">{error ?? "Something went wrong."}</p>
           <button
             onClick={() => router.push("/venues")}
             className="px-6 py-2.5 bg-emerald-500 text-black font-bold rounded-xl hover:bg-emerald-400 transition"
@@ -218,19 +218,19 @@ export default function CheckoutPage() {
         onLoad={() => setSdkReady(true)}
       />
 
-      <main className="min-h-screen bg-black pt-24 pb-16 px-4">
+      <main className="min-h-screen bg-surface-base pt-24 pb-16 px-4">
         <div className="container mx-auto max-w-2xl">
 
           {/* Back */}
           <button
             onClick={() => router.back()}
-            className="inline-flex items-center text-sm text-zinc-500 hover:text-white mb-8 transition-colors"
+            className="inline-flex items-center text-sm text-muted hover:text-primary mb-8 transition-colors"
           >
             <ArrowLeft className="w-4 h-4 mr-2" /> Back
           </button>
 
-          <h1 className="text-3xl font-bold text-white mb-2">Complete Payment</h1>
-          <p className="text-zinc-400 mb-8">
+          <h1 className="text-3xl font-bold text-primary mb-2">Complete Payment</h1>
+          <p className="text-secondary mb-8">
             Confirm your slot by completing payment below.
           </p>
 
@@ -241,7 +241,7 @@ export default function CheckoutPage() {
                 ? "bg-red-900/20 border-red-700/40 text-red-400"
                 : countdown < 60
                 ? "bg-amber-900/20 border-amber-700/40 text-amber-400"
-                : "bg-zinc-900/60 border-zinc-700/40 text-zinc-300"
+                : "bg-surface-raised/60 border-subtle/40 text-secondary"
             }`}>
               <Clock className={`w-5 h-5 flex-shrink-0 ${isExpired ? "text-red-500" : countdown < 60 ? "text-amber-400" : "text-emerald-400"}`} />
               {isExpired ? (
@@ -257,23 +257,23 @@ export default function CheckoutPage() {
           <div className="grid gap-6 md:grid-cols-2">
 
             {/* Booking Summary */}
-            <div className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-6">
-              <h2 className="text-base font-bold text-white mb-5">Booking Summary</h2>
+            <div className="bg-surface-raised/60 border border-default rounded-2xl p-6">
+              <h2 className="text-base font-bold text-primary mb-5">Booking Summary</h2>
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
                   <MapPin className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="text-xs text-zinc-500 uppercase mb-0.5">Venue</p>
-                    <p className="text-sm font-medium text-white">{booking.court?.venue_name}</p>
-                    <p className="text-xs text-zinc-400">{booking.court?.name} — {booking.sport || booking.court?.sport_type?.name}</p>
+                    <p className="text-xs text-muted uppercase mb-0.5">Venue</p>
+                    <p className="text-sm font-medium text-primary">{booking.court?.venue_name}</p>
+                    <p className="text-xs text-secondary">{booking.court?.name} — {booking.sport || booking.court?.sport_type?.name}</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3">
                   <Calendar className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="text-xs text-zinc-500 uppercase mb-0.5">Date</p>
-                    <p className="text-sm font-medium text-white">
+                    <p className="text-xs text-muted uppercase mb-0.5">Date</p>
+                    <p className="text-sm font-medium text-primary">
                       {fmtDateShort(booking.start_time)}
                     </p>
                   </div>
@@ -282,43 +282,43 @@ export default function CheckoutPage() {
                 <div className="flex items-start gap-3">
                   <Clock className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="text-xs text-zinc-500 uppercase mb-0.5">Time</p>
-                    <p className="text-sm font-medium text-white">
+                    <p className="text-xs text-muted uppercase mb-0.5">Time</p>
+                    <p className="text-sm font-medium text-primary">
                       {fmtTime(booking.start_time)} – {fmtTime(booking.end_time)}
                     </p>
                   </div>
                 </div>
 
-                <div className="border-t border-zinc-800 pt-4 mt-2 space-y-2">
-                  <div className="flex justify-between text-sm text-zinc-400">
+                <div className="border-t border-default pt-4 mt-2 space-y-2">
+                  <div className="flex justify-between text-sm text-secondary">
                     <span>Court ({booking.duration_hours}h)</span>
                     <span>LKR {booking.subtotal.toLocaleString()}</span>
                   </div>
-                  <div className="flex justify-between text-sm text-zinc-400">
+                  <div className="flex justify-between text-sm text-secondary">
                     <span>Platform Fee</span>
                     <span>LKR {booking.platform_fee.toLocaleString()}</span>
                   </div>
-                  <div className="flex justify-between text-base font-bold text-white pt-2 border-t border-zinc-800">
+                  <div className="flex justify-between text-base font-bold text-primary pt-2 border-t border-default">
                     <span>Total</span>
                     <span>LKR {booking.total_price.toLocaleString()}</span>
                   </div>
                 </div>
 
-                <div className="text-[10px] text-zinc-600 font-mono">REF: {booking.booking_reference}</div>
+                <div className="text-[10px] text-faint font-mono">REF: {booking.booking_reference}</div>
               </div>
             </div>
 
             {/* Payment Panel */}
             <div className="flex flex-col gap-4">
-              <div className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-6">
-                <h2 className="text-base font-bold text-white mb-4">Payment via PayHere</h2>
+              <div className="bg-surface-raised/60 border border-default rounded-2xl p-6">
+                <h2 className="text-base font-bold text-primary mb-4">Payment via PayHere</h2>
 
                 <div className="flex items-center gap-2 mb-5">
                   <Shield className="w-4 h-4 text-emerald-400" />
-                  <span className="text-xs text-zinc-400">Secured by PayHere · SSL Encrypted</span>
+                  <span className="text-xs text-secondary">Secured by PayHere · SSL Encrypted</span>
                 </div>
 
-                <div className="text-3xl font-black text-white mb-6">
+                <div className="text-3xl font-black text-primary mb-6">
                   LKR {booking.total_price.toLocaleString()}
                 </div>
 
@@ -328,7 +328,7 @@ export default function CheckoutPage() {
                   disabled={paying || isExpired || !sdkReady}
                   className={`w-full py-3.5 rounded-xl font-bold text-base transition-all flex items-center justify-center gap-2 ${
                     paying || isExpired || !sdkReady
-                      ? "bg-zinc-800 text-zinc-500 cursor-not-allowed"
+                      ? "bg-surface-overlay text-muted cursor-not-allowed"
                       : "bg-emerald-500 text-black hover:bg-emerald-400 shadow-lg shadow-emerald-500/20"
                   }`}
                 >
@@ -349,7 +349,7 @@ export default function CheckoutPage() {
                 {isExpired && (
                   <button
                     onClick={() => router.push("/venues")}
-                    className="w-full mt-3 py-3 rounded-xl font-bold text-sm border border-zinc-700 text-zinc-300 hover:bg-zinc-800 transition"
+                    className="w-full mt-3 py-3 rounded-xl font-bold text-sm border border-subtle text-secondary hover:bg-surface-overlay transition"
                   >
                     Find Another Venue
                   </button>

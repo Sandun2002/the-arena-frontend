@@ -9,13 +9,13 @@ export default function Footer() {
   const isVenueContext = pathname?.startsWith("/venue-dashboard");
 
   return (
-    <footer className={`w-full border-t border-zinc-800 bg-black pt-12 pb-28 md:pb-12 text-zinc-400${isVenueContext ? " hidden" : ""}`}>
+    <footer className={`w-full border-t border-default bg-surface-base pt-12 pb-28 md:pb-12 text-secondary${isVenueContext ? " hidden" : ""}`}>
       <div className="container mx-auto px-4 md:px-6">
         <div className="grid gap-8 md:grid-cols-4">
           
           {/* Brand Column */}
           <div className="space-y-4">
-            <h3 className="text-lg font-bold text-white">
+            <h3 className="text-lg font-bold text-primary">
               THE <span className="text-emerald-500">ARENA</span>
             </h3>
             <p className="text-sm">
@@ -25,7 +25,7 @@ export default function Footer() {
 
           {/* Links Column 1 */}
           <div>
-            <h4 className="mb-4 font-semibold text-white">Company</h4>
+            <h4 className="mb-4 font-semibold text-primary">Company</h4>
             <ul className="space-y-2 text-sm">
               <li><Link href="/about" className="hover:text-emerald-400">About Us</Link></li>
               <li><Link href="/partner" className="hover:text-emerald-400">Partner</Link></li>
@@ -35,7 +35,7 @@ export default function Footer() {
 
           {/* Links Column 2 */}
           <div>
-            <h4 className="mb-4 font-semibold text-white">Support</h4>
+            <h4 className="mb-4 font-semibold text-primary">Support</h4>
             <ul className="space-y-2 text-sm">
               <li><Link href="/help" className="hover:text-emerald-400">Help Center</Link></li>
               <li><Link href="/terms" className="hover:text-emerald-400">Terms of Service</Link></li>
@@ -45,7 +45,7 @@ export default function Footer() {
 
           {/* Socials Column */}
           <div>
-            <h4 className="mb-4 font-semibold text-white">Follow Us</h4>
+            <h4 className="mb-4 font-semibold text-primary">Follow Us</h4>
             <div className="flex gap-4">
               <Link href="#" aria-label="Follow us on Instagram" className="hover:text-emerald-400 transition-colors">
                 <Instagram className="h-5 w-5" />
@@ -60,7 +60,7 @@ export default function Footer() {
           </div>
         </div>
         
-        <div className="mt-12 border-t border-zinc-800 pt-8 text-center text-xs">
+        <div className="mt-12 border-t border-default pt-8 text-center text-xs">
           &copy; <span suppressHydrationWarning>{new Date().getFullYear()}</span> The Arena. All rights reserved.
         </div>
       </div>

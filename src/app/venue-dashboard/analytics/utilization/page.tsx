@@ -44,7 +44,7 @@ export default function UtilizationAnalyticsPage() {
     if (!user || !currentVenue) return null;
 
     return (
-        <main className="min-h-screen bg-black pt-24 pb-12 px-4">
+        <main className="min-h-screen bg-surface-base pt-24 pb-12 px-4">
             {/* Background Effects */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
                 <div className="absolute top-20 left-1/4 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-[150px]" />
@@ -52,27 +52,27 @@ export default function UtilizationAnalyticsPage() {
 
             <div className="container mx-auto max-w-5xl relative z-10">
                 <div className="mb-6">
-                    <Button variant="ghost" onClick={() => router.back()} className="text-zinc-400 hover:text-white pl-0">
+                    <Button variant="ghost" onClick={() => router.back()} className="text-secondary hover:text-primary pl-0">
                         <ArrowLeft className="w-4 h-4 mr-2" /> Back to Analytics
                     </Button>
                 </div>
 
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                     <div>
-                        <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-2">
+                        <h1 className="text-3xl font-bold text-primary mb-2 flex items-center gap-2">
                             <Zap className="w-8 h-8 text-blue-500" /> Utilization Analytics
                         </h1>
-                        <p className="text-zinc-400">Court usage and peak hours for <span className="text-emerald-500">{currentVenue.name}</span>.</p>
+                        <p className="text-secondary">Court usage and peak hours for <span className="text-emerald-500">{currentVenue.name}</span>.</p>
                     </div>
 
-                    <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded-lg p-1">
+                    <div className="flex items-center gap-2 bg-surface-raised border border-default rounded-lg p-1">
                         {(['daily', 'weekly', 'monthly'] as const).map((p) => (
                             <button
                                 key={p}
                                 onClick={() => setPeriod(p)}
                                 className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${period === p
-                                        ? "bg-zinc-800 text-white shadow-sm"
-                                        : "text-zinc-500 hover:text-zinc-300"
+                                        ? "bg-surface-overlay text-primary shadow-sm"
+                                        : "text-muted hover:text-secondary"
                                     } capitalization`}
                             >
                                 {p}
@@ -83,16 +83,16 @@ export default function UtilizationAnalyticsPage() {
 
                 {isLoading && !data ? (
                     <div className="h-96 flex items-center justify-center">
-                        <Loader2 className="w-8 h-8 animate-spin text-zinc-500" />
+                        <Loader2 className="w-8 h-8 animate-spin text-muted" />
                     </div>
                 ) : (
                     <div className="space-y-6">
                         {/* Overall Utilization Card */}
-                        <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-8 backdrop-blur-sm">
+                        <div className="bg-surface-raised/40 border border-default rounded-3xl p-8 backdrop-blur-sm">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-zinc-500 font-medium mb-1">Overall Utilization ({period})</p>
-                                    <h2 className="text-4xl font-bold text-white">{data?.overall_percentage || 0}%</h2>
+                                    <p className="text-muted font-medium mb-1">Overall Utilization ({period})</p>
+                                    <h2 className="text-4xl font-bold text-primary">{data?.overall_percentage || 0}%</h2>
                                 </div>
                                 <div className="w-24 h-24 relative flex items-center justify-center">
                                     <svg className="w-full h-full transform -rotate-90">
@@ -109,19 +109,19 @@ export default function UtilizationAnalyticsPage() {
 
                         <div className="grid md:grid-cols-2 gap-8">
                             {/* Booking Status Breakdown */}
-                            <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-8 backdrop-blur-sm">
-                                <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
-                                    <BarChart2 className="w-5 h-5 text-zinc-500" /> Booking Status
+                            <div className="bg-surface-raised/40 border border-default rounded-3xl p-8 backdrop-blur-sm">
+                                <h3 className="text-lg font-bold text-primary mb-6 flex items-center gap-2">
+                                    <BarChart2 className="w-5 h-5 text-muted" /> Booking Status
                                 </h3>
                                 <div className="space-y-4">
                                     {data?.status_breakdown && data.status_breakdown.length > 0 ? (
                                         data.status_breakdown.map((slot, i) => (
                                             <div key={i}>
-                                                <div className="flex justify-between text-xs text-zinc-400 mb-1">
-                                                    <span className="font-medium text-white">{slot.label}</span>
+                                                <div className="flex justify-between text-xs text-secondary mb-1">
+                                                    <span className="font-medium text-primary">{slot.label}</span>
                                                     <span>{slot.percentage}% ({slot.hours} hours)</span>
                                                 </div>
-                                                <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
+                                                <div className="h-2 bg-surface-overlay rounded-full overflow-hidden">
                                                     <div
                                                         className={`h-full rounded-full ${i < 1 ? "bg-emerald-500" : "bg-yellow-500"}`}
                                                         style={{ width: `${slot.percentage}%` }}
@@ -130,38 +130,38 @@ export default function UtilizationAnalyticsPage() {
                                             </div>
                                         ))
                                     ) : (
-                                        <div className="h-40 flex items-center justify-center text-zinc-500 text-sm italic">
+                                        <div className="h-40 flex items-center justify-center text-muted text-sm italic">
                                             No breakdown data available
                                         </div>
                                     )}
                                 </div>
-                                <div className="mt-8 pt-6 border-t border-zinc-800/50">
+                                <div className="mt-8 pt-6 border-t border-default/50">
                                     <div className="flex justify-between text-sm mb-2">
-                                        <span className="text-zinc-400">Total Booked Hours</span>
-                                        <span className="text-white font-bold">{data?.total_booked_hours || 0}</span>
+                                        <span className="text-secondary">Total Booked Hours</span>
+                                        <span className="text-primary font-bold">{data?.total_booked_hours || 0}</span>
                                     </div>
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-zinc-400">Total Available Hours</span>
-                                        <span className="text-white font-bold">{data?.total_available_hours || 0}</span>
+                                        <span className="text-secondary">Total Available Hours</span>
+                                        <span className="text-primary font-bold">{data?.total_available_hours || 0}</span>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Court Breakdown */}
-                            <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-8 backdrop-blur-sm">
-                                <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
-                                    <BarChart2 className="w-5 h-5 text-zinc-500" /> By Court
+                            <div className="bg-surface-raised/40 border border-default rounded-3xl p-8 backdrop-blur-sm">
+                                <h3 className="text-lg font-bold text-primary mb-6 flex items-center gap-2">
+                                    <BarChart2 className="w-5 h-5 text-muted" /> By Court
                                 </h3>
                                 <div className="space-y-4">
                                     {data?.court_breakdown && data.court_breakdown.length > 0 ? (
                                         data.court_breakdown.map((court, i) => (
                                             <div key={i} className="flex items-center gap-4">
                                                 <div className="flex-1">
-                                                    <div className="flex justify-between text-sm font-medium text-white mb-1">
+                                                    <div className="flex justify-between text-sm font-medium text-primary mb-1">
                                                         <span>{court.court_name}</span>
                                                         <span>{court.percentage}%</span>
                                                     </div>
-                                                    <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
+                                                    <div className="h-2 bg-surface-overlay rounded-full overflow-hidden">
                                                         <div
                                                             className="h-full rounded-full bg-emerald-500"
                                                             style={{ width: `${court.percentage}%` }}
@@ -171,7 +171,7 @@ export default function UtilizationAnalyticsPage() {
                                             </div>
                                         ))
                                     ) : (
-                                        <div className="h-40 flex items-center justify-center text-zinc-500 text-sm italic">
+                                        <div className="h-40 flex items-center justify-center text-muted text-sm italic">
                                             No court data available
                                         </div>
                                     )}

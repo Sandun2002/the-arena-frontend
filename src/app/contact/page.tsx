@@ -54,7 +54,7 @@ export default function ContactPage() {
     }
 
     return (
-        <main ref={containerRef} className="min-h-screen bg-black pt-32 pb-20 relative overflow-hidden">
+        <main ref={containerRef} className="min-h-screen bg-surface-base pt-32 pb-20 relative overflow-hidden">
 
             {/* Background Ambience */}
             <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[120px] pointer-events-none" />
@@ -64,13 +64,13 @@ export default function ContactPage() {
 
                 {/* Header */}
                 <div className="text-center mb-16 md:mb-24">
-                    <div className="contact-anim inline-block mb-4 px-4 py-1.5 rounded-full bg-zinc-900/80 border border-zinc-800 text-emerald-400 text-xs font-bold tracking-widest uppercase">
+                    <div className="contact-anim inline-block mb-4 px-4 py-1.5 rounded-full bg-surface-raised/80 border border-default text-emerald-400 text-xs font-bold tracking-widest uppercase">
                         Contact Us
                     </div>
-                    <h1 className="contact-anim text-5xl md:text-7xl font-black text-white mb-6 tracking-tighter">
+                    <h1 className="contact-anim text-5xl md:text-7xl font-black text-primary mb-6 tracking-tighter">
                         GET IN <span className="text-emerald-500">TOUCH</span>
                     </h1>
-                    <p className="contact-anim text-xl text-zinc-400 max-w-2xl mx-auto">
+                    <p className="contact-anim text-xl text-secondary max-w-2xl mx-auto">
                         Have a question about a booking or want to report an issue? Our team is available 24/7 to help you get back in the game.
                     </p>
                 </div>
@@ -79,12 +79,12 @@ export default function ContactPage() {
 
                     {/* Info Side */}
                     <div className="space-y-8">
-                        <div className="contact-anim group p-8 rounded-3xl bg-zinc-900/30 border border-zinc-800 hover:border-emerald-500/50 hover:bg-zinc-900/50 transition-all duration-300">
-                            <div className="w-12 h-12 bg-zinc-800 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <div className="contact-anim group p-8 rounded-3xl bg-surface-raised/30 border border-default hover:border-emerald-500/50 hover:bg-surface-raised/50 transition-all duration-300">
+                            <div className="w-12 h-12 bg-surface-overlay rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                                 <Mail className="h-6 w-6 text-emerald-500" />
                             </div>
-                            <h3 className="text-2xl font-bold text-white mb-2">Email Us</h3>
-                            <p className="text-zinc-400 mb-4">For general inquiries and support.</p>
+                            <h3 className="text-2xl font-bold text-primary mb-2">Email Us</h3>
+                            <p className="text-secondary mb-4">For general inquiries and support.</p>
                             <div className="flex flex-col gap-1">
                                 <a href="mailto:admin@thearena.lk" className="text-emerald-400 font-bold hover:text-emerald-300 transition-colors">
                                     admin@thearena.lk
@@ -98,12 +98,12 @@ export default function ContactPage() {
                             </div>
                         </div>
 
-                        <div className="contact-anim group p-8 rounded-3xl bg-zinc-900/30 border border-zinc-800 hover:border-emerald-500/50 hover:bg-zinc-900/50 transition-all duration-300">
-                            <div className="w-12 h-12 bg-zinc-800 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <div className="contact-anim group p-8 rounded-3xl bg-surface-raised/30 border border-default hover:border-emerald-500/50 hover:bg-surface-raised/50 transition-all duration-300">
+                            <div className="w-12 h-12 bg-surface-overlay rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                                 <Phone className="h-6 w-6 text-emerald-500" />
                             </div>
-                            <h3 className="text-2xl font-bold text-white mb-2">Call Us</h3>
-                            <p className="text-zinc-400 mb-4">Available during business hours.</p>
+                            <h3 className="text-2xl font-bold text-primary mb-2">Call Us</h3>
+                            <p className="text-secondary mb-4">Available during business hours.</p>
                             <div className="flex flex-col gap-1">
                                 <a href="tel:+94710509041" className="text-emerald-400 font-bold hover:text-emerald-300 transition-colors">
                                     +94 71 050 9041
@@ -114,12 +114,12 @@ export default function ContactPage() {
                             </div>
                         </div>
 
-                        <div className="contact-anim group p-8 rounded-3xl bg-zinc-900/30 border border-zinc-800 hover:border-emerald-500/50 hover:bg-zinc-900/50 transition-all duration-300">
-                            <div className="w-12 h-12 bg-zinc-800 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <div className="contact-anim group p-8 rounded-3xl bg-surface-raised/30 border border-default hover:border-emerald-500/50 hover:bg-surface-raised/50 transition-all duration-300">
+                            <div className="w-12 h-12 bg-surface-overlay rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                                 <MapPin className="h-6 w-6 text-emerald-500" />
                             </div>
-                            <h3 className="text-2xl font-bold text-white mb-2">Visit HQ</h3>
-                            <p className="text-zinc-400">
+                            <h3 className="text-2xl font-bold text-primary mb-2">Visit HQ</h3>
+                            <p className="text-secondary">
                                 26/12b Station Road,<br />Dehiwala, Sri Lanka
                             </p>
                         </div>
@@ -129,32 +129,32 @@ export default function ContactPage() {
                     <div className="contact-anim relative">
                         <div className="absolute inset-0 bg-emerald-500/10 blur-[80px] rounded-full pointer-events-none" />
 
-                        <div className="relative bg-zinc-900/80 border border-zinc-800 rounded-3xl p-8 md:p-10 backdrop-blur-xl shadow-2xl">
+                        <div className="relative bg-surface-raised/80 border border-default rounded-3xl p-8 md:p-10 backdrop-blur-xl shadow-2xl">
                             {submitted ? (
                                 <div className="flex flex-col items-center justify-center py-16 text-center gap-6">
                                     <div className="w-16 h-16 rounded-full bg-emerald-500/15 flex items-center justify-center">
                                         <CheckCircle className="w-8 h-8 text-emerald-500" />
                                     </div>
                                     <div>
-                                        <h3 className="text-2xl font-bold text-white mb-2">Message Sent!</h3>
-                                        <p className="text-zinc-400">Thanks for reaching out. Our team will get back to you shortly.</p>
+                                        <h3 className="text-2xl font-bold text-primary mb-2">Message Sent!</h3>
+                                        <p className="text-secondary">Thanks for reaching out. Our team will get back to you shortly.</p>
                                     </div>
                                 </div>
                             ) : (
                                 <>
                                     <div className="flex items-center gap-3 mb-8">
                                         <MessageSquare className="w-6 h-6 text-emerald-500" />
-                                        <h3 className="text-2xl font-bold text-white">Send a Message</h3>
+                                        <h3 className="text-2xl font-bold text-primary">Send a Message</h3>
                                     </div>
 
                                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
                                         <div className="grid grid-cols-2 gap-6">
                                             <div className="space-y-2">
-                                                <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">First Name</label>
+                                                <label className="text-xs font-bold text-muted uppercase tracking-wider">First Name</label>
                                                 <input
                                                     type="text"
                                                     {...register("first_name")}
-                                                    className="w-full bg-black/50 border border-zinc-700 rounded-xl p-4 text-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all placeholder:text-zinc-700"
+                                                    className="w-full bg-surface-base/50 border border-subtle rounded-xl p-4 text-primary focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all placeholder:text-faint"
                                                     placeholder="John"
                                                 />
                                                 {errors.first_name && (
@@ -162,11 +162,11 @@ export default function ContactPage() {
                                                 )}
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Last Name</label>
+                                                <label className="text-xs font-bold text-muted uppercase tracking-wider">Last Name</label>
                                                 <input
                                                     type="text"
                                                     {...register("last_name")}
-                                                    className="w-full bg-black/50 border border-zinc-700 rounded-xl p-4 text-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all placeholder:text-zinc-700"
+                                                    className="w-full bg-surface-base/50 border border-subtle rounded-xl p-4 text-primary focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all placeholder:text-faint"
                                                     placeholder="Doe"
                                                 />
                                                 {errors.last_name && (
@@ -176,11 +176,11 @@ export default function ContactPage() {
                                         </div>
 
                                         <div className="space-y-2">
-                                            <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Email Address</label>
+                                            <label className="text-xs font-bold text-muted uppercase tracking-wider">Email Address</label>
                                             <input
                                                 type="email"
                                                 {...register("email")}
-                                                className="w-full bg-black/50 border border-zinc-700 rounded-xl p-4 text-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all placeholder:text-zinc-700"
+                                                className="w-full bg-surface-base/50 border border-subtle rounded-xl p-4 text-primary focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all placeholder:text-faint"
                                                 placeholder="john@example.com"
                                             />
                                             {errors.email && (
@@ -189,11 +189,11 @@ export default function ContactPage() {
                                         </div>
 
                                         <div className="space-y-2">
-                                            <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Message</label>
+                                            <label className="text-xs font-bold text-muted uppercase tracking-wider">Message</label>
                                             <textarea
                                                 rows={5}
                                                 {...register("message")}
-                                                className="w-full bg-black/50 border border-zinc-700 rounded-xl p-4 text-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all placeholder:text-zinc-700 resize-none"
+                                                className="w-full bg-surface-base/50 border border-subtle rounded-xl p-4 text-primary focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all placeholder:text-faint resize-none"
                                                 placeholder="How can we help you?"
                                             ></textarea>
                                             {errors.message && (
@@ -210,7 +210,7 @@ export default function ContactPage() {
                                         <Button
                                             type="submit"
                                             disabled={isSubmitting}
-                                            className="w-full py-5 text-lg font-bold bg-emerald-500 text-black hover:bg-white transition-colors group disabled:opacity-60 disabled:cursor-not-allowed"
+                                            className="w-full py-5 text-lg font-bold bg-emerald-500 text-black hover:bg-emerald-300 transition-colors group disabled:opacity-60 disabled:cursor-not-allowed"
                                         >
                                             <span className="flex items-center justify-center gap-2">
                                                 {isSubmitting ? (

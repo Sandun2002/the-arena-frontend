@@ -93,13 +93,13 @@ export default function GamificationTeaser() {
   return (
     <section
       ref={sectionRef}
-      className="py-20 bg-gradient-to-b from-zinc-900/40 via-black to-black relative overflow-hidden"
+      className="py-20 bg-gradient-to-b from-surface-raised/40 via-surface-base to-surface-base relative overflow-hidden"
     >
       {/* Hex grid background */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-[0.02]"
+        className="absolute inset-0 pointer-events-none opacity-[0.06]"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='52' viewBox='0 0 60 52' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 17.3v17.3L30 52 0 34.6V17.3L30 0z' fill='none' stroke='%23ffffff' stroke-width='1'/%3E%3C/svg%3E")`,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='52' viewBox='0 0 60 52' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 17.3v17.3L30 52 0 34.6V17.3L30 0z' fill='none' stroke='%2371717a' stroke-width='1'/%3E%3C/svg%3E")`,
           backgroundSize: "60px 52px",
         }}
       />
@@ -126,17 +126,17 @@ export default function GamificationTeaser() {
           <div className="text-center mb-10 animate-in">
             <div className="inline-flex items-center gap-2 mb-4">
               <Trophy className="w-5 h-5 text-amber-500" />
-              <span className="text-xs font-black tracking-[0.2em] uppercase text-zinc-500">
+              <span className="text-xs font-black tracking-[0.2em] uppercase text-muted">
                 Gamification
               </span>
             </div>
-            <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tight mb-3">
+            <h2 className="text-3xl md:text-5xl font-black text-primary uppercase tracking-tight mb-3">
               Level Up Your{" "}
               <span className="text-transparent bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text">
                 Game
               </span>
             </h2>
-            <p className="text-zinc-400 max-w-lg mx-auto">
+            <p className="text-secondary max-w-lg mx-auto">
               Book courts. Earn XP. Climb the ranks. Unlock exclusive rewards
               as you play.
             </p>
@@ -146,7 +146,7 @@ export default function GamificationTeaser() {
           <div className="mb-12 animate-in">
             <div className="flex items-center gap-2 mb-4">
               <Zap className="w-4 h-4 text-emerald-500" />
-              <span className="text-xs font-bold tracking-widest uppercase text-zinc-500">
+              <span className="text-xs font-bold tracking-widest uppercase text-muted">
                 8 Tiers to Unlock
               </span>
             </div>
@@ -168,7 +168,7 @@ export default function GamificationTeaser() {
                 {TIER_LADDER.map((tier, i) => (
                   <div
                     key={tier.name}
-                    className="relative flex w-[130px] shrink-0 flex-col items-center gap-3 rounded-2xl border border-zinc-800/70 bg-zinc-900/50 p-4 transition-all duration-300"
+                    className="relative flex w-[130px] shrink-0 flex-col items-center gap-3 rounded-2xl border border-default/70 bg-surface-raised/50 p-4 transition-all duration-300"
                     style={{
                       filter: "grayscale(0.6) brightness(0.4)", // All tiers appear locked for guests
                     }}
@@ -193,14 +193,14 @@ export default function GamificationTeaser() {
                       >
                         {tier.name}
                       </div>
-                      <div className="text-[10px] text-zinc-500 mt-0.5">
+                      <div className="text-[10px] text-muted mt-0.5">
                         {tier.minXp.toLocaleString()} XP
                       </div>
                     </div>
 
                     {/* Arrow (except last) */}
                     {i < TIER_LADDER.length - 1 && (
-                      <div className="hidden md:flex absolute -right-2 top-1/2 -translate-y-1/2 text-zinc-700">
+                      <div className="hidden md:flex absolute -right-2 top-1/2 -translate-y-1/2 text-faint">
                         <span className="text-xs">→</span>
                       </div>
                     )}
@@ -213,7 +213,7 @@ export default function GamificationTeaser() {
           {/* Sample Challenges */}
           <div className="mb-12 animate-in">
             <div className="flex items-center gap-2 mb-4">
-              <span className="text-xs font-bold tracking-widest uppercase text-zinc-500">
+              <span className="text-xs font-bold tracking-widest uppercase text-muted">
                 Sample Challenges
               </span>
             </div>
@@ -226,9 +226,9 @@ export default function GamificationTeaser() {
                     key={idx}
                     className="group relative flex flex-col overflow-hidden rounded-2xl border cursor-default transition-all duration-300 hover:-translate-y-0.5"
                     style={{
-                      background: "rgba(12,12,14,0.97)",
+                      background: "var(--surface-raised)",
                       borderColor: rarity.border,
-                      boxShadow: `0 6px 20px rgba(0,0,0,0.35)`,
+                      boxShadow: `0 6px 20px var(--shadow-elevation)`,
                     }}
                   >
                     {/* Top accent strip */}
@@ -267,7 +267,7 @@ export default function GamificationTeaser() {
                       </div>
 
                       {/* Title */}
-                      <h3 className="text-sm font-black leading-snug text-white">
+                      <h3 className="text-sm font-black leading-snug text-primary">
                         {challenge.title}
                       </h3>
 
@@ -298,7 +298,7 @@ export default function GamificationTeaser() {
               {user ? "Start Earning XP" : "Start Earning XP"}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <p className="text-zinc-500 text-xs mt-3">
+            <p className="text-muted text-xs mt-3">
               {user
                 ? "Complete challenges to climb the leaderboard"
                 : "Sign up to track your progress and earn rewards"}

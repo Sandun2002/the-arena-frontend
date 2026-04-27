@@ -117,21 +117,21 @@ export default function BookingPage() {
         }
     };
 
-    if (loading) return <div className="min-h-screen bg-black flex items-center justify-center text-emerald-500"><Loader2 className="w-8 h-8 animate-spin" /></div>;
-    if (!venue) return <div className="min-h-screen bg-black pt-24 text-white text-center">Venue not found</div>;
+    if (loading) return <div className="min-h-screen bg-surface-base flex items-center justify-center text-emerald-500"><Loader2 className="w-8 h-8 animate-spin" /></div>;
+    if (!venue) return <div className="min-h-screen bg-surface-base pt-24 text-primary text-center">Venue not found</div>;
 
     return (
-        <main className="min-h-screen bg-black pt-24 pb-12 px-4 selection:bg-emerald-500/30">
+        <main className="min-h-screen bg-surface-base pt-24 pb-12 px-4 selection:bg-emerald-500/30">
             <div className="container mx-auto max-w-4xl">
 
                 {/* Header */}
                 <div className="flex items-center gap-4 mb-8">
-                    <Link href={`/venues/${venueId}`} className="p-2 bg-zinc-900 rounded-full text-zinc-400 hover:text-white transition-colors">
+                    <Link href={`/venues/${venueId}`} className="p-2 bg-surface-raised rounded-full text-secondary hover:text-primary transition-colors">
                         <ArrowLeft className="w-5 h-5" />
                     </Link>
                     <div>
-                        <h1 className="text-2xl font-bold text-white mb-1">Book {venue.name}</h1>
-                        <div className="flex items-center gap-4 text-sm text-zinc-500">
+                        <h1 className="text-2xl font-bold text-primary mb-1">Book {venue.name}</h1>
+                        <div className="flex items-center gap-4 text-sm text-muted">
                             <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> {venue.city}</span>
                             <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> Step {step} of 3</span>
                         </div>
@@ -139,29 +139,29 @@ export default function BookingPage() {
                 </div>
 
                 {/* Progress Bar */}
-                <div className="w-full h-1 bg-zinc-900 rounded-full mb-8 overflow-hidden">
+                <div className="w-full h-1 bg-surface-raised rounded-full mb-8 overflow-hidden">
                     <div className="h-full bg-emerald-500 transition-all duration-500" style={{ width: `${(step / 3) * 100}%` }}></div>
                 </div>
 
                 {/* Step 1: Select Sport & Date */}
                 {step === 1 && (
                     <div className="space-y-8 animate-in fade-in slide-in-from-left-4 duration-300">
-                        <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-6 md:p-8">
-                            <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                        <div className="bg-surface-raised/50 border border-default rounded-3xl p-6 md:p-8">
+                            <h2 className="text-xl font-bold text-primary mb-6 flex items-center gap-2">
                                 <span className="w-8 h-8 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center text-sm font-bold border border-emerald-500/20">1</span>
                                 Choose Sport & Date
                             </h2>
 
                             <div className="grid md:grid-cols-2 gap-8">
                                 <div>
-                                    <label className="block text-xs font-bold text-zinc-500 uppercase mb-3">Sport</label>
+                                    <label className="block text-xs font-bold text-muted uppercase mb-3">Sport</label>
                                     <div className="grid grid-cols-2 gap-3">
                                         {Array.from(new Set(courts.map(c => c.sport_type?.name || 'Futsal'))).map((sportName) => {
                                             return (
                                                 <button
                                                     key={sportName}
                                                     onClick={() => setSelectedSport(sportName)}
-                                                    className={`p-4 rounded-xl border font-bold text-sm transition-all ${selectedSport === sportName ? 'bg-emerald-500 text-black border-emerald-500' : 'bg-black/40 border-zinc-800 text-zinc-400 hover:border-zinc-600'}`}
+                                                    className={`p-4 rounded-xl border font-bold text-sm transition-all ${selectedSport === sportName ? 'bg-emerald-500 text-black border-emerald-500' : 'bg-surface-base/40 border-default text-secondary hover:border-subtle'}`}
                                                 >
                                                     {sportName}
                                                 </button>
@@ -171,7 +171,7 @@ export default function BookingPage() {
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-bold text-zinc-500 uppercase mb-3">Date</label>
+                                    <label className="block text-xs font-bold text-muted uppercase mb-3">Date</label>
                                     <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                                         {[0, 1, 2, 3, 4, 5, 6].map((offset) => {
                                             const date = addDays(startOfToday(), offset);
@@ -180,7 +180,7 @@ export default function BookingPage() {
                                                 <button
                                                     key={offset}
                                                     onClick={() => setSelectedDate(date)}
-                                                    className={`flex-shrink-0 w-16 h-20 rounded-xl border flex flex-col items-center justify-center gap-1 transition-all ${isSelected ? 'bg-white text-black border-white' : 'bg-black/40 border-zinc-800 text-zinc-500 hover:border-zinc-600'}`}
+                                                    className={`flex-shrink-0 w-16 h-20 rounded-xl border flex flex-col items-center justify-center gap-1 transition-all ${isSelected ? 'bg-primary text-inverted border-primary' : 'bg-surface-base/40 border-default text-muted hover:border-subtle'}`}
                                                 >
                                                     <span className="text-xs font-medium uppercase">{format(date, "EEE")}</span>
                                                     <span className="text-xl font-bold">{format(date, "d")}</span>
@@ -215,21 +215,21 @@ export default function BookingPage() {
                                         <button
                                             key={court.id}
                                             onClick={() => { setSelectedCourt(court.id); setSelectedSlot(null); }}
-                                            className={`flex-shrink-0 min-w-[200px] p-4 rounded-2xl border text-left transition-all ${selectedCourt === court.id ? 'bg-emerald-500/10 border-emerald-500 ring-1 ring-emerald-500/50' : 'bg-zinc-900/50 border-zinc-800 hover:border-zinc-700'}`}
+                                            className={`flex-shrink-0 min-w-[200px] p-4 rounded-2xl border text-left transition-all ${selectedCourt === court.id ? 'bg-emerald-500/10 border-emerald-500 ring-1 ring-emerald-500/50' : 'bg-surface-raised/50 border-default hover:border-subtle'}`}
                                         >
-                                            <h3 className={`font-bold ${selectedCourt === court.id ? 'text-emerald-500' : 'text-white'}`}>{court.name}</h3>
-                                            <p className="text-xs text-zinc-500 mt-1">{court.is_indoor ? 'Indoor' : 'Outdoor'}</p>
-                                            <p className="text-sm font-bold text-white mt-3">LKR {court.hourly_rate}/hr</p>
+                                            <h3 className={`font-bold ${selectedCourt === court.id ? 'text-emerald-500' : 'text-primary'}`}>{court.name}</h3>
+                                            <p className="text-xs text-muted mt-1">{court.is_indoor ? 'Indoor' : 'Outdoor'}</p>
+                                            <p className="text-sm font-bold text-primary mt-3">LKR {court.hourly_rate}/hr</p>
                                         </button>
                                     ))
                             ) : (
-                                <p className="text-zinc-500">No courts available for {selectedSport}.</p>
+                                <p className="text-muted">No courts available for {selectedSport}.</p>
                             )}
                         </div>
 
                         {selectedCourt && (
-                            <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-6 md:p-8">
-                                <h3 className="text-lg font-bold text-white mb-6">Available Slots for {format(selectedDate, "MMMM d")}</h3>
+                            <div className="bg-surface-raised/50 border border-default rounded-3xl p-6 md:p-8">
+                                <h3 className="text-lg font-bold text-primary mb-6">Available Slots for {format(selectedDate, "MMMM d")}</h3>
 
                                 {loadingSlots ? (
                                     <div className="flex justify-center p-8"><Loader2 className="w-8 h-8 animate-spin text-emerald-500" /></div>
@@ -246,9 +246,9 @@ export default function BookingPage() {
                                                     disabled={!isAvailable}
                                                     onClick={() => setSelectedSlot({ start: slot.start, end: slot.end })}
                                                     className={`p-3 rounded-lg border text-sm font-bold transition-all
-                                                        ${!isAvailable ? 'bg-zinc-900 border-zinc-800 text-zinc-600 cursor-not-allowed line-through' :
+                                                        ${!isAvailable ? 'bg-surface-raised border-default text-faint cursor-not-allowed line-through' :
                                                             isSelected ? 'bg-emerald-500 text-black border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.4)]' :
-                                                                'bg-black/40 border-zinc-800 text-white hover:border-emerald-500/50 hover:bg-emerald-500/5'}
+                                                                'bg-surface-base/40 border-default text-primary hover:border-emerald-500/50 hover:bg-emerald-500/5'}
                                                     `}
                                                 >
                                                     {startTime}
@@ -261,7 +261,7 @@ export default function BookingPage() {
                         )}
 
                         <div className="flex justify-between">
-                            <Button variant="outline" onClick={handlePrevStep} className="text-zinc-400 border-zinc-800 hover:text-white">Back</Button>
+                            <Button variant="outline" onClick={handlePrevStep} className="text-secondary border-default hover:text-primary">Back</Button>
                             <Button
                                 onClick={handleNextStep}
                                 disabled={!selectedCourt || !selectedSlot}
@@ -276,53 +276,53 @@ export default function BookingPage() {
                 {/* Step 3: Review & Pay */}
                 {step === 3 && (
                     <div className="max-w-2xl mx-auto animate-in fade-in slide-in-from-right-4 duration-300">
-                        <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl overflow-hidden mb-6">
-                            <div className="p-6 border-b border-zinc-800 bg-black/20">
-                                <h2 className="text-xl font-bold text-white">Booking Summary</h2>
+                        <div className="bg-surface-raised/50 border border-default rounded-3xl overflow-hidden mb-6">
+                            <div className="p-6 border-b border-default bg-surface-base/20">
+                                <h2 className="text-xl font-bold text-primary">Booking Summary</h2>
                             </div>
                             <div className="p-6 space-y-4">
-                                <div className="flex justify-between items-center py-2 border-b border-zinc-800/50">
-                                    <span className="text-zinc-500">Venue</span>
-                                    <span className="text-white font-medium text-right">{venue.name}</span>
+                                <div className="flex justify-between items-center py-2 border-b border-default/50">
+                                    <span className="text-muted">Venue</span>
+                                    <span className="text-primary font-medium text-right">{venue.name}</span>
                                 </div>
-                                <div className="flex justify-between items-center py-2 border-b border-zinc-800/50">
-                                    <span className="text-zinc-500">Sport</span>
-                                    <span className="text-white font-medium">{selectedSport}</span>
+                                <div className="flex justify-between items-center py-2 border-b border-default/50">
+                                    <span className="text-muted">Sport</span>
+                                    <span className="text-primary font-medium">{selectedSport}</span>
                                 </div>
-                                <div className="flex justify-between items-center py-2 border-b border-zinc-800/50">
-                                    <span className="text-zinc-500">Court</span>
-                                    <span className="text-white font-medium">
+                                <div className="flex justify-between items-center py-2 border-b border-default/50">
+                                    <span className="text-muted">Court</span>
+                                    <span className="text-primary font-medium">
                                         {courts.find(c => c.id === selectedCourt)?.name}
                                     </span>
                                 </div>
-                                <div className="flex justify-between items-center py-2 border-b border-zinc-800/50">
-                                    <span className="text-zinc-500">Date & Time</span>
+                                <div className="flex justify-between items-center py-2 border-b border-default/50">
+                                    <span className="text-muted">Date & Time</span>
                                     <div className="text-right">
-                                        <p className="text-white font-medium">{format(selectedDate, "EEE, MMM d, yyyy")}</p>
-                                        <p className="text-white font-medium">
+                                        <p className="text-primary font-medium">{format(selectedDate, "EEE, MMM d, yyyy")}</p>
+                                        <p className="text-primary font-medium">
                                             {selectedSlot && format(parseISO(selectedSlot.start), "HH:mm")} - {selectedSlot && format(parseISO(selectedSlot.end), "HH:mm")}
                                         </p>
                                     </div>
                                 </div>
                             </div>
-                            <div className="p-6 bg-emerald-500/5 border-t border-zinc-800">
+                            <div className="p-6 bg-emerald-500/5 border-t border-default">
                                 <div className="flex justify-between items-center mb-2">
-                                    <span className="text-zinc-400">Subtotal</span>
-                                    <span className="text-white">LKR {pricing?.subtotal || 0}</span>
+                                    <span className="text-secondary">Subtotal</span>
+                                    <span className="text-primary">LKR {pricing?.subtotal || 0}</span>
                                 </div>
                                 <div className="flex justify-between items-center mb-4">
-                                    <span className="text-zinc-400">Platform Fee</span>
-                                    <span className="text-white">LKR {pricing?.platform_fee || 0}</span>
+                                    <span className="text-secondary">Platform Fee</span>
+                                    <span className="text-primary">LKR {pricing?.platform_fee || 0}</span>
                                 </div>
-                                <div className="flex justify-between items-center pt-4 border-t border-dashed border-zinc-700">
-                                    <span className="text-lg font-bold text-white">Total</span>
+                                <div className="flex justify-between items-center pt-4 border-t border-dashed border-subtle">
+                                    <span className="text-lg font-bold text-primary">Total</span>
                                     <span className="text-2xl font-bold text-emerald-500">LKR {pricing?.total_price || 0}</span>
                                 </div>
                             </div>
                         </div>
 
                         <div className="flex justify-between gap-4">
-                            <Button variant="outline" onClick={handlePrevStep} className="text-zinc-400 border-zinc-800 hover:text-white">Back</Button>
+                            <Button variant="outline" onClick={handlePrevStep} className="text-secondary border-default hover:text-primary">Back</Button>
                             <Button
                                 onClick={handleConfirmBooking}
                                 disabled={submitting}

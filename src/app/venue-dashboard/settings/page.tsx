@@ -291,14 +291,14 @@ export default function VenueSettingsPage() {
 
     if (!currentVenue) {
         return (
-            <div className="min-h-screen bg-black pt-24 pb-12 px-4 flex items-center justify-center text-zinc-500">
+            <div className="min-h-screen bg-surface-base pt-24 pb-12 px-4 flex items-center justify-center text-muted">
                 Please select a venue to edit settings.
             </div>
         );
     }
 
     return (
-        <main className="min-h-screen bg-black pt-24 pb-20 px-4 relative overflow-hidden">
+        <main className="min-h-screen bg-surface-base pt-24 pb-20 px-4 relative overflow-hidden">
             {/* Background Effects */}
             <div className="absolute inset-0 pointer-events-none">
                 <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-[150px]" />
@@ -307,16 +307,16 @@ export default function VenueSettingsPage() {
             <div className="container mx-auto max-w-4xl relative z-10">
 
                 <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-white mb-2">Venue Settings</h1>
-                    <p className="text-zinc-400">Update your venue information, contact details, and operating hours.</p>
+                    <h1 className="text-3xl font-bold text-primary mb-2">Venue Settings</h1>
+                    <p className="text-secondary">Update your venue information, contact details, and operating hours.</p>
                 </div>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
 
-                    <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-8 backdrop-blur-sm">
+                    <div className="bg-surface-raised/40 border border-default rounded-3xl p-8 backdrop-blur-sm">
                         {/* Visibility Status */}
-                        <div className="mb-10 pb-8 border-b border-zinc-800">
-                            <h2 className="text-lg font-bold text-white flex items-center gap-2 mb-4">
+                        <div className="mb-10 pb-8 border-b border-default">
+                            <h2 className="text-lg font-bold text-primary flex items-center gap-2 mb-4">
                                 <Globe className="w-5 h-5 text-emerald-500" /> Search Visibility
                             </h2>
                             
@@ -328,8 +328,8 @@ export default function VenueSettingsPage() {
                                         <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
                                     )}
                                     <div>
-                                        <p className="font-bold text-white text-sm">Verification Status</p>
-                                        <p className="text-xs text-zinc-400 mt-1">
+                                        <p className="font-bold text-primary text-sm">Verification Status</p>
+                                        <p className="text-xs text-secondary mt-1">
                                             {currentVenue.is_verified 
                                                 ? 'Your venue is verified and eligible for public search.' 
                                                 : 'Verification pending. Your venue is currently hidden from public search results.'}
@@ -344,8 +344,8 @@ export default function VenueSettingsPage() {
                                         <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
                                     )}
                                     <div>
-                                        <p className="font-bold text-white text-sm">Location Data</p>
-                                        <p className="text-xs text-zinc-400 mt-1">
+                                        <p className="font-bold text-primary text-sm">Location Data</p>
+                                        <p className="text-xs text-secondary mt-1">
                                             {(geoLat && geoLng) 
                                                 ? 'GPS coordinates are set. Your venue will appear in "Near Me" searches.' 
                                                 : 'Missing GPS coordinates. Your venue may be hidden from location-based searches.'}
@@ -355,7 +355,7 @@ export default function VenueSettingsPage() {
                             </div>
 
                             {!currentVenue.is_verified && (
-                                <p className="mt-4 text-xs text-zinc-500 italic flex items-center gap-2">
+                                <p className="mt-4 text-xs text-muted italic flex items-center gap-2">
                                     <AlertCircle className="w-3 h-3" /> Note: Even with GPS set, venues must be verified to appear in the public search.
                                 </p>
                             )}
@@ -363,22 +363,22 @@ export default function VenueSettingsPage() {
 
                         {/* Basic Info */}
                         <div className="space-y-4 mb-8">
-                            <h2 className="text-lg font-bold text-white flex items-center gap-2 border-b border-zinc-800 pb-2">
+                            <h2 className="text-lg font-bold text-primary flex items-center gap-2 border-b border-default pb-2">
                                 <FileText className="w-5 h-5 text-emerald-500" /> Basic Information
                             </h2>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Venue Name</label>
+                                    <label className="text-xs font-bold text-muted uppercase tracking-wider">Venue Name</label>
                                     <input
                                         {...register("name", { required: "Name is required" })}
-                                        className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
+                                        className="w-full bg-surface-base/50 border border-subtle rounded-xl px-4 py-3 text-primary focus:border-emerald-500 focus:outline-none transition-colors"
                                         placeholder="e.g. Arena Sports Complex"
                                     />
                                     {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message as string}</p>}
                                 </div>
                                  <div className="space-y-2">
-                                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">City</label>
+                                    <label className="text-xs font-bold text-muted uppercase tracking-wider">City</label>
                                     <input type="hidden" {...register("city", { required: "City is required" })} />
                                     <CityCombobox
                                         cities={availableCities}
@@ -392,11 +392,11 @@ export default function VenueSettingsPage() {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Description</label>
+                                <label className="text-xs font-bold text-muted uppercase tracking-wider">Description</label>
                                 <textarea
                                     {...register("description")}
                                     rows={4}
-                                    className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors resize-none"
+                                    className="w-full bg-surface-base/50 border border-subtle rounded-xl px-4 py-3 text-primary focus:border-emerald-500 focus:outline-none transition-colors resize-none"
                                     placeholder="Tell players about your venue..."
                                 />
                             </div>
@@ -404,28 +404,28 @@ export default function VenueSettingsPage() {
 
                         {/* Contact & Location */}
                         <div className="space-y-4">
-                            <h2 className="text-lg font-bold text-white flex items-center gap-2 border-b border-zinc-800 pb-2">
+                            <h2 className="text-lg font-bold text-primary flex items-center gap-2 border-b border-default pb-2">
                                 <MapPin className="w-5 h-5 text-blue-500" /> Location & Contact
                             </h2>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1">
+                                    <label className="text-xs font-bold text-muted uppercase tracking-wider flex items-center gap-1">
                                         <Phone className="w-3 h-3" /> Contact Number
                                     </label>
                                     <input
                                         {...register("phone_contact", { required: "Contact number is required" })}
-                                        className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
+                                        className="w-full bg-surface-base/50 border border-subtle rounded-xl px-4 py-3 text-primary focus:border-emerald-500 focus:outline-none transition-colors"
                                         placeholder="+94 77..."
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1">
+                                    <label className="text-xs font-bold text-muted uppercase tracking-wider flex items-center gap-1">
                                         <Clock className="w-3 h-3" /> Operating Hours (Summary)
                                     </label>
                                     <input
                                         {...register("operating_hours_summary")}
-                                        className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
+                                        className="w-full bg-surface-base/50 border border-subtle rounded-xl px-4 py-3 text-primary focus:border-emerald-500 focus:outline-none transition-colors"
                                         placeholder="e.g. 6:00 AM - 10:00 PM"
                                         readOnly
                                     />
@@ -433,17 +433,17 @@ export default function VenueSettingsPage() {
                             </div>
 
                             <div className="space-y-4">
-                                <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center justify-between">
+                                <label className="text-xs font-bold text-muted uppercase tracking-wider flex items-center justify-between">
                                     <span>Search Location (Google Maps)</span>
-                                    <span className="text-[10px] text-zinc-600">Syncs address & Coordinates</span>
+                                    <span className="text-[10px] text-faint">Syncs address & Coordinates</span>
                                 </label>
                                 <div className="relative group">
-                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500 group-focus-within:text-emerald-500 transition-colors" />
+                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted group-focus-within:text-emerald-500 transition-colors" />
                                     <input
                                         ref={searchInputRef}
                                         type="text"
                                         placeholder="Search for your venue on Google Maps..."
-                                        className="w-full bg-black/60 border border-zinc-700 focus:border-emerald-500 rounded-2xl pl-12 pr-4 py-4 text-white placeholder:text-zinc-600 transition-all outline-none shadow-xl"
+                                        className="w-full bg-surface-base/60 border border-subtle focus:border-emerald-500 rounded-2xl pl-12 pr-4 py-4 text-primary placeholder:text-faint transition-all outline-none shadow-xl"
                                     />
                                     {!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY && (
                                         <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] bg-red-500/20 text-red-400 px-2 py-1 rounded-full border border-red-500/30">
@@ -455,16 +455,16 @@ export default function VenueSettingsPage() {
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Address</label>
+                                    <label className="text-xs font-bold text-muted uppercase tracking-wider">Address</label>
                                     <textarea
                                         {...register("address", { required: "Address is required" })}
                                         rows={1}
-                                        className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors resize-none"
+                                        className="w-full bg-surface-base/50 border border-subtle rounded-xl px-4 py-3 text-primary focus:border-emerald-500 focus:outline-none transition-colors resize-none"
                                         placeholder="Full street address..."
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center justify-between">
+                                    <label className="text-xs font-bold text-muted uppercase tracking-wider flex items-center justify-between">
                                         <span>GPS Coordinates</span>
                                         <button 
                                             type="button"
@@ -483,10 +483,10 @@ export default function VenueSettingsPage() {
                                         </button>
                                     </label>
                                     <div className="grid grid-cols-2 gap-2">
-                                        <div className="bg-black/80 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-400 text-xs truncate">
+                                        <div className="bg-surface-base/80 border border-default rounded-xl px-4 py-3 text-secondary text-xs truncate">
                                             LAT: {geoLat?.toFixed(6) || 'None'}
                                         </div>
-                                        <div className="bg-black/80 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-400 text-xs truncate">
+                                        <div className="bg-surface-base/80 border border-default rounded-xl px-4 py-3 text-secondary text-xs truncate">
                                             LNG: {geoLng?.toFixed(6) || 'None'}
                                         </div>
                                     </div>
@@ -501,37 +501,37 @@ export default function VenueSettingsPage() {
                     />
 
                     {/* Amenities */}
-                    <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-8 backdrop-blur-sm">
-                        <div className="border-b border-zinc-800 pb-2 mb-6">
-                            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                    <div className="bg-surface-raised/40 border border-default rounded-3xl p-8 backdrop-blur-sm">
+                        <div className="border-b border-default pb-2 mb-6">
+                            <h2 className="text-lg font-bold text-primary flex items-center gap-2">
                                 <Shield className="w-5 h-5 text-emerald-500" /> Facilities & Amenities
                             </h2>
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                             {amenitiesList.map((amenity) => (
-                                <label key={amenity} className="flex items-center gap-3 p-3 rounded-xl border border-zinc-800 bg-black/40 cursor-pointer hover:border-emerald-500/50 hover:bg-zinc-900 transition-all group">
+                                <label key={amenity} className="flex items-center gap-3 p-3 rounded-xl border border-default bg-surface-base/40 cursor-pointer hover:border-emerald-500/50 hover:bg-surface-raised transition-all group">
                                     <input
                                         type="checkbox"
                                         value={amenity}
                                         {...register("amenities")}
-                                        className="w-4 h-4 rounded border-zinc-600 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-black accent-emerald-500"
+                                        className="w-4 h-4 rounded border-subtle text-emerald-500 focus:ring-emerald-500 focus:ring-offset-black accent-emerald-500"
                                     />
-                                    <span className="text-sm font-medium text-zinc-300 group-hover:text-white transition-colors">{amenity}</span>
+                                    <span className="text-sm font-medium text-secondary group-hover:text-primary transition-colors">{amenity}</span>
                                 </label>
                             ))}
                         </div>
                     </div>
 
                     {/* Peak Hours Configuration */}
-                    <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-8 backdrop-blur-sm">
-                        <div className="flex items-center justify-between border-b border-zinc-800 pb-2 mb-6">
-                            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                    <div className="bg-surface-raised/40 border border-default rounded-3xl p-8 backdrop-blur-sm">
+                        <div className="flex items-center justify-between border-b border-default pb-2 mb-6">
+                            <h2 className="text-lg font-bold text-primary flex items-center gap-2">
                                 <Zap className="w-5 h-5 text-amber-500" /> Peak Hours & Pricing
                             </h2>
-                            {peakLoading && <Loader2 className="w-4 h-4 animate-spin text-zinc-500" />}
+                            {peakLoading && <Loader2 className="w-4 h-4 animate-spin text-muted" />}
                         </div>
 
-                        <p className="text-sm text-zinc-400 mb-6">Set peak hours when demand is high. Courts with a peak rate configured will automatically charge that rate during these hours. Leave peak days empty to apply every day.</p>
+                        <p className="text-sm text-secondary mb-6">Set peak hours when demand is high. Courts with a peak rate configured will automatically charge that rate during these hours. Leave peak days empty to apply every day.</p>
 
                         {peakEdit ? (
                             <div className="space-y-6">
@@ -554,7 +554,7 @@ export default function VenueSettingsPage() {
 
                                 <div className="space-y-3">
                                     <div className="flex items-center justify-between">
-                                        <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Peak Days</label>
+                                        <label className="text-xs font-bold text-muted uppercase tracking-wider">Peak Days</label>
                                         <div className="flex gap-2">
                                             <button
                                                 type="button"
@@ -563,7 +563,7 @@ export default function VenueSettingsPage() {
                                             >
                                                 All days
                                             </button>
-                                            <span className="text-zinc-700">|</span>
+                                            <span className="text-faint">|</span>
                                             <button
                                                 type="button"
                                                 onClick={() => setPeakForm(prev => ({ ...prev, days: [0, 1, 2, 3, 4] }))}
@@ -571,7 +571,7 @@ export default function VenueSettingsPage() {
                                             >
                                                 Weekdays
                                             </button>
-                                            <span className="text-zinc-700">|</span>
+                                            <span className="text-faint">|</span>
                                             <button
                                                 type="button"
                                                 onClick={() => setPeakForm(prev => ({ ...prev, days: [5, 6] }))}
@@ -592,7 +592,7 @@ export default function VenueSettingsPage() {
                                                     className={`relative py-3 rounded-xl text-sm font-bold border transition-all ${
                                                         isSelected
                                                             ? 'bg-amber-500/20 border-amber-500/40 text-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.15)]'
-                                                            : 'bg-black/40 border-zinc-700 text-zinc-500 hover:text-zinc-300 hover:border-zinc-500'
+                                                            : 'bg-surface-base/40 border-subtle text-muted hover:text-secondary hover:border-subtle'
                                                     }`}
                                                 >
                                                     {label}
@@ -603,14 +603,14 @@ export default function VenueSettingsPage() {
                                             );
                                         })}
                                     </div>
-                                    <p className="text-[11px] text-zinc-600">
+                                    <p className="text-[11px] text-faint">
                                         {peakForm.days.length === 0
                                             ? "Peak pricing applies every day of the week."
                                             : `Peak pricing applies on ${peakForm.days.length} selected day${peakForm.days.length > 1 ? 's' : ''}.`}
                                     </p>
                                 </div>
 
-                                <div className="flex items-center gap-3 pt-2 border-t border-zinc-800">
+                                <div className="flex items-center gap-3 pt-2 border-t border-default">
                                     <Button
                                         type="button"
                                         onClick={savePeakHours}
@@ -624,7 +624,7 @@ export default function VenueSettingsPage() {
                                             Clear All
                                         </button>
                                     )}
-                                    <button type="button" onClick={() => setPeakEdit(false)} className="px-4 h-11 text-sm text-zinc-500 hover:text-white font-medium">
+                                    <button type="button" onClick={() => setPeakEdit(false)} className="px-4 h-11 text-sm text-muted hover:text-primary font-medium">
                                         Cancel
                                     </button>
                                 </div>
@@ -636,7 +636,7 @@ export default function VenueSettingsPage() {
                                         <div className="flex items-center gap-2 text-sm">
                                             <Sun className="w-4 h-4 text-amber-400" />
                                             <span className="text-amber-400 text-xs font-bold uppercase tracking-wider">Active</span>
-                                            <span className="text-white font-bold">
+                                            <span className="text-primary font-bold">
                                                 {peakHours.peak_start_time} &ndash; {peakHours.peak_end_time}
                                             </span>
                                         </div>
@@ -649,7 +649,7 @@ export default function VenueSettingsPage() {
                                                         className={`px-2.5 py-1 rounded-lg text-[11px] font-bold ${
                                                             isActive
                                                                 ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                                                                : 'bg-zinc-800/60 text-zinc-600 border border-zinc-800'
+                                                                : 'bg-surface-overlay/60 text-faint border border-default'
                                                         }`}
                                                     >
                                                         {label}
@@ -668,10 +668,10 @@ export default function VenueSettingsPage() {
                                 </div>
                             </div>
                         ) : (
-                            <div className="flex items-center justify-between gap-4 p-5 bg-zinc-800/20 rounded-2xl border border-dashed border-zinc-700">
+                            <div className="flex items-center justify-between gap-4 p-5 bg-surface-overlay/20 rounded-2xl border border-dashed border-subtle">
                                 <div>
-                                    <p className="text-sm text-zinc-400 font-medium">No peak hours configured</p>
-                                    <p className="text-xs text-zinc-600 mt-1">All courts use their base hourly rate for every booking.</p>
+                                    <p className="text-sm text-secondary font-medium">No peak hours configured</p>
+                                    <p className="text-xs text-faint mt-1">All courts use their base hourly rate for every booking.</p>
                                 </div>
                                 <button
                                     type="button"
@@ -685,24 +685,24 @@ export default function VenueSettingsPage() {
                     </div>
 
                     {/* Weekly Schedule */}
-                    <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-8 backdrop-blur-sm">
-                        <div className="flex items-center justify-between border-b border-zinc-800 pb-2 mb-6">
-                            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                    <div className="bg-surface-raised/40 border border-default rounded-3xl p-8 backdrop-blur-sm">
+                        <div className="flex items-center justify-between border-b border-default pb-2 mb-6">
+                            <h2 className="text-lg font-bold text-primary flex items-center gap-2">
                                 <Calendar className="w-5 h-5 text-purple-500" /> Weekly Schedule
                             </h2>
-                            {isLoadingProfile && <Loader2 className="w-4 h-4 animate-spin text-zinc-500" />}
+                            {isLoadingProfile && <Loader2 className="w-4 h-4 animate-spin text-muted" />}
                         </div>
 
                         <div className="space-y-4">
                             {scheduleFields.map((field, index) => (
-                                <div key={field.id} className="grid grid-cols-12 gap-4 items-center bg-zinc-900/50 p-4 rounded-xl border border-zinc-800/50">
+                                <div key={field.id} className="grid grid-cols-12 gap-4 items-center bg-surface-raised/50 p-4 rounded-xl border border-default/50">
                                     <div className="col-span-4">
-                                        <span className="text-sm font-bold text-white capitalize">{field.day}</span>
+                                        <span className="text-sm font-bold text-primary capitalize">{field.day}</span>
                                     </div>
                                     <div className="col-span-3">
                                         <select
                                             {...register(`schedule.${index}.open`)}
-                                            className="w-full bg-black border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm focus:border-purple-500 focus:outline-none appearance-none cursor-pointer"
+                                            className="w-full bg-surface-base border border-subtle rounded-lg px-3 py-2 text-primary text-sm focus:border-purple-500 focus:outline-none appearance-none cursor-pointer"
                                         >
                                             <option value="">Opening Time</option>
                                             {TIME_OPTIONS.map(time => (
@@ -710,11 +710,11 @@ export default function VenueSettingsPage() {
                                             ))}
                                         </select>
                                     </div>
-                                    <div className="col-span-1 text-center text-zinc-500">-</div>
+                                    <div className="col-span-1 text-center text-muted">-</div>
                                     <div className="col-span-3">
                                         <select
                                             {...register(`schedule.${index}.close`)}
-                                            className="w-full bg-black border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm focus:border-purple-500 focus:outline-none appearance-none cursor-pointer"
+                                            className="w-full bg-surface-base border border-subtle rounded-lg px-3 py-2 text-primary text-sm focus:border-purple-500 focus:outline-none appearance-none cursor-pointer"
                                         >
                                             <option value="">Closing Time</option>
                                             {TIME_OPTIONS.map(time => (

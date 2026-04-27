@@ -53,7 +53,7 @@ export default function Modal({ isOpen, onClose, children, title, size = "md" }:
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" data-lenis-prevent>
             {/* Backdrop */}
             <div
-                className={`fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-300 ${animateIn ? "opacity-100" : "opacity-0"}`}
+                className={`fixed inset-0 bg-backdrop backdrop-blur-sm transition-opacity duration-300 ${animateIn ? "opacity-100" : "opacity-0"}`}
                 onClick={onClose}
             />
 
@@ -61,17 +61,17 @@ export default function Modal({ isOpen, onClose, children, title, size = "md" }:
             <div
                 className={`
           relative w-full ${sizeClasses[size]} 
-          bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl 
+          bg-surface-raised border border-default rounded-2xl shadow-2xl 
           transform transition-all duration-300 ease-out 
           ${animateIn ? "scale-100 opacity-100 translate-y-0" : "scale-95 opacity-0 translate-y-4"}
         `}
             >
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-zinc-800">
-                    <h2 className="text-xl font-bold text-white">{title}</h2>
+                <div className="flex items-center justify-between p-6 border-b border-default">
+                    <h2 className="text-xl font-bold text-primary">{title}</h2>
                     <button
                         onClick={onClose}
-                        className="p-2 -mr-2 text-zinc-500 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors"
+                        className="p-2 -mr-2 text-muted hover:text-primary hover:bg-surface-overlay rounded-lg transition-colors"
                     >
                         <X className="w-5 h-5" />
                     </button>

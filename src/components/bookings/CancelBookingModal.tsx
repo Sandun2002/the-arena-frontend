@@ -52,11 +52,11 @@ export default function CancelBookingModal({ booking, onClose, onSuccess }: Canc
             </div>
 
             <div className="space-y-3">
-                <label className="text-xs font-bold text-zinc-400 uppercase">Reason for Cancellation</label>
+                <label className="text-xs font-bold text-secondary uppercase">Reason for Cancellation</label>
                 <select
                     value={reason}
                     onChange={(e) => setReason(e.target.value)}
-                    className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none"
+                    className="w-full bg-surface-base/50 border border-subtle rounded-xl px-4 py-3 text-primary focus:border-emerald-500 focus:outline-none transition-colors appearance-none"
                 >
                     <option value="" disabled>Select a reason...</option>
                     <option value="Change of plans">Change of plans</option>
@@ -66,12 +66,12 @@ export default function CancelBookingModal({ booking, onClose, onSuccess }: Canc
                 </select>
             </div>
 
-            <div className="flex gap-3 pt-4 border-t border-zinc-800">
+            <div className="flex gap-3 pt-4 border-t border-default">
                 <Button variant="ghost" onClick={onClose} className="flex-1">Keep Booking</Button>
                 <Button
                     onClick={handleConfirm}
                     disabled={isSubmitting}
-                    className="flex-1 bg-red-600 hover:bg-red-700 text-white border-none"
+                    className="flex-1 bg-red-600 hover:bg-red-700 text-primary border-none"
                 >
                     {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Confirm Cancellation"}
                 </Button>

@@ -231,12 +231,12 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
   // Success overlay
   if (showSuccess) {
     return (
-      <div className="w-full rounded-2xl bg-zinc-900/80 border border-emerald-500 p-8 backdrop-blur-md shadow-xl text-center">
+      <div className="w-full rounded-2xl bg-surface-raised/80 border border-emerald-500 p-8 backdrop-blur-md shadow-xl text-center">
         <div className="w-16 h-16 rounded-full bg-emerald-500 flex items-center justify-center mx-auto mb-4">
           <Check className="h-8 w-8 text-black" />
         </div>
-        <h3 className="text-xl font-bold text-white mb-2">Booking Confirmed!</h3>
-        <p className="text-zinc-400 text-sm mb-4">Redirecting to your bookings...</p>
+        <h3 className="text-xl font-bold text-primary mb-2">Booking Confirmed!</h3>
+        <p className="text-secondary text-sm mb-4">Redirecting to your bookings...</p>
         <div className="animate-pulse text-emerald-500 text-sm">Please wait...</div>
       </div>
     );
@@ -245,23 +245,23 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
   // Login prompt overlay
   if (showLoginPrompt) {
     return (
-      <div className="w-full rounded-2xl bg-zinc-900/80 border border-zinc-800 p-8 backdrop-blur-md shadow-xl text-center">
-        <div className="w-16 h-16 rounded-full bg-zinc-800 flex items-center justify-center mx-auto mb-4">
+      <div className="w-full rounded-2xl bg-surface-raised/80 border border-default p-8 backdrop-blur-md shadow-xl text-center">
+        <div className="w-16 h-16 rounded-full bg-surface-overlay flex items-center justify-center mx-auto mb-4">
           <LogIn className="h-8 w-8 text-emerald-500" />
         </div>
-        <h3 className="text-xl font-bold text-white mb-2">Login Required</h3>
-        <p className="text-zinc-400 text-sm mb-6">Please sign in to complete your booking.</p>
+        <h3 className="text-xl font-bold text-primary mb-2">Login Required</h3>
+        <p className="text-secondary text-sm mb-6">Please sign in to complete your booking.</p>
 
         <div className="space-y-3">
           <button
             onClick={() => router.push("/login")}
-            className="w-full py-3 text-sm text-zinc-400 hover:text-white transition-colors"
+            className="w-full py-3 text-sm text-secondary hover:text-primary transition-colors"
           >
             Go to Login Page
           </button>
           <button
             onClick={() => setShowLoginPrompt(false)}
-            className="text-xs text-zinc-500 hover:text-zinc-400"
+            className="text-xs text-muted hover:text-secondary"
           >
             Cancel
           </button>
@@ -271,10 +271,10 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
   }
 
   return (
-    <div className="w-full rounded-2xl bg-zinc-900/80 border border-zinc-800 p-6 backdrop-blur-md shadow-xl">
+    <div className="w-full rounded-2xl bg-surface-raised/80 border border-default p-6 backdrop-blur-md shadow-xl">
 
-      <h3 className="text-xl font-bold text-white mb-1">Confirm Booking</h3>
-      <p className="text-xs text-zinc-400 mb-6">Select your date, court, and time slots.</p>
+      <h3 className="text-xl font-bold text-primary mb-1">Confirm Booking</h3>
+      <p className="text-xs text-secondary mb-6">Select your date, court, and time slots.</p>
 
       {/* Peak Hours Banner */}
       {peakConfig?.has_peak_config && (
@@ -302,8 +302,8 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
       {/* Court Selection Tabs */}
       {!isVenueClosed && (
         <div className="mb-6">
-          <label className="mb-2 block text-xs font-bold text-zinc-500 uppercase tracking-wider">Select Court</label>
-          <div className="flex bg-zinc-950 p-1 rounded-lg border border-zinc-800 overflow-x-auto scrollbar-hide">
+          <label className="mb-2 block text-xs font-bold text-muted uppercase tracking-wider">Select Court</label>
+          <div className="flex bg-surface-sunken p-1 rounded-lg border border-default overflow-x-auto scrollbar-hide">
             {courtsData.map((cData) => (
               <button
                 key={cData.court.id}
@@ -313,17 +313,17 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
                 }}
                 className={`flex-shrink-0 min-w-[120px] px-4 py-2 text-xs font-bold rounded-md transition-all ${selectedCourtId === cData.court.id
                   ? "bg-emerald-500 text-black shadow-lg"
-                  : "text-zinc-400 hover:text-white"
+                  : "text-secondary hover:text-primary"
                   }`}
               >
                 {cData.court.name} <span className="opacity-60 font-normal">({cData.court.sport})</span>
               </button>
             ))}
             {loadingSlots && courtsData.length === 0 && (
-              <span className="py-2 px-4 text-xs text-zinc-500">Loading...</span>
+              <span className="py-2 px-4 text-xs text-muted">Loading...</span>
             )}
             {!loadingSlots && courtsData.length === 0 && (
-              <span className="py-2 px-4 text-xs text-zinc-500">No courts available</span>
+              <span className="py-2 px-4 text-xs text-muted">No courts available</span>
             )}
           </div>
         </div>
@@ -331,12 +331,12 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
 
       {/* Legend */}
       {!isVenueClosed && (
-        <div className="flex justify-between text-[10px] text-zinc-400 mb-4 px-1 flex-wrap gap-2">
+        <div className="flex justify-between text-[10px] text-secondary mb-4 px-1 flex-wrap gap-2">
           <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(80,200,120,0.6)]"></span> Selected</div>
           <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500/50"></span> Booked</div>
           <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-indigo-500/60"></span> Reserved</div>
           <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-zinc-600/70 border border-zinc-500/40"></span> Maintenance</div>
-          <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full border border-zinc-600 bg-zinc-800/50"></span> Past/Closed</div>
+          <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full border border-subtle bg-surface-overlay/50"></span> Past/Closed</div>
           <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-zinc-600"></span> Available</div>
           <div className="flex items-center gap-1"><Zap className="w-2.5 h-2.5 text-amber-400" /> Peak</div>
         </div>
@@ -377,7 +377,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
         <div className="mb-8 p-6 rounded-xl border border-red-500/20 bg-red-500/5 text-center">
           <Calendar className="w-8 h-8 text-red-500/50 mx-auto mb-3" />
           <h4 className="text-red-400 font-bold mb-1">Venue Closed</h4>
-          <p className="text-zinc-400 text-sm">
+          <p className="text-secondary text-sm">
             {closureReason || "This venue is closed on the selected date. Please choose another date."}
           </p>
         </div>
@@ -419,18 +419,18 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
                   className={`
                       relative py-2 rounded-lg text-xs font-medium border transition-all duration-200
                       ${isMaintenance
-                        ? "bg-zinc-700/30 border-zinc-600/50 text-zinc-400 cursor-not-allowed"
+                        ? "bg-surface-overlay/30 border-subtle/50 text-secondary cursor-not-allowed"
                         : isBooked
                           ? "bg-red-900/20 border-red-900/50 text-red-500 cursor-not-allowed opacity-60"
                           : isRecurring
                             ? "bg-indigo-900/30 border-indigo-700/50 text-indigo-400 cursor-not-allowed"
                             : isClosed || isPast
-                              ? "bg-black/20 border-zinc-800/50 text-zinc-600 cursor-not-allowed"
+                              ? "bg-surface-base/20 border-default/50 text-faint cursor-not-allowed"
                               : isSelected
                                 ? "bg-emerald-500 border-emerald-500 text-black shadow-[0_0_10px_rgba(80,200,120,0.4)] scale-105"
                                 : isPeak
                                   ? "bg-amber-500/10 border-amber-500/30 text-amber-300 hover:border-amber-500/60 hover:bg-amber-500/20"
-                                  : "bg-zinc-800 border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:bg-zinc-700"
+                                  : "bg-surface-overlay border-subtle text-secondary hover:border-subtle hover:bg-surface-overlay"
                     }
                   `}
                 >
@@ -466,10 +466,10 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
       )}
 
       {/* Total & Action */}
-      <div className="border-t border-zinc-800 pt-4">
+      <div className="border-t border-default pt-4">
         <div className="flex justify-between items-center mb-4">
-          <span className="text-sm text-zinc-400">Total:</span>
-          <span className="text-2xl font-bold text-white">
+          <span className="text-sm text-secondary">Total:</span>
+          <span className="text-2xl font-bold text-primary">
             {pricing ? `LKR ${pricing.total.toLocaleString()}` : "LKR 0"}
           </span>
         </div>
@@ -479,7 +479,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
           disabled={submitting || selectedSlots.length === 0}
           className={`w-full py-4 text-sm font-bold transition-all border ${selectedSlots.length > 0
             ? "bg-emerald-500 hover:bg-emerald-400 text-black border-emerald-500"
-            : "bg-zinc-800 hover:bg-zinc-700 text-white border-zinc-700"
+            : "bg-surface-overlay hover:bg-surface-overlay text-primary border-subtle"
             } disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center`}
         >
           {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : (selectedSlots.length > 0 ? "Proceed to Pay" : "Select Slots")}

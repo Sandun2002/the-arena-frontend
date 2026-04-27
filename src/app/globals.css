@@ -1,12 +1,18 @@
 @import "tailwindcss";
 
+/* Make Tailwind's `dark:` variant key off our html.dark class so it works
+   alongside the semantic-token system (instead of OS prefers-color-scheme). */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Define the Design System Variables directly here.
   This replaces the old tailwind.config.ts file.
 */
 @theme {
-  /* Custom Colors */
-  --color-background: #050505; /* Deep Luxury Black */
-  --color-foreground: #ededed; /* Soft White */
+  /* Custom Colors — wired to runtime vars so body's `bg-background` /
+     `text-foreground` utilities follow the active theme. The actual color
+     values live in the html.dark / html.light blocks below. */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
 
   /* Emerald Palette */
   --color-emerald-400: #5ede4a;
@@ -18,6 +24,40 @@
   --color-zinc-800: #27272a;
   --color-zinc-900: #18181b;
   --color-zinc-950: #09090b;
+
+  /* ── Semantic Theme Tokens ───────────────────────────────────────────
+     Values live under html.dark / html.light below; Tailwind utilities
+     reference these via bg-surface-base, text-primary, border-default, etc. */
+
+  /* Surfaces */
+  --color-surface-base: var(--surface-base);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-overlay: var(--surface-overlay);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-surface-inset: var(--surface-inset);
+
+  /* Text — registered as bare names so Tailwind utilities resolve as
+     text-primary, text-secondary, etc. (collides harmlessly with bg-primary). */
+  --color-primary: var(--text-primary);
+  --color-secondary: var(--text-secondary);
+  --color-muted: var(--text-muted);
+  --color-faint: var(--text-faint);
+  --color-inverted: var(--text-inverted);
+
+  /* Borders — registered so utilities resolve as border-default, border-subtle. */
+  --color-default: var(--border-default);
+  --color-subtle: var(--border-subtle);
+  --color-faint-border: var(--border-faint);
+
+  /* Glass (frosted panels) */
+  --color-glass-bg: var(--glass-bg);
+  --color-glass-border: var(--glass-border);
+
+  /* Modal / overlay backdrop — always dims the page (unlike surface-inset). */
+  --color-backdrop: var(--backdrop);
+
+  /* Subtle interactive tint (e.g. hover highlights on flat surfaces). */
+  --color-tint-hover: var(--tint-hover);
 
   /* Custom Animations */
   --animate-fade-in: fadeIn 0.7s ease-out forwards;
@@ -33,13 +73,131 @@
   }
 }
 
-/* Global Styles 
-*/
-:root {
+/* ── Theme token values: DARK (default) ─────────────────────────────── */
+html,
+html.dark {
+  /* Surfaces */
+  --surface-base: #050505;
+  --surface-raised: #18181b;
+  --surface-overlay: #27272a;
+  --surface-sunken: #09090b;
+  --surface-inset: rgba(0, 0, 0, 0.4);
+
+  /* Text */
+  --text-primary: #ffffff;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --text-faint: #52525b;
+  --text-inverted: #000000;
+
+  /* Borders */
+  --border-default: #27272a;
+  --border-subtle: #3f3f46;
+  --border-faint: rgba(255, 255, 255, 0.05);
+
+  /* Glass */
+  --glass-bg: rgba(0, 0, 0, 0.50);
+  --glass-border: rgba(255, 255, 255, 0.07);
+  /* Subtle top-edge reflection on glass surfaces — mimics light catching
+     a glass edge. Visible in dark mode; transparent in light (where a
+     white-on-white edge would be invisible anyway). */
+  --glass-highlight: rgba(255, 255, 255, 0.04);
+
+  /* Modal/overlay backdrop — dim the page so modals stand out. */
+  --backdrop: rgba(0, 0, 0, 0.70);
+
+  /* Subtle hover tint (white-on-dark feel). */
+  --tint-hover: rgba(255, 255, 255, 0.06);
+
+  /* Decorative SVG pattern stroke (hex grid etc.) — visible in this theme. */
+  --pattern-stroke: #ffffff;
+
+  /* Shadows / scrollbar / swiper */
+  --shadow-elevation: rgba(0, 0, 0, 0.8);
+  --scrollbar-track: #0a0a0a;
+  --scrollbar-thumb: #27272a;
+  --swiper-bullet: rgba(255, 255, 255, 0.3);
+  --swiper-nav-bg: rgba(9, 9, 11, 0.7);
+
+  /* Body shorthands (legacy vars) */
   --background: #050505;
   --foreground: #ededed;
+
+  color-scheme: dark;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  accent-color: #50C878;
 }
 
+/* ── Theme token values: LIGHT ──────────────────────────────────────── */
+html.light {
+  /* Surfaces */
+  --surface-base: #ffffff;
+  --surface-raised: #f4f4f5;
+  --surface-overlay: #e4e4e7;
+  --surface-sunken: #fafafa;
+  --surface-inset: rgba(0, 0, 0, 0.03);
+
+  /* Text */
+  --text-primary: #18181b;
+  --text-secondary: #52525b;
+  --text-muted: #71717a;
+  /* zinc-500 (≈ 4.6:1 on white) instead of zinc-400 (≈ 2.85:1) so faint
+     text still passes WCAG AA in light mode. */
+  --text-faint: #71717a;
+  --text-inverted: #ffffff;
+
+  /* Borders */
+  --border-default: #e4e4e7;
+  --border-subtle: #d4d4d8;
+  --border-faint: rgba(0, 0, 0, 0.06);
+
+  /* Glass */
+  --glass-bg: rgba(255, 255, 255, 0.80);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  /* No top-edge highlight in light mode (would be invisible white-on-white). */
+  --glass-highlight: transparent;
+
+  /* Modal/overlay backdrop — lighter dim in light mode but still clearly visible. */
+  --backdrop: rgba(0, 0, 0, 0.45);
+
+  /* Subtle hover tint (black-on-light feel). */
+  --tint-hover: rgba(0, 0, 0, 0.04);
+
+  /* Decorative SVG pattern stroke — use a mid-gray so hex grids etc. read
+     subtly on white as well. */
+  --pattern-stroke: #71717a;
+
+  /* Shadows / scrollbar / swiper */
+  --shadow-elevation: rgba(0, 0, 0, 0.12);
+  --scrollbar-track: #f4f4f5;
+  --scrollbar-thumb: #d4d4d8;
+  --swiper-bullet: rgba(0, 0, 0, 0.25);
+  --swiper-nav-bg: rgba(255, 255, 255, 0.85);
+
+  /* Body shorthands */
+  --background: #ffffff;
+  --foreground: #18181b;
+
+  color-scheme: light;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  accent-color: #50C878;
+}
+
+/* ── Smooth theme transition (only on root surfaces — don't animate every
+     descendant or it gets sluggish). Disabled for users who prefer reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  html, body {
+    transition: background-color 200ms ease, color 200ms ease;
+  }
+}
+
+/* ── Brand selection color (works in both themes via CSS variable). */
+::selection {
+  background-color: rgba(80, 200, 120, 0.30);
+  color: var(--text-primary);
+}
+
+/* Global Styles */
 html {
     overscroll-behavior-y: none;
     overflow-x: clip; /* Prevent horizontal scroll without breaking scroll observers */
@@ -54,6 +212,42 @@ body {
   /* Premium Font Rendering */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* Mobile tap highlight — emerald-tinted instead of default semi-transparent black
+     (which is harsh on light surfaces and barely visible on dark surfaces). */
+  -webkit-tap-highlight-color: rgba(80, 200, 120, 0.18);
+}
+
+/* ── Browser autofill override ─────────────────────────────────────────────
+   Chrome/Safari paint a yellow background on autofilled inputs that overrides
+   our themed `bg-surface-inset`. Use a long-duration transition trick + text
+   fill color so autofilled fields visually match the active theme. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-text-fill-color: var(--text-primary);
+  -webkit-box-shadow: 0 0 0 1000px var(--surface-inset) inset;
+  caret-color: var(--text-primary);
+  transition: background-color 5000s ease-in-out 0s; /* defer browser's bg paint */
+}
+
+/* ── Accessibility: visible focus ring for keyboard users ───────────────────
+   Many buttons disable :focus outline. :focus-visible only fires for keyboard
+   navigation, not mouse clicks — so this is a non-intrusive a11y safety net
+   without affecting our designed mouse interactions. */
+:focus-visible {
+  outline: 2px solid #50C878;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+/* Form controls already have focus styling via Tailwind utilities — opt out. */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none;
 }
 
 /* Custom Scrollbar */
@@ -61,10 +255,10 @@ body {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #0a0a0a;
+  background: var(--scrollbar-track);
 }
 ::-webkit-scrollbar-thumb {
-  background: #27272a;
+  background: var(--scrollbar-thumb);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
@@ -103,7 +297,7 @@ body {
 .hero-carousel .swiper-pagination-bullet {
   width: 10px;
   height: 10px;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--swiper-bullet);
   opacity: 1;
   transition: background 0.3s ease, width 0.3s ease, border-radius 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
 }
@@ -146,6 +340,15 @@ body {
   background-size: 200% 100%;
   animation: shimmer 2s infinite;
 }
+html.light .shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.05) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+}
 
 /* Card Lift Hover Animation */
 @keyframes cardLift {
@@ -175,10 +378,14 @@ select {
   background-size: 1.25em 1.25em;
   padding-right: 2.5rem;
 }
+/* Darker arrow in light mode for legibility on white. */
+html.light select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2371717a' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+}
 
 select option {
-  background-color: #18181b; /* zinc-900 */
-  color: #ededed;
+  background-color: var(--surface-raised);
+  color: var(--text-primary);
   padding: 12px;
 }
 
@@ -248,6 +455,14 @@ select:focus {
 .marquee-track:has(.sport-card:hover) .sport-card:not(:hover) {
   filter: grayscale(100%) brightness(0.4);
   opacity: 0.55;
+}
+
+/* Light-mode override: don't crush brightness as aggressively (looks harsh
+   over a white surround). Saturation drop is enough to communicate "resting". */
+html.light .sport-card { filter: grayscale(70%) brightness(0.92); }
+html.light .marquee-track:has(.sport-card:hover) .sport-card:not(:hover) {
+  filter: grayscale(100%) brightness(0.7);
+  opacity: 0.6;
 }
 
 .sport-card .sport-corner {
@@ -341,7 +556,7 @@ select:focus {
 .hero-carousel .swiper-button-next {
   width: 48px;
   height: 48px;
-  background: rgba(9, 9, 11, 0.7);
+  background: var(--swiper-nav-bg);
   backdrop-filter: blur(8px);
   border: 1px solid rgba(80, 200, 120, 0.3);
   border-radius: 9999px;

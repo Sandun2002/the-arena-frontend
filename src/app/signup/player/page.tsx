@@ -106,15 +106,15 @@ export default function PlayerSignupPage() {
   };
 
   return (
-    <main className="min-h-screen bg-black flex flex-col items-center justify-start pt-16 pb-24 px-4">
+    <main className="min-h-screen bg-surface-base flex flex-col items-center justify-start pt-16 pb-24 px-4">
       <div className="w-full max-w-md">
-        <Link href="/signup" className="mb-6 inline-flex items-center text-sm text-zinc-500 hover:text-white transition-colors">
+        <Link href="/signup" className="mb-6 inline-flex items-center text-sm text-muted hover:text-primary transition-colors">
           <ArrowLeft className="mr-2 h-4 w-4" /> Back to Selection
         </Link>
 
-        <div className="rounded-3xl border border-zinc-800 bg-zinc-900/50 p-6 sm:p-8 backdrop-blur-xl shadow-2xl">
-          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">Player Sign Up</h1>
-          <p className="text-zinc-400 text-sm mb-6">Create your athlete profile to start booking.</p>
+        <div className="rounded-3xl border border-default bg-surface-raised/50 p-6 sm:p-8 backdrop-blur-xl shadow-2xl">
+          <h1 className="text-2xl sm:text-3xl font-bold text-primary mb-1">Player Sign Up</h1>
+          <p className="text-secondary text-sm mb-6">Create your athlete profile to start booking.</p>
 
           {/* Google Sign-Up — TOP for best UX and visibility */}
           {mounted && (
@@ -123,7 +123,7 @@ export default function PlayerSignupPage() {
                 type="button"
                 onClick={() => handleGoogleSignup()}
                 disabled={isGoogleLoading}
-                className="w-full flex items-center justify-center gap-3 py-3.5 px-4 rounded-xl border border-zinc-600 bg-zinc-800/60 hover:bg-zinc-700 hover:border-zinc-500 text-white text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
+                className="w-full flex items-center justify-center gap-3 py-3.5 px-4 rounded-xl border border-subtle bg-surface-overlay/60 hover:bg-surface-overlay hover:border-subtle text-primary text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
               >
                 {isGoogleLoading ? (
                   <div className="w-4 h-4 border-2 border-zinc-500 border-t-white rounded-full animate-spin" />
@@ -143,29 +143,29 @@ export default function PlayerSignupPage() {
           {/* Divider */}
           <div className="relative mb-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-zinc-800" />
+              <div className="w-full border-t border-default" />
             </div>
             <div className="relative flex justify-center">
-              <span className="bg-zinc-900/50 px-3 text-xs text-zinc-500">or sign up with email</span>
+              <span className="bg-surface-raised/50 px-3 text-xs text-muted">or sign up with email</span>
             </div>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-zinc-500 uppercase">First Name</label>
+                <label className="block text-xs font-bold text-muted uppercase">First Name</label>
                 <input
                   {...register("firstName")}
-                  className="w-full rounded-xl border border-zinc-700 bg-black/50 p-3 text-white placeholder-zinc-600 focus:border-emerald-500 focus:outline-none transition-colors"
+                  className="w-full rounded-xl border border-subtle bg-surface-base/50 p-3 text-primary placeholder-muted focus:border-emerald-500 focus:outline-none transition-colors"
                   placeholder="Dilshan"
                 />
                 {errors.firstName && <p className="text-red-500 text-xs">{errors.firstName.message}</p>}
               </div>
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-zinc-500 uppercase">Last Name</label>
+                <label className="block text-xs font-bold text-muted uppercase">Last Name</label>
                 <input
                   {...register("lastName")}
-                  className="w-full rounded-xl border border-zinc-700 bg-black/50 p-3 text-white placeholder-zinc-600 focus:border-emerald-500 focus:outline-none transition-colors"
+                  className="w-full rounded-xl border border-subtle bg-surface-base/50 p-3 text-primary placeholder-muted focus:border-emerald-500 focus:outline-none transition-colors"
                   placeholder="Perera"
                 />
                 {errors.lastName && <p className="text-red-500 text-xs">{errors.lastName.message}</p>}
@@ -173,46 +173,46 @@ export default function PlayerSignupPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-zinc-500 uppercase">Email</label>
+              <label className="block text-xs font-bold text-muted uppercase">Email</label>
               <input
                 {...register("email")}
                 type="email"
-                className="w-full rounded-xl border border-zinc-700 bg-black/50 p-3 text-white placeholder-zinc-600 focus:border-emerald-500 focus:outline-none transition-colors"
+                className="w-full rounded-xl border border-subtle bg-surface-base/50 p-3 text-primary placeholder-muted focus:border-emerald-500 focus:outline-none transition-colors"
                 placeholder="dilshan@example.com"
               />
               {errors.email && <p className="text-red-500 text-xs">{errors.email.message}</p>}
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-zinc-500 uppercase">
-                Phone Number <span className="text-zinc-600 text-[10px] normal-case ml-1">(e.g. 0771234567)</span>
+              <label className="block text-xs font-bold text-muted uppercase">
+                Phone Number <span className="text-faint text-[10px] normal-case ml-1">(e.g. 0771234567)</span>
               </label>
               <input
                 {...register("phone")}
                 type="tel"
-                className="w-full rounded-xl border border-zinc-700 bg-black/50 p-3 text-white placeholder-zinc-600 focus:border-emerald-500 focus:outline-none transition-colors"
+                className="w-full rounded-xl border border-subtle bg-surface-base/50 p-3 text-primary placeholder-muted focus:border-emerald-500 focus:outline-none transition-colors"
                 placeholder="0771234567"
               />
               {errors.phone && <p className="text-red-500 text-xs">{errors.phone.message}</p>}
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-zinc-500 uppercase">Password</label>
+              <label className="block text-xs font-bold text-muted uppercase">Password</label>
               <input
                 {...register("password")}
                 type="password"
-                className="w-full rounded-xl border border-zinc-700 bg-black/50 p-3 text-white placeholder-zinc-600 focus:border-emerald-500 focus:outline-none transition-colors"
+                className="w-full rounded-xl border border-subtle bg-surface-base/50 p-3 text-primary placeholder-muted focus:border-emerald-500 focus:outline-none transition-colors"
                 placeholder="••••••••"
               />
               {errors.password && <p className="text-red-500 text-xs">{errors.password.message}</p>}
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-zinc-500 uppercase">Confirm Password</label>
+              <label className="block text-xs font-bold text-muted uppercase">Confirm Password</label>
               <input
                 {...register("confirmPassword")}
                 type="password"
-                className="w-full rounded-xl border border-zinc-700 bg-black/50 p-3 text-white placeholder-zinc-600 focus:border-emerald-500 focus:outline-none transition-colors"
+                className="w-full rounded-xl border border-subtle bg-surface-base/50 p-3 text-primary placeholder-muted focus:border-emerald-500 focus:outline-none transition-colors"
                 placeholder="••••••••"
               />
               {errors.confirmPassword && <p className="text-red-500 text-xs">{errors.confirmPassword.message}</p>}
@@ -227,9 +227,9 @@ export default function PlayerSignupPage() {
             </Button>
           </form>
 
-          <p className="mt-6 text-center text-zinc-500 text-sm">
+          <p className="mt-6 text-center text-muted text-sm">
             Already have an account?{" "}
-            <Link href="/login" className="text-white font-bold hover:text-emerald-500 transition-colors">
+            <Link href="/login" className="text-primary font-bold hover:text-emerald-500 transition-colors">
               Log In
             </Link>
           </p>

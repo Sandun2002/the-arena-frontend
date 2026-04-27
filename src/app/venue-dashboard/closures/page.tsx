@@ -107,15 +107,15 @@ export default function ClosuresPage() {
     if (!currentVenue) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
-                <XCircle className="w-12 h-12 text-zinc-600 mb-4" />
-                <h2 className="text-xl font-bold text-white mb-2">No Venue Selected</h2>
-                <p className="text-zinc-400">Please select a venue to manage closures.</p>
+                <XCircle className="w-12 h-12 text-faint mb-4" />
+                <h2 className="text-xl font-bold text-primary mb-2">No Venue Selected</h2>
+                <p className="text-secondary">Please select a venue to manage closures.</p>
             </div>
         );
     }
 
     return (
-        <main className="min-h-screen bg-black pt-24 pb-20 relative overflow-hidden" ref={containerRef}>
+        <main className="min-h-screen bg-surface-base pt-24 pb-20 relative overflow-hidden" ref={containerRef}>
             {/* Background Effects */}
             <div className="absolute inset-0 pointer-events-none">
                 <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-orange-500/5 rounded-full blur-[150px]" />
@@ -125,41 +125,41 @@ export default function ClosuresPage() {
 
                 <div className="flex justify-between items-end mb-12">
                     <div>
-                        <h1 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tight mb-2">
+                        <h1 className="text-3xl md:text-5xl font-black text-primary uppercase tracking-tight mb-2">
                             <span className="text-transparent bg-gradient-to-r from-orange-400 to-red-600 bg-clip-text">Closures</span>
                         </h1>
-                        <p className="text-zinc-400">Schedule maintenance, holidays, or unexpected closures for {currentVenue.name}.</p>
+                        <p className="text-secondary">Schedule maintenance, holidays, or unexpected closures for {currentVenue.name}.</p>
                     </div>
-                    <Button onClick={() => setIsModalOpen(true)} className="bg-red-600 text-white hover:bg-red-500 shadow-[0_0_20px_rgba(220,38,38,0.3)]">
+                    <Button onClick={() => setIsModalOpen(true)} className="bg-red-600 text-primary hover:bg-red-500 shadow-[0_0_20px_rgba(220,38,38,0.3)]">
                         <Plus className="mr-2 h-4 w-4" /> Add Closure
                     </Button>
                 </div>
 
                 <div className="space-y-4">
                     {isLoading ? (
-                        [1, 2].map(i => <div key={i} className="h-32 bg-zinc-900/30 rounded-2xl animate-pulse" />)
+                        [1, 2].map(i => <div key={i} className="h-32 bg-surface-raised/30 rounded-2xl animate-pulse" />)
                     ) : closures.length === 0 ? (
-                        <div className="text-center py-12 bg-zinc-900/20 rounded-3xl border border-zinc-800 border-dashed">
-                            <p className="text-zinc-500">No scheduled closures found.</p>
+                        <div className="text-center py-12 bg-surface-raised/20 rounded-3xl border border-default border-dashed">
+                            <p className="text-muted">No scheduled closures found.</p>
                         </div>
                     ) : (
                         closures.map(closure => (
-                            <div key={closure.id} className="closure-card bg-zinc-900/40 border border-zinc-800 rounded-2xl p-6 backdrop-blur-sm flex flex-col md:flex-row items-center justify-between gap-6 group hover:border-orange-500/30 transition-all">
+                            <div key={closure.id} className="closure-card bg-surface-raised/40 border border-default rounded-2xl p-6 backdrop-blur-sm flex flex-col md:flex-row items-center justify-between gap-6 group hover:border-orange-500/30 transition-all">
                                 <div className="flex items-center gap-6 w-full md:w-auto">
-                                    <div className={`w-14 h-14 rounded-xl flex items-center justify-center shrink-0 bg-zinc-800/50`}>
+                                    <div className={`w-14 h-14 rounded-xl flex items-center justify-center shrink-0 bg-surface-overlay/50`}>
                                         {getIcon(closure)}
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-white text-lg mb-1">{closure.displayTitle}</h3>
-                                        <div className="flex flex-wrap gap-4 text-sm text-zinc-400">
+                                        <h3 className="font-bold text-primary text-lg mb-1">{closure.displayTitle}</h3>
+                                        <div className="flex flex-wrap gap-4 text-sm text-secondary">
                                             <span className="flex items-center gap-2">
-                                                <Calendar className="h-4 w-4 text-zinc-600" />
+                                                <Calendar className="h-4 w-4 text-faint" />
                                                 {closure._type === "court"
                                                     ? `${fmtDateShort(closure.start_time)} ${fmtTime(closure.start_time)} – ${fmtTime(closure.end_time)}`
                                                     : (closure.closure_date ? format(new Date(closure.closure_date), "MMM dd, yyyy") : "Unknown Date")
                                                 }
                                             </span>
-                                            <span className="hidden md:inline text-zinc-700">|</span>
+                                            <span className="hidden md:inline text-faint">|</span>
                                             <span>{closure.reason || "Scheduled Closure"}</span>
                                         </div>
                                     </div>
@@ -167,7 +167,7 @@ export default function ClosuresPage() {
 
                                 <div className="flex items-center gap-6 w-full md:w-auto justify-between md:justify-end">
                                     <div className="text-right">
-                                        <p className="text-xs font-bold text-zinc-500 uppercase mb-1">Affected Courts</p>
+                                        <p className="text-xs font-bold text-muted uppercase mb-1">Affected Courts</p>
                                         <div className="flex flex-wrap justify-end gap-2">
                                             {closure._type === "court" ? (
                                                 <span className="bg-orange-500/10 text-orange-400 text-xs px-2 py-1 rounded border border-orange-500/20">
@@ -188,8 +188,8 @@ export default function ClosuresPage() {
                     )}
                 </div>
 
-                <div className="mt-8 p-6 rounded-2xl bg-zinc-900/20 border border-dashed border-zinc-800 text-center">
-                    <p className="text-sm text-zinc-500">
+                <div className="mt-8 p-6 rounded-2xl bg-surface-raised/20 border border-dashed border-default text-center">
+                    <p className="text-sm text-muted">
                         Closures will automatically block the calendar preventing any new bookings. <br />
                         Existing bookings during this period will be flagged for cancellation/refund.
                     </p>

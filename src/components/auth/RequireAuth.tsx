@@ -6,9 +6,9 @@ import { useAuth } from "@/services/authContext";
 
 export function AuthLoadingSpinner() {
   return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center gap-4">
+    <div className="min-h-screen bg-surface-base flex flex-col items-center justify-center gap-4">
       <div className="w-10 h-10 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin" />
-      <p className="text-zinc-600 text-sm font-medium">Loading…</p>
+      <p className="text-faint text-sm font-medium">Loading…</p>
     </div>
   );
 }

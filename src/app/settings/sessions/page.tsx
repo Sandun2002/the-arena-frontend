@@ -41,27 +41,27 @@ export default function SessionsPage() {
     if (!user) return null;
 
     return (
-        <main className="min-h-screen bg-black pt-24 pb-12 px-4 selection:bg-emerald-500/30">
+        <main className="min-h-screen bg-surface-base pt-24 pb-12 px-4 selection:bg-emerald-500/30">
             <div className="container mx-auto max-w-3xl">
 
-                <Link href="/profile" className="inline-flex items-center text-sm font-medium text-zinc-500 hover:text-white mb-8 transition-colors group">
+                <Link href="/profile" className="inline-flex items-center text-sm font-medium text-muted hover:text-primary mb-8 transition-colors group">
                     <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" /> Back to Profile
                 </Link>
 
-                <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 backdrop-blur-md shadow-2xl">
+                <div className="bg-surface-raised/50 border border-default rounded-3xl p-8 backdrop-blur-md shadow-2xl">
                     <div className="flex gap-4 mb-8">
                         <div className="p-3 bg-blue-500/10 rounded-2xl text-blue-500 border border-blue-500/20">
                             <Monitor className="w-8 h-8" />
                         </div>
                         <div>
-                            <h1 className="text-2xl font-bold text-white">Active Sessions</h1>
-                            <p className="text-zinc-500 text-sm mt-1">Manage devices where you're currently logged in.</p>
+                            <h1 className="text-2xl font-bold text-primary">Active Sessions</h1>
+                            <p className="text-muted text-sm mt-1">Manage devices where you're currently logged in.</p>
                         </div>
                     </div>
 
                     {sessions.length > 0 && (
                         <div className="mb-6">
-                            <Button variant="outline" onClick={handleLogoutEverywhere} className="border-zinc-700 text-zinc-300 hover:text-white">
+                            <Button variant="outline" onClick={handleLogoutEverywhere} className="border-subtle text-secondary hover:text-primary">
                                 Sign Out All Devices
                             </Button>
                         </div>
@@ -70,28 +70,28 @@ export default function SessionsPage() {
                     <div className="space-y-4">
                         {sessions.length > 0 ? (
                             sessions.map((session) => (
-                                <div key={session.id} className="flex flex-col md:flex-row md:items-center justify-between p-5 bg-black/40 border border-zinc-800 rounded-2xl hover:bg-zinc-800/30 transition-colors">
+                                <div key={session.id} className="flex flex-col md:flex-row md:items-center justify-between p-5 bg-surface-base/40 border border-default rounded-2xl hover:bg-surface-overlay/30 transition-colors">
                                     <div className="flex items-center gap-4 mb-4 md:mb-0">
-                                        <div className="w-12 h-12 bg-zinc-800 rounded-xl flex items-center justify-center shrink-0">
-                                            {session.user_agent.toLowerCase().includes("mobile") ? <Smartphone className="w-6 h-6 text-zinc-400" /> : <Laptop className="w-6 h-6 text-zinc-400" />}
+                                        <div className="w-12 h-12 bg-surface-overlay rounded-xl flex items-center justify-center shrink-0">
+                                            {session.user_agent.toLowerCase().includes("mobile") ? <Smartphone className="w-6 h-6 text-secondary" /> : <Laptop className="w-6 h-6 text-secondary" />}
                                         </div>
                                         <div>
-                                            <p className="text-white font-bold flex items-center gap-2">
+                                            <p className="text-primary font-bold flex items-center gap-2">
                                                 {session.user_agent}
                                                 {session.is_current && <span className="bg-emerald-500 text-black text-[10px] font-bold px-2 py-0.5 rounded-full">THIS DEVICE</span>}
                                             </p>
                                             <div className="flex items-center gap-4 mt-1">
-                                                <span className="text-xs text-zinc-500 flex items-center gap-1.5 align-middle">
+                                                <span className="text-xs text-muted flex items-center gap-1.5 align-middle">
                                                     <Clock className="w-3.5 h-3.5" /> Active {formatDistanceToNow(new Date(session.created_at))} ago
                                                 </span>
-                                                <span className="text-xs text-zinc-600">Token {session.token_hint}</span>
+                                                <span className="text-xs text-faint">Token {session.token_hint}</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             ))
                         ) : (
-                            <div className="text-center py-12 text-zinc-500">
+                            <div className="text-center py-12 text-muted">
                                 <p>No active sessions found.</p>
                             </div>
                         )}

@@ -56,20 +56,20 @@ export default function ReviewPage() {
         }
     };
 
-    if (!venue) return <div className="min-h-screen bg-black flex items-center justify-center text-emerald-500"><Loader2 className="w-8 h-8 animate-spin" /></div>;
+    if (!venue) return <div className="min-h-screen bg-surface-base flex items-center justify-center text-emerald-500"><Loader2 className="w-8 h-8 animate-spin" /></div>;
 
     return (
-        <main className="min-h-screen bg-black pt-24 pb-12 px-4 selection:bg-emerald-500/30">
+        <main className="min-h-screen bg-surface-base pt-24 pb-12 px-4 selection:bg-emerald-500/30">
             <div className="container mx-auto max-w-2xl">
 
-                <Link href={`/venues/${venueId}`} className="inline-flex items-center text-sm font-medium text-zinc-500 hover:text-white mb-8 transition-colors group">
+                <Link href={`/venues/${venueId}`} className="inline-flex items-center text-sm font-medium text-muted hover:text-primary mb-8 transition-colors group">
                     <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" /> Back to Venue
                 </Link>
 
-                <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 backdrop-blur-md shadow-2xl">
+                <div className="bg-surface-raised/50 border border-default rounded-3xl p-8 backdrop-blur-md shadow-2xl">
                     <div className="text-center mb-8">
-                        <h1 className="text-2xl font-bold text-white mb-2">Review {venue.name}</h1>
-                        <p className="text-zinc-500">Share your experience from a completed booking.</p>
+                        <h1 className="text-2xl font-bold text-primary mb-2">Review {venue.name}</h1>
+                        <p className="text-muted">Share your experience from a completed booking.</p>
                     </div>
 
                     {!bookingId && (
@@ -82,7 +82,7 @@ export default function ReviewPage() {
 
                         {/* Star Rating */}
                         <div className="flex flex-col items-center gap-4">
-                            <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Rate your experience</label>
+                            <label className="text-xs font-bold text-muted uppercase tracking-wider">Rate your experience</label>
                             <div className="flex gap-2">
                                 {[1, 2, 3, 4, 5].map((star) => (
                                     <button
@@ -96,7 +96,7 @@ export default function ReviewPage() {
                                         <Star
                                             className={`w-10 h-10 transition-colors ${star <= (hoveredRating || rating)
                                                 ? "text-yellow-400 fill-yellow-400"
-                                                : "text-zinc-700"
+                                                : "text-faint"
                                                 }`}
                                         />
                                     </button>
@@ -113,12 +113,12 @@ export default function ReviewPage() {
 
                         {/* Comment */}
                         <div className="space-y-2">
-                            <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Write a review</label>
+                            <label className="text-xs font-bold text-muted uppercase tracking-wider">Write a review</label>
                             <textarea
                                 value={comment}
                                 onChange={(e) => setComment(e.target.value)}
                                 rows={5}
-                                className="w-full bg-black/50 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 outline-none transition-all resize-none placeholder:text-zinc-700"
+                                className="w-full bg-surface-base/50 border border-default rounded-xl px-4 py-3 text-primary focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 outline-none transition-all resize-none placeholder:text-faint"
                                 placeholder="What did you like or dislike? How were the facilities?"
                             />
                         </div>

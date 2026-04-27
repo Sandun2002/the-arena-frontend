@@ -101,17 +101,17 @@ export default function SportExplorer() {
   // pass the single copy of each row straight through.
 
   return (
-    <section ref={sectionRef} className="py-10 md:py-14 bg-black overflow-hidden">
+    <section ref={sectionRef} className="py-10 md:py-14 bg-surface-base overflow-hidden">
       <div className="container mx-auto px-4 max-w-7xl">
         {/* Header — unchanged, clean */}
         <div className="sport-header mb-6 md:mb-8">
-          <h2 className="text-xl md:text-3xl font-bold text-white mb-1.5">
+          <h2 className="text-xl md:text-3xl font-bold text-primary mb-1.5">
             Explore by{" "}
             <span className="text-transparent bg-gradient-to-r from-emerald-400 to-emerald-500 bg-clip-text">
               Sport
             </span>
           </h2>
-          <p className="text-zinc-400 text-xs md:text-sm">
+          <p className="text-secondary text-xs md:text-sm">
             Find courts for your favorite game
           </p>
         </div>
@@ -123,7 +123,7 @@ export default function SportExplorer() {
           {[...Array(6)].map((_, i) => (
             <div
               key={i}
-              className="w-[150px] h-[190px] md:w-[200px] md:h-[260px] rounded-xl bg-zinc-900/50 border border-zinc-800 animate-pulse flex-shrink-0"
+              className="w-[150px] h-[190px] md:w-[200px] md:h-[260px] rounded-xl bg-surface-raised/50 border border-default animate-pulse flex-shrink-0"
             />
           ))}
         </div>

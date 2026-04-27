@@ -74,21 +74,21 @@ export default function ProfileSettingsPage() {
     if (!user) return null;
 
     return (
-        <main className="min-h-screen bg-black pt-24 pb-12 px-4 selection:bg-emerald-500/30">
+        <main className="min-h-screen bg-surface-base pt-24 pb-12 px-4 selection:bg-emerald-500/30">
             <div className="container mx-auto max-w-2xl">
 
-                <Link href="/profile" className="inline-flex items-center text-sm font-medium text-zinc-500 hover:text-white mb-8 transition-colors group">
+                <Link href="/profile" className="inline-flex items-center text-sm font-medium text-muted hover:text-primary mb-8 transition-colors group">
                     <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" /> Back to Profile
                 </Link>
 
-                <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 backdrop-blur-md shadow-2xl">
-                    <h1 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
+                <div className="bg-surface-raised/50 border border-default rounded-3xl p-8 backdrop-blur-md shadow-2xl">
+                    <h1 className="text-2xl font-bold text-primary mb-8 flex items-center gap-3">
                         <span className="bg-emerald-500/10 p-2 rounded-xl text-emerald-500"><Edit2Icon className="w-6 h-6" /></span>
                         Edit Profile
                     </h1>
 
                     {/* Avatar Upload */}
-                    <div className="flex items-center gap-6 mb-10 pb-10 border-b border-zinc-800/50">
+                    <div className="flex items-center gap-6 mb-10 pb-10 border-b border-default/50">
                         <div
                             className="relative group cursor-pointer"
                             onClick={() => fileInputRef.current?.click()}
@@ -101,12 +101,12 @@ export default function ProfileSettingsPage() {
                                 alt="Avatar"
                             />
                             {uploadingAvatar && (
-                                <div className="absolute inset-0 rounded-full bg-black/60 flex items-center justify-center z-30">
+                                <div className="absolute inset-0 rounded-full bg-surface-base/60 flex items-center justify-center z-30">
                                     <Loader2 className="w-6 h-6 text-emerald-500 animate-spin" />
                                 </div>
                             )}
-                            <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-30">
-                                <Upload className="w-8 h-8 text-white" />
+                            <div className="absolute inset-0 rounded-full bg-surface-base/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-30">
+                                <Upload className="w-8 h-8 text-primary" />
                             </div>
                             <input
                                 type="file"
@@ -117,8 +117,8 @@ export default function ProfileSettingsPage() {
                             />
                         </div>
                         <div>
-                            <p className="text-white font-bold mb-1">Profile Photo</p>
-                            <p className="text-zinc-500 text-xs mb-3">Recommended 400x400px. JPG or PNG.</p>
+                            <p className="text-primary font-bold mb-1">Profile Photo</p>
+                            <p className="text-muted text-xs mb-3">Recommended 400x400px. JPG or PNG.</p>
                             <Button size="sm" variant="outline" onClick={() => fileInputRef.current?.click()}>
                                 Change Photo
                             </Button>
@@ -129,22 +129,22 @@ export default function ProfileSettingsPage() {
 
                         <div className="grid md:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Full Name</label>
+                                <label className="text-xs font-bold text-muted uppercase tracking-wider">Full Name</label>
                                 <input
                                     {...register("full_name", { required: "Name is required" })}
-                                    className="w-full bg-black/50 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 outline-none transition-all"
+                                    className="w-full bg-surface-base/50 border border-default rounded-xl px-4 py-3 text-primary focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 outline-none transition-all"
                                     placeholder="e.g. Dilshan Perera"
                                 />
                                 {errors.full_name && <p className="text-red-500 text-xs mt-1">{errors.full_name.message}</p>}
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Phone Number</label>
+                                <label className="text-xs font-bold text-muted uppercase tracking-wider">Phone Number</label>
                                 <input
                                     {...register("phone_number", {
                                         pattern: { value: /^(?:\+94|0)[0-9]{2}[0-9]{7}$/, message: "Invalid SL phone format" }
                                     })}
-                                    className="w-full bg-black/50 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 outline-none transition-all"
+                                    className="w-full bg-surface-base/50 border border-default rounded-xl px-4 py-3 text-primary focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 outline-none transition-all"
                                     placeholder="+94 7X XXX XXXX"
                                 />
                                 {errors.phone_number && <p className="text-red-500 text-xs mt-1">{errors.phone_number.message}</p>}
@@ -152,19 +152,19 @@ export default function ProfileSettingsPage() {
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Bio</label>
+                            <label className="text-xs font-bold text-muted uppercase tracking-wider">Bio</label>
                             <textarea
                                 {...register("bio")}
                                 rows={5}
-                                className="w-full bg-black/50 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 outline-none transition-all resize-none"
+                                className="w-full bg-surface-base/50 border border-default rounded-xl px-4 py-3 text-primary focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 outline-none transition-all resize-none"
                                 placeholder="Tell other players about your favorite sports, skill level, and availability..."
                             />
-                            <p className="text-xs text-zinc-600 text-right">Write a short bio to display on your profile.</p>
+                            <p className="text-xs text-faint text-right">Write a short bio to display on your profile.</p>
                         </div>
 
-                        <div className="pt-6 flex items-center justify-end gap-4 border-t border-zinc-800/50 mt-8">
+                        <div className="pt-6 flex items-center justify-end gap-4 border-t border-default/50 mt-8">
                             <Link href="/profile">
-                                <Button type="button" variant="ghost" className="hover:bg-zinc-800 text-zinc-400 hover:text-white">Cancel</Button>
+                                <Button type="button" variant="ghost" className="hover:bg-surface-overlay text-secondary hover:text-primary">Cancel</Button>
                             </Link>
                             <Button
                                 type="submit"
