@@ -73,7 +73,7 @@ function ToggleSwitch({
       onClick={() => onChange(!checked)}
       className={cn(
         "relative w-9 h-5 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500",
-        checked ? "bg-emerald-600" : "bg-zinc-700",
+        checked ? "bg-emerald-600" : "bg-surface-sunken",
         disabled && "opacity-40 cursor-not-allowed"
       )}
     >
@@ -133,17 +133,17 @@ export function NotificationPreferences() {
   return (
     <div className="space-y-6">
       {/* Global mute */}
-      <div className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-5">
+      <div className="bg-surface-raised border border-default rounded-2xl p-5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             {mute ? (
-              <BellOff size={18} className="text-zinc-500" />
+              <BellOff size={18} className="text-muted" />
             ) : (
-              <Bell size={18} className="text-emerald-400" />
+              <Bell size={18} className="text-emerald-500" />
             )}
             <div>
-              <p className="text-sm font-semibold text-zinc-200">Mute Player Notifications</p>
-              <p className="text-xs text-zinc-500 mt-0.5">
+              <p className="text-sm font-semibold text-primary">Mute Player Notifications</p>
+              <p className="text-xs text-muted mt-0.5">
                 Suppress all push and in-app notifications for player activity (bookings, XP, etc.)
               </p>
             </div>
@@ -154,13 +154,13 @@ export function NotificationPreferences() {
 
       {/* Push toggle */}
       {pushSupported && (
-        <div className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-5">
+        <div className="bg-surface-raised border border-default rounded-2xl p-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Smartphone size={18} className="text-zinc-400" />
+              <Smartphone size={18} className="text-secondary" />
               <div>
-                <p className="text-sm font-semibold text-zinc-200">Push Notifications</p>
-                <p className="text-xs text-zinc-500 mt-0.5">
+                <p className="text-sm font-semibold text-primary">Push Notifications</p>
+                <p className="text-xs text-muted mt-0.5">
                   {pushEnabled
                     ? "Push notifications are enabled on this device."
                     : "Enable real-time push notifications for this device."}
@@ -177,33 +177,33 @@ export function NotificationPreferences() {
 
       {/* Per-type preferences */}
       {GROUPED_TYPES.map((group) => (
-        <div key={group.group} className="bg-zinc-900/60 border border-zinc-800 rounded-2xl overflow-hidden">
-          <div className="px-5 py-3 border-b border-zinc-800/60">
-            <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">{group.group}</h3>
+        <div key={group.group} className="bg-surface-raised border border-default rounded-2xl overflow-hidden">
+          <div className="px-5 py-3 border-b border-default/60">
+            <h3 className="text-xs font-semibold text-secondary uppercase tracking-wider">{group.group}</h3>
           </div>
-          <div className="divide-y divide-zinc-900/60">
+          <div className="divide-y divide-default/60">
             {group.types.map((type) => {
               const p = getPref(type.key);
               return (
                 <div key={type.key} className="flex items-center px-5 py-3 gap-4">
-                  <span className="flex-1 text-sm text-zinc-300">{type.label}</span>
+                  <span className="flex-1 text-sm text-primary">{type.label}</span>
                   <div className="flex items-center gap-4">
                     <div className="flex flex-col items-center gap-1">
-                      <Smartphone size={12} className="text-zinc-600" />
+                      <Smartphone size={12} className="text-faint" />
                       <ToggleSwitch
                         checked={p.push_enabled}
                         onChange={(v) => setPref(type.key, "push_enabled", v)}
                       />
                     </div>
                     <div className="flex flex-col items-center gap-1">
-                      <Mail size={12} className="text-zinc-600" />
+                      <Mail size={12} className="text-faint" />
                       <ToggleSwitch
                         checked={p.email_enabled}
                         onChange={(v) => setPref(type.key, "email_enabled", v)}
                       />
                     </div>
                     <div className="flex flex-col items-center gap-1">
-                      <Monitor size={12} className="text-zinc-600" />
+                      <Monitor size={12} className="text-faint" />
                       <ToggleSwitch
                         checked={p.in_app_enabled}
                         onChange={(v) => setPref(type.key, "in_app_enabled", v)}
@@ -219,7 +219,7 @@ export function NotificationPreferences() {
 
       {/* Save */}
       <div className="flex items-center justify-end gap-3">
-        {saved && <span className="text-sm text-emerald-400">Saved!</span>}
+        {saved && <span className="text-sm text-emerald-500">Saved!</span>}
         <button
           onClick={handleSave}
           disabled={saving}

@@ -35,8 +35,8 @@ function NotificationItem({
     <div
       className={cn(
         "group relative flex gap-3 px-4 py-3 transition-colors cursor-pointer",
-        "hover:bg-white/[0.03] border-b border-zinc-900/60 last:border-0",
-        !notification.is_read && "bg-emerald-950/10"
+        "hover:bg-surface-overlay border-b border-default last:border-0",
+        !notification.is_read && "bg-emerald-500/10"
       )}
       onClick={handleClick}
     >
@@ -47,16 +47,16 @@ function NotificationItem({
         <div className="flex items-start justify-between gap-2">
           <p className={cn(
             "text-sm leading-snug line-clamp-1",
-            notification.is_read ? "text-zinc-400 font-normal" : "text-zinc-100 font-medium"
+            notification.is_read ? "text-muted font-normal" : "text-primary font-medium"
           )}>
             {notification.icon && <span className="mr-1.5">{notification.icon}</span>}
             {notification.title}
           </p>
-          <span className="text-[11px] text-zinc-600 whitespace-nowrap flex-shrink-0">
+          <span className="text-[11px] text-faint whitespace-nowrap flex-shrink-0">
             {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
           </span>
         </div>
-        <p className="text-xs text-zinc-500 mt-0.5 line-clamp-2 leading-relaxed">
+        <p className="text-xs text-secondary mt-0.5 line-clamp-2 leading-relaxed">
           {notification.body}
         </p>
       </div>
@@ -67,7 +67,7 @@ function NotificationItem({
         {!notification.is_read && (
           <button
             onClick={() => onMarkRead(notification.id)}
-            className="p-1 rounded text-zinc-500 hover:text-emerald-400 hover:bg-emerald-950/30 transition-colors"
+            className="p-1 rounded text-muted hover:text-emerald-500 hover:bg-emerald-500/20 transition-colors"
             aria-label="Mark as read"
           >
             <Check size={13} />
@@ -76,7 +76,7 @@ function NotificationItem({
         {notification.action_url && (
           <button
             onClick={() => { if (notification.action_url) window.open(notification.action_url, "_self"); }}
-            className="p-1 rounded text-zinc-500 hover:text-zinc-300 hover:bg-white/5 transition-colors"
+            className="p-1 rounded text-muted hover:text-primary hover:bg-surface-overlay transition-colors"
             aria-label="Open"
           >
             <ExternalLink size={13} />
@@ -84,7 +84,7 @@ function NotificationItem({
         )}
         <button
           onClick={() => onDelete(notification.id)}
-          className="p-1 rounded text-zinc-500 hover:text-red-400 hover:bg-red-950/30 transition-colors"
+          className="p-1 rounded text-muted hover:text-red-500 hover:bg-red-500/20 transition-colors"
           aria-label="Delete"
         >
           <Trash2 size={13} />
@@ -147,17 +147,17 @@ export function NotificationPanel() {
       className={cn(
         "absolute right-0 top-full mt-2 z-50",
         "w-[380px] max-h-[580px] flex flex-col",
-        "bg-zinc-950 border border-zinc-800/80 rounded-2xl shadow-2xl shadow-black/60",
+        "bg-surface-raised border border-default rounded-2xl shadow-2xl",
         "animate-in fade-in-0 slide-in-from-top-2 duration-150"
       )}
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-900">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-default">
         <div className="flex items-center gap-2">
-          <Bell size={15} className="text-zinc-400" />
-          <span className="text-sm font-semibold text-zinc-200">Notifications</span>
+          <Bell size={15} className="text-secondary" />
+          <span className="text-sm font-semibold text-primary">Notifications</span>
           {unreadCount > 0 && (
-            <span className="text-xs bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded-full font-medium">
+            <span className="text-xs bg-emerald-500/20 text-emerald-500 px-1.5 py-0.5 rounded-full font-medium">
               {unreadCount}
             </span>
           )}
@@ -166,7 +166,7 @@ export function NotificationPanel() {
           {tabUnread > 0 && (
             <button
               onClick={() => markAllRead(activeTab)}
-              className="flex items-center gap-1 px-2 py-1 text-xs text-zinc-400 hover:text-emerald-400 hover:bg-emerald-950/30 rounded-lg transition-colors"
+              className="flex items-center gap-1 px-2 py-1 text-xs text-muted hover:text-emerald-500 hover:bg-emerald-500/20 rounded-lg transition-colors"
             >
               <CheckCheck size={13} />
               <span>Mark all read</span>
@@ -174,7 +174,7 @@ export function NotificationPanel() {
           )}
           <button
             onClick={closePanel}
-            className="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-300 hover:bg-white/5 transition-colors"
+            className="p-1.5 rounded-lg text-muted hover:text-primary hover:bg-surface-overlay transition-colors"
           >
             <X size={15} />
           </button>
@@ -182,7 +182,7 @@ export function NotificationPanel() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-1 px-4 pt-2 pb-0 border-b border-zinc-900/60">
+      <div className="flex items-center gap-1 px-4 pt-2 pb-0 border-b border-default/60">
         {TABS.filter((t) => t.key !== "business" || showBusinessTab).map((tab) => {
           const count = notifications.filter(
             (n) => n.role_context === tab.key && !n.is_read
@@ -194,13 +194,13 @@ export function NotificationPanel() {
               className={cn(
                 "flex items-center gap-1.5 px-3 pb-2 pt-1 text-xs font-medium rounded-t transition-colors border-b-2 -mb-px",
                 activeTab === tab.key
-                  ? "text-white border-emerald-500"
-                  : "text-zinc-500 hover:text-zinc-300 border-transparent"
+                  ? "text-primary border-emerald-500"
+                  : "text-muted hover:text-primary border-transparent"
               )}
             >
               {tab.label}
               {count > 0 && (
-                <span className="min-w-[16px] h-4 px-1 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold flex items-center justify-center">
+                <span className="min-w-[16px] h-4 px-1 rounded-full bg-emerald-500/20 text-emerald-500 text-[10px] font-bold flex items-center justify-center">
                   {count}
                 </span>
               )}
@@ -212,12 +212,12 @@ export function NotificationPanel() {
       {/* Body */}
       <div className="flex-1 overflow-y-auto overscroll-contain">
         {loading && filteredNotifications.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 gap-3 text-zinc-600">
-            <div className="w-5 h-5 rounded-full border-2 border-zinc-700 border-t-emerald-500 animate-spin" />
+          <div className="flex flex-col items-center justify-center py-16 gap-3 text-faint">
+            <div className="w-5 h-5 rounded-full border-2 border-muted border-t-emerald-500 animate-spin" />
             <span className="text-xs">Loading...</span>
           </div>
         ) : filteredNotifications.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 gap-3 text-zinc-600">
+          <div className="flex flex-col items-center justify-center py-16 gap-3 text-faint">
             <BellOff size={24} strokeWidth={1.5} />
             <span className="text-sm">No notifications</span>
           </div>
@@ -234,10 +234,10 @@ export function NotificationPanel() {
       </div>
 
       {/* Footer */}
-      <div className="px-4 py-2.5 border-t border-zinc-900/60">
+      <div className="px-4 py-2.5 border-t border-default/60">
         <a
           href="/settings/notifications"
-          className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+          className="text-xs text-muted hover:text-primary transition-colors"
           onClick={closePanel}
         >
           Notification settings →

@@ -24,8 +24,8 @@ export default function NotificationSettingsPage() {
         {/* Header */}
         <div>
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-9 h-9 rounded-xl bg-emerald-950/60 border border-emerald-900/40 flex items-center justify-center">
-              <Bell size={16} className="text-emerald-400" />
+            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+              <Bell size={16} className="text-emerald-500" />
             </div>
             <h1 className="text-2xl font-bold text-primary">Notification Settings</h1>
           </div>
