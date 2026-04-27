@@ -245,7 +245,7 @@ export function NotificationPanel() {
     <>
       {/* Mobile: full-screen backdrop + bottom sheet */}
       <div
-        className="md:hidden fixed inset-0 z-50 flex flex-col justify-end bg-black/50 backdrop-blur-sm animate-in fade-in-0 duration-150"
+        className="md:hidden fixed inset-0 z-[200] flex flex-col justify-end bg-black/50 backdrop-blur-sm animate-in fade-in-0 duration-150"
         onClick={closePanel}
       >
         <div className="flex flex-col max-h-[85vh] animate-in slide-in-from-bottom-4 duration-200">
