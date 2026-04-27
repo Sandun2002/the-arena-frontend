@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { Bell, BellOff, Smartphone, Mail, Monitor, Check, AlertCircle, Loader2 } from "lucide-react";
+import { Bell, BellOff, Smartphone, Monitor, Check, AlertCircle, Loader2 } from "lucide-react";
 import { useNotifications } from "@/contexts/NotificationContext";
 import { useAuth } from "@/services/authContext";
 import { NotificationPreferenceItem } from "@/services/notificationService";
@@ -109,7 +109,6 @@ function arePrefsEqual(
     if (!x || !y) return false;
     if (
       x.push_enabled !== y.push_enabled ||
-      x.email_enabled !== y.email_enabled ||
       x.in_app_enabled !== y.in_app_enabled
     ) {
       return false;
@@ -275,7 +274,6 @@ export function NotificationPreferences() {
               </h3>
               <div className="flex items-center gap-4 pr-1">
                 <ChannelHeader icon={<Smartphone size={11} />} label="Push" />
-                <ChannelHeader icon={<Mail size={11} />} label="Email" />
                 <ChannelHeader icon={<Monitor size={11} />} label="In-app" />
               </div>
             </div>
@@ -296,10 +294,6 @@ export function NotificationPreferences() {
                         onChange={(v) => setPref(type.key, "push_enabled", v)}
                       />
                       <ToggleSwitch
-                        checked={p.email_enabled}
-                        onChange={(v) => setPref(type.key, "email_enabled", v)}
-                      />
-                      <ToggleSwitch
                         checked={p.in_app_enabled}
                         onChange={(v) => setPref(type.key, "in_app_enabled", v)}
                       />
@@ -311,6 +305,12 @@ export function NotificationPreferences() {
           </div>
         );
       })}
+
+      {/* Email policy note */}
+      <p className="text-xs text-muted px-1">
+        Critical emails (account verification, booking confirmations, payment receipts, security
+        alerts) are always sent and cannot be disabled here.
+      </p>
 
       {/* Inline save bar — sits in normal flow above the footer */}
       <div
