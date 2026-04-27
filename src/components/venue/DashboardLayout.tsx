@@ -99,7 +99,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const currentRouteName = allRoutes.find(r => r.path === pathname)?.name || "Dashboard";
 
     return (
-        <div className="min-h-screen bg-black text-zinc-100 flex selection:bg-emerald-500/30 overflow-x-hidden lg:pt-20 pt-0">
+        <div className="min-h-screen bg-surface-base text-zinc-100 flex selection:bg-emerald-500/30 overflow-x-hidden lg:pt-20 pt-0">
 
             {/* Global Ambient Background */}
             <div className="fixed inset-0 pointer-events-none z-0">
@@ -109,17 +109,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
             {/* ── MOBILE ONLY: Fixed top bar (always visible, even when user scrolls) ── */}
             <div
-                className="lg:hidden fixed top-20 left-0 right-0 z-[58] bg-zinc-900/95 border-b border-zinc-800 backdrop-blur-xl px-4 flex items-center justify-between h-12"
+                className="lg:hidden fixed top-20 left-0 right-0 z-[58] bg-surface-raised/95 border-b border-default backdrop-blur-xl px-4 flex items-center justify-between h-12"
                 data-lenis-prevent
             >
                 <button
                     onClick={() => setIsSidebarOpen(true)}
-                    className="p-2 rounded-lg bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700 transition-colors"
+                    className="p-2 rounded-lg bg-surface-overlay text-secondary hover:text-primary hover:bg-surface-overlay transition-colors"
                     aria-label="Open sidebar"
                 >
                     <Menu className="w-5 h-5" />
                 </button>
-                <span className="text-sm font-bold text-white truncate px-3">
+                <span className="text-sm font-bold text-primary truncate px-3">
                     {currentVenue?.name ? `${currentVenue.name} — ${currentRouteName}` : currentRouteName}
                 </span>
                 <div className="w-9" /> {/* Spacer for symmetry */}
@@ -128,7 +128,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {/* Mobile Overlay */}
             {isSidebarOpen && (
                 <div
-                    className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[55] lg:hidden cursor-pointer"
+                    className="fixed inset-0 bg-surface-base/80 backdrop-blur-sm z-[55] lg:hidden cursor-pointer"
                     onClick={() => setIsSidebarOpen(false)}
                 />
             )}
@@ -139,7 +139,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 className={`
                     fixed lg:top-20 top-0 left-0 z-[60] lg:z-40
                     lg:h-[calc(100vh-5rem)] h-[100dvh] w-72
-                    bg-zinc-900/60 border-r border-zinc-800/60 backdrop-blur-xl
+                    bg-surface-raised/60 border-r border-default/60 backdrop-blur-xl
                     transition-transform duration-300 ease-in-out
                     flex flex-col
                     ${isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
@@ -147,12 +147,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             >
                 <div className="flex flex-col h-full">
                     {/* Sidebar Header */}
-                    <div className="p-6 border-b border-zinc-800/60 flex items-center justify-between gap-4">
+                    <div className="p-6 border-b border-default/60 flex items-center justify-between gap-4">
                         <div className="flex-1">
                             <VenueSwitcher hideCreateAction={true} />
                         </div>
                         <button
-                            className="lg:hidden p-2 text-zinc-400 hover:text-white bg-black/40 rounded-xl"
+                            className="lg:hidden p-2 text-secondary hover:text-primary bg-surface-base/40 rounded-xl"
                             onClick={() => setIsSidebarOpen(false)}
                         >
                             <X className="w-5 h-5" />
@@ -161,7 +161,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
                     {/* Nav Links — overflow-y-auto allows native sidebar scroll */}
                     <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-1 custom-scrollbar">
-                        <p className="px-4 text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3">Menu</p>
+                        <p className="px-4 text-xs font-bold text-muted uppercase tracking-widest mb-3">Menu</p>
 
                         {routes.map((route) => {
                             const isActive = pathname === route.path;
@@ -178,25 +178,25 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                         flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden
                                         ${isDisabled ? "opacity-40 cursor-not-allowed filter grayscale" : "cursor-pointer"}
                                         ${isActive
-                                            ? "text-emerald-400 font-bold bg-zinc-800/50 border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.1)]"
+                                            ? "text-emerald-400 font-bold bg-surface-overlay/50 border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.1)]"
                                             : isDisabled
-                                                ? "text-zinc-600"
-                                                : "text-zinc-400 hover:bg-zinc-800/40 hover:text-white border border-transparent"
+                                                ? "text-faint"
+                                                : "text-secondary hover:bg-surface-overlay/40 hover:text-primary border border-transparent"
                                         }
                                     `}
                                 >
                                     {isActive && <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-transparent pointer-events-none" />}
-                                    <route.icon className={`w-5 h-5 relative z-10 ${isActive ? "text-emerald-400" : isDisabled ? "text-zinc-700" : "text-zinc-500 group-hover:text-emerald-500 transition-colors"}`} />
+                                    <route.icon className={`w-5 h-5 relative z-10 ${isActive ? "text-emerald-400" : isDisabled ? "text-faint" : "text-muted group-hover:text-emerald-500 transition-colors"}`} />
                                     <span className="relative z-10">{route.name}</span>
                                     {isActive && <ChevronRight className="ml-auto w-4 h-4 text-emerald-500/80 relative z-10" />}
-                                    {isDisabled && <Clock className="ml-auto w-3 h-3 text-zinc-600" />}
+                                    {isDisabled && <Clock className="ml-auto w-3 h-3 text-faint" />}
                                 </Link>
                             );
                         })}
 
                         {/* Analytics Sub-menu */}
                         <div className="pt-8 pb-2">
-                            <p className="px-4 text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3">Analytics</p>
+                            <p className="px-4 text-xs font-bold text-muted uppercase tracking-widest mb-3">Analytics</p>
                             {analyticsRoutes.map((route) => {
                                 if (isVenueManager && route.ownerOnly) return null;
 
@@ -214,15 +214,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                             flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden
                                             ${isDisabled ? "opacity-40 cursor-not-allowed filter grayscale" : "cursor-pointer"}
                                             ${isActive
-                                                ? "text-blue-400 font-bold bg-zinc-800/50 border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.1)]"
+                                                ? "text-blue-400 font-bold bg-surface-overlay/50 border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.1)]"
                                                 : isDisabled
-                                                    ? "text-zinc-600"
-                                                    : "text-zinc-400 hover:bg-zinc-800/40 hover:text-white border border-transparent"
+                                                    ? "text-faint"
+                                                    : "text-secondary hover:bg-surface-overlay/40 hover:text-primary border border-transparent"
                                             }
                                         `}
                                     >
                                         {isActive && <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent pointer-events-none" />}
-                                        <route.icon className={`w-5 h-5 relative z-10 ${isActive ? "text-blue-400" : isDisabled ? "text-zinc-700" : "text-zinc-500 group-hover:text-blue-500 transition-colors"}`} />
+                                        <route.icon className={`w-5 h-5 relative z-10 ${isActive ? "text-blue-400" : isDisabled ? "text-faint" : "text-muted group-hover:text-blue-500 transition-colors"}`} />
                                         <span className="relative z-10">{route.name}</span>
                                         {isActive && <ChevronRight className="ml-auto w-4 h-4 text-blue-500/80 relative z-10" />}
                                     </Link>
@@ -239,39 +239,39 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                     className={`
                                         flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden
                                         ${pathname === "/venue-dashboard/managers"
-                                            ? "text-purple-400 font-bold bg-zinc-800/50 border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.1)]"
-                                            : "text-zinc-400 hover:bg-zinc-800/40 hover:text-white border border-transparent"
+                                            ? "text-purple-400 font-bold bg-surface-overlay/50 border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.1)]"
+                                            : "text-secondary hover:bg-surface-overlay/40 hover:text-primary border border-transparent"
                                         }
                                     `}
                                 >
                                     {pathname === "/venue-dashboard/managers" && <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-transparent pointer-events-none" />}
-                                    <Users className={`w-5 h-5 relative z-10 ${pathname === "/venue-dashboard/managers" ? "text-purple-400" : "text-zinc-500 group-hover:text-purple-500 transition-colors"}`} />
+                                    <Users className={`w-5 h-5 relative z-10 ${pathname === "/venue-dashboard/managers" ? "text-purple-400" : "text-muted group-hover:text-purple-500 transition-colors"}`} />
                                     <span className="relative z-10">Managers</span>
                                 </Link>
                             </div>
                         )}
 
                         {/* Return to Player View */}
-                        <div className="pt-4 pb-2 mt-4 border-t border-zinc-800/60">
+                        <div className="pt-4 pb-2 mt-4 border-t border-default/60">
                             <Link
                                 href="/"
-                                className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden text-zinc-400 hover:bg-zinc-800/40 hover:text-white"
+                                className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden text-secondary hover:bg-surface-overlay/40 hover:text-primary"
                             >
-                                <LayoutDashboard className="w-5 h-5 relative z-10 text-zinc-500 group-hover:text-white transition-colors" />
+                                <LayoutDashboard className="w-5 h-5 relative z-10 text-muted group-hover:text-primary transition-colors" />
                                 <span className="relative z-10 font-medium tracking-wide text-sm">Return to Player View</span>
                             </Link>
                         </div>
                     </nav>
 
                     {/* Sidebar Footer — User info + logout */}
-                    <div className="p-4 border-t border-zinc-800/60 bg-zinc-900/40 backdrop-blur-md">
+                    <div className="p-4 border-t border-default/60 bg-surface-raised/40 backdrop-blur-md">
                         <div className="flex items-center gap-3 px-2 mb-3">
-                            <div className="w-10 h-10 rounded-full bg-zinc-800 ring-2 ring-zinc-700 flex items-center justify-center text-white font-bold shadow-lg">
+                            <div className="w-10 h-10 rounded-full bg-surface-overlay ring-2 ring-subtle flex items-center justify-center text-primary font-bold shadow-lg">
                                 {user?.full_name?.charAt(0) || "U"}
                             </div>
                             <div className="overflow-hidden">
-                                <p className="text-sm font-bold text-white truncate">{user?.full_name}</p>
-                                <p className="text-xs text-zinc-500 truncate">{user?.email}</p>
+                                <p className="text-sm font-bold text-primary truncate">{user?.full_name}</p>
+                                <p className="text-xs text-muted truncate">{user?.email}</p>
                             </div>
                         </div>
                         <button

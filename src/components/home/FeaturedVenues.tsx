@@ -27,15 +27,15 @@ export default function FeaturedVenues() {
   }, []);
 
   return (
-    <section className="py-20 bg-black">
+    <section className="py-20 bg-surface-base">
       <div className="container mx-auto px-4">
         
         <div className="flex justify-between items-end mb-12">
           <div>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">
+            <h2 className="text-3xl md:text-4xl font-bold text-primary mb-2">
               Trending <span className="text-emerald-500">Arenas</span>
             </h2>
-            <p className="text-zinc-400">Most booked arenas in the last two weeks.</p>
+            <p className="text-secondary">Most booked arenas in the last two weeks.</p>
           </div>
           <div className="hidden md:block">
             <Button href="/venues" variant="ghost">View All Venues</Button>
@@ -46,17 +46,17 @@ export default function FeaturedVenues() {
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="w-full rounded-xl bg-zinc-900 border border-zinc-800 overflow-hidden animate-pulse">
-                  <div className="h-64 bg-zinc-800" />
+                <div key={i} className="w-full rounded-xl bg-surface-raised border border-default overflow-hidden animate-pulse">
+                  <div className="h-64 bg-surface-overlay" />
                   <div className="p-5">
                     <div className="mb-3 flex items-center justify-between">
-                      <div className="h-6 bg-zinc-800 rounded w-3/4" />
-                      <div className="h-5 bg-zinc-800 rounded w-10" />
+                      <div className="h-6 bg-surface-overlay rounded w-3/4" />
+                      <div className="h-5 bg-surface-overlay rounded w-10" />
                     </div>
-                    <div className="mb-4 h-4 bg-zinc-800 rounded w-1/2" />
-                    <div className="border-t border-zinc-800 pt-4 flex items-center justify-between">
-                      <div className="h-5 bg-zinc-800 rounded w-2/5" />
-                      <div className="h-4 bg-zinc-800 rounded w-16" />
+                    <div className="mb-4 h-4 bg-surface-overlay rounded w-1/2" />
+                    <div className="border-t border-default pt-4 flex items-center justify-between">
+                      <div className="h-5 bg-surface-overlay rounded w-2/5" />
+                      <div className="h-4 bg-surface-overlay rounded w-16" />
                     </div>
                   </div>
                 </div>
@@ -71,7 +71,7 @@ export default function FeaturedVenues() {
               ))}
             </div>
           ) : (
-            <div className="text-center text-zinc-500 py-10">
+            <div className="text-center text-muted py-10">
               No trending venues found.
             </div>
           )}

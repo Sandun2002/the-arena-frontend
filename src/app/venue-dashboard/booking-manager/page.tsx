@@ -248,9 +248,9 @@ export default function BookingManagerPage() {
     if (!currentVenue) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
-                <CalendarIcon className="w-12 h-12 text-zinc-600 mb-4" />
-                <h2 className="text-xl font-bold text-white mb-2">No Venue Selected</h2>
-                <p className="text-zinc-400">Please select a venue to manage bookings.</p>
+                <CalendarIcon className="w-12 h-12 text-faint mb-4" />
+                <h2 className="text-xl font-bold text-primary mb-2">No Venue Selected</h2>
+                <p className="text-secondary">Please select a venue to manage bookings.</p>
             </div>
         );
     }
@@ -259,12 +259,12 @@ export default function BookingManagerPage() {
         <div className="flex flex-col space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
 
             {/* Header Area */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-6 bg-zinc-900/50 border border-zinc-800 rounded-3xl backdrop-blur-sm gap-4">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-6 bg-surface-raised/50 border border-default rounded-3xl backdrop-blur-sm gap-4">
                 <div>
-                    <h1 className="text-3xl font-black text-white uppercase tracking-tight mb-1">Booking Manager</h1>
+                    <h1 className="text-3xl font-black text-primary uppercase tracking-tight mb-1">Booking Manager</h1>
                     <div className="flex items-center gap-3">
-                        <p className="text-zinc-400">Manage slots for <span className="text-emerald-500 font-bold">{activeCourt?.name || "the venue"}</span></p>
-                        <span className="flex items-center gap-1.5 text-[10px] text-zinc-600 font-medium">
+                        <p className="text-secondary">Manage slots for <span className="text-emerald-500 font-bold">{activeCourt?.name || "the venue"}</span></p>
+                        <span className="flex items-center gap-1.5 text-[10px] text-faint font-medium">
                             <RefreshCcw className="w-3 h-3" />
                             {format(lastSynced, "HH:mm:ss")}
                         </span>
@@ -272,14 +272,14 @@ export default function BookingManagerPage() {
                 </div>
 
                 {/* Date Picker (Top Right) */}
-                <div className="flex items-center bg-zinc-900 border border-zinc-800 rounded-xl p-1 shadow-lg shadow-black/50">
-                    <button onClick={handlePrevDay} className="p-3 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-white transition-colors active:scale-95">
+                <div className="flex items-center bg-surface-raised border border-default rounded-xl p-1 shadow-lg shadow-[var(--shadow-elevation)]">
+                    <button onClick={handlePrevDay} className="p-3 hover:bg-surface-overlay rounded-lg text-secondary hover:text-primary transition-colors active:scale-95">
                         <ChevronLeft className="w-5 h-5" />
                     </button>
 
-                    <div className="px-2 relative cursor-pointer group hover:bg-zinc-800 rounded-lg transition-colors py-2 flex items-center gap-2" onClick={() => (document.getElementById('date-picker') as HTMLInputElement)?.showPicker()}>
+                    <div className="px-2 relative cursor-pointer group hover:bg-surface-overlay rounded-lg transition-colors py-2 flex items-center gap-2" onClick={() => (document.getElementById('date-picker') as HTMLInputElement)?.showPicker()}>
                         <CalendarIcon className="w-4 h-4 text-emerald-500 group-hover:scale-110 transition-transform" />
-                        <span className="text-white font-bold text-sm tracking-wide">{format(selectedDate, "MM/dd/yyyy")}</span>
+                        <span className="text-primary font-bold text-sm tracking-wide">{format(selectedDate, "MM/dd/yyyy")}</span>
                         {isSameDay(selectedDate, new Date()) && (
                             <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">TODAY</span>
                         )}
@@ -299,7 +299,7 @@ export default function BookingManagerPage() {
                         />
                     </div>
 
-                    <button onClick={handleNextDay} className="p-3 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-white transition-colors active:scale-95">
+                    <button onClick={handleNextDay} className="p-3 hover:bg-surface-overlay rounded-lg text-secondary hover:text-primary transition-colors active:scale-95">
                         <ChevronRight className="w-5 h-5" />
                     </button>
                 </div>
@@ -314,12 +314,12 @@ export default function BookingManagerPage() {
                             onClick={() => setActiveCourtId(court.id)}
                             className={`flex items-center gap-2 px-6 py-3.5 rounded-2xl font-bold whitespace-nowrap transition-all border
                                 ${activeCourtId === court.id
-                                    ? "bg-zinc-800 text-white border-zinc-700 shadow-lg"
-                                    : "bg-black/40 text-zinc-400 border-zinc-800 hover:border-zinc-700 hover:text-white"
+                                    ? "bg-surface-overlay text-primary border-subtle shadow-lg"
+                                    : "bg-surface-base/40 text-secondary border-default hover:border-subtle hover:text-primary"
                                 }
                             `}
                         >
-                            <MapPin className={`w-4 h-4 ${activeCourtId === court.id ? "text-emerald-500" : "text-zinc-500"}`} />
+                            <MapPin className={`w-4 h-4 ${activeCourtId === court.id ? "text-emerald-500" : "text-muted"}`} />
                             {court.name}
                         </button>
                     ))}
@@ -327,9 +327,9 @@ export default function BookingManagerPage() {
             )}
 
             {/* 24-Hour Slots Grid */}
-            <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-6 md:p-8 backdrop-blur-sm min-h-[60vh]">
+            <div className="bg-surface-raised/40 border border-default rounded-3xl p-6 md:p-8 backdrop-blur-sm min-h-[60vh]">
                 {isLoading ? (
-                    <div className="flex flex-col items-center justify-center h-full text-zinc-500 py-20">
+                    <div className="flex flex-col items-center justify-center h-full text-muted py-20">
                         <Loader2 className="w-8 h-8 animate-spin mb-4 text-emerald-500" />
                         <p>Loading slots...</p>
                     </div>
@@ -340,31 +340,31 @@ export default function BookingManagerPage() {
                         <p className="text-red-400/80">{closureReason || `The venue is not operating on ${format(selectedDate, "MMM dd, yyyy")}.`}</p>
                     </div>
                 ) : !activeCourtId ? (
-                    <div className="flex flex-col items-center justify-center h-full text-zinc-500 py-20">
+                    <div className="flex flex-col items-center justify-center h-full text-muted py-20">
                         <p>No courts available. Please add courts first.</p>
                     </div>
                 ) : (
                     <>
                         {/* Legend */}
-                        <div className="flex flex-wrap items-center gap-4 mb-6 pb-4 border-b border-zinc-800/60">
-                            <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">Legend</span>
-                            <div className="flex items-center gap-1.5 text-[11px] text-zinc-400">
+                        <div className="flex flex-wrap items-center gap-4 mb-6 pb-4 border-b border-default/60">
+                            <span className="text-[10px] font-bold text-faint uppercase tracking-widest">Legend</span>
+                            <div className="flex items-center gap-1.5 text-[11px] text-secondary">
                                 <Globe className="w-3 h-3 text-blue-400" />
                                 <span>Platform</span>
                             </div>
-                            <div className="flex items-center gap-1.5 text-[11px] text-zinc-400">
+                            <div className="flex items-center gap-1.5 text-[11px] text-secondary">
                                 <UserPlus className="w-3 h-3 text-orange-400" />
                                 <span>Walk-in</span>
                             </div>
-                            <div className="flex items-center gap-1.5 text-[11px] text-zinc-400">
+                            <div className="flex items-center gap-1.5 text-[11px] text-secondary">
                                 <Repeat className="w-3 h-3 text-indigo-400" />
                                 <span>Recurring</span>
                             </div>
-                            <div className="flex items-center gap-1.5 text-[11px] text-zinc-400">
-                                <Hammer className="w-3 h-3 text-zinc-500" />
+                            <div className="flex items-center gap-1.5 text-[11px] text-secondary">
+                                <Hammer className="w-3 h-3 text-muted" />
                                 <span>Maintenance</span>
                             </div>
-                            <div className="flex items-center gap-1.5 text-[11px] text-zinc-400">
+                            <div className="flex items-center gap-1.5 text-[11px] text-secondary">
                                 <Zap className="w-3 h-3 text-green-400" />
                                 <span>Live Now</span>
                             </div>
@@ -386,8 +386,8 @@ export default function BookingManagerPage() {
                                     <div key={hour} className={`flex gap-4 ${isPast && !booking && !recurring ? 'opacity-50' : ''}`}>
                                         {/* Time Indicator */}
                                         <div className="w-24 flex-shrink-0 text-right pt-4">
-                                            <p className={`text-sm font-bold ${isLive ? 'text-green-400' : 'text-zinc-300'}`}>{format(slotStart, "h:mm a")}</p>
-                                            <p className="text-xs text-zinc-600 font-medium">to {format(slotEnd, "h:mm a")}</p>
+                                            <p className={`text-sm font-bold ${isLive ? 'text-green-400' : 'text-secondary'}`}>{format(slotStart, "h:mm a")}</p>
+                                            <p className="text-xs text-faint font-medium">to {format(slotEnd, "h:mm a")}</p>
                                         </div>
 
                                         {/* Slot Card */}
@@ -407,12 +407,12 @@ export default function BookingManagerPage() {
                                                     onClick={() => !isPast && !isVenueClosed ? openBookingModal(hour) : null}
                                                     className={`h-full rounded-2xl p-4 border transition-all flex items-center justify-between group
                                                         ${isPast || isVenueClosed
-                                                            ? "bg-black/20 border-zinc-800/50 cursor-not-allowed"
-                                                            : "bg-black/40 border-zinc-800 hover:border-emerald-500/40 hover:bg-emerald-500/5 cursor-pointer shadow-sm hover:shadow-[0_0_20px_rgba(16,185,129,0.1)]"
+                                                            ? "bg-surface-base/20 border-default/50 cursor-not-allowed"
+                                                            : "bg-surface-base/40 border-default hover:border-emerald-500/40 hover:bg-emerald-500/5 cursor-pointer shadow-sm hover:shadow-[0_0_20px_rgba(16,185,129,0.1)]"
                                                         }
                                                     `}
                                                 >
-                                                    <span className={`font-bold ${isPast || isVenueClosed ? "text-zinc-600" : "text-emerald-500"}`}>
+                                                    <span className={`font-bold ${isPast || isVenueClosed ? "text-faint" : "text-emerald-500"}`}>
                                                         {isVenueClosed ? "Closed" : "Available"}
                                                     </span>
                                                     {!isPast && !isVenueClosed && (
@@ -434,14 +434,14 @@ export default function BookingManagerPage() {
             {/* Walk-in Modal */}
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="New Booking">
                 <div className="mb-6">
-                    <p className="text-zinc-400">Record a manual booking for {currentVenue.name}</p>
+                    <p className="text-secondary">Record a manual booking for {currentVenue.name}</p>
                 </div>
 
                 <form onSubmit={handleSubmit(onSubmitWalkIn)} className="space-y-6">
                     {/* Court Info (Read-only since it's pre-selected) */}
                     <div className="space-y-2">
-                        <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Selected Court</label>
-                        <div className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3.5 text-white flex justify-between items-center opacity-70">
+                        <label className="text-xs font-bold text-muted uppercase tracking-wider">Selected Court</label>
+                        <div className="w-full bg-surface-raised border border-default rounded-xl px-4 py-3.5 text-primary flex justify-between items-center opacity-70">
                             <span>{activeCourt?.name}</span>
                             <span className="text-sm font-bold text-emerald-500">LKR {activeCourt?.hourly_rate}/hr</span>
                         </div>
@@ -450,15 +450,15 @@ export default function BookingManagerPage() {
                     {/* Date & Time */}
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Date</label>
-                            <div className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white opacity-70 flex items-center gap-2">
+                            <label className="text-xs font-bold text-muted uppercase tracking-wider">Date</label>
+                            <div className="w-full bg-surface-raised border border-default rounded-xl px-4 py-3 text-primary opacity-70 flex items-center gap-2">
                                 <CalendarIcon className="w-4 h-4 text-emerald-500" />
                                 {format(selectedDate, "MMM dd, yyyy")}
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Start Time</label>
-                            <div className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white opacity-70 flex items-center gap-2">
+                            <label className="text-xs font-bold text-muted uppercase tracking-wider">Start Time</label>
+                            <div className="w-full bg-surface-raised border border-default rounded-xl px-4 py-3 text-primary opacity-70 flex items-center gap-2">
                                 <Clock className="w-4 h-4 text-emerald-500" />
                                 {format(new Date().setHours(selectedHour, 0, 0, 0), "h:mm a")}
                             </div>
@@ -467,14 +467,14 @@ export default function BookingManagerPage() {
 
                     {/* Duration Selectors */}
                     <div className="space-y-2">
-                        <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Duration</label>
-                        <div className="flex bg-black/40 border border-zinc-700/50 rounded-xl p-1 gap-1">
+                        <label className="text-xs font-bold text-muted uppercase tracking-wider">Duration</label>
+                        <div className="flex bg-surface-base/40 border border-subtle/50 rounded-xl p-1 gap-1">
                             {[1, 2, 3, 4].map((h) => (
                                 <button
                                     key={h}
                                     type="button"
                                     onClick={() => setValue("duration", h)}
-                                    className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-all ${duration === h ? "bg-emerald-500 text-black shadow-lg scale-100" : "text-zinc-400 hover:text-white hover:bg-zinc-800"}`}
+                                    className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-all ${duration === h ? "bg-emerald-500 text-black shadow-lg scale-100" : "text-secondary hover:text-primary hover:bg-surface-overlay"}`}
                                 >
                                     {h}h
                                 </button>
@@ -484,12 +484,12 @@ export default function BookingManagerPage() {
 
                     {/* Customer details */}
                     <div className="space-y-4 pt-2">
-                        <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Customer Details</label>
+                        <label className="text-xs font-bold text-muted uppercase tracking-wider">Customer Details</label>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <input
                                 {...register("customer_name", { required: true })}
                                 placeholder="Name (Required)"
-                                className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3.5 text-white focus:border-emerald-500 focus:outline-none transition-all placeholder:text-zinc-600 focus:bg-black"
+                                className="w-full bg-surface-base/40 border border-subtle rounded-xl px-4 py-3.5 text-primary focus:border-emerald-500 focus:outline-none transition-all placeholder:text-faint focus:bg-surface-base"
                             />
                             <input
                                 {...register("customer_phone", {
@@ -502,7 +502,7 @@ export default function BookingManagerPage() {
                                 type="tel"
                                 maxLength={10}
                                 placeholder="Phone — 10 digits (Required)"
-                                className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3.5 text-white focus:border-emerald-500 focus:outline-none transition-all placeholder:text-zinc-600 focus:bg-black"
+                                className="w-full bg-surface-base/40 border border-subtle rounded-xl px-4 py-3.5 text-primary focus:border-emerald-500 focus:outline-none transition-all placeholder:text-faint focus:bg-surface-base"
                             />
                         </div>
                         {errors.customer_name && <p className="text-red-500 text-xs font-bold mt-1">Name is required.</p>}
@@ -511,45 +511,45 @@ export default function BookingManagerPage() {
 
                     {/* Payment Method */}
                     <div className="space-y-3 pt-2">
-                        <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Payment Method</label>
+                        <label className="text-xs font-bold text-muted uppercase tracking-wider">Payment Method</label>
                         <div className="grid grid-cols-2 gap-3">
                             <label className={`
                                 border rounded-xl p-4 flex items-center gap-3 cursor-pointer transition-all
-                                ${paymentMethod === "cash" ? "bg-emerald-500/10 border-emerald-500" : "bg-black/40 border-zinc-800 hover:border-zinc-700"}
+                                ${paymentMethod === "cash" ? "bg-emerald-500/10 border-emerald-500" : "bg-surface-base/40 border-default hover:border-subtle"}
                             `}>
                                 <input type="radio" value="cash" {...register("payment_method")} className="hidden" />
-                                <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${paymentMethod === "cash" ? "border-emerald-500" : "border-zinc-600"}`}>
+                                <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${paymentMethod === "cash" ? "border-emerald-500" : "border-subtle"}`}>
                                     {paymentMethod === "cash" && <div className="w-2 h-2 rounded-full bg-emerald-500" />}
                                 </div>
-                                <span className="font-bold text-white text-sm">Cash</span>
+                                <span className="font-bold text-primary text-sm">Cash</span>
                             </label>
                             <label className={`
                                 border rounded-xl p-4 flex items-center gap-3 cursor-pointer transition-all
-                                ${paymentMethod === "card" ? "bg-emerald-500/10 border-emerald-500" : "bg-black/40 border-zinc-800 hover:border-zinc-700"}
+                                ${paymentMethod === "card" ? "bg-emerald-500/10 border-emerald-500" : "bg-surface-base/40 border-default hover:border-subtle"}
                             `}>
                                 <input type="radio" value="card" {...register("payment_method")} className="hidden" />
-                                <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${paymentMethod === "card" ? "border-emerald-500" : "border-zinc-600"}`}>
+                                <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${paymentMethod === "card" ? "border-emerald-500" : "border-subtle"}`}>
                                     {paymentMethod === "card" && <div className="w-2 h-2 rounded-full bg-emerald-500" />}
                                 </div>
-                                <span className="font-bold text-white text-sm">Card</span>
+                                <span className="font-bold text-primary text-sm">Card</span>
                             </label>
                         </div>
                     </div>
 
-                    <div className="h-px bg-zinc-800/50 my-6" />
+                    <div className="h-px bg-surface-overlay/50 my-6" />
 
                     {/* Summary & Submit */}
                     <div className="pt-2">
-                        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 mb-6 flex justify-between items-center">
+                        <div className="bg-surface-raised border border-default rounded-2xl p-4 mb-6 flex justify-between items-center">
                             <div className="flex items-center gap-3">
                                 <div className="p-2 bg-emerald-500/10 rounded-lg">
                                     <DollarSign className="w-5 h-5 text-emerald-500" />
                                 </div>
                                 <div>
-                                    <p className="text-xs text-zinc-500 font-bold uppercase tracking-wider">Total Due</p>
+                                    <p className="text-xs text-muted font-bold uppercase tracking-wider">Total Due</p>
                                 </div>
                             </div>
-                            <span className="text-2xl font-black text-white tracking-tight">LKR {totalPrice.toLocaleString()}</span>
+                            <span className="text-2xl font-black text-primary tracking-tight">LKR {totalPrice.toLocaleString()}</span>
                         </div>
 
                         <Button
@@ -591,7 +591,7 @@ function BookingSlotCard({
         : "shadow-[inset_4px_0_0_0_rgba(245,158,11,1)]";
 
     const bgColor = isMaintenance
-        ? "bg-zinc-800/50 border-zinc-700/50 hover:bg-zinc-800/70"
+        ? "bg-surface-overlay/50 border-subtle/50 hover:bg-surface-overlay/70"
         : isConfirmed
         ? "bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/15"
         : "bg-amber-500/10 border-amber-500/20 hover:bg-amber-500/15";
@@ -600,7 +600,7 @@ function BookingSlotCard({
         <div className={`h-full rounded-2xl p-4 border transition-all flex justify-between items-center group relative overflow-hidden backdrop-blur-sm ${bgColor} ${borderColor}`}>
             <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
-                    <p className="font-bold text-white text-base truncate">{booking.user?.full_name || booking.customer_name || "Guest"}</p>
+                    <p className="font-bold text-primary text-base truncate">{booking.user?.full_name || booking.customer_name || "Guest"}</p>
                     {isLive && (
                         <span className="flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded bg-green-500/20 text-green-400 border border-green-500/30 flex-shrink-0">
                             <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
@@ -608,16 +608,16 @@ function BookingSlotCard({
                         </span>
                     )}
                 </div>
-                <p className={`text-xs mt-0.5 font-medium truncate ${isMaintenance ? "text-zinc-500" : isConfirmed ? "text-emerald-500/70" : "text-amber-500/70"}`}>
+                <p className={`text-xs mt-0.5 font-medium truncate ${isMaintenance ? "text-muted" : isConfirmed ? "text-emerald-500/70" : "text-amber-500/70"}`}>
                     {activeCourt?.name}
-                    {booking.customer_phone && <span className="text-zinc-600 ml-2">{booking.customer_phone}</span>}
+                    {booking.customer_phone && <span className="text-faint ml-2">{booking.customer_phone}</span>}
                 </p>
             </div>
 
             <div className="flex flex-col items-end gap-1.5 flex-shrink-0 ml-3">
                 {/* Source badge */}
                 {isMaintenance ? (
-                    <span className="flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded border bg-zinc-700/30 text-zinc-400 border-zinc-600/50 uppercase tracking-wider">
+                    <span className="flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded border bg-surface-overlay/30 text-secondary border-subtle/50 uppercase tracking-wider">
                         <Hammer className="w-2.5 h-2.5" /> Maintenance
                     </span>
                 ) : type === "walkin" ? (
@@ -656,7 +656,7 @@ function BookingSlotCard({
                         <button
                             onClick={() => onCancel(booking.id)}
                             title="Cancel Booking"
-                            className="p-2 bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-white rounded-xl transition-all shadow-lg active:scale-95"
+                            className="p-2 bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-primary rounded-xl transition-all shadow-lg active:scale-95"
                         >
                             <XCircle className="w-4 h-4" />
                         </button>
@@ -672,7 +672,7 @@ function RecurringSlotCard({ recurring, isLive }: { recurring: RecurringBlock; i
         <div className="h-full rounded-2xl p-4 border transition-all flex justify-between items-center backdrop-blur-sm bg-indigo-500/10 border-indigo-500/20 shadow-[inset_4px_0_0_0_rgba(99,102,241,1)] hover:bg-indigo-500/15">
             <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
-                    <p className="font-bold text-white text-base truncate">{recurring.customer_name}</p>
+                    <p className="font-bold text-primary text-base truncate">{recurring.customer_name}</p>
                     {isLive && (
                         <span className="flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded bg-green-500/20 text-green-400 border border-green-500/30 flex-shrink-0">
                             <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />

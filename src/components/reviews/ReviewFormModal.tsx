@@ -71,7 +71,7 @@ export default function ReviewFormModal({ venueId, bookingId, onClose, onSuccess
     };
 
     if (isChecking) {
-        return <div className="p-8 text-center text-zinc-500"><Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" />Checking eligibility...</div>;
+        return <div className="p-8 text-center text-muted"><Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" />Checking eligibility...</div>;
     }
 
     if (error) {
@@ -99,7 +99,7 @@ export default function ReviewFormModal({ venueId, bookingId, onClose, onSuccess
     return (
         <div className="space-y-6">
             <div className="text-center">
-                <p className="text-zinc-400 text-sm mb-4">How was your experience?</p>
+                <p className="text-secondary text-sm mb-4">How was your experience?</p>
                 <div className="flex justify-center gap-2 mb-4">
                     {[1, 2, 3, 4, 5].map((star) => (
                         <button
@@ -108,7 +108,7 @@ export default function ReviewFormModal({ venueId, bookingId, onClose, onSuccess
                             className="transition-transform hover:scale-110 focus:outline-none"
                         >
                             <Star
-                                className={`w-8 h-8 ${rating >= star ? "text-yellow-500 fill-yellow-500" : "text-zinc-700"}`}
+                                className={`w-8 h-8 ${rating >= star ? "text-yellow-500 fill-yellow-500" : "text-faint"}`}
                             />
                         </button>
                     ))}
@@ -116,12 +116,12 @@ export default function ReviewFormModal({ venueId, bookingId, onClose, onSuccess
             </div>
 
             <div className="space-y-2">
-                <label className="text-xs font-bold text-zinc-500 uppercase">Comment (Minimum 10 characters)</label>
+                <label className="text-xs font-bold text-muted uppercase">Comment (Minimum 10 characters)</label>
                 <textarea
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
                     rows={4}
-                    className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors resize-none"
+                    className="w-full bg-surface-base/50 border border-subtle rounded-xl px-4 py-3 text-primary focus:border-emerald-500 focus:outline-none transition-colors resize-none"
                     placeholder="Tell us what you liked..."
                 />
             </div>

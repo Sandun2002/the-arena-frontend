@@ -100,10 +100,10 @@ export default function CourtFormModal({ venueId, existingCourt, onClose, onSucc
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
 
             <div className="space-y-2">
-                <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Court Name</label>
+                <label className="text-xs font-bold text-muted uppercase tracking-wider">Court Name</label>
                 <input
                     {...register("name", { required: "Name is required" })}
-                    className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
+                    className="w-full bg-surface-base/40 border border-subtle rounded-xl px-4 py-3 text-primary focus:border-emerald-500 focus:outline-none transition-colors"
                     placeholder="Ex: Pitch 1"
                 />
                 {errors.name && <p className="text-red-500 text-xs font-bold">{errors.name.message as string}</p>}
@@ -111,17 +111,17 @@ export default function CourtFormModal({ venueId, existingCourt, onClose, onSucc
 
             <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Sport</label>
+                    <label className="text-xs font-bold text-muted uppercase tracking-wider">Sport</label>
                     <div className="relative">
                         {loadingSports ? (
-                            <div className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-zinc-500 flex items-center gap-2">
+                            <div className="w-full bg-surface-base/40 border border-subtle rounded-xl px-4 py-3 text-muted flex items-center gap-2">
                                 <Loader2 className="w-4 h-4 animate-spin" />
                                 <span className="text-sm">Loading sports...</span>
                             </div>
                         ) : (
                             <select
                                 {...register("sport_type_id", { required: "Sport is required" })}
-                                className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none"
+                                className="w-full bg-surface-base/40 border border-subtle rounded-xl px-4 py-3 text-primary focus:border-emerald-500 focus:outline-none transition-colors appearance-none"
                             >
                                 <option value="">Select a sport...</option>
                                 {sports.map(s => (
@@ -132,7 +132,7 @@ export default function CourtFormModal({ venueId, existingCourt, onClose, onSucc
                             </select>
                         )}
                         {!loadingSports && (
-                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-500">
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-muted">
                                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
                             </div>
                         )}
@@ -144,56 +144,56 @@ export default function CourtFormModal({ venueId, existingCourt, onClose, onSucc
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Hourly Rate (LKR)</label>
+                    <label className="text-xs font-bold text-muted uppercase tracking-wider">Hourly Rate (LKR)</label>
                     <input
                         type="number"
                         {...register("hourly_rate", { required: true, min: 0 })}
-                        className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
+                        className="w-full bg-surface-base/40 border border-subtle rounded-xl px-4 py-3 text-primary focus:border-emerald-500 focus:outline-none transition-colors"
                     />
                 </div>
             </div>
 
             <div className="space-y-2">
-                <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Peak Hourly Rate (LKR)</label>
+                <label className="text-xs font-bold text-muted uppercase tracking-wider">Peak Hourly Rate (LKR)</label>
                 <input
                     type="number"
                     {...register("peak_hourly_rate", { min: 0 })}
-                    className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
+                    className="w-full bg-surface-base/40 border border-subtle rounded-xl px-4 py-3 text-primary focus:border-emerald-500 focus:outline-none transition-colors"
                     placeholder="Optional — higher rate during peak hours"
                 />
-                <p className="text-zinc-600 text-xs">Leave blank to use base rate for all hours. Peak hours are set in venue settings.</p>
+                <p className="text-faint text-xs">Leave blank to use base rate for all hours. Peak hours are set in venue settings.</p>
             </div>
 
             <div className="space-y-2">
-                <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Cover Image</label>
+                <label className="text-xs font-bold text-muted uppercase tracking-wider">Cover Image</label>
                 <div className="relative group">
                     <input
                         type="file"
                         accept="image/*"
                         {...register("imageFile")}
-                        className="w-full bg-black/40 border border-zinc-700 border-dashed hover:border-emerald-500/50 rounded-xl px-4 py-6 text-white text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-500/10 file:text-emerald-500 hover:file:bg-emerald-500/20 cursor-pointer transition-colors"
+                        className="w-full bg-surface-base/40 border border-subtle border-dashed hover:border-emerald-500/50 rounded-xl px-4 py-6 text-primary text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-500/10 file:text-emerald-500 hover:file:bg-emerald-500/20 cursor-pointer transition-colors"
                     />
                 </div>
             </div>
 
 
             <div className="space-y-2">
-                <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Description</label>
+                <label className="text-xs font-bold text-muted uppercase tracking-wider">Description</label>
                 <textarea
                     {...register("description")}
                     rows={3}
-                    className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors resize-none"
+                    className="w-full bg-surface-base/40 border border-subtle rounded-xl px-4 py-3 text-primary focus:border-emerald-500 focus:outline-none transition-colors resize-none"
                     placeholder="Dimensions, special features..."
                 />
             </div>
 
-            <div className="flex items-center gap-3 p-4 rounded-xl border border-zinc-700 bg-black/30 cursor-pointer hover:border-emerald-500/50 transition-colors group">
+            <div className="flex items-center gap-3 p-4 rounded-xl border border-subtle bg-surface-base/30 cursor-pointer hover:border-emerald-500/50 transition-colors group">
                 <div className="relative flex items-center">
                     <input
                         type="checkbox"
                         {...register("is_indoor")}
                         id="is_indoor"
-                        className="peer h-5 w-5 cursor-pointer appearance-none rounded-md border border-zinc-600 bg-black/50 transition-all checked:border-emerald-500 checked:bg-emerald-500"
+                        className="peer h-5 w-5 cursor-pointer appearance-none rounded-md border border-subtle bg-surface-base/50 transition-all checked:border-emerald-500 checked:bg-emerald-500"
                     />
                     <svg
                         className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-black opacity-0 transition-opacity peer-checked:opacity-100"
@@ -212,7 +212,7 @@ export default function CourtFormModal({ venueId, existingCourt, onClose, onSucc
                         />
                     </svg>
                 </div>
-                <label htmlFor="is_indoor" className="text-sm font-bold text-white cursor-pointer select-none group-hover:text-emerald-400 transition-colors">Indoor Court?</label>
+                <label htmlFor="is_indoor" className="text-sm font-bold text-primary cursor-pointer select-none group-hover:text-emerald-400 transition-colors">Indoor Court?</label>
             </div>
 
             <Button

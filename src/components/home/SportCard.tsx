@@ -25,7 +25,7 @@ export default function SportCard({ sport, priority = false }: SportCardProps) {
   return (
     <Link
       href={`/venues?sport_type=${sport.slug}`}
-      className="sport-card group relative flex-shrink-0 block overflow-hidden rounded-xl border border-zinc-800/60 bg-zinc-950 w-[150px] h-[190px] md:w-[200px] md:h-[260px] mx-1.5 md:mx-2"
+      className="sport-card group relative flex-shrink-0 block overflow-hidden rounded-xl border border-default bg-surface-sunken w-[150px] h-[190px] md:w-[200px] md:h-[260px] mx-1.5 md:mx-2"
       aria-label={`Explore ${sport.name} venues`}
     >
       {/* Background image */}

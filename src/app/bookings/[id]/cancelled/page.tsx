@@ -31,26 +31,26 @@ export default function BookingCancelledPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-black flex items-center justify-center">
+      <main className="min-h-screen bg-surface-base flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-2 border-zinc-500 border-t-transparent rounded-full" />
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-black flex items-center justify-center p-4 pt-24">
+    <main className="min-h-screen bg-surface-base flex items-center justify-center p-4 pt-24">
       <div className="max-w-md w-full text-center">
 
         {/* Icon */}
-        <div className="inline-flex w-20 h-20 rounded-full bg-zinc-800/60 border border-zinc-700 items-center justify-center mb-6">
-          <XCircle className="w-10 h-10 text-zinc-400" strokeWidth={1.5} />
+        <div className="inline-flex w-20 h-20 rounded-full bg-surface-overlay/60 border border-subtle items-center justify-center mb-6">
+          <XCircle className="w-10 h-10 text-secondary" strokeWidth={1.5} />
         </div>
 
-        <h1 className="text-2xl font-bold text-white mb-3">Payment Cancelled</h1>
+        <h1 className="text-2xl font-bold text-primary mb-3">Payment Cancelled</h1>
 
         {holdValid ? (
           <>
-            <p className="text-zinc-400 mb-8">
+            <p className="text-secondary mb-8">
               Your slot is still reserved. You can try paying again before your hold expires.
             </p>
             <div className="flex flex-col gap-3">
@@ -62,7 +62,7 @@ export default function BookingCancelledPage() {
               </button>
               <Link
                 href="/venues"
-                className="w-full py-3 text-sm text-zinc-500 hover:text-white transition text-center"
+                className="w-full py-3 text-sm text-muted hover:text-primary transition text-center"
               >
                 Find a Different Venue
               </Link>
@@ -70,7 +70,7 @@ export default function BookingCancelledPage() {
           </>
         ) : (
           <>
-            <p className="text-zinc-400 mb-8">
+            <p className="text-secondary mb-8">
               Your payment hold has expired and the slot has been released back to the public.
             </p>
             <Link

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { MapPin, Loader2, MapPinOff } from "lucide-react";
 import { useLocation } from "@/contexts/LocationContext";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 
 export default function MobileTopBar() {
   const pathname = usePathname();
@@ -20,7 +21,7 @@ export default function MobileTopBar() {
 
     if (locState === "loading") {
       return (
-        <span className={`${base} bg-zinc-800/60 border-zinc-700/40 text-zinc-400 pointer-events-none`}>
+        <span className={`${base} bg-surface-overlay/60 border-subtle/40 text-secondary pointer-events-none`}>
           <Loader2 className="w-3 h-3 animate-spin shrink-0" />
           <span className="truncate">Locating…</span>
         </span>
@@ -43,7 +44,7 @@ export default function MobileTopBar() {
       return (
         <button
           onClick={requestLocation}
-          className={`${base} bg-zinc-800/60 border-zinc-700/40 text-zinc-400 hover:border-zinc-600 hover:text-zinc-300`}
+          className={`${base} bg-surface-overlay/60 border-subtle/40 text-secondary hover:border-subtle hover:text-primary`}
         >
           <MapPinOff className="w-3 h-3 shrink-0" />
           <span className="truncate">No location</span>
@@ -55,7 +56,7 @@ export default function MobileTopBar() {
     return (
       <button
         onClick={requestLocation}
-        className={`${base} bg-zinc-800/60 border-zinc-700/40 text-zinc-400 hover:border-emerald-500/30 hover:text-emerald-400 hover:bg-emerald-500/5`}
+        className={`${base} bg-surface-overlay/60 border-subtle/40 text-secondary hover:border-emerald-500/30 hover:text-emerald-400 hover:bg-emerald-500/5`}
       >
         <MapPin className="w-3 h-3 shrink-0" />
         <span className="truncate">Set location</span>
@@ -65,7 +66,7 @@ export default function MobileTopBar() {
 
   return (
     <header className="fixed top-3 left-4 right-4 z-50 md:hidden">
-      <div className="bg-zinc-950/95 backdrop-blur-2xl rounded-2xl border border-white/[0.07] shadow-[0_4px_24px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)] h-14 px-4 flex items-center justify-between gap-2">
+      <div className="bg-glass-bg backdrop-blur-2xl rounded-2xl border border-glass-border shadow-[0_4px_24px_var(--shadow-elevation),inset_0_1px_0_var(--glass-highlight)] h-14 px-4 flex items-center justify-between gap-2">
 
         {/* Left: Logo */}
         <Link href="/" className="shrink-0">
@@ -79,8 +80,11 @@ export default function MobileTopBar() {
           />
         </Link>
 
-        {/* Right: Location Pill */}
-        <LocationPill />
+        {/* Right: Location Pill + Theme Toggle */}
+        <div className="flex items-center gap-2">
+          <LocationPill />
+          <ThemeToggle className="h-8 w-8" size={15} />
+        </div>
       </div>
     </header>
   );

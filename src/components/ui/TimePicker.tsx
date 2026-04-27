@@ -120,9 +120,9 @@ export default function TimePicker({
                 disabled={disabled}
                 onClick={() => handleHourSelect(h)}
                 className={`text-center py-2 rounded-lg text-xs font-bold transition-all ${
-                    disabled ? "text-zinc-700 cursor-not-allowed"
+                    disabled ? "text-faint cursor-not-allowed"
                     : active ? "bg-emerald-500 text-black shadow-[0_0_10px_rgba(80,200,120,0.4)]"
-                    : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
+                    : "text-secondary hover:bg-surface-overlay hover:text-primary"
                 }`}
             >
                 {h12.toString().padStart(2, "0")}
@@ -132,23 +132,23 @@ export default function TimePicker({
 
     const dropdown = isOpen && mounted ? createPortal(
         <div ref={dropdownRef} style={dropdownStyle}
-            className="bg-zinc-900 border border-zinc-700 rounded-2xl shadow-2xl shadow-black/80 overflow-hidden"
+            className="bg-surface-raised border border-subtle rounded-2xl shadow-2xl shadow-[var(--shadow-elevation)] overflow-hidden"
             data-lenis-prevent>
             <div className="p-4 space-y-3">
-                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-1.5">
-                    <span className="w-4 h-px bg-zinc-700 inline-block" />AM<span className="w-full h-px bg-zinc-700 inline-block" />
+                <p className="text-[10px] font-bold text-muted uppercase tracking-widest flex items-center gap-1.5">
+                    <span className="w-4 h-px bg-subtle inline-block" />AM<span className="w-full h-px bg-subtle inline-block" />
                 </p>
                 <div className="grid grid-cols-6 gap-1.5">
                     {amHours.map(h => <HourBtn key={h} h={h} />)}
                 </div>
-                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-1.5">
-                    <span className="w-4 h-px bg-zinc-700 inline-block" />PM<span className="w-full h-px bg-zinc-700 inline-block" />
+                <p className="text-[10px] font-bold text-muted uppercase tracking-widest flex items-center gap-1.5">
+                    <span className="w-4 h-px bg-subtle inline-block" />PM<span className="w-full h-px bg-subtle inline-block" />
                 </p>
                 <div className="grid grid-cols-6 gap-1.5">
                     {pmHours.map(h => <HourBtn key={h} h={h} />)}
                 </div>
-                <div className="border-t border-zinc-800 pt-3 flex items-center justify-between">
-                    <span className="text-zinc-500 text-xs">Selected:</span>
+                <div className="border-t border-default pt-3 flex items-center justify-between">
+                    <span className="text-muted text-xs">Selected:</span>
                     <span className="text-emerald-400 font-bold text-sm">{value ? formatDisplay(selectedHour) : "—"}</span>
                     <button type="button" onClick={() => setIsOpen(false)}
                         className="text-xs font-bold bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-black px-3 py-1.5 rounded-lg transition-all">
@@ -162,14 +162,14 @@ export default function TimePicker({
 
     return (
         <div className={`relative ${className}`}>
-            {label && <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider block mb-2">{label}</label>}
+            {label && <label className="text-xs font-bold text-muted uppercase tracking-wider block mb-2">{label}</label>}
             <button id={id} ref={triggerRef} type="button" onClick={handleOpen}
-                className={`w-full flex items-center gap-3 bg-black/50 border rounded-xl px-4 py-3 text-white transition-all group ${
-                    isOpen ? "border-emerald-500 shadow-[0_0_12px_rgba(80,200,120,0.15)]" : "border-zinc-700 hover:border-zinc-600"
+                className={`w-full flex items-center gap-3 bg-surface-inset border rounded-xl px-4 py-3 text-primary transition-all group ${
+                    isOpen ? "border-emerald-500 shadow-[0_0_12px_rgba(80,200,120,0.15)]" : "border-subtle hover:border-emerald-500/40"
                 }`}>
-                <Clock className={`w-4 h-4 transition-colors ${isOpen ? "text-emerald-500" : "text-zinc-500 group-hover:text-zinc-400"}`} />
+                <Clock className={`w-4 h-4 transition-colors ${isOpen ? "text-emerald-500" : "text-muted group-hover:text-secondary"}`} />
                 <span className="flex-1 text-left font-medium text-sm">{value ? formatDisplay(selectedHour) : "Select time"}</span>
-                <ChevronDown className={`w-4 h-4 text-zinc-500 transition-transform duration-200 ${isOpen ? "rotate-180 text-emerald-500" : ""}`} />
+                <ChevronDown className={`w-4 h-4 text-muted transition-transform duration-200 ${isOpen ? "rotate-180 text-emerald-500" : ""}`} />
             </button>
             {dropdown}
         </div>

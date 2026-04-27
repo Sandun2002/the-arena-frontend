@@ -41,53 +41,53 @@ export default function MyReviewsPage() {
     if (!user) return null;
 
     return (
-        <main className="min-h-screen bg-black pt-24 pb-12 px-4">
+        <main className="min-h-screen bg-surface-base pt-24 pb-12 px-4">
             <div className="container mx-auto max-w-4xl">
-                <h1 className="text-3xl font-bold text-white mb-8">My Reviews</h1>
+                <h1 className="text-3xl font-bold text-primary mb-8">My Reviews</h1>
 
                 <div className="space-y-4">
                     {isLoading ? (
-                        [1, 2].map(i => <div key={i} className="h-32 bg-zinc-900/50 rounded-2xl animate-pulse" />)
+                        [1, 2].map(i => <div key={i} className="h-32 bg-surface-raised/50 rounded-2xl animate-pulse" />)
                     ) : reviews.length > 0 ? (
                         reviews.map((review) => (
-                            <div key={review.id} className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 group">
+                            <div key={review.id} className="bg-surface-raised/50 border border-default rounded-2xl p-6 group">
                                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
                                     <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 bg-zinc-800 rounded-xl overflow-hidden">
+                                        <div className="w-12 h-12 bg-surface-overlay rounded-xl overflow-hidden">
                                             {review.venue_image ? (
                                                 <img src={review.venue_image} alt={review.venue_name} className="w-full h-full object-cover" />
                                             ) : (
-                                                <div className="w-full h-full bg-zinc-700"></div>
+                                                <div className="w-full h-full bg-surface-overlay"></div>
                                             )}
                                         </div>
                                         <div>
-                                            <h3 className="text-lg font-bold text-white">{review.venue_name}</h3>
+                                            <h3 className="text-lg font-bold text-primary">{review.venue_name}</h3>
                                             <div className="flex items-center gap-1">
                                                 {[...Array(5)].map((_, i) => (
-                                                    <Star key={i} className={`w-3.5 h-3.5 ${i < review.rating ? "text-yellow-500 fill-yellow-500" : "text-zinc-700"}`} />
+                                                    <Star key={i} className={`w-3.5 h-3.5 ${i < review.rating ? "text-yellow-500 fill-yellow-500" : "text-faint"}`} />
                                                 ))}
-                                                <span className="text-xs text-zinc-500 ml-2">{format(new Date(review.created_at), "MMM dd, yyyy")}</span>
+                                                <span className="text-xs text-muted ml-2">{format(new Date(review.created_at), "MMM dd, yyyy")}</span>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <Button size="sm" variant="ghost" className="text-zinc-400 hover:text-red-400" onClick={() => handleDelete(review.id)}>
+                                        <Button size="sm" variant="ghost" className="text-secondary hover:text-red-400" onClick={() => handleDelete(review.id)}>
                                             <Trash2 className="w-4 h-4" />
                                         </Button>
                                     </div>
                                 </div>
 
-                                <div className="bg-black/30 p-4 rounded-xl text-zinc-300 text-sm leading-relaxed border border-zinc-800/50">
+                                <div className="bg-surface-base/30 p-4 rounded-xl text-secondary text-sm leading-relaxed border border-default/50">
                                     "{review.comment}"
                                 </div>
                             </div>
                         ))
                     ) : (
-                        <div className="text-center py-12 bg-zinc-900/30 rounded-3xl border border-zinc-800">
-                            <MessageSquare className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
-                            <h3 className="text-xl font-bold text-white mb-2">No reviews yet</h3>
-                            <p className="text-zinc-500 mb-6">Book a court and share your experience!</p>
+                        <div className="text-center py-12 bg-surface-raised/30 rounded-3xl border border-default">
+                            <MessageSquare className="w-12 h-12 text-faint mx-auto mb-4" />
+                            <h3 className="text-xl font-bold text-primary mb-2">No reviews yet</h3>
+                            <p className="text-muted mb-6">Book a court and share your experience!</p>
                             <Link href="/venues">
                                 <Button className="bg-emerald-500 text-black font-bold">Explore Venues</Button>
                             </Link>

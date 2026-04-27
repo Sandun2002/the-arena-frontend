@@ -57,7 +57,7 @@ export default function MaintenancePage() {
   return (
     <div
       ref={rootRef}
-      className="fixed inset-0 z-[9999] min-h-screen w-full bg-black overflow-hidden flex flex-col"
+      className="fixed inset-0 z-[9999] min-h-screen w-full bg-surface-base overflow-hidden flex flex-col"
     >
       {/* Background blobs (matches Hero) */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -81,18 +81,18 @@ export default function MaintenancePage() {
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
             <span className="text-black font-black text-sm">A</span>
           </div>
-          <span className="text-white font-bold text-sm tracking-wider uppercase">
+          <span className="text-primary font-bold text-sm tracking-wider uppercase">
             The Arena
           </span>
         </div>
 
         {/* Status badge */}
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-900/80 backdrop-blur-xl border border-zinc-800">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-raised/80 backdrop-blur-xl border border-default">
           <div className="relative flex items-center justify-center">
             <div className="w-2 h-2 bg-emerald-500 rounded-full relative z-10" />
             <div className="m-pulse absolute w-2 h-2 bg-emerald-500 rounded-full" />
           </div>
-          <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-zinc-300">
+          <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-secondary">
             Maintenance
           </span>
         </div>
@@ -107,7 +107,7 @@ export default function MaintenancePage() {
           </div>
 
           {/* Headline */}
-          <h1 className="text-5xl sm:text-6xl md:text-8xl font-black tracking-tighter text-white mb-4 flex flex-wrap justify-center gap-x-3 md:gap-x-5 leading-none">
+          <h1 className="text-5xl sm:text-6xl md:text-8xl font-black tracking-tighter text-primary mb-4 flex flex-wrap justify-center gap-x-3 md:gap-x-5 leading-none">
             <span className="m-word inline-block">HALF</span>
             <span className="m-word inline-block text-transparent bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text">
               TIME
@@ -115,45 +115,45 @@ export default function MaintenancePage() {
           </h1>
 
           {/* Tagline */}
-          <p className="m-tagline text-zinc-400 text-sm md:text-base uppercase tracking-[0.3em] mb-6 md:mb-8 font-semibold">
+          <p className="m-tagline text-secondary text-sm md:text-base uppercase tracking-[0.3em] mb-6 md:mb-8 font-semibold">
             We&apos;ll be back on the court shortly
           </p>
 
           {/* Body */}
-          <p className="m-body text-zinc-500 text-sm md:text-base max-w-xl mx-auto mb-10 md:mb-14 leading-relaxed">
+          <p className="m-body text-muted text-sm md:text-base max-w-xl mx-auto mb-10 md:mb-14 leading-relaxed">
             Our team is upgrading the arena&apos;s infrastructure to bring you an
             even smoother booking experience. Thanks for your patience. Game time resumes soon.
           </p>
 
           {/* Info cards */}
           <div className="grid sm:grid-cols-2 gap-3 md:gap-4 max-w-xl mx-auto">
-            <div className="m-card bg-zinc-900/60 backdrop-blur-xl border border-zinc-800/60 rounded-2xl p-4 md:p-5 text-left hover:border-emerald-500/30 transition-colors">
+            <div className="m-card bg-surface-raised/60 backdrop-blur-xl border border-default/60 rounded-2xl p-4 md:p-5 text-left hover:border-emerald-500/30 transition-colors">
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
                   <Clock className="w-4 h-4 text-emerald-400" />
                 </div>
-                <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-zinc-400">
+                <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-secondary">
                   Status
                 </span>
               </div>
-              <p className="text-white font-bold text-sm md:text-base">
+              <p className="text-primary font-bold text-sm md:text-base">
                 In Progress
               </p>
             </div>
 
             <a
               href="mailto:support@thearena.lk"
-              className="m-card bg-zinc-900/60 backdrop-blur-xl border border-zinc-800/60 rounded-2xl p-4 md:p-5 text-left hover:border-emerald-500/30 transition-colors group"
+              className="m-card bg-surface-raised/60 backdrop-blur-xl border border-default/60 rounded-2xl p-4 md:p-5 text-left hover:border-emerald-500/30 transition-colors group"
             >
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
                   <Mail className="w-4 h-4 text-emerald-400" />
                 </div>
-                <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-zinc-400">
+                <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-secondary">
                   Questions?
                 </span>
               </div>
-              <p className="text-white font-bold text-sm md:text-base group-hover:text-emerald-400 transition-colors truncate">
+              <p className="text-primary font-bold text-sm md:text-base group-hover:text-emerald-400 transition-colors truncate">
                 support@thearena.lk
               </p>
             </a>
@@ -163,7 +163,7 @@ export default function MaintenancePage() {
 
       {/* Footer */}
       <div className="m-footer relative z-10 w-full px-6 md:px-10 pb-6 md:pb-8 text-center">
-        <p className="text-zinc-600 text-[10px] md:text-xs uppercase tracking-[0.25em]">
+        <p className="text-faint text-[10px] md:text-xs uppercase tracking-[0.25em]">
           &copy; {new Date().getFullYear()} The Arena. Sri Lanka&apos;s Premium Sports Booking
         </p>
       </div>

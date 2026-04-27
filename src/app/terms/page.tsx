@@ -39,16 +39,16 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-mt-24 md:scroll-mt-28 border-b border-zinc-800 pb-8 md:pb-10 mb-8 md:mb-10">
+    <section id={id} className="scroll-mt-24 md:scroll-mt-28 border-b border-default pb-8 md:pb-10 mb-8 md:mb-10">
       <p className="text-xs font-bold tracking-[0.18em] uppercase text-emerald-400 mb-2">Section {number}</p>
-      <h2 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-white mb-4 md:mb-5">{title}</h2>
-      <div className="space-y-4 text-zinc-300 leading-7 md:leading-8 text-[14px] md:text-[15px]">{children}</div>
+      <h2 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-primary mb-4 md:mb-5">{title}</h2>
+      <div className="space-y-4 text-secondary leading-7 md:leading-8 text-[14px] md:text-[15px]">{children}</div>
     </section>
   );
 }
 
 function SubHeading({ children }: { children: React.ReactNode }) {
-  return <h3 className="text-white text-base md:text-lg font-bold mt-6 md:mt-7 mb-2">{children}</h3>;
+  return <h3 className="text-primary text-base md:text-lg font-bold mt-6 md:mt-7 mb-2">{children}</h3>;
 }
 
 function BulletList({ children }: { children: React.ReactNode }) {
@@ -57,7 +57,7 @@ function BulletList({ children }: { children: React.ReactNode }) {
 
 export default function TermsPage() {
   return (
-    <main className="min-h-screen bg-black text-zinc-300 pt-24 md:pt-28 pb-14 md:pb-20 relative">
+    <main className="min-h-screen bg-surface-base text-secondary pt-24 md:pt-28 pb-14 md:pb-20 relative">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 right-0 w-[420px] h-[420px] bg-emerald-500/10 rounded-full blur-[120px]" />
         <div className="absolute bottom-0 left-0 w-[420px] h-[420px] bg-emerald-500/5 rounded-full blur-[120px]" />
@@ -66,13 +66,13 @@ export default function TermsPage() {
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-[260px,1fr] gap-6 md:gap-10">
           <aside data-lenis-prevent className="hidden lg:block sticky top-28 h-fit max-h-[calc(100vh-8rem)] overflow-y-auto pr-2">
-            <p className="text-xs text-zinc-500 uppercase tracking-[0.18em] font-bold border-b border-zinc-800 pb-3 mb-4">Contents</p>
+            <p className="text-xs text-muted uppercase tracking-[0.18em] font-bold border-b border-default pb-3 mb-4">Contents</p>
             <nav className="space-y-1">
               {tocItems.map((item) => (
                 <a
                   key={item.id}
                   href={`#${item.id}`}
-                  className="block text-sm text-zinc-500 hover:text-emerald-400 transition-colors"
+                  className="block text-sm text-muted hover:text-emerald-400 transition-colors"
                 >
                   {item.label}
                 </a>
@@ -81,36 +81,36 @@ export default function TermsPage() {
           </aside>
 
           <div>
-            <header className="mb-8 md:mb-12 border-b border-zinc-800 pb-8 md:pb-10">
-              <span className="inline-flex px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[11px] font-bold uppercase tracking-wider text-emerald-400">
+            <header className="mb-8 md:mb-12 border-b border-default pb-8 md:pb-10">
+              <span className="inline-flex px-3 py-1 rounded-full bg-surface-raised border border-default text-[11px] font-bold uppercase tracking-wider text-emerald-400">
                 Legal Document
               </span>
-              <h1 className="mt-5 text-3xl sm:text-4xl md:text-6xl font-black tracking-tight text-white">
+              <h1 className="mt-5 text-3xl sm:text-4xl md:text-6xl font-black tracking-tight text-primary">
                 Terms of <span className="text-emerald-500">Service</span>
               </h1>
-              <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-1 text-sm text-zinc-400">
-                <span>Operated by <span className="text-white font-semibold">Astryx Global (Pvt) Ltd</span></span>
-                <span>Effective: <span className="text-white font-semibold">[INSERT DATE]</span></span>
-                <span>Last Updated: <span className="text-white font-semibold">[INSERT DATE]</span></span>
+              <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-1 text-sm text-secondary">
+                <span>Operated by <span className="text-primary font-semibold">Astryx Global (Pvt) Ltd</span></span>
+                <span>Effective: <span className="text-primary font-semibold">[INSERT DATE]</span></span>
+                <span>Last Updated: <span className="text-primary font-semibold">[INSERT DATE]</span></span>
               </div>
-              <p className="mt-6 border-l-[3px] border-l-emerald-500/50 bg-zinc-900/60 pl-5 pr-4 py-4 leading-7 md:leading-8 text-[14px] md:text-[15px] rounded-r-lg">
+              <p className="mt-6 border-l-[3px] border-l-emerald-500/50 bg-surface-raised/60 pl-5 pr-4 py-4 leading-7 md:leading-8 text-[14px] md:text-[15px] rounded-r-lg">
                 Please read these Terms of Service carefully before using The Arena platform. By accessing or using the Platform —
                 whether as a Player or a Vendor — you agree to be legally bound by these Terms. If you do not agree, you must
                 not use the Platform.
               </p>
             </header>
 
-            <details className="lg:hidden mb-8 rounded-xl border border-zinc-800 bg-zinc-900/50">
-              <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-white flex items-center justify-between">
+            <details className="lg:hidden mb-8 rounded-xl border border-default bg-surface-raised/50">
+              <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-primary flex items-center justify-between">
                 Jump to Section
-                <span className="text-xs uppercase tracking-wider text-zinc-500">18 items</span>
+                <span className="text-xs uppercase tracking-wider text-muted">18 items</span>
               </summary>
-              <nav data-lenis-prevent className="px-4 pb-4 pt-1 space-y-1 max-h-64 overflow-y-auto border-t border-zinc-800">
+              <nav data-lenis-prevent className="px-4 pb-4 pt-1 space-y-1 max-h-64 overflow-y-auto border-t border-default">
                 {tocItems.map((item) => (
                   <a
                     key={`mobile-${item.id}`}
                     href={`#${item.id}`}
-                    className="block text-sm text-zinc-400 hover:text-emerald-400 transition-colors"
+                    className="block text-sm text-secondary hover:text-emerald-400 transition-colors"
                   >
                     {item.label}
                   </a>
@@ -147,7 +147,7 @@ export default function TermsPage() {
                 connecting Players with Vendors to enable the discovery, availability checking, and booking of indoor sports
                 facilities.
               </p>
-              <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-zinc-200">
+              <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-primary">
                 <strong>The Arena does not own, operate, manage, control, or maintain any of the sports facilities listed on the Platform.</strong>{" "}
                 We are not a party to the underlying service relationship between a Player and a Vendor in respect of the use of
                 any sports facility. Our role is limited to providing the Platform as a technology intermediary and facilitating the
@@ -163,49 +163,49 @@ export default function TermsPage() {
             <Section id="definitions" number="03" title="Definitions">
               <p>In these Terms, the following words and expressions shall have the meanings set out below:</p>
               <div className="overflow-x-auto">
-                <table className="w-full text-left border border-zinc-800 text-sm">
+                <table className="w-full text-left border border-default text-sm">
                   <thead>
-                    <tr className="bg-zinc-900/70">
-                      <th className="p-3 border border-zinc-800 text-white uppercase text-xs tracking-wider">Term</th>
-                      <th className="p-3 border border-zinc-800 text-white uppercase text-xs tracking-wider">Meaning</th>
+                    <tr className="bg-surface-raised/70">
+                      <th className="p-3 border border-default text-primary uppercase text-xs tracking-wider">Term</th>
+                      <th className="p-3 border border-default text-primary uppercase text-xs tracking-wider">Meaning</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <td className="p-3 border border-zinc-800"><strong>"Platform"</strong></td>
-                      <td className="p-3 border border-zinc-800">The Arena web-based application and all associated services operated by Astryx Global (Pvt) Ltd.</td>
+                      <td className="p-3 border border-default"><strong>"Platform"</strong></td>
+                      <td className="p-3 border border-default">The Arena web-based application and all associated services operated by Astryx Global (Pvt) Ltd.</td>
                     </tr>
                     <tr>
-                      <td className="p-3 border border-zinc-800"><strong>"Player" / "End-User"</strong></td>
-                      <td className="p-3 border border-zinc-800">Any individual who registers an account on the Platform for the purpose of discovering and booking indoor sports facilities.</td>
+                      <td className="p-3 border border-default"><strong>"Player" / "End-User"</strong></td>
+                      <td className="p-3 border border-default">Any individual who registers an account on the Platform for the purpose of discovering and booking indoor sports facilities.</td>
                     </tr>
                     <tr>
-                      <td className="p-3 border border-zinc-800"><strong>"Vendor"</strong></td>
-                      <td className="p-3 border border-zinc-800">Any indoor sports facility operator registered on the Platform who lists their facilities, availability, and pricing for booking by Players.</td>
+                      <td className="p-3 border border-default"><strong>"Vendor"</strong></td>
+                      <td className="p-3 border border-default">Any indoor sports facility operator registered on the Platform who lists their facilities, availability, and pricing for booking by Players.</td>
                     </tr>
                     <tr>
-                      <td className="p-3 border border-zinc-800"><strong>"Booking"</strong></td>
-                      <td className="p-3 border border-zinc-800">A confirmed reservation of a specific time slot at a Vendor's facility, made through the Platform by a Player upon successful payment.</td>
+                      <td className="p-3 border border-default"><strong>"Booking"</strong></td>
+                      <td className="p-3 border border-default">A confirmed reservation of a specific time slot at a Vendor's facility, made through the Platform by a Player upon successful payment.</td>
                     </tr>
                     <tr>
-                      <td className="p-3 border border-zinc-800"><strong>"Platform Service Fee"</strong></td>
-                      <td className="p-3 border border-zinc-800">The fee charged by The Arena to the Player on top of the Vendor's facility price, as a consideration for use of the Platform.</td>
+                      <td className="p-3 border border-default"><strong>"Platform Service Fee"</strong></td>
+                      <td className="p-3 border border-default">The fee charged by The Arena to the Player on top of the Vendor's facility price, as a consideration for use of the Platform.</td>
                     </tr>
                     <tr>
-                      <td className="p-3 border border-zinc-800"><strong>"Total Booking Amount"</strong></td>
-                      <td className="p-3 border border-zinc-800">The sum of the Vendor's facility price and The Arena's Platform Service Fee, displayed to the Player at checkout prior to payment confirmation.</td>
+                      <td className="p-3 border border-default"><strong>"Total Booking Amount"</strong></td>
+                      <td className="p-3 border border-default">The sum of the Vendor's facility price and The Arena's Platform Service Fee, displayed to the Player at checkout prior to payment confirmation.</td>
                     </tr>
                     <tr>
-                      <td className="p-3 border border-zinc-800"><strong>"PayHere"</strong></td>
-                      <td className="p-3 border border-zinc-800">The third-party payment gateway used by The Arena to process all transactions on the Platform.</td>
+                      <td className="p-3 border border-default"><strong>"PayHere"</strong></td>
+                      <td className="p-3 border border-default">The third-party payment gateway used by The Arena to process all transactions on the Platform.</td>
                     </tr>
                     <tr>
-                      <td className="p-3 border border-zinc-800"><strong>"Content"</strong></td>
-                      <td className="p-3 border border-zinc-800">All text, images, data, listings, reviews, information, and other material available on or submitted to the Platform.</td>
+                      <td className="p-3 border border-default"><strong>"Content"</strong></td>
+                      <td className="p-3 border border-default">All text, images, data, listings, reviews, information, and other material available on or submitted to the Platform.</td>
                     </tr>
                     <tr>
-                      <td className="p-3 border border-zinc-800"><strong>"User"</strong></td>
-                      <td className="p-3 border border-zinc-800">Any individual or entity accessing or using the Platform, including Players and Vendors.</td>
+                      <td className="p-3 border border-default"><strong>"User"</strong></td>
+                      <td className="p-3 border border-default">Any individual or entity accessing or using the Platform, including Players and Vendors.</td>
                     </tr>
                   </tbody>
                 </table>
@@ -697,14 +697,14 @@ export default function TermsPage() {
                 For any questions, concerns, or complaints regarding these Terms of Service, or for any other enquiries relating to
                 the Platform, please contact us at:
               </p>
-              <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 space-y-2">
-                <p className="text-white font-bold">Astryx Global (Pvt) Ltd — The Arena</p>
+              <div className="rounded-2xl border border-default bg-surface-raised/50 p-6 space-y-2">
+                <p className="text-primary font-bold">Astryx Global (Pvt) Ltd — The Arena</p>
                 <p><strong>Address:</strong> [Full Registered Address Placeholder]</p>
                 <p><strong>Email:</strong> [contact@placeholder.com]</p>
                 <p><strong>Phone:</strong> [+94 XX XXX XXXX]</p>
               </div>
               <p>We aim to respond to all enquiries within [X] business days.</p>
-              <p className="text-xs text-zinc-500 pt-3">
+              <p className="text-xs text-muted pt-3">
                 Looking for account support? Visit our <Link href="/help" className="text-emerald-400 hover:text-emerald-300">Help Center</Link>.
               </p>
             </Section>

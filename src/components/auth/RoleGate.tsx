@@ -24,9 +24,9 @@ export default function RoleGate({ children, allowedRoles, showError = true }: R
         if (showError) {
             return (
                 <div className="min-h-[50vh] flex flex-col items-center justify-center p-8 text-center">
-                    <AlertTriangle className="w-12 h-12 text-zinc-600 mb-4" />
-                    <h2 className="text-xl font-bold text-white mb-2">Login Required</h2>
-                    <p className="text-zinc-500 mb-6">You need to sign in to access this page.</p>
+                    <AlertTriangle className="w-12 h-12 text-faint mb-4" />
+                    <h2 className="text-xl font-bold text-primary mb-2">Login Required</h2>
+                    <p className="text-muted mb-6">You need to sign in to access this page.</p>
                     <Link href="/login">
                         <Button className="bg-emerald-500 text-black font-bold">Sign In</Button>
                     </Link>
@@ -45,8 +45,8 @@ export default function RoleGate({ children, allowedRoles, showError = true }: R
                     <div className="bg-red-500/10 p-4 rounded-full mb-4">
                         <AlertTriangle className="w-8 h-8 text-red-500" />
                     </div>
-                    <h2 className="text-xl font-bold text-white mb-2">Access Denied</h2>
-                    <p className="text-zinc-500 mb-6 max-w-md">
+                    <h2 className="text-xl font-bold text-primary mb-2">Access Denied</h2>
+                    <p className="text-muted mb-6 max-w-md">
                         You do not have the required permissions to view this content.
                         Please contact your administrator if you believe this is an error.
                     </p>

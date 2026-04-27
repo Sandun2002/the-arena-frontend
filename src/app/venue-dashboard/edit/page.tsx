@@ -81,22 +81,22 @@ export default function EditVenuePage() {
 
     if (isLoading) {
         return (
-            <main className="min-h-screen bg-black pt-24 pb-12 px-4 flex items-center justify-center">
-                <Loader2 className="w-8 h-8 animate-spin text-zinc-500" />
+            <main className="min-h-screen bg-surface-base pt-24 pb-12 px-4 flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-muted" />
             </main>
         );
     }
 
     if (!currentVenue) {
         return (
-            <main className="min-h-screen bg-black pt-24 pb-12 px-4 flex items-center justify-center text-zinc-500">
+            <main className="min-h-screen bg-surface-base pt-24 pb-12 px-4 flex items-center justify-center text-muted">
                 Please select a venue to edit.
             </main>
         );
     }
 
     return (
-        <main className="min-h-screen bg-black pt-24 pb-12 px-4 flex items-center justify-center relative overflow-hidden">
+        <main className="min-h-screen bg-surface-base pt-24 pb-12 px-4 flex items-center justify-center relative overflow-hidden">
             <div className="absolute inset-0 pointer-events-none">
                 <div className="absolute top-20 right-1/4 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-[150px]" />
             </div>
@@ -104,75 +104,75 @@ export default function EditVenuePage() {
             <div className="w-full max-w-2xl relative z-10">
 
                 <div className="mb-8 text-center">
-                    <h1 className="text-3xl font-bold text-white mb-2">Edit Venue Details</h1>
-                    <p className="text-zinc-400">Step {step === "details" ? 1 : 2} of 2</p>
+                    <h1 className="text-3xl font-bold text-primary mb-2">Edit Venue Details</h1>
+                    <p className="text-secondary">Step {step === "details" ? 1 : 2} of 2</p>
 
                     {/* Progress Bar (2 steps) */}
                     <div className="flex gap-2 mt-6 justify-center">
-                        <div className={`h-1.5 w-24 rounded-full transition-colors duration-300 ${step === "details" || step === "location" ? "bg-emerald-500" : "bg-zinc-800"}`} />
-                        <div className={`h-1.5 w-24 rounded-full transition-colors duration-300 ${step === "location" ? "bg-emerald-500" : "bg-zinc-800"}`} />
+                        <div className={`h-1.5 w-24 rounded-full transition-colors duration-300 ${step === "details" || step === "location" ? "bg-emerald-500" : "bg-surface-overlay"}`} />
+                        <div className={`h-1.5 w-24 rounded-full transition-colors duration-300 ${step === "location" ? "bg-emerald-500" : "bg-surface-overlay"}`} />
                     </div>
                 </div>
 
-                <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-8 backdrop-blur-sm shadow-2xl">
+                <div className="bg-surface-raised/40 border border-default rounded-3xl p-8 backdrop-blur-sm shadow-2xl">
                     <form onSubmit={handleSubmit(onSubmit)}>
 
                         {/* Step 1: Basic Details */}
                         {step === "details" && (
                             <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300">
-                                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-zinc-800">
+                                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-default">
                                     <div className="p-2 bg-emerald-500/10 rounded-lg">
                                         <Building2 className="w-6 h-6 text-emerald-500" />
                                     </div>
-                                    <h2 className="text-xl font-bold text-white">Venue Details</h2>
+                                    <h2 className="text-xl font-bold text-primary">Venue Details</h2>
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Venue Name</label>
+                                    <label className="text-xs font-bold text-muted uppercase tracking-wider">Venue Name</label>
                                     <input
                                         {...register("name", { required: "Name is required" })}
-                                        className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
+                                        className="w-full bg-surface-base/50 border border-subtle rounded-xl px-4 py-3 text-primary focus:border-emerald-500 focus:outline-none transition-colors"
                                         placeholder="Ex: City Sports Arena"
                                     />
                                     {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message as string}</p>}
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Description</label>
+                                    <label className="text-xs font-bold text-muted uppercase tracking-wider">Description</label>
                                     <textarea
                                         {...register("description")}
                                         rows={3}
-                                        className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors resize-none"
+                                        className="w-full bg-surface-base/50 border border-subtle rounded-xl px-4 py-3 text-primary focus:border-emerald-500 focus:outline-none transition-colors resize-none"
                                         placeholder="Tell players about your facilities..."
                                     />
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Contact Number</label>
+                                        <label className="text-xs font-bold text-muted uppercase tracking-wider">Contact Number</label>
                                         <input
                                             {...register("contact_number", { required: true })}
-                                            className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
+                                            className="w-full bg-surface-base/50 border border-subtle rounded-xl px-4 py-3 text-primary focus:border-emerald-500 focus:outline-none transition-colors"
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Contact Email</label>
+                                        <label className="text-xs font-bold text-muted uppercase tracking-wider">Contact Email</label>
                                         <input
                                             {...register("contact_email")}
-                                            className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
+                                            className="w-full bg-surface-base/50 border border-subtle rounded-xl px-4 py-3 text-primary focus:border-emerald-500 focus:outline-none transition-colors"
                                         />
                                     </div>
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Operating Hours (Summary)</label>
+                                    <label className="text-xs font-bold text-muted uppercase tracking-wider">Operating Hours (Summary)</label>
                                     <input
                                         {...register("operating_hours_summary")}
-                                        className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors opacity-60"
+                                        className="w-full bg-surface-base/50 border border-subtle rounded-xl px-4 py-3 text-primary focus:border-emerald-500 focus:outline-none transition-colors opacity-60"
                                         placeholder="Ex: 06:00 - 23:00"
                                         readOnly
                                     />
-                                    <p className="text-zinc-600 text-xs">Manage schedule in Settings → Schedule</p>
+                                    <p className="text-faint text-xs">Manage schedule in Settings → Schedule</p>
                                 </div>
 
                                 <Button type="button" onClick={() => setStep("location")} className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-12 text-lg shadow-[0_0_20px_rgba(16,185,129,0.2)]">
@@ -184,29 +184,29 @@ export default function EditVenuePage() {
                         {/* Step 2: Location & Save */}
                         {step === "location" && (
                             <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300">
-                                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-zinc-800">
+                                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-default">
                                     <div className="p-2 bg-blue-500/10 rounded-lg">
                                         <MapPin className="w-6 h-6 text-blue-500" />
                                     </div>
-                                    <h2 className="text-xl font-bold text-white">Location</h2>
+                                    <h2 className="text-xl font-bold text-primary">Location</h2>
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">City</label>
+                                    <label className="text-xs font-bold text-muted uppercase tracking-wider">City</label>
                                     <input
                                         {...register("city", { required: "City is required" })}
-                                        className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
+                                        className="w-full bg-surface-base/50 border border-subtle rounded-xl px-4 py-3 text-primary focus:border-emerald-500 focus:outline-none transition-colors"
                                         placeholder="Ex: Colombo"
                                     />
                                     {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city.message as string}</p>}
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Full Address</label>
+                                    <label className="text-xs font-bold text-muted uppercase tracking-wider">Full Address</label>
                                     <textarea
                                         {...register("address", { required: "Address is required" })}
                                         rows={3}
-                                        className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors resize-none"
+                                        className="w-full bg-surface-base/50 border border-subtle rounded-xl px-4 py-3 text-primary focus:border-emerald-500 focus:outline-none transition-colors resize-none"
                                         placeholder="Street, Area, etc."
                                     />
                                     {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address.message as string}</p>}
@@ -221,7 +221,7 @@ export default function EditVenuePage() {
                                 </div>
 
                                 <div className="flex gap-3 pt-4">
-                                    <Button type="button" variant="ghost" onClick={() => setStep("details")} className="flex-1 h-12 text-zinc-400 hover:text-white">
+                                    <Button type="button" variant="ghost" onClick={() => setStep("details")} className="flex-1 h-12 text-secondary hover:text-primary">
                                         <ArrowLeft className="w-5 h-5 mr-2" /> Back
                                     </Button>
                                     <Button

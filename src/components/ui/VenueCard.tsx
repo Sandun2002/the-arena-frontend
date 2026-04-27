@@ -21,7 +21,7 @@ export default function VenueCard({ venue, searchParams }: VenueCardProps) {
   const href = `/venues/${venue.id}${queryStr ? `?${queryStr}` : ""}`;
 
   return (
-    <Link href={href} className="group relative block w-full overflow-hidden rounded-xl bg-zinc-900 border border-zinc-800 transition-all hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-900/20">
+    <Link href={href} className="group relative block w-full overflow-hidden rounded-xl bg-surface-raised border border-default transition-all hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-900/20">
 
       {/* Image Section */}
       <div className="relative h-64 w-full overflow-hidden">
@@ -33,7 +33,7 @@ export default function VenueCard({ venue, searchParams }: VenueCardProps) {
           className="object-cover transition-transform duration-700 group-hover:scale-110"
         />
         {/* Gradient Overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent opacity-90" />
+        <div className="absolute inset-0 bg-gradient-to-t from-surface-sunken via-transparent to-transparent opacity-90" />
 
         {/* Badges */}
         <div className="absolute top-4 left-4 flex gap-2">
@@ -48,23 +48,23 @@ export default function VenueCard({ venue, searchParams }: VenueCardProps) {
       {/* Content Section */}
       <div className="p-5">
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-xl font-bold text-white group-hover:text-emerald-400 transition-colors">
+          <h3 className="text-xl font-bold text-primary group-hover:text-emerald-400 transition-colors">
             {venue.name}
           </h3>
           <div className="flex items-center gap-1 text-yellow-400">
             <Star className="h-4 w-4 fill-yellow-400" />
-            <span className="text-sm font-bold text-white">{venue.rating.toFixed(1)}</span>
+            <span className="text-sm font-bold text-primary">{venue.rating.toFixed(1)}</span>
           </div>
         </div>
 
-        <div className="mb-4 flex items-center gap-2 text-zinc-400 text-sm">
+        <div className="mb-4 flex items-center gap-2 text-secondary text-sm">
           <MapPin className="h-4 w-4" />
           <span className="truncate">{venue.city}</span>
         </div>
 
-        <div className="flex items-center justify-between border-t border-zinc-800 pt-4">
+        <div className="flex items-center justify-between border-t border-default pt-4">
           <div>
-            <span className="text-lg font-bold text-white">
+            <span className="text-lg font-bold text-primary">
               {venue.min_hourly_rate ? `From LKR ${venue.min_hourly_rate.toLocaleString()}/hr` : "View availability"}
             </span>
           </div>

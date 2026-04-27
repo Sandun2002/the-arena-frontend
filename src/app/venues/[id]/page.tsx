@@ -42,45 +42,45 @@ export default function VenueDetailsPage() {
   }, [venue]);
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-black"><div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-emerald-500" /></div>;
+    return <div className="min-h-screen flex items-center justify-center bg-surface-base"><div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-emerald-500" /></div>;
   }
 
   if (!venue) {
-    return <div className="min-h-screen bg-black text-white flex items-center justify-center">Venue not found</div>;
+    return <div className="min-h-screen bg-surface-base text-primary flex items-center justify-center">Venue not found</div>;
   }
 
   return (
     <RequireAuth>
-    <main className="min-h-screen bg-black text-white pb-20 pt-24">
+    <main className="min-h-screen bg-surface-base text-primary pb-20 pt-24">
       <div className="fixed top-0 left-0 w-full h-[500px] bg-emerald-500/5 blur-[120px] pointer-events-none" />
 
       <div className="container mx-auto px-4 mb-8 relative z-10">
-        <div className="text-xs font-bold text-zinc-500 mb-6 flex gap-2 uppercase tracking-wider">
-          <Link href="/" className="hover:text-white transition-colors">Home</Link> /
-          <Link href="/venues" className="hover:text-white transition-colors">Search</Link> /
+        <div className="text-xs font-bold text-muted mb-6 flex gap-2 uppercase tracking-wider">
+          <Link href="/" className="hover:text-primary transition-colors">Home</Link> /
+          <Link href="/venues" className="hover:text-primary transition-colors">Search</Link> /
           <span className="text-emerald-500">{venue.name}</span>
         </div>
 
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
           <div>
             <h1 className="text-4xl md:text-6xl font-black mb-4 tracking-tight uppercase">{venue.name}</h1>
-            <div className="flex flex-wrap items-center gap-6 text-sm text-zinc-400 font-medium">
+            <div className="flex flex-wrap items-center gap-6 text-sm text-secondary font-medium">
               <div className="flex items-center gap-2">
                 <MapPin className="h-5 w-5 text-emerald-500" />
                 {venue.city}
               </div>
               <div className="flex items-center gap-2">
                 <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
-                <span className="text-white font-bold text-lg">{venue.rating.toFixed(1)}</span>
+                <span className="text-primary font-bold text-lg">{venue.rating.toFixed(1)}</span>
                 <span className="underline decoration-zinc-700 underline-offset-4">({venue.review_count} reviews)</span>
               </div>
             </div>
           </div>
 
           <div className="text-right">
-            <p className="text-xs text-zinc-500 font-bold uppercase tracking-wider mb-1">Starting from</p>
-            <p className="text-3xl font-black text-white flex items-baseline gap-1 justify-end">
-              {venue.min_hourly_rate ? `LKR ${venue.min_hourly_rate.toLocaleString()}` : "See courts"} <span className="text-sm font-bold text-zinc-500">/hr</span>
+            <p className="text-xs text-muted font-bold uppercase tracking-wider mb-1">Starting from</p>
+            <p className="text-3xl font-black text-primary flex items-baseline gap-1 justify-end">
+              {venue.min_hourly_rate ? `LKR ${venue.min_hourly_rate.toLocaleString()}` : "See courts"} <span className="text-sm font-bold text-muted">/hr</span>
             </p>
           </div>
         </div>
@@ -88,14 +88,14 @@ export default function VenueDetailsPage() {
 
       <div className="container mx-auto px-4 mb-12 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 h-[400px] md:h-[500px]">
-          <div className="md:col-span-3 relative rounded-[2rem] overflow-hidden border border-zinc-800 group cursor-pointer bg-zinc-900">
-            {gallery[0] ? <Image src={gallery[0].url} alt={venue.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" priority unoptimized /> : <div className="h-full w-full bg-zinc-900" />}
+          <div className="md:col-span-3 relative rounded-[2rem] overflow-hidden border border-default group cursor-pointer bg-surface-raised">
+            {gallery[0] ? <Image src={gallery[0].url} alt={venue.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" priority unoptimized /> : <div className="h-full w-full bg-surface-raised" />}
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
 
           <div className="hidden md:flex flex-col gap-4">
             {gallery.slice(1, 3).map((image) => (
-              <div key={image.id} className="relative flex-1 rounded-[2rem] overflow-hidden border border-zinc-800 group cursor-pointer">
+              <div key={image.id} className="relative flex-1 rounded-[2rem] overflow-hidden border border-default group cursor-pointer">
                 <Image src={image.url} alt={venue.name} fill className="object-cover transition-transform duration-700 group-hover:scale-110" unoptimized />
               </div>
             ))}
@@ -107,32 +107,32 @@ export default function VenueDetailsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2 space-y-12">
             <section>
-              <h3 className="text-xl font-black text-white uppercase tracking-tight mb-6">About Venue</h3>
-              <div className="bg-zinc-900/40 p-8 rounded-[2rem] border border-zinc-800 backdrop-blur-sm">
-                <p className="text-zinc-400 leading-relaxed text-lg">{venue.description || "Venue description is not available yet."}</p>
+              <h3 className="text-xl font-black text-primary uppercase tracking-tight mb-6">About Venue</h3>
+              <div className="bg-surface-raised/40 p-8 rounded-[2rem] border border-default backdrop-blur-sm">
+                <p className="text-secondary leading-relaxed text-lg">{venue.description || "Venue description is not available yet."}</p>
               </div>
             </section>
 
             <section>
-              <h3 className="text-xl font-black text-white uppercase tracking-tight mb-6">Amenities</h3>
+              <h3 className="text-xl font-black text-primary uppercase tracking-tight mb-6">Amenities</h3>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {venue.amenities.length > 0 ? venue.amenities.map((amenity) => (
-                  <div key={amenity.id} className="flex items-center justify-center p-6 rounded-[2rem] bg-zinc-900/40 border border-zinc-800 text-zinc-300 text-sm font-bold uppercase tracking-wider">
+                  <div key={amenity.id} className="flex items-center justify-center p-6 rounded-[2rem] bg-surface-raised/40 border border-default text-secondary text-sm font-bold uppercase tracking-wider">
                     {amenity.name}
                   </div>
-                )) : <div className="col-span-full rounded-[2rem] border border-zinc-800 bg-zinc-900/40 p-6 text-sm text-zinc-500">Amenities have not been listed yet.</div>}
+                )) : <div className="col-span-full rounded-[2rem] border border-default bg-surface-raised/40 p-6 text-sm text-muted">Amenities have not been listed yet.</div>}
               </div>
             </section>
 
             <section>
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-black text-white uppercase tracking-tight">Player Reviews</h3>
-                <p className="text-xs font-bold uppercase tracking-wider text-zinc-500">Reviews are available after completed bookings.</p>
+                <h3 className="text-xl font-black text-primary uppercase tracking-tight">Player Reviews</h3>
+                <p className="text-xs font-bold uppercase tracking-wider text-muted">Reviews are available after completed bookings.</p>
               </div>
 
               <div className="space-y-4">
                 {reviews.length > 0 ? reviews.map((review) => (
-                  <div key={review.id} className="p-6 rounded-[2rem] bg-zinc-900/40 border border-zinc-800 backdrop-blur-sm">
+                  <div key={review.id} className="p-6 rounded-[2rem] bg-surface-raised/40 border border-default backdrop-blur-sm">
                     <div className="flex justify-between items-start mb-3">
                       <div className="flex items-center gap-3">
                         <TierFrame
@@ -143,22 +143,22 @@ export default function VenueDetailsPage() {
                             alt={review.user_name}
                         />
                         <div>
-                          <p className="font-bold text-white text-sm">{review.user_name}</p>
-                          <p className="text-xs text-zinc-500">{formatDistanceToNow(new Date(review.created_at), { addSuffix: true })}</p>
+                          <p className="font-bold text-primary text-sm">{review.user_name}</p>
+                          <p className="text-xs text-muted">{formatDistanceToNow(new Date(review.created_at), { addSuffix: true })}</p>
                         </div>
                       </div>
-                      <div className="flex gap-1">{[...Array(5)].map((_, index) => <Star key={index} className={`h-3 w-3 ${index < review.rating ? "text-yellow-500 fill-yellow-500" : "text-zinc-700"}`} />)}</div>
+                      <div className="flex gap-1">{[...Array(5)].map((_, index) => <Star key={index} className={`h-3 w-3 ${index < review.rating ? "text-yellow-500 fill-yellow-500" : "text-faint"}`} />)}</div>
                     </div>
-                    {review.title && <p className="mb-2 text-sm font-bold text-white">{review.title}</p>}
-                    <p className="text-zinc-400 text-sm italic">"{review.comment}"</p>
+                    {review.title && <p className="mb-2 text-sm font-bold text-primary">{review.title}</p>}
+                    <p className="text-secondary text-sm italic">"{review.comment}"</p>
                   </div>
-                )) : <div className="rounded-[2rem] border border-zinc-800 bg-zinc-900/40 p-6 text-sm text-zinc-500">No public reviews yet.</div>}
+                )) : <div className="rounded-[2rem] border border-default bg-surface-raised/40 p-6 text-sm text-muted">No public reviews yet.</div>}
               </div>
             </section>
 
             <section>
-              <h3 className="text-xl font-black text-white uppercase tracking-tight mb-6">Location</h3>
-              <div className="rounded-[2rem] border border-zinc-800 bg-zinc-900 overflow-hidden">
+              <h3 className="text-xl font-black text-primary uppercase tracking-tight mb-6">Location</h3>
+              <div className="rounded-[2rem] border border-default bg-surface-raised overflow-hidden">
                 {venue.geo_lat && venue.geo_lng ? (
                   <iframe
                     title="Venue location"
@@ -173,8 +173,8 @@ export default function VenueDetailsPage() {
                     <MapPin className="mt-1 h-5 w-5 text-emerald-500" />
                     <div>
                       <p className="text-sm font-bold uppercase tracking-wider text-emerald-500">Address</p>
-                      <p className="mt-2 text-lg font-bold text-white">{venue.address}</p>
-                      <p className="text-sm text-zinc-500">{venue.city}</p>
+                      <p className="mt-2 text-lg font-bold text-primary">{venue.address}</p>
+                      <p className="text-sm text-muted">{venue.city}</p>
                     </div>
                   </div>
                 </div>
@@ -185,18 +185,18 @@ export default function VenueDetailsPage() {
           <div className="sticky top-24 space-y-6 pb-4">
             <BookingWidget venue={venue} />
 
-            <div className="p-6 rounded-[2rem] bg-gradient-to-br from-zinc-900 to-zinc-900/50 border border-zinc-800 text-center">
+            <div className="p-6 rounded-[2rem] bg-gradient-to-br from-surface-raised to-surface-raised/50 border border-default text-center">
               <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-4 text-emerald-500">
                 <CheckCircle className="h-6 w-6" />
               </div>
-              <h4 className="font-bold text-white mb-2">{venue.is_verified ? "Verified Venue" : "Venue Listed"}</h4>
-              <p className="text-xs text-zinc-500">{venue.is_verified ? "This venue meets Arena's standards for quality and safety." : "Venue information is available and bookable through Arena."}</p>
+              <h4 className="font-bold text-primary mb-2">{venue.is_verified ? "Verified Venue" : "Venue Listed"}</h4>
+              <p className="text-xs text-muted">{venue.is_verified ? "This venue meets Arena's standards for quality and safety." : "Venue information is available and bookable through Arena."}</p>
             </div>
 
             {venue.available_sports && venue.available_sports.length > 0 && (
-              <div className="rounded-[2rem] border border-zinc-800 bg-zinc-900/40 p-6">
-                <div className="mb-3 flex items-center gap-2 text-white font-bold"><Trophy className="h-4 w-4 text-emerald-500" /> Sports Available</div>
-                <div className="flex flex-wrap gap-2">{venue.available_sports.map((sport) => <span key={sport} className="rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-300">{sport}</span>)}</div>
+              <div className="rounded-[2rem] border border-default bg-surface-raised/40 p-6">
+                <div className="mb-3 flex items-center gap-2 text-primary font-bold"><Trophy className="h-4 w-4 text-emerald-500" /> Sports Available</div>
+                <div className="flex flex-wrap gap-2">{venue.available_sports.map((sport) => <span key={sport} className="rounded-full border border-subtle px-3 py-1 text-xs text-secondary">{sport}</span>)}</div>
               </div>
             )}
           </div>

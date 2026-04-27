@@ -162,21 +162,21 @@ export default function DatePicker({
 
     const dropdown = isOpen && mounted ? createPortal(
         <div ref={dropdownRef} style={dropdownStyle}
-            className="bg-zinc-900 border border-zinc-700 rounded-2xl shadow-2xl shadow-black/80 overflow-hidden"
+            className="bg-surface-raised border border-subtle rounded-2xl shadow-2xl shadow-[var(--shadow-elevation)] overflow-hidden"
             data-lenis-prevent>
             <div className="p-4">
 
                 {/* Month/Year Navigation */}
                 <div className="flex items-center justify-between mb-4">
                     <button type="button" onClick={prevMonth}
-                        className="p-1.5 rounded-lg text-zinc-400 hover:bg-zinc-800 hover:text-white transition-all">
+                        className="p-1.5 rounded-lg text-secondary hover:bg-surface-overlay hover:text-primary transition-all">
                         <ChevronLeft className="w-4 h-4" />
                     </button>
-                    <span className="text-sm font-bold text-white">
+                    <span className="text-sm font-bold text-primary">
                         {MONTHS[viewMonth]} {viewYear}
                     </span>
                     <button type="button" onClick={nextMonth}
-                        className="p-1.5 rounded-lg text-zinc-400 hover:bg-zinc-800 hover:text-white transition-all">
+                        className="p-1.5 rounded-lg text-secondary hover:bg-surface-overlay hover:text-primary transition-all">
                         <ChevronRight className="w-4 h-4" />
                     </button>
                 </div>
@@ -184,7 +184,7 @@ export default function DatePicker({
                 {/* Day-of-week headers */}
                 <div className="grid grid-cols-7 mb-1">
                     {DAYS.map(d => (
-                        <div key={d} className="text-center text-[10px] font-bold text-zinc-600 uppercase py-1">{d}</div>
+                        <div key={d} className="text-center text-[10px] font-bold text-faint uppercase py-1">{d}</div>
                     ))}
                 </div>
 
@@ -204,12 +204,12 @@ export default function DatePicker({
                                 onClick={() => handleDaySelect(ymd)}
                                 className={`relative text-center py-1.5 rounded-lg text-xs font-bold transition-all ${
                                     disabled
-                                        ? "text-zinc-700 cursor-not-allowed"
+                                        ? "text-faint cursor-not-allowed"
                                         : isSelected
                                         ? "bg-emerald-500 text-black shadow-[0_0_10px_rgba(80,200,120,0.4)]"
                                         : isToday
-                                        ? "text-emerald-400 ring-1 ring-emerald-500/40 hover:bg-zinc-800"
-                                        : "text-zinc-300 hover:bg-zinc-800 hover:text-white"
+                                        ? "text-emerald-400 ring-1 ring-emerald-500/40 hover:bg-surface-overlay"
+                                        : "text-secondary hover:bg-surface-overlay hover:text-primary"
                                 }`}
                             >
                                 {day}
@@ -222,8 +222,8 @@ export default function DatePicker({
                 </div>
 
                 {/* Footer */}
-                <div className="border-t border-zinc-800 mt-4 pt-3 flex items-center justify-between">
-                    <span className="text-zinc-500 text-xs">Selected:</span>
+                <div className="border-t border-default mt-4 pt-3 flex items-center justify-between">
+                    <span className="text-muted text-xs">Selected:</span>
                     <span className="text-emerald-400 font-bold text-xs">{value ? formatDisplay(value) : "—"}</span>
                     <button type="button" onClick={() => setIsOpen(false)}
                         className="text-xs font-bold bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-black px-3 py-1.5 rounded-lg transition-all">
@@ -237,16 +237,16 @@ export default function DatePicker({
 
     return (
         <div className={`relative ${className}`}>
-            {label && <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider block mb-2">{label}</label>}
+            {label && <label className="text-xs font-bold text-muted uppercase tracking-wider block mb-2">{label}</label>}
             <button id={id} ref={triggerRef} type="button" onClick={handleOpen}
-                className={`w-full flex items-center gap-3 bg-black/50 border rounded-xl px-4 py-3 text-white transition-all group ${
-                    isOpen ? "border-emerald-500 shadow-[0_0_12px_rgba(80,200,120,0.15)]" : "border-zinc-700 hover:border-zinc-600"
+                className={`w-full flex items-center gap-3 bg-surface-inset border rounded-xl px-4 py-3 text-primary transition-all group ${
+                    isOpen ? "border-emerald-500 shadow-[0_0_12px_rgba(80,200,120,0.15)]" : "border-subtle hover:border-emerald-500/40"
                 }`}>
-                <Calendar className={`w-4 h-4 transition-colors flex-shrink-0 ${isOpen ? "text-emerald-500" : "text-zinc-500 group-hover:text-zinc-400"}`} />
-                <span className={`flex-1 text-left font-medium text-sm ${!value ? "text-zinc-500" : "text-white"}`}>
+                <Calendar className={`w-4 h-4 transition-colors flex-shrink-0 ${isOpen ? "text-emerald-500" : "text-muted group-hover:text-secondary"}`} />
+                <span className={`flex-1 text-left font-medium text-sm ${!value ? "text-muted" : "text-primary"}`}>
                     {value ? formatDisplay(value) : placeholder}
                 </span>
-                <ChevronDown className={`w-4 h-4 text-zinc-500 transition-transform duration-200 flex-shrink-0 ${isOpen ? "rotate-180 text-emerald-500" : ""}`} />
+                <ChevronDown className={`w-4 h-4 text-muted transition-transform duration-200 flex-shrink-0 ${isOpen ? "rotate-180 text-emerald-500" : ""}`} />
             </button>
             {dropdown}
         </div>

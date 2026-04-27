@@ -101,13 +101,13 @@ export default function PWAInstallGuide() {
   return (
     <section
       ref={sectionRef}
-      className="py-16 bg-zinc-900/20 border-y border-zinc-800/50 relative"
+      className="py-16 bg-surface-raised/30 border-y border-default/50 relative"
     >
       <div className="container mx-auto px-4 max-w-4xl">
         {/* Dismiss Button */}
         <button
           onClick={handleDismiss}
-          className="absolute top-4 right-4 p-2 text-zinc-500 hover:text-white hover:bg-zinc-800 rounded-full transition-colors"
+          className="absolute top-4 right-4 p-2 text-muted hover:text-primary hover:bg-surface-overlay rounded-full transition-colors"
           aria-label="Dismiss"
         >
           <X className="w-5 h-5" />
@@ -117,17 +117,17 @@ export default function PWAInstallGuide() {
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-3">
             <Smartphone className="w-5 h-5 text-emerald-500" />
-            <span className="text-xs font-black tracking-[0.2em] uppercase text-zinc-500">
+            <span className="text-xs font-black tracking-[0.2em] uppercase text-muted">
               Progressive Web App
             </span>
           </div>
-          <h2 className="text-2xl md:text-3xl font-black text-white mb-2">
+          <h2 className="text-2xl md:text-3xl font-black text-primary mb-2">
             Take The Arena{" "}
             <span className="text-transparent bg-gradient-to-r from-emerald-400 to-emerald-500 bg-clip-text">
               Everywhere
             </span>
           </h2>
-          <p className="text-zinc-400 text-sm max-w-md mx-auto">
+          <p className="text-secondary text-sm max-w-md mx-auto">
             No App Store needed. Install in seconds and get instant access to your bookings.
           </p>
         </div>
@@ -136,23 +136,23 @@ export default function PWAInstallGuide() {
         <div className="grid md:grid-cols-2 gap-4 md:gap-6 mb-8">
           {/* iOS Instructions */}
           {(platform === "ios" || platform === "desktop") && (
-            <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-5">
+            <div className="bg-surface-raised/50 border border-default rounded-2xl p-5">
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-xl">🍎</span>
-                <span className="text-sm font-bold text-white">iPhone / iPad</span>
+                <span className="text-sm font-bold text-primary">iPhone / iPad</span>
               </div>
               <div className="space-y-3">
-                <Step number={1} icon={<span className="text-zinc-400">Safari</span>}>
+                <Step number={1} icon={<span className="text-secondary">Safari</span>}>
                   Open in Safari browser
                 </Step>
                 <Step number={2} icon={<Share2 className="w-4 h-4" />}>
-                  Tap the <strong className="text-white">Share</strong> button
+                  Tap the <strong className="text-primary">Share</strong> button
                 </Step>
                 <Step number={3} text="Add to Home Screen">
-                  Scroll and tap <strong className="text-white">Add to Home Screen</strong>
+                  Scroll and tap <strong className="text-primary">Add to Home Screen</strong>
                 </Step>
                 <Step number={4} text="Add">
-                  Tap <strong className="text-white">Add</strong> in the top right
+                  Tap <strong className="text-primary">Add</strong> in the top right
                 </Step>
               </div>
             </div>
@@ -160,15 +160,15 @@ export default function PWAInstallGuide() {
 
           {/* Android Instructions */}
           {(platform === "android" || platform === "desktop") && (
-            <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-5">
+            <div className="bg-surface-raised/50 border border-default rounded-2xl p-5">
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-xl">🤖</span>
-                <span className="text-sm font-bold text-white">Android</span>
+                <span className="text-sm font-bold text-primary">Android</span>
               </div>
               
               {canInstall ? (
                 <div className="text-center py-4">
-                  <p className="text-zinc-400 text-sm mb-4">
+                  <p className="text-secondary text-sm mb-4">
                     One-tap install available for your browser
                   </p>
                   <button
@@ -182,14 +182,14 @@ export default function PWAInstallGuide() {
               ) : (
                 <div className="space-y-3">
                   <Step number={1} icon={<MoreVertical className="w-4 h-4" />}>
-                    Tap the <strong className="text-white">⋮</strong> menu (top right)
+                    Tap the <strong className="text-primary">⋮</strong> menu (top right)
                   </Step>
                   <Step number={2} text="Install App">
-                    Tap <strong className="text-white">Install App</strong> or{" "}
-                    <strong className="text-white">Add to Home Screen</strong>
+                    Tap <strong className="text-primary">Install App</strong> or{" "}
+                    <strong className="text-primary">Add to Home Screen</strong>
                   </Step>
                   <Step number={3} text="Install">
-                    Tap <strong className="text-white">Install</strong> in the prompt
+                    Tap <strong className="text-primary">Install</strong> in the prompt
                   </Step>
                 </div>
               )}
@@ -221,12 +221,12 @@ function Step({
 }) {
   return (
     <div className="flex items-start gap-3">
-      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-xs font-bold text-white">
+      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-surface-overlay border border-subtle flex items-center justify-center text-xs font-bold text-primary">
         {number}
       </div>
-      <div className="text-sm text-zinc-400">
+      <div className="text-sm text-secondary">
         {icon && <span className="inline-flex items-center gap-1.5">{icon}</span>}
-        {text && <strong className="text-white font-medium">{text}</strong>}
+        {text && <strong className="text-primary font-medium">{text}</strong>}
         {children}
       </div>
     </div>
@@ -235,7 +235,7 @@ function Step({
 
 function FeaturePill({ children }: { children: React.ReactNode }) {
   return (
-    <div className="inline-flex items-center gap-1.5 bg-zinc-900/70 border border-zinc-800 rounded-full px-3 py-1.5 text-xs text-zinc-300">
+    <div className="inline-flex items-center gap-1.5 bg-surface-raised/70 border border-default rounded-full px-3 py-1.5 text-xs text-secondary">
       <Check className="w-3 h-3 text-emerald-500" />
       {children}
     </div>

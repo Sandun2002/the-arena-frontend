@@ -69,7 +69,7 @@ export default function Hero() {
     <section className="hero-section relative w-full flex flex-col justify-start items-center pt-24 md:pt-28 pb-6 md:pb-20">
 
       {/* Background Effects */}
-      <div className="absolute inset-0 bg-black z-0 pointer-events-none overflow-hidden">
+      <div className="absolute inset-0 bg-surface-base z-0 pointer-events-none overflow-hidden">
         <div className="absolute top-0 left-0 w-[400px] h-[400px] bg-emerald-500/10 rounded-full blur-[100px] -translate-x-1/4 -translate-y-1/4" />
         <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-emerald-500/5 rounded-full blur-[100px] translate-x-1/4 translate-y-1/4" />
       </div>
@@ -81,7 +81,7 @@ export default function Hero() {
           {venues.length > 0 ? (
             <HeroCarousel venues={venues} />
           ) : isLoading ? (
-            <div className="h-[180px] md:h-[260px] w-full flex items-center justify-center text-zinc-600">
+            <div className="h-[180px] md:h-[260px] w-full flex items-center justify-center text-faint">
               Loading Arenas...
             </div>
           ) : null}
@@ -89,12 +89,12 @@ export default function Hero() {
 
         {/* 2. TEXT (Middle) */}
         <div ref={textRef} className="text-center max-w-2xl perspective-[1000px] mt-4 md:mt-6 px-2">
-          <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tighter text-white mb-1 md:mb-2 flex flex-wrap justify-center gap-x-2 md:gap-x-3">
+          <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tighter text-primary mb-1 md:mb-2 flex flex-wrap justify-center gap-x-2 md:gap-x-3">
             <span className="hero-word inline-block">WHERE</span>
             <span className="hero-word inline-block text-transparent bg-gradient-to-r from-emerald-400 to-emerald-500 bg-clip-text">CHAMPIONS</span>
             <span className="hero-word inline-block">PLAY</span>
           </h1>
-          <p className="hero-tagline text-zinc-400 text-xs sm:text-sm md:text-base">
+          <p className="hero-tagline text-secondary text-xs sm:text-sm md:text-base">
             Discover and book Sri Lanka&apos;s most premium sports venues instantly.
           </p>
         </div>
@@ -120,8 +120,8 @@ export default function Hero() {
 
       {/* Scroll Indicator - desktop only */}
       <div ref={scrollIndicatorRef} className="hidden md:flex absolute bottom-6 left-1/2 -translate-x-1/2 flex-col items-center gap-1.5 opacity-0 z-20">
-        <span className="text-zinc-500 text-[10px] uppercase tracking-widest">Scroll</span>
-        <div className="w-5 h-8 rounded-full border border-zinc-600 flex items-start justify-center p-1">
+        <span className="text-muted text-[10px] uppercase tracking-widest">Scroll</span>
+        <div className="w-5 h-8 rounded-full border border-subtle flex items-start justify-center p-1">
           <div className="w-1 h-1.5 bg-emerald-400 rounded-full animate-scroll" />
         </div>
       </div>

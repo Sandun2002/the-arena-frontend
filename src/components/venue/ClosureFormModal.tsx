@@ -108,21 +108,21 @@ export default function ClosureFormModal({ venueId, courts, onClose, onSuccess }
     return (
         <div className="space-y-6">
             {/* Toggle Level */}
-            <div className="flex bg-black/40 border border-zinc-800 rounded-xl p-1 relative">
+            <div className="flex bg-surface-base/40 border border-default rounded-xl p-1 relative">
                 <button
                     onClick={() => setClosureLevel("venue")}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold transition-all relative z-10 ${closureLevel === "venue" ? "text-white" : "text-zinc-500 hover:text-zinc-300"}`}
+                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold transition-all relative z-10 ${closureLevel === "venue" ? "text-primary" : "text-muted hover:text-secondary"}`}
                 >
                     <MapPin className="w-4 h-4" /> Venue
                 </button>
                 <button
                     onClick={() => setClosureLevel("court")}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold transition-all relative z-10 ${closureLevel === "court" ? "text-white" : "text-zinc-500 hover:text-zinc-300"}`}
+                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold transition-all relative z-10 ${closureLevel === "court" ? "text-primary" : "text-muted hover:text-secondary"}`}
                 >
                     <Clock className="w-4 h-4" /> Court
                 </button>
                 <div
-                    className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-zinc-800 rounded-lg transition-transform duration-300 ${closureLevel === "venue" ? "translate-x-0" : "translate-x-full left-1"}`}
+                    className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-surface-overlay rounded-lg transition-transform duration-300 ${closureLevel === "venue" ? "translate-x-0" : "translate-x-full left-1"}`}
                 />
             </div>
 
@@ -130,10 +130,10 @@ export default function ClosureFormModal({ venueId, courts, onClose, onSuccess }
                 {closureLevel === "venue" && (
                     <div className="space-y-5 animate-in fade-in slide-in-from-right-2">
                         <div className="space-y-2">
-                            <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Closure Title</label>
+                            <label className="text-xs font-bold text-muted uppercase tracking-wider">Closure Title</label>
                             <input
                                 {...register("title")}
-                                className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
+                                className="w-full bg-surface-base/40 border border-subtle rounded-xl px-4 py-3 text-primary focus:border-emerald-500 focus:outline-none transition-colors"
                                 placeholder="Ex: Pitch Maintenance"
                             />
                         </div>
@@ -166,10 +166,10 @@ export default function ClosureFormModal({ venueId, courts, onClose, onSuccess }
                     <div className="space-y-5 animate-in fade-in slide-in-from-left-2">
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Select Court</label>
+                                <label className="text-xs font-bold text-muted uppercase tracking-wider">Select Court</label>
                                 <select
                                     {...register("court_id", { required: "Court is required" })}
-                                    className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none"
+                                    className="w-full bg-surface-base/40 border border-subtle rounded-xl px-4 py-3 text-primary focus:border-emerald-500 focus:outline-none transition-colors appearance-none"
                                 >
                                     {courts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                                 </select>
@@ -186,7 +186,7 @@ export default function ClosureFormModal({ venueId, courts, onClose, onSuccess }
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex justify-between">
+                            <label className="text-xs font-bold text-muted uppercase tracking-wider flex justify-between">
                                 <span>Select Time Slots</span>
                                 <span className="text-emerald-500">{selectedSlots.length} selected</span>
                             </label>
@@ -205,11 +205,11 @@ export default function ClosureFormModal({ venueId, courts, onClose, onSuccess }
                                             onClick={() => toggleSlot(hour)}
                                             className={`py-2 rounded-lg text-xs font-bold transition-all border
                                                 ${isPastHour
-                                                    ? 'bg-zinc-900/40 text-zinc-700 border-zinc-900 cursor-not-allowed'
+                                                    ? 'bg-surface-raised/40 text-faint border-default cursor-not-allowed'
                                                     : ''}
                                                 ${isSelected
                                                     ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/50'
-                                                    : 'bg-black/40 text-zinc-400 border-zinc-800 hover:border-zinc-700'}
+                                                    : 'bg-surface-base/40 text-secondary border-default hover:border-subtle'}
                                             `}
                                         >
                                             {timeStr}
@@ -222,11 +222,11 @@ export default function ClosureFormModal({ venueId, courts, onClose, onSuccess }
                 )}
 
                 <div className="space-y-2 mt-2">
-                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Reason</label>
+                    <label className="text-xs font-bold text-muted uppercase tracking-wider">Reason</label>
                     <textarea
                         {...register("reason")}
                         rows={2}
-                        className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors resize-none"
+                        className="w-full bg-surface-base/40 border border-subtle rounded-xl px-4 py-3 text-primary focus:border-emerald-500 focus:outline-none transition-colors resize-none"
                         placeholder="Details about the closure..."
                     />
                 </div>
@@ -234,7 +234,7 @@ export default function ClosureFormModal({ venueId, courts, onClose, onSuccess }
                 <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-3.5 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl mt-4 shadow-[0_0_20px_rgba(220,38,38,0.2)]"
+                    className="w-full py-3.5 bg-red-600 hover:bg-red-500 text-primary font-bold rounded-xl mt-4 shadow-[0_0_20px_rgba(220,38,38,0.2)]"
                 >
                     {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "Confirm Closure"}
                 </Button>

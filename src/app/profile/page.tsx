@@ -66,7 +66,7 @@ export default function ProfilePage() {
         ? Math.min(100, Math.round(((xp - tierMinXp) / (nextTierMinXp - tierMinXp)) * 100))
         : 100;
     const TIER_COLORS: Record<string, { badge: string; bar: string; text: string }> = {
-        Rookie:    { badge: "bg-zinc-500/10 border-zinc-500/20 text-zinc-400",   bar: "from-zinc-500 to-zinc-400",    text: "text-zinc-400" },
+        Rookie:    { badge: "bg-zinc-500/10 border-zinc-500/20 text-secondary",   bar: "from-zinc-500 to-zinc-400",    text: "text-secondary" },
         Contender: { badge: "bg-blue-500/10 border-blue-500/20 text-blue-400",    bar: "from-blue-500 to-cyan-400",    text: "text-blue-400" },
         Athlete:   { badge: "bg-emerald-500/10 border-emerald-500/20 text-emerald-400", bar: "from-emerald-500 to-cyan-400", text: "text-emerald-400" },
         Champion:  { badge: "bg-yellow-500/10 border-yellow-500/20 text-yellow-400", bar: "from-yellow-500 to-amber-400", text: "text-yellow-400" },
@@ -78,13 +78,13 @@ export default function ProfilePage() {
     const tierStyle = TIER_COLORS[tier] || TIER_COLORS.Rookie;
 
     return (
-        <main className="min-h-screen bg-black pt-24 pb-12 px-4 selection:bg-emerald-500/30">
+        <main className="min-h-screen bg-surface-base pt-24 pb-12 px-4 selection:bg-emerald-500/30">
             <div className="container mx-auto max-w-5xl">
 
                 {/* Header / Cover */}
-                <div className="relative h-48 md:h-64 rounded-3xl overflow-hidden mb-20 bg-gradient-to-r from-zinc-900 to-zinc-800 border border-zinc-800 group">
+                <div className="relative h-48 md:h-64 rounded-3xl overflow-hidden mb-20 bg-gradient-to-r from-surface-raised to-surface-overlay border border-default group">
                     <div className="absolute inset-0 bg-[url('/profile-cover.jpg')] bg-cover bg-center opacity-30 group-hover:scale-105 transition-transform duration-700"></div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-surface-base via-surface-base/40 to-transparent"></div>
                 </div>
 
                 {/* Profile Header (Overlapping) */}
@@ -101,12 +101,12 @@ export default function ProfilePage() {
 
                         {/* Info */}
                         <div className="flex-1 pb-2 w-full text-center md:text-left">
-                            <h1 className="text-3xl md:text-5xl font-bold text-white mb-2 tracking-tight">{user.full_name}</h1>
-                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 text-zinc-400 text-sm mb-5">
-                                <span className="flex items-center gap-1.5 bg-zinc-900/50 px-3 py-1 rounded-full border border-zinc-800">
+                            <h1 className="text-3xl md:text-5xl font-bold text-primary mb-2 tracking-tight">{user.full_name}</h1>
+                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 text-secondary text-sm mb-5">
+                                <span className="flex items-center gap-1.5 bg-surface-raised/50 px-3 py-1 rounded-full border border-default">
                                     <Mail className="w-3.5 h-3.5" /> {user.email}
                                 </span>
-                                <span className="flex items-center gap-1.5 bg-zinc-900/50 px-3 py-1 rounded-full border border-zinc-800">
+                                <span className="flex items-center gap-1.5 bg-surface-raised/50 px-3 py-1 rounded-full border border-default">
                                     <Calendar className="w-3.5 h-3.5" /> Joined {fmtMonthYear(user.created_at)}
                                 </span>
                                 {/* Tier Badge */}
@@ -117,19 +117,19 @@ export default function ProfilePage() {
 
                             {/* XP → Next Tier Progress */}
                             <div className="max-w-md mx-auto md:mx-0">
-                                <div className="flex justify-between text-xs font-bold uppercase text-zinc-500 mb-2 tracking-wider">
+                                <div className="flex justify-between text-xs font-bold uppercase text-muted mb-2 tracking-wider">
                                     <span>Level {level} · <span className={tierStyle.text}>{tier}</span></span>
                                     <span>{xp.toLocaleString()} XP</span>
                                 </div>
-                                <div className="h-3 bg-zinc-800 rounded-full overflow-hidden p-0.5 border border-zinc-700/50">
+                                <div className="h-3 bg-surface-overlay rounded-full overflow-hidden p-0.5 border border-subtle/50">
                                     <div
                                         className={`h-full bg-gradient-to-r ${tierStyle.bar} rounded-full transition-all duration-1000 ease-out`}
                                         style={{ width: `${tierXpProgress}%`, boxShadow: "0 0 10px rgba(255,255,255,0.1)" }}
                                     ></div>
                                 </div>
-                                <p className="text-xs text-zinc-500 mt-2 text-right">
+                                <p className="text-xs text-muted mt-2 text-right">
                                     {nextTier
-                                        ? <>{xpToNextTier} XP to reach <span className="text-zinc-400">{nextTier}</span></>
+                                        ? <>{xpToNextTier} XP to reach <span className="text-secondary">{nextTier}</span></>
                                         : <span className="text-yellow-500">Max tier reached!</span>
                                     }
                                 </p>
@@ -139,7 +139,7 @@ export default function ProfilePage() {
                         {/* Quick Edit (Desktop) */}
                         <div className="hidden md:block">
                             <Link href="/profile/settings">
-                                <Button variant="outline" className="border-zinc-700 hover:bg-zinc-800">
+                                <Button variant="outline" className="border-subtle hover:bg-surface-overlay">
                                     <Edit2 className="w-4 h-4 mr-2" /> Edit Profile
                                 </Button>
                             </Link>
@@ -175,7 +175,7 @@ export default function ProfilePage() {
                         </div>
 
                         {/* Menu */}
-                        <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-2 backdrop-blur-sm">
+                        <div className="bg-surface-raised/50 border border-default rounded-3xl p-2 backdrop-blur-sm">
                             {(isVenueOwner || isVenueManager) && (
                                 <MenuLink href="/venue-dashboard" icon={<LayoutDashboard className="w-4 h-4" />} label="Manager Dashboard" />
                             )}
@@ -198,9 +198,9 @@ export default function ProfilePage() {
                     <div className="lg:col-span-2 space-y-6">
 
                         {/* Upcoming Games — merged from /dashboard */}
-                        <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-6 backdrop-blur-sm">
+                        <div className="bg-surface-raised/50 border border-default rounded-3xl p-6 backdrop-blur-sm">
                             <div className="flex justify-between items-center mb-5">
-                                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                                <h3 className="text-lg font-bold text-primary flex items-center gap-2">
                                     <Calendar className="w-5 h-5 text-emerald-400" /> Upcoming Games
                                 </h3>
                                 <Link href="/venues">
@@ -214,19 +214,19 @@ export default function ProfilePage() {
                                 <div className="space-y-3">
                                     {upcomingBookings.map(booking => (
                                         <Link href={`/bookings/${booking.id}`} key={booking.id} className="block group">
-                                            <div className="flex items-center gap-4 p-4 rounded-2xl bg-black/40 border border-zinc-800 hover:border-emerald-500/30 hover:bg-zinc-800/50 transition-all">
-                                                <div className="w-12 h-12 bg-zinc-800 rounded-xl flex flex-col items-center justify-center shrink-0 border border-zinc-700 group-hover:border-emerald-500/30 transition-colors">
-                                                    <span className="text-[9px] font-bold text-zinc-500 uppercase">{fmtMonthAbbr(booking.start_time)}</span>
-                                                    <span className="text-lg font-black text-white leading-none">{fmtDayNum(booking.start_time)}</span>
+                                            <div className="flex items-center gap-4 p-4 rounded-2xl bg-surface-base/40 border border-default hover:border-emerald-500/30 hover:bg-surface-overlay/50 transition-all">
+                                                <div className="w-12 h-12 bg-surface-overlay rounded-xl flex flex-col items-center justify-center shrink-0 border border-subtle group-hover:border-emerald-500/30 transition-colors">
+                                                    <span className="text-[9px] font-bold text-muted uppercase">{fmtMonthAbbr(booking.start_time)}</span>
+                                                    <span className="text-lg font-black text-primary leading-none">{fmtDayNum(booking.start_time)}</span>
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <h4 className="text-white font-bold text-sm truncate group-hover:text-emerald-400 transition-colors">
+                                                    <h4 className="text-primary font-bold text-sm truncate group-hover:text-emerald-400 transition-colors">
                                                         {booking.court?.sport_type?.name || booking.sport || "Sport"}
                                                     </h4>
-                                                    <p className="text-xs text-zinc-500 flex items-center gap-1.5 truncate">
+                                                    <p className="text-xs text-muted flex items-center gap-1.5 truncate">
                                                         <MapPin className="w-3 h-3 flex-shrink-0" />{booking.court?.venue_name}
                                                     </p>
-                                                    <p className="text-xs text-zinc-400 flex items-center gap-1.5 font-mono mt-0.5">
+                                                    <p className="text-xs text-secondary flex items-center gap-1.5 font-mono mt-0.5">
                                                         <Clock className="w-3 h-3 flex-shrink-0" />
                                                         {fmtTime(booking.start_time)}
                                                     </p>
@@ -243,16 +243,16 @@ export default function ProfilePage() {
                                     ))}
                                 </div>
                             ) : (
-                                <div className="text-center py-8 text-zinc-500">
-                                    <Calendar className="w-10 h-10 text-zinc-600 mx-auto mb-3" />
-                                    <p className="text-sm text-zinc-400 mb-4">No upcoming bookings.</p>
+                                <div className="text-center py-8 text-muted">
+                                    <Calendar className="w-10 h-10 text-faint mx-auto mb-3" />
+                                    <p className="text-sm text-secondary mb-4">No upcoming bookings.</p>
                                     <Link href="/venues">
                                         <Button variant="outline" size="sm">Find a Court</Button>
                                     </Link>
                                 </div>
                             )}
                             {upcomingBookings.length > 0 && (
-                                <Link href="/bookings" className="block mt-5 text-center text-sm font-bold text-zinc-500 hover:text-white transition-colors">
+                                <Link href="/bookings" className="block mt-5 text-center text-sm font-bold text-muted hover:text-primary transition-colors">
                                     View All Bookings
                                 </Link>
                             )}
@@ -260,16 +260,16 @@ export default function ProfilePage() {
 
                         {/* Gamification Teaser */}
                         <Link href="/challenges" className="block">
-                            <div className="bg-gradient-to-br from-zinc-900 to-black border border-zinc-800 rounded-3xl p-6 relative overflow-hidden group hover:border-emerald-500/50 transition-colors cursor-pointer">
+                            <div className="bg-gradient-to-br from-surface-raised to-surface-base border border-default rounded-3xl p-6 relative overflow-hidden group hover:border-emerald-500/50 transition-colors cursor-pointer">
                                 <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
                                     <Trophy className="w-32 h-32 text-emerald-500" />
                                 </div>
                                 <div className="relative z-10">
-                                    <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
+                                    <h3 className="text-xl font-bold text-primary mb-2 flex items-center gap-2">
                                         <Trophy className="w-5 h-5 text-emerald-500" />
                                         Achievements & Challenges
                                     </h3>
-                                    <p className="text-zinc-400 mb-4 max-w-md">
+                                    <p className="text-secondary mb-4 max-w-md">
                                         Complete daily challenges to earn XP, unlock badges, and climb the tiers.
                                     </p>
                                     <div className="flex items-center gap-4 text-sm font-bold text-emerald-500 group-hover:translate-x-1 transition-transform">
@@ -280,41 +280,41 @@ export default function ProfilePage() {
                         </Link>
 
                         {/* Recent Activity */}
-                        <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-6 backdrop-blur-sm">
-                            <h3 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
-                                <Activity className="w-5 h-5 text-zinc-400" /> Recent Activity
+                        <div className="bg-surface-raised/50 border border-default rounded-3xl p-6 backdrop-blur-sm">
+                            <h3 className="text-lg font-bold text-primary mb-5 flex items-center gap-2">
+                                <Activity className="w-5 h-5 text-secondary" /> Recent Activity
                             </h3>
 
                             <div className="space-y-3">
                                 {bookings.length > 0 ? (
                                     bookings.map((booking) => (
                                         <Link href={`/bookings/${booking.id}`} key={booking.id} className="block">
-                                            <div className="flex items-center gap-4 p-4 rounded-2xl bg-black/40 border border-zinc-800 hover:bg-zinc-800/50 transition-colors group">
-                                                <div className="w-10 h-10 bg-zinc-800 rounded-xl flex items-center justify-center text-zinc-500 text-[10px] font-bold uppercase shrink-0 group-hover:bg-zinc-700 transition-colors">
+                                            <div className="flex items-center gap-4 p-4 rounded-2xl bg-surface-base/40 border border-default hover:bg-surface-overlay/50 transition-colors group">
+                                                <div className="w-10 h-10 bg-surface-overlay rounded-xl flex items-center justify-center text-muted text-[10px] font-bold uppercase shrink-0 group-hover:bg-surface-overlay transition-colors">
                                                     {fmtMonthAbbr(booking.start_time)} {fmtDayNum(booking.start_time)}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <h4 className="text-white font-medium text-sm truncate group-hover:text-emerald-400 transition-colors">
+                                                    <h4 className="text-primary font-medium text-sm truncate group-hover:text-emerald-400 transition-colors">
                                                         {booking.court?.venue_name || "Venue"}
                                                     </h4>
-                                                    <p className="text-xs text-zinc-500 truncate">
+                                                    <p className="text-xs text-muted truncate">
                                                         {booking.court?.name} · {booking.court?.sport_type?.name || booking.sport || "Sport"}
                                                     </p>
                                                 </div>
                                                 <div className="text-right shrink-0">
-                                                    <p className="text-white font-bold text-sm">LKR {booking.total_price.toLocaleString()}</p>
+                                                    <p className="text-primary font-bold text-sm">LKR {booking.total_price.toLocaleString()}</p>
                                                 </div>
                                             </div>
                                         </Link>
                                     ))
                                 ) : (
-                                    <div className="text-center py-8 text-zinc-500">
+                                    <div className="text-center py-8 text-muted">
                                         <p>No recent activity.</p>
                                     </div>
                                 )}
                             </div>
                             {bookings.length > 0 && (
-                                <Link href="/bookings" className="block mt-5 text-center text-sm font-bold text-zinc-400 hover:text-white transition-colors">
+                                <Link href="/bookings" className="block mt-5 text-center text-sm font-bold text-secondary hover:text-primary transition-colors">
                                     View All Bookings
                                 </Link>
                             )}
@@ -322,9 +322,9 @@ export default function ProfilePage() {
 
                         {/* Bio */}
                         {user.bio && (
-                            <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-6 backdrop-blur-sm">
-                                <h3 className="text-lg font-bold text-white mb-4">About Me</h3>
-                                <p className="text-zinc-400 leading-relaxed">{user.bio}</p>
+                            <div className="bg-surface-raised/50 border border-default rounded-3xl p-6 backdrop-blur-sm">
+                                <h3 className="text-lg font-bold text-primary mb-4">About Me</h3>
+                                <p className="text-secondary leading-relaxed">{user.bio}</p>
                             </div>
                         )}
                     </div>
@@ -336,20 +336,20 @@ export default function ProfilePage() {
 
 function StatsCard({ icon, label, value, subtext, fullWidth }: any) {
     return (
-        <div className={`bg-zinc-900/50 border border-zinc-800 rounded-2xl p-5 hover:bg-zinc-800/50 transition-colors ${fullWidth ? 'col-span-2' : ''}`}>
+        <div className={`bg-surface-raised/50 border border-default rounded-2xl p-5 hover:bg-surface-overlay/50 transition-colors ${fullWidth ? 'col-span-2' : ''}`}>
             <div className="flex items-start justify-between mb-3">
-                <div className="p-2 bg-white/5 rounded-lg">{icon}</div>
+                <div className="p-2 bg-tint-hover rounded-lg">{icon}</div>
             </div>
-            <p className="text-2xl font-bold text-white mb-0.5">{value}</p>
-            <p className="text-xs font-bold text-white mb-0.5 opacity-80">{label}</p>
-            <p className="text-xs text-zinc-500 uppercase tracking-wide">{subtext}</p>
+            <p className="text-2xl font-bold text-primary mb-0.5">{value}</p>
+            <p className="text-xs font-bold text-primary mb-0.5 opacity-80">{label}</p>
+            <p className="text-xs text-muted uppercase tracking-wide">{subtext}</p>
         </div>
     )
 }
 
 function MenuLink({ href, icon, label }: any) {
     return (
-        <Link href={href} className="flex items-center justify-between p-4 rounded-2xl hover:bg-white/5 text-zinc-400 hover:text-white transition-colors group">
+        <Link href={href} className="flex items-center justify-between p-4 rounded-2xl hover:bg-tint-hover text-secondary hover:text-primary transition-colors group">
             <span className="flex items-center gap-3 font-medium">
                 <span className="group-hover:text-emerald-500 transition-colors">{icon}</span>
                 {label}

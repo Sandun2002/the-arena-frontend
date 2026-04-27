@@ -113,7 +113,7 @@ function SearchContent() {
     const sportOptions = useMemo(() => ["All", ...sports.map((sport) => sport.name)], [sports]);
 
     return (
-        <main className="min-h-screen bg-black pt-24 pb-20 relative overflow-hidden" ref={containerRef}>
+        <main className="min-h-screen bg-surface-base pt-24 pb-20 relative overflow-hidden" ref={containerRef}>
             <div className="absolute inset-0 pointer-events-none">
                 <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-emerald-500/5 rounded-full blur-[120px]" />
                 <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-[120px]" />
@@ -121,22 +121,22 @@ function SearchContent() {
 
             <div className="container mx-auto px-4 max-w-7xl relative z-10">
                 <div className="mb-8 md:mb-12">
-                    <h1 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tight mb-4">
+                    <h1 className="text-4xl md:text-5xl font-black text-primary uppercase tracking-tight mb-4">
                         Find Your <span className="text-transparent bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text">Court</span>
                     </h1>
-                    <p className="text-zinc-400 max-w-2xl">Search live venue availability by sport, city, and time window.</p>
+                    <p className="text-secondary max-w-2xl">Search live venue availability by sport, city, and time window.</p>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                     <aside className="filter-sidebar lg:col-span-1 space-y-6">
-                        <div className="rounded-[2rem] border border-zinc-800 bg-zinc-900/40 backdrop-blur-sm p-6 sticky top-24">
-                            <div className="flex items-center gap-2 mb-6 text-white font-bold text-lg">
+                        <div className="rounded-[2rem] border border-default bg-surface-raised/40 backdrop-blur-sm p-6 sticky top-24">
+                            <div className="flex items-center gap-2 mb-6 text-primary font-bold text-lg">
                                 <Filter className="h-5 w-5 text-emerald-500" />
                                 Filters
                             </div>
 
                             <div className="mb-6">
-                                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">City</label>
+                                <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-2">City</label>
                                 <CityCombobox
                                     cities={cities}
                                     value={selectedCity}
@@ -189,13 +189,13 @@ function SearchContent() {
                             </div>
 
                             <div className="mb-6">
-                                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Sport</label>
+                                <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-2">Sport</label>
                                 <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
                                     {sportOptions.map((sport) => (
                                         <button
                                             key={sport}
                                             onClick={() => setSelectedSport(sport)}
-                                            className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium transition-all ${selectedSport === sport ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "text-zinc-400 hover:bg-zinc-800 hover:text-white"}`}
+                                            className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium transition-all ${selectedSport === sport ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "text-secondary hover:bg-surface-overlay hover:text-primary"}`}
                                         >
                                             {sport}
                                         </button>
@@ -211,14 +211,14 @@ function SearchContent() {
 
                     <div className="lg:col-span-3 space-y-6">
                         {loading ? (
-                            <div className="rounded-[2rem] border border-zinc-800 bg-zinc-900/40 p-10 text-center text-zinc-500">Loading live availability...</div>
+                            <div className="rounded-[2rem] border border-default bg-surface-raised/40 p-10 text-center text-muted">Loading live availability...</div>
                         ) : selectedCity === "" && results.length === 0 ? (
                             <div className="text-center py-20">
-                                <p className="text-zinc-500 text-lg">Please select a City to view live availability.</p>
+                                <p className="text-muted text-lg">Please select a City to view live availability.</p>
                             </div>
                         ) : results.length === 0 ? (
                             <div className="text-center py-20">
-                                <p className="text-zinc-500 text-lg">No venues found matching your criteria.</p>
+                                <p className="text-muted text-lg">No venues found matching your criteria.</p>
                                 <button onClick={() => { setSelectedCity(""); setSelectedSport("All"); }} className="mt-4 text-emerald-500 hover:underline">Clear Filters</button>
                             </div>
                         ) : (
@@ -233,12 +233,12 @@ function SearchContent() {
                                 }).toString();
 
                                 return (
-                                <div key={venue.venue_id} className="venue-card group rounded-[2rem] border border-zinc-800 bg-zinc-900/40 backdrop-blur-sm overflow-hidden hover:border-emerald-500/30 transition-all duration-300">
+                                <div key={venue.venue_id} className="venue-card group rounded-[2rem] border border-default bg-surface-raised/40 backdrop-blur-sm overflow-hidden hover:border-emerald-500/30 transition-all duration-300">
                                     <div className="grid md:grid-cols-3 gap-0">
-                                        <div className="relative h-48 md:h-auto overflow-hidden bg-zinc-950">
+                                        <div className="relative h-48 md:h-auto overflow-hidden bg-surface-sunken">
                                             <Image src={venue.cover_image || "/images/placeholder.jpg"} alt={venue.venue_name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
                                             {venue.distance_km !== null && (
-                                                <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-white border border-white/10">
+                                                <div className="absolute top-4 left-4 bg-surface-base/60 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-primary border border-glass-border">
                                                     {venue.distance_km.toFixed(1)} km away
                                                 </div>
                                             )}
@@ -247,39 +247,39 @@ function SearchContent() {
                                         <div className="md:col-span-2 p-6 md:p-8">
                                             <div className="flex justify-between items-start mb-4 gap-4">
                                                 <div>
-                                                    <h3 className="text-2xl font-bold text-white mb-1">{venue.venue_name}</h3>
-                                                    <div className="flex items-center gap-2 text-zinc-400 text-sm mb-2">
+                                                    <h3 className="text-2xl font-bold text-primary mb-1">{venue.venue_name}</h3>
+                                                    <div className="flex items-center gap-2 text-secondary text-sm mb-2">
                                                         <MapPin className="h-4 w-4 text-emerald-500" />
                                                         {venue.city}
                                                     </div>
-                                                    <p className="text-sm text-zinc-500">{venue.address}</p>
+                                                    <p className="text-sm text-muted">{venue.address}</p>
                                                 </div>
                                                 <div className="text-right">
                                                     <div className="flex items-center justify-end gap-1 bg-yellow-500/10 px-2 py-1 rounded-lg border border-yellow-500/20">
                                                         <span className="text-yellow-500 font-bold text-sm">★ {(venue.rating || 0).toFixed(1)}</span>
                                                     </div>
-                                                    <p className="mt-2 text-xs text-zinc-500">{venue.review_count} reviews</p>
+                                                    <p className="mt-2 text-xs text-muted">{venue.review_count} reviews</p>
                                                 </div>
                                             </div>
 
                                             <div className="grid sm:grid-cols-3 gap-3 mb-6">
-                                                <div className="rounded-xl border border-zinc-800/60 bg-black/20 p-4">
-                                                    <p className="text-xs font-bold uppercase tracking-wide text-zinc-500">Available Courts</p>
-                                                    <p className="mt-2 text-xl font-bold text-white">{venue.available_courts_count}/{venue.total_courts_count}</p>
+                                                <div className="rounded-xl border border-default/60 bg-surface-base/20 p-4">
+                                                    <p className="text-xs font-bold uppercase tracking-wide text-muted">Available Courts</p>
+                                                    <p className="mt-2 text-xl font-bold text-primary">{venue.available_courts_count}/{venue.total_courts_count}</p>
                                                 </div>
-                                                <div className="rounded-xl border border-zinc-800/60 bg-black/20 p-4">
-                                                    <p className="text-xs font-bold uppercase tracking-wide text-zinc-500">Starting Rate</p>
+                                                <div className="rounded-xl border border-default/60 bg-surface-base/20 p-4">
+                                                    <p className="text-xs font-bold uppercase tracking-wide text-muted">Starting Rate</p>
                                                     <p className="mt-2 text-xl font-bold text-emerald-400">LKR {venue.hourly_rate.toLocaleString()}</p>
                                                 </div>
-                                                <div className="rounded-xl border border-zinc-800/60 bg-black/20 p-4">
-                                                    <p className="text-xs font-bold uppercase tracking-wide text-zinc-500">Amenities</p>
-                                                    <p className="mt-2 text-sm text-zinc-300 line-clamp-2">{venue.amenities.length > 0 ? venue.amenities.join(", ") : "Venue amenities available on details page"}</p>
+                                                <div className="rounded-xl border border-default/60 bg-surface-base/20 p-4">
+                                                    <p className="text-xs font-bold uppercase tracking-wide text-muted">Amenities</p>
+                                                    <p className="mt-2 text-sm text-secondary line-clamp-2">{venue.amenities.length > 0 ? venue.amenities.join(", ") : "Venue amenities available on details page"}</p>
                                                 </div>
                                             </div>
 
                                             <div className="flex justify-between items-center gap-4">
-                                                <p className="text-xs text-zinc-500">Search window: {selectedDate} · {startTime} - {endTime}</p>
-                                                <Link href={`/venues/${venue.venue_id}?${queryStr}`} className="text-sm font-bold text-white hover:text-emerald-400 transition-colors flex items-center gap-1">
+                                                <p className="text-xs text-muted">Search window: {selectedDate} · {startTime} - {endTime}</p>
+                                                <Link href={`/venues/${venue.venue_id}?${queryStr}`} className="text-sm font-bold text-primary hover:text-emerald-400 transition-colors flex items-center gap-1">
                                                     View Venue Details <Search className="h-4 w-4" />
                                                 </Link>
                                             </div>
@@ -298,7 +298,7 @@ function SearchContent() {
 
 export default function SearchPage() {
     return (
-        <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-emerald-500"></div></div>}>
+        <Suspense fallback={<div className="min-h-screen bg-surface-base flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-emerald-500"></div></div>}>
             <SearchContent />
         </Suspense>
     );

@@ -34,21 +34,21 @@ function InviteManagerForm({ venueId, onClose, onSuccess }: { venueId: string, o
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-                <label className="text-xs font-bold text-zinc-500 uppercase">Email Address</label>
+                <label className="text-xs font-bold text-muted uppercase">Email Address</label>
                 <input
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
+                    className="w-full bg-surface-base/50 border border-subtle rounded-xl px-4 py-3 text-primary focus:border-emerald-500 focus:outline-none transition-colors"
                     placeholder="manager@example.com"
                 />
-                <p className="text-xs text-zinc-500">
+                <p className="text-xs text-muted">
                     The user must already have an Arena account before they can be added.
                 </p>
             </div>
 
-            <div className="flex gap-3 pt-4 border-t border-zinc-800">
+            <div className="flex gap-3 pt-4 border-t border-default">
                 <Button type="button" variant="ghost" onClick={onClose} className="flex-1">Cancel</Button>
                 <Button
                     type="submit"
@@ -111,15 +111,15 @@ export default function ManagersPage() {
     if (!currentVenue) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[50vh] text-center pt-24">
-                <Users className="w-12 h-12 text-zinc-600 mb-4" />
-                <h2 className="text-xl font-bold text-white mb-2">No Venue Selected</h2>
-                <p className="text-zinc-400">Please select a venue to manage staff.</p>
+                <Users className="w-12 h-12 text-faint mb-4" />
+                <h2 className="text-xl font-bold text-primary mb-2">No Venue Selected</h2>
+                <p className="text-secondary">Please select a venue to manage staff.</p>
             </div>
         );
     }
 
     return (
-        <main className="min-h-screen bg-black pt-24 pb-12 px-4">
+        <main className="min-h-screen bg-surface-base pt-24 pb-12 px-4">
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
                 <div className="absolute top-20 left-1/4 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-[150px]" />
             </div>
@@ -127,8 +127,8 @@ export default function ManagersPage() {
             <div className="container mx-auto max-w-4xl relative z-10">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                     <div>
-                        <h1 className="text-3xl font-bold text-white mb-2">Venue Staff</h1>
-                        <p className="text-zinc-400">Manage access to <span className="text-emerald-500">{currentVenue.name}</span> dashboard.</p>
+                        <h1 className="text-3xl font-bold text-primary mb-2">Venue Staff</h1>
+                        <p className="text-secondary">Manage access to <span className="text-emerald-500">{currentVenue.name}</span> dashboard.</p>
                     </div>
 
                     <div className="flex items-center gap-4">
@@ -139,17 +139,17 @@ export default function ManagersPage() {
                 </div>
 
                 <div>
-                    <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <h2 className="text-lg font-bold text-primary mb-4 flex items-center gap-2">
                         <Shield className="w-5 h-5 text-emerald-500" /> Active Managers
                     </h2>
                     <div className="space-y-3">
                         {isLoading ? (
-                            <div className="h-20 bg-zinc-900/30 rounded-xl animate-pulse" />
+                            <div className="h-20 bg-surface-raised/30 rounded-xl animate-pulse" />
                         ) : managers.length > 0 ? (
                             managers.map((manager) => (
-                                <div key={manager.id} className="bg-zinc-900/40 border border-zinc-800 rounded-xl p-4 flex justify-between items-center backdrop-blur-sm">
+                                <div key={manager.id} className="bg-surface-raised/40 border border-default rounded-xl p-4 flex justify-between items-center backdrop-blur-sm">
                                     <div className="flex items-center gap-4">
-                                        <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-white font-bold border border-zinc-700">
+                                        <div className="w-10 h-10 rounded-full bg-surface-overlay flex items-center justify-center text-primary font-bold border border-subtle">
                                             {manager.avatar ? (
                                                 <img src={manager.avatar} alt={manager.name} className="w-full h-full object-cover rounded-full" />
                                             ) : (
@@ -157,22 +157,22 @@ export default function ManagersPage() {
                                             )}
                                         </div>
                                         <div>
-                                            <p className="text-white font-medium">{manager.name}</p>
-                                            <p className="text-xs text-zinc-500">{manager.email}</p>
+                                            <p className="text-primary font-medium">{manager.name}</p>
+                                            <p className="text-xs text-muted">{manager.email}</p>
                                             <span className="inline-block mt-1 text-[10px] uppercase font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
                                                 {manager.role}
                                             </span>
                                         </div>
                                     </div>
                                     {manager.user_id !== user.id && (
-                                        <Button size="sm" variant="ghost" onClick={() => handleRemoveManager(manager.user_id)} className="text-zinc-400 hover:text-red-400 hover:bg-red-500/10">
+                                        <Button size="sm" variant="ghost" onClick={() => handleRemoveManager(manager.user_id)} className="text-secondary hover:text-red-400 hover:bg-red-500/10">
                                             <Trash2 className="w-4 h-4 mr-2" /> Remove
                                         </Button>
                                     )}
                                 </div>
                             ))
                         ) : (
-                            <div className="bg-zinc-900/20 border border-zinc-800 border-dashed rounded-xl p-6 text-center text-zinc-500">
+                            <div className="bg-surface-raised/20 border border-default border-dashed rounded-xl p-6 text-center text-muted">
                                 <p className="text-sm">No active managers found. Add someone to help manage this venue.</p>
                             </div>
                         )}

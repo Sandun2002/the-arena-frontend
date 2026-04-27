@@ -34,16 +34,16 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-mt-24 md:scroll-mt-28 border-b border-zinc-800 pb-8 md:pb-10 mb-8 md:mb-10">
+    <section id={id} className="scroll-mt-24 md:scroll-mt-28 border-b border-default pb-8 md:pb-10 mb-8 md:mb-10">
       <p className="text-xs font-bold tracking-[0.18em] uppercase text-emerald-400 mb-2">Section {number}</p>
-      <h2 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-white mb-4 md:mb-5">{title}</h2>
-      <div className="space-y-4 text-zinc-300 leading-7 md:leading-8 text-[14px] md:text-[15px]">{children}</div>
+      <h2 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-primary mb-4 md:mb-5">{title}</h2>
+      <div className="space-y-4 text-secondary leading-7 md:leading-8 text-[14px] md:text-[15px]">{children}</div>
     </section>
   );
 }
 
 function SubHeading({ children }: { children: React.ReactNode }) {
-  return <h3 className="text-white text-base md:text-lg font-bold mt-6 md:mt-7 mb-2">{children}</h3>;
+  return <h3 className="text-primary text-base md:text-lg font-bold mt-6 md:mt-7 mb-2">{children}</h3>;
 }
 
 function BulletList({ children }: { children: React.ReactNode }) {
@@ -52,16 +52,16 @@ function BulletList({ children }: { children: React.ReactNode }) {
 
 function RightCard({ title, description }: { title: string; description: string }) {
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 hover:border-emerald-500/40 transition-colors">
-      <p className="text-white font-bold text-sm mb-2">{title}</p>
-      <p className="text-zinc-400 text-sm leading-6">{description}</p>
+    <div className="rounded-xl border border-default bg-surface-raised/50 p-5 hover:border-emerald-500/40 transition-colors">
+      <p className="text-primary font-bold text-sm mb-2">{title}</p>
+      <p className="text-secondary text-sm leading-6">{description}</p>
     </div>
   );
 }
 
 export default function PrivacyPage() {
   return (
-    <main className="min-h-screen bg-black text-zinc-300 pt-24 md:pt-28 pb-14 md:pb-20 relative">
+    <main className="min-h-screen bg-surface-base text-secondary pt-24 md:pt-28 pb-14 md:pb-20 relative">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 right-0 w-[420px] h-[420px] bg-emerald-500/10 rounded-full blur-[120px]" />
         <div className="absolute bottom-0 left-0 w-[420px] h-[420px] bg-emerald-500/5 rounded-full blur-[120px]" />
@@ -70,13 +70,13 @@ export default function PrivacyPage() {
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-[260px,1fr] gap-6 md:gap-10">
           <aside data-lenis-prevent className="hidden lg:block sticky top-28 h-fit max-h-[calc(100vh-8rem)] overflow-y-auto pr-2">
-            <p className="text-xs text-zinc-500 uppercase tracking-[0.18em] font-bold border-b border-zinc-800 pb-3 mb-4">Contents</p>
+            <p className="text-xs text-muted uppercase tracking-[0.18em] font-bold border-b border-default pb-3 mb-4">Contents</p>
             <nav className="space-y-1">
               {tocItems.map((item) => (
                 <a
                   key={item.id}
                   href={`#${item.id}`}
-                  className="block text-sm text-zinc-500 hover:text-emerald-400 transition-colors"
+                  className="block text-sm text-muted hover:text-emerald-400 transition-colors"
                 >
                   {item.label}
                 </a>
@@ -85,19 +85,19 @@ export default function PrivacyPage() {
           </aside>
 
           <div>
-            <header className="mb-8 md:mb-12 border-b border-zinc-800 pb-8 md:pb-10">
-              <span className="inline-flex px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[11px] font-bold uppercase tracking-wider text-emerald-400">
+            <header className="mb-8 md:mb-12 border-b border-default pb-8 md:pb-10">
+              <span className="inline-flex px-3 py-1 rounded-full bg-surface-raised border border-default text-[11px] font-bold uppercase tracking-wider text-emerald-400">
                 Legal Document
               </span>
-              <h1 className="mt-5 text-3xl sm:text-4xl md:text-6xl font-black tracking-tight text-white">
+              <h1 className="mt-5 text-3xl sm:text-4xl md:text-6xl font-black tracking-tight text-primary">
                 Privacy <span className="text-emerald-500">Policy</span>
               </h1>
-              <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-1 text-sm text-zinc-400">
-                <span>Operated by <span className="text-white font-semibold">Astryx Global (Pvt) Ltd</span></span>
-                <span>Effective: <span className="text-white font-semibold">[INSERT DATE]</span></span>
-                <span>Last Updated: <span className="text-white font-semibold">[INSERT DATE]</span></span>
+              <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-1 text-sm text-secondary">
+                <span>Operated by <span className="text-primary font-semibold">Astryx Global (Pvt) Ltd</span></span>
+                <span>Effective: <span className="text-primary font-semibold">[INSERT DATE]</span></span>
+                <span>Last Updated: <span className="text-primary font-semibold">[INSERT DATE]</span></span>
               </div>
-              <p className="mt-6 border-l-[3px] border-l-emerald-500/50 bg-zinc-900/60 pl-5 pr-4 py-4 leading-7 md:leading-8 text-[14px] md:text-[15px] rounded-r-lg">
+              <p className="mt-6 border-l-[3px] border-l-emerald-500/50 bg-surface-raised/60 pl-5 pr-4 py-4 leading-7 md:leading-8 text-[14px] md:text-[15px] rounded-r-lg">
                 This Privacy Policy explains how The Arena collects, uses, stores, and protects your personal data. It is prepared
                 in compliance with Sri Lanka's <strong>Personal Data Protection Act No. 9 of 2022 (PDPA)</strong> and the
                 <strong> Electronic Transactions Act No. 19 of 2006</strong>. By using the Platform, you agree to the terms of this
@@ -105,17 +105,17 @@ export default function PrivacyPage() {
               </p>
             </header>
 
-            <details className="lg:hidden mb-8 rounded-xl border border-zinc-800 bg-zinc-900/50">
-              <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-white flex items-center justify-between">
+            <details className="lg:hidden mb-8 rounded-xl border border-default bg-surface-raised/50">
+              <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-primary flex items-center justify-between">
                 Jump to Section
-                <span className="text-xs uppercase tracking-wider text-zinc-500">18 items</span>
+                <span className="text-xs uppercase tracking-wider text-muted">18 items</span>
               </summary>
-              <nav data-lenis-prevent className="px-4 pb-4 pt-1 space-y-1 max-h-64 overflow-y-auto border-t border-zinc-800">
+              <nav data-lenis-prevent className="px-4 pb-4 pt-1 space-y-1 max-h-64 overflow-y-auto border-t border-default">
                 {tocItems.map((item) => (
                   <a
                     key={`mobile-${item.id}`}
                     href={`#${item.id}`}
-                    className="block text-sm text-zinc-400 hover:text-emerald-400 transition-colors"
+                    className="block text-sm text-secondary hover:text-emerald-400 transition-colors"
                   >
                     {item.label}
                   </a>
@@ -146,8 +146,8 @@ export default function PrivacyPage() {
                 through the Platform. In our capacity as a marketplace intermediary, we also act as a <strong>Processor</strong> for
                 certain personal data we handle on behalf of Vendors to facilitate bookings.
               </p>
-              <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 space-y-2">
-                <p className="text-white font-bold">Astryx Global (Pvt) Ltd</p>
+              <div className="rounded-2xl border border-default bg-surface-raised/50 p-6 space-y-2">
+                <p className="text-primary font-bold">Astryx Global (Pvt) Ltd</p>
                 <p><strong>Address:</strong> [Registered Address Placeholder]</p>
                 <p><strong>Reg. No.:</strong> [Company Registration No. Placeholder]</p>
                 <p><strong>DPO Email:</strong> [privacy@placeholder.com]</p>
@@ -170,7 +170,7 @@ export default function PrivacyPage() {
             </Section>
 
             <Section id="age" number="04" title="Age Restriction and Eligibility">
-              <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-zinc-200">
+              <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-primary">
                 The Platform is intended exclusively for individuals who are <strong>18 years of age or older</strong>. By using the
                 Platform and providing your personal data, you represent and warrant that you meet this age requirement.
               </div>
@@ -191,25 +191,25 @@ export default function PrivacyPage() {
               <SubHeading>5.1 Account Registration Data</SubHeading>
               <p>When you register an account — whether as a Player or Vendor — we collect:</p>
               <div className="overflow-x-auto">
-                <table className="w-full text-left border border-zinc-800 text-sm">
+                <table className="w-full text-left border border-default text-sm">
                   <thead>
-                    <tr className="bg-zinc-900/70">
-                      <th className="p-3 border border-zinc-800 text-white uppercase text-xs tracking-wider">Data</th>
-                      <th className="p-3 border border-zinc-800 text-white uppercase text-xs tracking-wider">Purpose</th>
+                    <tr className="bg-surface-raised/70">
+                      <th className="p-3 border border-default text-primary uppercase text-xs tracking-wider">Data</th>
+                      <th className="p-3 border border-default text-primary uppercase text-xs tracking-wider">Purpose</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <td className="p-3 border border-zinc-800"><strong>Full Name</strong></td>
-                      <td className="p-3 border border-zinc-800">Identity verification and personalisation</td>
+                      <td className="p-3 border border-default"><strong>Full Name</strong></td>
+                      <td className="p-3 border border-default">Identity verification and personalisation</td>
                     </tr>
                     <tr>
-                      <td className="p-3 border border-zinc-800"><strong>Email Address</strong></td>
-                      <td className="p-3 border border-zinc-800">Account creation, login, booking confirmations, and service communications</td>
+                      <td className="p-3 border border-default"><strong>Email Address</strong></td>
+                      <td className="p-3 border border-default">Account creation, login, booking confirmations, and service communications</td>
                     </tr>
                     <tr>
-                      <td className="p-3 border border-zinc-800"><strong>Phone Number</strong></td>
-                      <td className="p-3 border border-zinc-800">Account verification, booking management, and Vendor communication for confirmed bookings</td>
+                      <td className="p-3 border border-default"><strong>Phone Number</strong></td>
+                      <td className="p-3 border border-default">Account verification, booking management, and Vendor communication for confirmed bookings</td>
                     </tr>
                   </tbody>
                 </table>
@@ -286,29 +286,29 @@ export default function PrivacyPage() {
 
               <SubHeading>8.2 How We Use Cookies</SubHeading>
               <div className="overflow-x-auto">
-                <table className="w-full text-left border border-zinc-800 text-sm">
+                <table className="w-full text-left border border-default text-sm">
                   <thead>
-                    <tr className="bg-zinc-900/70">
-                      <th className="p-3 border border-zinc-800 text-white uppercase text-xs tracking-wider">Cookie Type</th>
-                      <th className="p-3 border border-zinc-800 text-white uppercase text-xs tracking-wider">Purpose</th>
-                      <th className="p-3 border border-zinc-800 text-white uppercase text-xs tracking-wider">Can Be Disabled?</th>
+                    <tr className="bg-surface-raised/70">
+                      <th className="p-3 border border-default text-primary uppercase text-xs tracking-wider">Cookie Type</th>
+                      <th className="p-3 border border-default text-primary uppercase text-xs tracking-wider">Purpose</th>
+                      <th className="p-3 border border-default text-primary uppercase text-xs tracking-wider">Can Be Disabled?</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <td className="p-3 border border-zinc-800"><strong>Strictly Necessary</strong></td>
-                      <td className="p-3 border border-zinc-800">Essential for login sessions and secure Platform access</td>
-                      <td className="p-3 border border-zinc-800">No</td>
+                      <td className="p-3 border border-default"><strong>Strictly Necessary</strong></td>
+                      <td className="p-3 border border-default">Essential for login sessions and secure Platform access</td>
+                      <td className="p-3 border border-default">No</td>
                     </tr>
                     <tr>
-                      <td className="p-3 border border-zinc-800"><strong>Functional</strong></td>
-                      <td className="p-3 border border-zinc-800">Remembers your preferences and display settings</td>
-                      <td className="p-3 border border-zinc-800">Yes</td>
+                      <td className="p-3 border border-default"><strong>Functional</strong></td>
+                      <td className="p-3 border border-default">Remembers your preferences and display settings</td>
+                      <td className="p-3 border border-default">Yes</td>
                     </tr>
                     <tr>
-                      <td className="p-3 border border-zinc-800"><strong>Analytics (Google Analytics)</strong></td>
-                      <td className="p-3 border border-zinc-800">Collects anonymised data on how users interact with the Platform to help us improve the experience</td>
-                      <td className="p-3 border border-zinc-800">Yes</td>
+                      <td className="p-3 border border-default"><strong>Analytics (Google Analytics)</strong></td>
+                      <td className="p-3 border border-default">Collects anonymised data on how users interact with the Platform to help us improve the experience</td>
+                      <td className="p-3 border border-default">Yes</td>
                     </tr>
                   </tbody>
                 </table>
@@ -352,7 +352,7 @@ export default function PrivacyPage() {
             </Section>
 
             <Section id="sharing" number="10" title="Disclosure and Sharing of Personal Data">
-              <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-zinc-200">
+              <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-primary">
                 We do not sell, rent, or trade your personal data to third parties for their own commercial or marketing purposes.
               </div>
               <p>We may share your personal data only in the following strictly defined circumstances:</p>
@@ -403,33 +403,33 @@ export default function PrivacyPage() {
                 including to comply with legal, accounting, or reporting obligations.
               </p>
               <div className="overflow-x-auto">
-                <table className="w-full text-left border border-zinc-800 text-sm">
+                <table className="w-full text-left border border-default text-sm">
                   <thead>
-                    <tr className="bg-zinc-900/70">
-                      <th className="p-3 border border-zinc-800 text-white uppercase text-xs tracking-wider">Data Type</th>
-                      <th className="p-3 border border-zinc-800 text-white uppercase text-xs tracking-wider">Retention Period</th>
+                    <tr className="bg-surface-raised/70">
+                      <th className="p-3 border border-default text-primary uppercase text-xs tracking-wider">Data Type</th>
+                      <th className="p-3 border border-default text-primary uppercase text-xs tracking-wider">Retention Period</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <td className="p-3 border border-zinc-800"><strong>Active Account Data</strong></td>
-                      <td className="p-3 border border-zinc-800">Duration of active account registration</td>
+                      <td className="p-3 border border-default"><strong>Active Account Data</strong></td>
+                      <td className="p-3 border border-default">Duration of active account registration</td>
                     </tr>
                     <tr>
-                      <td className="p-3 border border-zinc-800"><strong>Booking & Transaction Records</strong></td>
-                      <td className="p-3 border border-zinc-800">As required by Sri Lankan statutory obligations (tax, financial record-keeping)</td>
+                      <td className="p-3 border border-default"><strong>Booking & Transaction Records</strong></td>
+                      <td className="p-3 border border-default">As required by Sri Lankan statutory obligations (tax, financial record-keeping)</td>
                     </tr>
                     <tr>
-                      <td className="p-3 border border-zinc-800"><strong>Post-Deletion Personal Data</strong></td>
-                      <td className="p-3 border border-zinc-800"><strong>90 days</strong> from the date the deletion request is processed, then permanently deleted</td>
+                      <td className="p-3 border border-default"><strong>Post-Deletion Personal Data</strong></td>
+                      <td className="p-3 border border-default"><strong>90 days</strong> from the date the deletion request is processed, then permanently deleted</td>
                     </tr>
                     <tr>
-                      <td className="p-3 border border-zinc-800"><strong>Location Data</strong></td>
-                      <td className="p-3 border border-zinc-800"><strong>Not retained</strong> — processed in real-time and immediately discarded</td>
+                      <td className="p-3 border border-default"><strong>Location Data</strong></td>
+                      <td className="p-3 border border-default"><strong>Not retained</strong> — processed in real-time and immediately discarded</td>
                     </tr>
                     <tr>
-                      <td className="p-3 border border-zinc-800"><strong>Anonymised / Aggregated Data</strong></td>
-                      <td className="p-3 border border-zinc-800">Retained indefinitely for analytical purposes</td>
+                      <td className="p-3 border border-default"><strong>Anonymised / Aggregated Data</strong></td>
+                      <td className="p-3 border border-default">Retained indefinitely for analytical purposes</td>
                     </tr>
                   </tbody>
                 </table>
@@ -571,8 +571,8 @@ export default function PrivacyPage() {
                 If you have any questions, concerns, or complaints regarding this Privacy Policy or our data processing practices, or
                 if you wish to exercise any of the rights described in Section 13, please contact our Data Protection Officer:
               </p>
-              <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 space-y-2">
-                <p className="text-white font-bold">Data Protection Officer — Astryx Global (Pvt) Ltd</p>
+              <div className="rounded-2xl border border-default bg-surface-raised/50 p-6 space-y-2">
+                <p className="text-primary font-bold">Data Protection Officer — Astryx Global (Pvt) Ltd</p>
                 <p><strong>Address:</strong> [Full Registered Address Placeholder]</p>
                 <p><strong>Email:</strong> [privacy@placeholder.com]</p>
                 <p><strong>Phone:</strong> [+94 XX XXX XXXX]</p>
@@ -582,7 +582,7 @@ export default function PrivacyPage() {
                 within such other period as required by the PDPA. If you are not satisfied with our response, you have the right to
                 lodge a complaint with the relevant data protection authority in Sri Lanka.
               </p>
-              <p className="text-xs text-zinc-500 pt-3">
+              <p className="text-xs text-muted pt-3">
                 For platform usage terms, see <Link href="/terms" className="text-emerald-400 hover:text-emerald-300">Terms of Service</Link>.
               </p>
             </Section>

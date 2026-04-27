@@ -81,8 +81,8 @@ function ToastItem({ type, message, onDismiss }: Toast & { onDismiss: () => void
             style={{ minWidth: "300px", maxWidth: "400px" }}
         >
             {icons[type]}
-            <p className="flex-1 text-sm font-medium text-white">{message}</p>
-            <button onClick={onDismiss} className="text-zinc-400 hover:text-white transition-colors">
+            <p className="flex-1 text-sm font-medium text-primary">{message}</p>
+            <button onClick={onDismiss} className="text-secondary hover:text-primary transition-colors">
                 <X className="w-4 h-4" />
             </button>
         </div>

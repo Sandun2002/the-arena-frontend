@@ -31,27 +31,27 @@ export default function ForgotPasswordPage() {
     };
 
     return (
-        <main className="min-h-screen bg-black flex items-center justify-center p-4">
+        <main className="min-h-screen bg-surface-base flex items-center justify-center p-4">
             <div className="w-full max-w-md">
-                <Link href="/login" className="mb-8 inline-flex items-center text-sm text-zinc-500 hover:text-white transition-colors">
+                <Link href="/login" className="mb-8 inline-flex items-center text-sm text-muted hover:text-primary transition-colors">
                     <ArrowLeft className="mr-2 h-4 w-4" /> Back to Login
                 </Link>
 
-                <div className="rounded-3xl border border-zinc-800 bg-zinc-900/50 p-8 backdrop-blur-xl shadow-2xl">
-                    <h1 className="text-2xl font-bold text-white mb-2">Reset Password</h1>
-                    <p className="text-zinc-400 mb-6">Enter your email to receive recovery instructions.</p>
+                <div className="rounded-3xl border border-default bg-surface-raised/50 p-8 backdrop-blur-xl shadow-2xl">
+                    <h1 className="text-2xl font-bold text-primary mb-2">Reset Password</h1>
+                    <p className="text-secondary mb-6">Enter your email to receive recovery instructions.</p>
 
                     {!isSent ? (
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="space-y-2">
-                                <label className="block text-xs font-bold text-zinc-500 uppercase">Email Address</label>
+                                <label className="block text-xs font-bold text-muted uppercase">Email Address</label>
                                 <div className="relative group">
-                                    <Mail className="absolute left-4 top-3.5 h-5 w-5 text-zinc-500 group-focus-within:text-emerald-500 transition-colors" />
+                                    <Mail className="absolute left-4 top-3.5 h-5 w-5 text-muted group-focus-within:text-emerald-500 transition-colors" />
                                     <input
                                         type="email"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        className="w-full rounded-xl border border-zinc-700 bg-black/50 pl-12 pr-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition-colors"
+                                        className="w-full rounded-xl border border-subtle bg-surface-base/50 pl-12 pr-4 py-3 text-primary focus:border-emerald-500 focus:outline-none transition-colors"
                                         placeholder="john@example.com"
                                         required
                                     />
@@ -71,9 +71,9 @@ export default function ForgotPasswordPage() {
                             <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <Mail className="w-8 h-8 text-emerald-500" />
                             </div>
-                            <h3 className="text-xl font-bold text-white mb-2">Check your email</h3>
-                            <p className="text-zinc-400 text-sm mb-6">
-                                We have sent a password reset link to <span className="text-white font-bold">{email}</span>.
+                            <h3 className="text-xl font-bold text-primary mb-2">Check your email</h3>
+                            <p className="text-secondary text-sm mb-6">
+                                We have sent a password reset link to <span className="text-primary font-bold">{email}</span>.
                             </p>
                             <Button
                                 onClick={() => setIsSent(false)}
