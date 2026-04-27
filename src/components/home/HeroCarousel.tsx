@@ -199,7 +199,7 @@ export default function HeroCarousel({ venues }: HeroCarouselProps) {
                 willChange: "transform, opacity",
               }}
             >
-              <HeroVenueCard venue={venue} isActive={offset === 0} priority={offset === 0} />
+              <HeroVenueCard venue={venue} isActive={offset === 0} priority={Math.abs(offset) <= 1} />
             </div>
           );
         })}
@@ -216,7 +216,7 @@ export default function HeroCarousel({ venues }: HeroCarouselProps) {
                 type="button"
                 aria-label={`Show venue ${i + 1}`}
                 onClick={() => goTo(i)}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
+                className={`p-3 -m-1.5 rounded-full transition-all duration-300 ${
                   activeDot
                     ? "w-6 bg-emerald-500 shadow-[0_0_10px_rgba(80,200,120,0.6)]"
                     : "w-1.5 bg-subtle hover:bg-secondary"

@@ -101,7 +101,7 @@ export default function SportExplorer() {
   // pass the single copy of each row straight through.
 
   return (
-    <section ref={sectionRef} className="py-10 md:py-14 bg-surface-base overflow-hidden">
+    <section ref={sectionRef} className="py-10 md:py-14 bg-surface-base overflow-hidden min-h-[420px] md:min-h-[520px]">
       <div className="container mx-auto px-4 max-w-7xl">
         {/* Header — unchanged, clean */}
         <div className="sport-header mb-6 md:mb-8">

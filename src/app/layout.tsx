@@ -61,6 +61,7 @@ export default async function RootLayout({
             suppressHydrationWarning silences the attribute mismatch React
             would otherwise log when content has been mutated pre-hydration. */}
         <meta name="theme-color" content="#050505" suppressHydrationWarning />
+        <link rel="preconnect" href="https://api.thearena.lk" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://api.thearena.lk" />
         {/* PWA / iOS */}
         <meta name="apple-mobile-web-app-capable" content="yes" />

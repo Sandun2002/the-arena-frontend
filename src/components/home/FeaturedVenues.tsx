@@ -33,7 +33,7 @@ export default function FeaturedVenues() {
         <div className="flex justify-between items-end mb-12">
           <div>
             <h2 className="text-3xl md:text-4xl font-bold text-primary mb-2">
-              Trending <span className="text-emerald-500">Arenas</span>
+              Trending <span className="text-brand-accent">Arenas</span>
             </h2>
             <p className="text-secondary">Most booked arenas in the last two weeks.</p>
           </div>

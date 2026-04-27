@@ -64,6 +64,7 @@ export default function HeroVenueCard({ venue, isActive, priority }: HeroVenueCa
           fill
           sizes="(max-width: 768px) 280px, 400px"
           priority={priority}
+          fetchPriority={priority ? "high" : undefined}
           className="object-cover"
         />
       </div>

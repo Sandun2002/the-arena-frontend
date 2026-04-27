@@ -29,7 +29,7 @@ export default function VenueCard({ venue, searchParams }: VenueCardProps) {
           src={venue.cover_image || "/sports/futsal.png"}
           alt={venue.name}
           fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
           className="object-cover transition-transform duration-700 group-hover:scale-110"
         />
         {/* Gradient Overlay for text readability */}
@@ -69,7 +69,7 @@ export default function VenueCard({ venue, searchParams }: VenueCardProps) {
             </span>
           </div>
 
-          <span className="flex items-center gap-2 text-sm font-bold text-emerald-500 transition-transform group-hover:translate-x-1">
+          <span className="flex items-center gap-2 text-sm font-bold text-brand-accent transition-transform group-hover:translate-x-1">
             Details <ArrowRight className="h-4 w-4" />
           </span>
         </div>

@@ -16,7 +16,7 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="space-y-4">
             <h3 className="text-lg font-bold text-primary">
-              THE <span className="text-emerald-500">ARENA</span>
+              THE <span className="text-brand-accent">ARENA</span>
             </h3>
             <p className="text-sm">
               Premium sports venue booking for athletes who demand the best.
@@ -27,9 +27,9 @@ export default function Footer() {
           <div>
             <h4 className="mb-4 font-semibold text-primary">Company</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/about" className="hover:text-emerald-400">About Us</Link></li>
-              <li><Link href="/partner" className="hover:text-emerald-400">Partner</Link></li>
-              <li><Link href="/careers" className="hover:text-emerald-400">Careers</Link></li>
+              <li><Link href="/about" className="hover:text-brand-accent-hover">About Us</Link></li>
+              <li><Link href="/partner" className="hover:text-brand-accent-hover">Partner</Link></li>
+              <li><Link href="/careers" className="hover:text-brand-accent-hover">Careers</Link></li>
             </ul>
           </div>
 
@@ -37,9 +37,9 @@ export default function Footer() {
           <div>
             <h4 className="mb-4 font-semibold text-primary">Support</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/help" className="hover:text-emerald-400">Help Center</Link></li>
-              <li><Link href="/terms" className="hover:text-emerald-400">Terms of Service</Link></li>
-              <li><Link href="/privacy" className="hover:text-emerald-400">Privacy Policy</Link></li>
+              <li><Link href="/help" className="hover:text-brand-accent-hover">Help Center</Link></li>
+              <li><Link href="/terms" className="hover:text-brand-accent-hover">Terms of Service</Link></li>
+              <li><Link href="/privacy" className="hover:text-brand-accent-hover">Privacy Policy</Link></li>
             </ul>
           </div>
 
@@ -47,13 +47,13 @@ export default function Footer() {
           <div>
             <h4 className="mb-4 font-semibold text-primary">Follow Us</h4>
             <div className="flex gap-4">
-              <Link href="#" aria-label="Follow us on Instagram" className="hover:text-emerald-400 transition-colors">
+              <Link href="#" aria-label="Follow us on Instagram" className="hover:text-brand-accent-hover transition-colors">
                 <Instagram className="h-5 w-5" />
               </Link>
-              <Link href="#" aria-label="Follow us on Twitter" className="hover:text-emerald-400 transition-colors">
+              <Link href="#" aria-label="Follow us on Twitter" className="hover:text-brand-accent-hover transition-colors">
                 <Twitter className="h-5 w-5" />
               </Link>
-              <Link href="#" aria-label="Follow us on LinkedIn" className="hover:text-emerald-400 transition-colors">
+              <Link href="#" aria-label="Follow us on LinkedIn" className="hover:text-brand-accent-hover transition-colors">
                 <Linkedin className="h-5 w-5" />
               </Link>
             </div>

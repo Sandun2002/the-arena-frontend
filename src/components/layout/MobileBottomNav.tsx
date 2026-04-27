@@ -41,7 +41,7 @@ function NavItem({
         className={`text-[9.5px] font-semibold tracking-tight transition-colors duration-300 leading-none ${
           isActive
             ? "text-emerald-400"
-            : "text-faint group-hover:text-muted"
+            : "text-muted group-hover:text-secondary"
         }`}
       >
         {label}
@@ -117,7 +117,7 @@ export default function MobileBottomNav() {
             <div className="flex flex-col items-center justify-end pb-2">
               <span
                 className={`text-[9.5px] font-semibold tracking-tight leading-none transition-colors duration-300 ${
-                  exploreActive ? "text-emerald-400" : "text-faint"
+                  exploreActive ? "text-emerald-400" : "text-muted"
                 }`}
               >
                 Explore

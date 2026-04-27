@@ -210,7 +210,7 @@ export default function MarqueeRow({
         ))}
         {/* Second copy — aria-hidden so screen readers don't repeat content. */}
         {childArray.map((child, i) => (
-          <div key={`b-${i}`} className="flex-shrink-0" aria-hidden="true">
+          <div key={`b-${i}`} className="flex-shrink-0" aria-hidden="true" tabIndex={-1} {...({ inert: "true" } as any)}>
             {child}
           </div>
         ))}

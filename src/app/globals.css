@@ -14,6 +14,10 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
+  /* Brand Accent — adapts to theme for WCAG AA contrast */
+  --color-brand-accent: var(--brand-accent);
+  --color-brand-accent-hover: var(--brand-accent-hover);
+
   /* Emerald Palette */
   --color-emerald-400: #5ede4a;
   --color-emerald-500: #50C878; /* Primary Brand Color */
@@ -76,6 +80,9 @@
 /* ── Theme token values: DARK (default) ─────────────────────────────── */
 html,
 html.dark {
+  --brand-accent: #50C878;
+  --brand-accent-hover: #5ede4a;
+
   /* Surfaces */
   --surface-base: #050505;
   --surface-raised: #18181b;
@@ -130,6 +137,9 @@ html.dark {
 
 /* ── Theme token values: LIGHT ──────────────────────────────────────── */
 html.light {
+  --brand-accent: #047857;
+  --brand-accent-hover: #059669;
+
   /* Surfaces */
   --surface-base: #ffffff;
   --surface-raised: #f4f4f5;
@@ -611,6 +621,7 @@ html.light .marquee-track:has(.sport-card:hover) .sport-card:not(:hover) {
 
 /* Elite — fire conic ring */
 .tier-ring-elite {
+  contain: layout style;
   background: conic-gradient(
     from var(--frame-angle),
     #ef4444 0%, #f97316 20%, #fbbf24 38%, #f97316 56%, #dc2626 78%, #ef4444 100%
@@ -620,6 +631,7 @@ html.light .marquee-track:has(.sport-card:hover) .sport-card:not(:hover) {
 
 /* Legend — arcane conic ring */
 .tier-ring-legend {
+  contain: layout style;
   background: conic-gradient(
     from var(--frame-angle),
     #8b5cf6 0%, #3b82f6 22%, #a78bfa 44%, #60a5fa 66%, #c4b5fd 84%, #8b5cf6 100%
@@ -629,6 +641,7 @@ html.light .marquee-track:has(.sport-card:hover) .sport-card:not(:hover) {
 
 /* Icon — celestial rainbow conic ring */
 .tier-ring-icon {
+  contain: layout style;
   background: conic-gradient(
     from var(--frame-angle),
     #f59e0b 0%, #fde68a 12%, #ffffff 25%, #fbbf24 38%,
@@ -642,24 +655,25 @@ html.light .marquee-track:has(.sport-card:hover) .sport-card:not(:hover) {
   0%, 100% { box-shadow: 0 0 32px #ef4444aa, 0 0 64px #f9731644; }
   50%       { box-shadow: 0 0 52px #ef4444cc, 0 0 96px #f9731666, 0 0 8px #fbbf2455; }
 }
-.tier-glow-elite { animation: tier-pulse-fire 2s ease-in-out infinite; }
+.tier-glow-elite { animation: tier-pulse-fire 2s ease-in-out infinite; will-change: filter; }
 
 /* Glow pulse — Legend */
 @keyframes tier-pulse-arcane {
   0%, 100% { box-shadow: 0 0 40px #8b5cf6cc, 0 0 80px #3b82f644; }
   50%       { box-shadow: 0 0 64px #8b5cf6ff, 0 0 120px #3b82f666, 0 0 10px #c4b5fd55; }
 }
-.tier-glow-legend { animation: tier-pulse-arcane 2.5s ease-in-out infinite; }
+.tier-glow-legend { animation: tier-pulse-arcane 2.5s ease-in-out infinite; will-change: filter; }
 
 /* Glow pulse — Icon */
 @keyframes tier-pulse-celestial {
   0%, 100% { box-shadow: 0 0 20px #f59e0bcc, 0 0 60px #f59e0b55, 0 0 100px #ffffff22; }
   50%       { box-shadow: 0 0 36px #f59e0bff, 0 0 90px #f59e0b77, 0 0 150px #ffffff33, 0 0 8px #fde68a; }
 }
-.tier-glow-icon { animation: tier-pulse-celestial 3s ease-in-out infinite; }
+.tier-glow-icon { animation: tier-pulse-celestial 3s ease-in-out infinite; will-change: filter; }
 
 /* Titan — platinum / diamond ice ring */
 .tier-ring-titan {
+  contain: layout style;
   background: conic-gradient(
     from var(--frame-angle),
     #7dd3fc 0%, #bae6fd 10%, #ffffff 20%, #e0f2fe 30%,
@@ -674,5 +688,5 @@ html.light .marquee-track:has(.sport-card:hover) .sport-card:not(:hover) {
   0%, 100% { box-shadow: 0 0 44px #bae6fdcc, 0 0 88px #7dd3fc55, 0 0 130px #e0f2fe22; }
   50%       { box-shadow: 0 0 68px #ffffffcc, 0 0 110px #bae6fd77, 0 0 170px #7dd3fc44, 0 0 12px #ffffffaa; }
 }
-.tier-glow-titan { animation: tier-pulse-titan 2s ease-in-out infinite; }
+.tier-glow-titan { animation: tier-pulse-titan 2s ease-in-out infinite; will-change: filter; }
 
