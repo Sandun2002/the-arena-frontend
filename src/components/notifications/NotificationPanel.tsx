@@ -109,6 +109,7 @@ export function NotificationPanel() {
   } = useNotifications();
 
   const { isVenueOwner, isVenueManager } = useAuth();
+  const router = useRouter();
   const panelRef = useRef<HTMLDivElement>(null);
 
   const showBusinessTab = isVenueOwner || isVenueManager;
@@ -235,13 +236,12 @@ export function NotificationPanel() {
 
       {/* Footer */}
       <div className="px-4 py-2.5 border-t border-default/60">
-        <a
-          href="/settings/notifications"
+        <button
           className="text-xs text-muted hover:text-primary transition-colors"
-          onClick={closePanel}
+          onClick={() => { closePanel(); router.push("/settings/notifications"); }}
         >
           Notification settings →
-        </a>
+        </button>
       </div>
     </div>
   );
