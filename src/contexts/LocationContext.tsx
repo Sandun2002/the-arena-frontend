@@ -5,6 +5,7 @@ import {
   useContext,
   useState,
   useCallback,
+  useRef,
   ReactNode,
 } from "react";
 
@@ -28,21 +29,36 @@ export function LocationProvider({ children }: { children: ReactNode }) {
   const [locState, setLocState] = useState<LocationState>("idle");
   const [locName, setLocName] = useState<string | null>(null);
   const [coords, setCoords] = useState<Coords | null>(null);
+  const fallbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearFallbackTimer = useCallback(() => {
+    if (fallbackTimerRef.current) {
+      clearTimeout(fallbackTimerRef.current);
+      fallbackTimerRef.current = null;
+    }
+  }, []);
 
   const requestLocation = useCallback(() => {
     if (typeof navigator === "undefined" || !navigator.geolocation) return;
     if (locState === "loading") return;
 
+    clearFallbackTimer();
     setLocState("loading");
 
     // Dual-callback guard for Chrome/Windows behaviour
     let succeeded = false;
     let errorTimer: ReturnType<typeof setTimeout> | null = null;
 
+    // Fallback: if neither callback fires (e.g. prompt dismissed), reset after 10s
+    fallbackTimerRef.current = setTimeout(() => {
+      setLocState("idle");
+    }, 10000);
+
     navigator.geolocation.getCurrentPosition(
       async ({ coords: pos }) => {
         succeeded = true;
         if (errorTimer) clearTimeout(errorTimer);
+        clearFallbackTimer();
 
         const { latitude, longitude } = pos;
         setCoords({ lat: latitude, lng: longitude });
@@ -71,18 +87,20 @@ export function LocationProvider({ children }: { children: ReactNode }) {
       () => {
         errorTimer = setTimeout(() => {
           if (succeeded) return;
+          clearFallbackTimer();
           setLocState("denied");
-        }, 2000);
+        }, 500);
       },
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 600_000 }
     );
-  }, [locState]);
+  }, [locState, clearFallbackTimer]);
 
   const clearLocation = useCallback(() => {
+    clearFallbackTimer();
     setLocState("idle");
     setLocName(null);
     setCoords(null);
-  }, []);
+  }, [clearFallbackTimer]);
 
   return (
     <LocationContext.Provider
