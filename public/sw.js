@@ -43,8 +43,8 @@ self.addEventListener('push', (event) => {
   const title = data.title || 'TheArena.lk';
   const options = {
     body: data.body || '',
-    icon: '/icons/icon-192x192.png',
-    badge: '/icons/badge-72x72.png',
+    icon: '/android-chrome-192x192.png',
+    badge: '/badge-72x72.png',
     tag: data.tag || data.type || 'arena-notification',
     data: { action_url: data.action_url || '/' },
     requireInteraction: false,
