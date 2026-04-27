@@ -136,7 +136,7 @@ export function NotificationPanel() {
         "flex flex-col min-h-0",
         "bg-surface-raised border border-default shadow-2xl",
         "md:rounded-2xl md:w-[380px] md:max-h-[580px]",
-        "w-full flex-1 rounded-t-2xl"
+        "w-full max-h-[85vh] rounded-t-2xl overflow-hidden"
       )}
       onClick={(e) => e.stopPropagation()}
     >
@@ -248,7 +248,7 @@ export function NotificationPanel() {
         className="md:hidden fixed inset-0 z-[200] flex flex-col justify-end bg-black/50 backdrop-blur-sm animate-in fade-in-0 duration-150"
         onClick={closePanel}
       >
-        <div className="flex flex-col max-h-[85vh] animate-in slide-in-from-bottom-4 duration-200">
+        <div className="flex flex-col animate-in slide-in-from-bottom-4 duration-200">
           {panelContent}
         </div>
       </div>
