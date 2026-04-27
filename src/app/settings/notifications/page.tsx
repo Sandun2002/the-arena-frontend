@@ -19,7 +19,7 @@ export default function NotificationSettingsPage() {
   if (loading || !isLoggedIn) return null;
 
   return (
-    <div className="min-h-screen bg-surface-base py-12 px-4">
+    <div className="min-h-screen bg-surface-base px-4 pb-12 pt-24 md:pt-32">
       <div className="max-w-2xl mx-auto space-y-8">
         {/* Header */}
         <div>
