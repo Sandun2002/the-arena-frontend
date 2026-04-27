@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { X, Check, CheckCheck, Trash2, ExternalLink, Bell, BellOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useNotifications } from "@/contexts/NotificationContext";
@@ -113,6 +114,9 @@ export function NotificationPanel() {
 
   const showBusinessTab = isVenueOwner || isVenueManager;
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   useEffect(() => {
     if (!panelOpen) return;
     const handleEsc = (e: KeyboardEvent) => { if (e.key === "Escape") closePanel(); };
@@ -120,7 +124,7 @@ export function NotificationPanel() {
     return () => document.removeEventListener("keydown", handleEsc);
   }, [panelOpen, closePanel]);
 
-  if (!panelOpen) return null;
+  if (!panelOpen || !mounted) return null;
 
   const filteredNotifications = notifications.filter(
     (n) => n.role_context === activeTab
@@ -241,19 +245,23 @@ export function NotificationPanel() {
     </div>
   );
 
+  const mobileOverlay = (
+    <div
+      className="md:hidden fixed inset-0 z-[200] flex flex-col justify-end bg-black/50 backdrop-blur-sm animate-in fade-in-0 duration-150"
+      onClick={closePanel}
+    >
+      <div className="flex flex-col animate-in slide-in-from-bottom-4 duration-200">
+        {panelContent}
+      </div>
+    </div>
+  );
+
   return (
     <>
-      {/* Mobile: full-screen backdrop + bottom sheet */}
-      <div
-        className="md:hidden fixed inset-0 z-[200] flex flex-col justify-end bg-black/50 backdrop-blur-sm animate-in fade-in-0 duration-150"
-        onClick={closePanel}
-      >
-        <div className="flex flex-col animate-in slide-in-from-bottom-4 duration-200">
-          {panelContent}
-        </div>
-      </div>
+      {/* Mobile: portal to body to escape backdrop-filter containing block on MobileTopBar */}
+      {createPortal(mobileOverlay, document.body)}
 
-      {/* Desktop: dropdown */}
+      {/* Desktop: dropdown anchored to bell */}
       <div className="hidden md:block absolute right-0 top-full mt-2 z-50 animate-in fade-in-0 slide-in-from-top-2 duration-150">
         <div className="fixed inset-0 z-[-1]" onClick={closePanel} />
         {panelContent}
