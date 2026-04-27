@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { X, Check, CheckCheck, Trash2, ExternalLink, Bell, BellOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useNotifications } from "@/contexts/NotificationContext";
@@ -61,13 +61,13 @@ function NotificationItem({
         </p>
       </div>
       <div
-        className="absolute right-3 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center gap-1"
+        className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 sm:flex"
         onClick={(e) => e.stopPropagation()}
       >
         {!notification.is_read && (
           <button
             onClick={() => onMarkRead(notification.id)}
-            className="p-1 rounded text-muted hover:text-emerald-500 hover:bg-emerald-500/20 transition-colors"
+            className="p-1.5 rounded text-muted hover:text-emerald-500 hover:bg-emerald-500/20 transition-colors"
             aria-label="Mark as read"
           >
             <Check size={13} />
@@ -76,7 +76,7 @@ function NotificationItem({
         {notification.action_url && (
           <button
             onClick={() => { if (notification.action_url) window.open(notification.action_url, "_self"); }}
-            className="p-1 rounded text-muted hover:text-primary hover:bg-surface-overlay transition-colors"
+            className="p-1.5 rounded text-muted hover:text-primary hover:bg-surface-overlay transition-colors"
             aria-label="Open"
           >
             <ExternalLink size={13} />
@@ -84,7 +84,7 @@ function NotificationItem({
         )}
         <button
           onClick={() => onDelete(notification.id)}
-          className="p-1 rounded text-muted hover:text-red-500 hover:bg-red-500/20 transition-colors"
+          className="p-1.5 rounded text-muted hover:text-red-500 hover:bg-red-500/20 transition-colors"
           aria-label="Delete"
         >
           <Trash2 size={13} />
@@ -110,20 +110,8 @@ export function NotificationPanel() {
 
   const { isVenueOwner, isVenueManager } = useAuth();
   const router = useRouter();
-  const panelRef = useRef<HTMLDivElement>(null);
 
   const showBusinessTab = isVenueOwner || isVenueManager;
-
-  useEffect(() => {
-    if (!panelOpen) return;
-    const handleClickOutside = (e: MouseEvent) => {
-      if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
-        closePanel();
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [panelOpen, closePanel]);
 
   useEffect(() => {
     if (!panelOpen) return;
@@ -142,15 +130,15 @@ export function NotificationPanel() {
   const handleMarkRead = (id: string) => markRead([id]);
   const handleDelete = (id: string) => deleteNotification(id);
 
-  return (
+  const panelContent = (
     <div
-      ref={panelRef}
       className={cn(
-        "absolute right-0 top-full mt-2 z-50",
-        "w-[380px] max-h-[580px] flex flex-col",
-        "bg-surface-raised border border-default rounded-2xl shadow-2xl",
-        "animate-in fade-in-0 slide-in-from-top-2 duration-150"
+        "flex flex-col",
+        "bg-surface-raised border border-default shadow-2xl",
+        "md:rounded-2xl md:w-[380px] md:max-h-[580px]",
+        "w-full max-h-[85vh] rounded-t-2xl"
       )}
+      onClick={(e) => e.stopPropagation()}
     >
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-default">
@@ -235,7 +223,7 @@ export function NotificationPanel() {
       </div>
 
       {/* Footer */}
-      <div className="px-4 py-2.5 border-t border-default/60">
+      <div className="px-4 py-3 border-t border-default/60">
         <button
           className="text-xs text-muted hover:text-primary transition-colors"
           onClick={() => { closePanel(); router.push("/settings/notifications"); }}
@@ -244,5 +232,25 @@ export function NotificationPanel() {
         </button>
       </div>
     </div>
+  );
+
+  return (
+    <>
+      {/* Mobile: full-screen backdrop + bottom sheet */}
+      <div
+        className="md:hidden fixed inset-0 z-50 flex flex-col justify-end bg-black/50 backdrop-blur-sm animate-in fade-in-0 duration-150"
+        onClick={closePanel}
+      >
+        <div className="animate-in slide-in-from-bottom-4 duration-200">
+          {panelContent}
+        </div>
+      </div>
+
+      {/* Desktop: dropdown */}
+      <div className="hidden md:block absolute right-0 top-full mt-2 z-50 animate-in fade-in-0 slide-in-from-top-2 duration-150">
+        <div className="fixed inset-0 z-[-1]" onClick={closePanel} />
+        {panelContent}
+      </div>
+    </>
   );
 }
