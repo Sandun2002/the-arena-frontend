@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { Bell, BellOff, Smartphone, Mail, Monitor, Check } from "lucide-react";
+import { Bell, BellOff, Smartphone, Mail, Monitor, Check, AlertCircle, Loader2 } from "lucide-react";
 import { useNotifications } from "@/contexts/NotificationContext";
 import { useAuth } from "@/services/authContext";
 import { NotificationPreferenceItem } from "@/services/notificationService";
@@ -130,8 +130,16 @@ function PreferencesSkeleton() {
 }
 
 export function NotificationPreferences() {
-  const { preferences, updatePreferences, pushEnabled, pushSupported, requestPushPermission, disablePush } =
-    useNotifications();
+  const {
+    preferences,
+    updatePreferences,
+    pushEnabled,
+    pushSupported,
+    pushAvailable,
+    pushPermission,
+    requestPushPermission,
+    disablePush,
+  } = useNotifications();
   const { isVenueOwner, isVenueManager } = useAuth();
 
   const isBusiness = isVenueOwner || isVenueManager;
@@ -239,27 +247,14 @@ export function NotificationPreferences() {
         </div>
       </div>
 
-      {/* Device push toggle */}
-      {pushSupported && (
-        <div className="bg-surface-raised border border-default rounded-2xl p-5">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3 min-w-0">
-              <Smartphone size={18} className="text-secondary shrink-0" />
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-primary">Push Notifications on This Device</p>
-                <p className="text-xs text-muted mt-0.5">
-                  {pushEnabled
-                    ? "Real-time push notifications are enabled on this device."
-                    : "Enable real-time browser push notifications for this device."}
-                </p>
-              </div>
-            </div>
-            <ToggleSwitch
-              checked={pushEnabled}
-              onChange={(v) => (v ? requestPushPermission() : disablePush())}
-            />
-          </div>
-        </div>
+      {/* Device push — context-aware: hidden if unsupported/unavailable */}
+      {pushSupported && pushAvailable && (
+        <DevicePushCard
+          pushEnabled={pushEnabled}
+          permission={pushPermission}
+          onEnable={requestPushPermission}
+          onDisable={disablePush}
+        />
       )}
 
       {/* Per-type preferences */}
@@ -354,6 +349,83 @@ function ChannelHeader({ icon, label }: { icon: React.ReactNode; label: string }
     <div className="flex flex-col items-center gap-0.5 w-9" aria-hidden="true">
       <span className="text-faint">{icon}</span>
       <span className="text-[9px] uppercase tracking-wider text-faint">{label}</span>
+    </div>
+  );
+}
+
+function DevicePushCard({
+  pushEnabled,
+  permission,
+  onEnable,
+  onDisable,
+}: {
+  pushEnabled: boolean;
+  permission: "default" | "granted" | "denied" | "unsupported";
+  onEnable: () => Promise<boolean>;
+  onDisable: () => Promise<void>;
+}) {
+  const [busy, setBusy] = useState(false);
+
+  // Permission denied at the browser level — we cannot re-prompt programmatically.
+  if (permission === "denied") {
+    return (
+      <div className="bg-surface-raised border border-amber-500/30 rounded-2xl p-5">
+        <div className="flex items-start gap-3">
+          <AlertCircle size={18} className="text-amber-500 shrink-0 mt-0.5" />
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-primary">Push Blocked in Browser</p>
+            <p className="text-xs text-muted mt-1">
+              Your browser is blocking push notifications for this site. To enable them, click the
+              lock icon in the address bar, set <strong>Notifications</strong> to <strong>Allow</strong>,
+              then reload this page.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const handleClick = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      if (pushEnabled) await onDisable();
+      else await onEnable();
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="bg-surface-raised border border-default rounded-2xl p-5">
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3 min-w-0">
+          <Smartphone size={18} className="text-secondary shrink-0" />
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-primary">Push Notifications on This Device</p>
+            <p className="text-xs text-muted mt-0.5">
+              {pushEnabled
+                ? "Real-time push notifications are enabled on this device."
+                : "Get real-time alerts on this browser even when the tab is closed."}
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={handleClick}
+          disabled={busy}
+          className={cn(
+            "shrink-0 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors",
+            pushEnabled
+              ? "bg-surface-sunken hover:bg-surface-overlay text-primary border border-default"
+              : "bg-emerald-600 hover:bg-emerald-500 text-white",
+            busy && "opacity-60 cursor-wait"
+          )}
+        >
+          {busy && <Loader2 size={12} className="animate-spin" />}
+          {pushEnabled ? "Disable on This Device" : "Enable Push"}
+        </button>
+      </div>
     </div>
   );
 }

@@ -17,6 +17,8 @@ import { useAuth } from "@/services/authContext";
 
 const POLL_INTERVAL_MS = 30_000; // 30 seconds
 
+type PushPermission = "default" | "granted" | "denied" | "unsupported";
+
 interface NotificationContextType {
   notifications: AppNotification[];
   unreadCount: number;
@@ -25,6 +27,8 @@ interface NotificationContextType {
   activeTab: "player" | "business" | "system";
   pushEnabled: boolean;
   pushSupported: boolean;
+  pushAvailable: boolean; // server VAPID configured + browser supports
+  pushPermission: PushPermission;
   preferences: NotificationPreferences | null;
   openPanel: () => void;
   closePanel: () => void;
@@ -54,6 +58,8 @@ export const NotificationProvider: FunctionComponent<{
   const [activeTab, setActiveTab] = useState<"player" | "business" | "system">("player");
   const [pushEnabled, setPushEnabled] = useState(false);
   const [pushSupported, setPushSupported] = useState(false);
+  const [pushAvailable, setPushAvailable] = useState(false);
+  const [pushPermission, setPushPermission] = useState<PushPermission>("default");
   const [preferences, setPreferences] = useState<NotificationPreferences | null>(null);
 
   const pollTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -145,13 +151,21 @@ export const NotificationProvider: FunctionComponent<{
 
   // ── Push subscription ────────────────────────────────────────────────────────
   const requestPushPermission = useCallback(async (): Promise<boolean> => {
-    if (!pushSupport) return false;
+    if (!pushSupport) {
+      setPushPermission("unsupported");
+      return false;
+    }
     try {
       const permission = await Notification.requestPermission();
+      setPushPermission(permission as PushPermission);
       if (permission !== "granted") return false;
 
       const { vapid_public_key, enabled } = await notificationService.getVapidPublicKey();
-      if (!enabled || !vapid_public_key) return false;
+      if (!enabled || !vapid_public_key) {
+        setPushAvailable(false);
+        return false;
+      }
+      setPushAvailable(true);
 
       const reg = swRegRef.current || await navigator.serviceWorker.ready;
       swRegRef.current = reg;
@@ -194,13 +208,30 @@ export const NotificationProvider: FunctionComponent<{
 
   // ── Detect push state on mount ───────────────────────────────────────────────
   useEffect(() => {
-    if (!pushSupport) return;
+    if (!pushSupport) {
+      setPushSupported(false);
+      setPushPermission("unsupported");
+      setPushAvailable(false);
+      return;
+    }
     setPushSupported(true);
-    navigator.serviceWorker.ready.then(async (reg) => {
-      swRegRef.current = reg;
-      const sub = await reg.pushManager.getSubscription();
-      setPushEnabled(!!sub);
-    }).catch(() => {});
+    setPushPermission((Notification.permission as PushPermission) ?? "default");
+
+    // Check VAPID availability on the server
+    notificationService
+      .getVapidPublicKey()
+      .then(({ enabled, vapid_public_key }) => {
+        setPushAvailable(!!enabled && !!vapid_public_key);
+      })
+      .catch(() => setPushAvailable(false));
+
+    navigator.serviceWorker.ready
+      .then(async (reg) => {
+        swRegRef.current = reg;
+        const sub = await reg.pushManager.getSubscription();
+        setPushEnabled(!!sub);
+      })
+      .catch(() => {});
   }, [pushSupport]);
 
   // ── Init + polling ───────────────────────────────────────────────────────────
@@ -231,6 +262,8 @@ export const NotificationProvider: FunctionComponent<{
         activeTab,
         pushEnabled,
         pushSupported,
+        pushAvailable,
+        pushPermission,
         preferences,
         openPanel,
         closePanel,
