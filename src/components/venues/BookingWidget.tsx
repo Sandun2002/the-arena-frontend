@@ -3,7 +3,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { Venue } from "@/types";
 import Button from "@/components/ui/Button";
 import DatePicker from "@/components/ui/DatePicker";
-import { Check, LogIn, Loader2, Calendar, Hammer, Zap } from "lucide-react";
+import { Check, LogIn, Loader2, Calendar, Hammer, Zap, AlertCircle, RefreshCw } from "lucide-react";
 import { useAuth } from "@/services/authContext";
 import { api } from "@/services/api";
 import { bookingService } from "@/services/bookingService";
@@ -41,6 +41,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
   } | null>(null);
 
   const [loadingSlots, setLoadingSlots] = useState(false);
+  const [slotsError, setSlotsError] = useState(false);
   const [pricing, setPricing] = useState<any>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -57,6 +58,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
   const loadSlots = () => {
     if (!venue?.id || !date) return;
     setLoadingSlots(true);
+    setSlotsError(false);
     api.getVenueSlots(venue.id, date)
       .then((res: any) => {
         setIsVenueClosed(res.is_closed || false);
@@ -123,7 +125,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
           setHasAutoSelected(true);
         }
       })
-      .catch(console.error)
+      .catch((err) => { console.error(err); setSlotsError(true); })
       .finally(() => setLoadingSlots(false));
   };
 
@@ -320,7 +322,11 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
               </button>
             ))}
             {loadingSlots && courtsData.length === 0 && (
-              <span className="py-2 px-4 text-xs text-muted">Loading...</span>
+              <>
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="flex-shrink-0 min-w-[120px] h-8 rounded-md bg-surface-overlay animate-pulse" />
+                ))}
+              </>
             )}
             {!loadingSlots && courtsData.length === 0 && (
               <span className="py-2 px-4 text-xs text-muted">No courts available</span>
@@ -384,7 +390,22 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
       ) : (
         <div className="grid grid-cols-4 gap-2 mb-8 min-h-[120px]">
           {loadingSlots ? (
-            <div className="col-span-4 flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin text-emerald-500" /></div>
+            <>
+              {Array.from({ length: 16 }).map((_, i) => (
+                <div key={i} className="h-9 rounded-lg bg-surface-raised border border-default/30 animate-pulse" />
+              ))}
+            </>
+          ) : slotsError ? (
+            <div className="col-span-4 flex flex-col items-center justify-center gap-3 py-6 text-sm text-muted">
+              <AlertCircle className="w-5 h-5 text-red-400" />
+              <span>Failed to load availability.</span>
+              <button
+                onClick={loadSlots}
+                className="inline-flex items-center gap-1.5 text-emerald-400 font-bold hover:underline text-xs"
+              >
+                <RefreshCw className="w-3.5 h-3.5" /> Retry
+              </button>
+            </div>
           ) : (
             timeSlots.map((slot: any) => {
               const isSelected = selectedSlots.some(s => s.start === slot.start);

@@ -16,7 +16,8 @@ import {
     Loader2,
     Sparkles,
     Locate,
-    Check
+    Check,
+    AlertCircle
 } from "lucide-react";
 
 interface CourtFinderPanelProps {
@@ -30,6 +31,8 @@ export default function CourtFinderPanel({ onSearch, initialSport = "All", initi
     // Dynamic sports from API
     const [sports, setSports] = useState<Sport[]>([]);
     const [loadingSports, setLoadingSports] = useState(true);
+    const [sportsError, setSportsError] = useState(false);
+    const [retryCount, setRetryCount] = useState(0);
 
     const [selectedSport, setSelectedSport] = useState(initialSport);
     const [selectedDate, setSelectedDate] = useState("");
@@ -70,19 +73,21 @@ export default function CourtFinderPanel({ onSearch, initialSport = "All", initi
                 ]);
                 setSports(sportsData);
                 setAvailableCities(citiesData);
+                setSportsError(false);
                 // Default to first city only if no initial city provided
                 if (!initialCity && citiesData.length > 0) {
                     setLocation(citiesData[0].name);
                 }
             } catch (error) {
                 console.error("Error loading initial data:", error);
+                setSportsError(true);
             } finally {
                 setLoadingSports(false);
                 setLoadingCities(false);
             }
         };
         loadInitialData();
-    }, [initialCity]);
+    }, [initialCity, retryCount]);
 
     // Sync location context → panel state
     useEffect(() => {
@@ -238,8 +243,24 @@ export default function CourtFinderPanel({ onSearch, initialSport = "All", initi
                             </h3>
 
                             {loadingSports ? (
-                                <div className="flex items-center justify-center py-12">
-                                    <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
+                                <div className="flex md:grid md:grid-cols-5 gap-3 md:gap-4 overflow-x-auto md:overflow-visible pb-4 md:pb-0 -mx-2 px-2 md:mx-0 md:px-0">
+                                    {[1,2,3,4,5].map((i) => (
+                                        <div
+                                            key={i}
+                                            className="flex-shrink-0 w-[110px] h-[100px] md:w-auto md:h-[110px] rounded-xl bg-surface-raised border border-default/30 animate-pulse"
+                                        />
+                                    ))}
+                                </div>
+                            ) : sportsError ? (
+                                <div className="flex items-center justify-center gap-3 py-8 text-sm text-muted">
+                                    <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+                                    <span>Failed to load sports.</span>
+                                    <button
+                                        onClick={() => { setSportsError(false); setLoadingSports(true); setRetryCount(c => c + 1); }}
+                                        className="text-emerald-400 font-bold hover:underline"
+                                    >
+                                        Retry
+                                    </button>
                                 </div>
                             ) : (
                                 <div className="flex md:grid md:grid-cols-5 gap-3 md:gap-4 overflow-x-auto md:overflow-visible pb-4 md:pb-0 snap-x snap-mandatory scrollbar-hide -mx-2 px-2 md:mx-0 md:px-0">
