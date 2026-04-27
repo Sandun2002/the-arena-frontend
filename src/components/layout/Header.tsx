@@ -7,6 +7,8 @@ import Image from "next/image";
 import { useState } from "react";
 import Button from "../ui/Button";
 import { Menu, X, User, LogOut, Calendar, Settings, Shield } from "lucide-react";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
+import { NotificationPanel } from "@/components/notifications/NotificationPanel";
 import { useAuth } from "@/services/authContext";
 import VenueSwitcher from "@/components/venue/VenueSwitcher";
 import TierFrame from "@/components/ui/TierFrame";
@@ -73,6 +75,12 @@ export default function Header() {
           {isLoggedIn ? (
             <div className="flex items-center gap-4">
 
+              {/* Notification Bell */}
+              <div className="relative">
+                <NotificationBell />
+                <NotificationPanel />
+              </div>
+
               {/* Context Switcher Link */}
               {!isVenueContext && (isVenueOwner || isVenueManager) && (
                 <Link href="/venue-dashboard">
@@ -118,6 +126,9 @@ export default function Header() {
                         </Link>
                         <Link href="/settings/sessions" className="flex items-center gap-2 px-3 py-2 text-sm text-secondary hover:text-primary hover:bg-surface-overlay rounded-lg transition-colors">
                           <Shield className="w-4 h-4" /> Security
+                        </Link>
+                        <Link href="/settings/notifications" className="flex items-center gap-2 px-3 py-2 text-sm text-secondary hover:text-primary hover:bg-surface-overlay rounded-lg transition-colors">
+                          <Settings className="w-4 h-4" /> Notifications
                         </Link>
                       </div>
                       <div className="p-2 border-t border-default">

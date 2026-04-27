@@ -28,6 +28,50 @@ self.addEventListener("activate", (event) => {
   );
 });
 
+// ─── Push Notification Handlers ────────────────────────────────────────────────
+
+self.addEventListener('push', (event) => {
+  if (!event.data) return;
+
+  let data = {};
+  try {
+    data = event.data.json();
+  } catch {
+    data = { title: 'TheArena.lk', body: event.data.text() };
+  }
+
+  const title = data.title || 'TheArena.lk';
+  const options = {
+    body: data.body || '',
+    icon: '/icons/icon-192x192.png',
+    badge: '/icons/badge-72x72.png',
+    tag: data.tag || data.type || 'arena-notification',
+    data: { action_url: data.action_url || '/' },
+    requireInteraction: false,
+  };
+
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = (event.notification.data && event.notification.data.action_url) || '/';
+  const fullUrl = new URL(url, self.location.origin).href;
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      for (const client of clientList) {
+        if (client.url === fullUrl && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      if (clients.openWindow) {
+        return clients.openWindow(fullUrl);
+      }
+    })
+  );
+});
+
 // ── Fetch: routing strategy ───────────────────────────────────────────────────
 self.addEventListener("fetch", (event) => {
   const { request } = event;

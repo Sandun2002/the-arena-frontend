@@ -6,8 +6,12 @@ import { usePathname } from "next/navigation";
 import { MapPin, Loader2, MapPinOff } from "lucide-react";
 import { useLocation } from "@/contexts/LocationContext";
 import ThemeToggle from "@/components/ui/ThemeToggle";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
+import { NotificationPanel } from "@/components/notifications/NotificationPanel";
+import { useAuth } from "@/services/authContext";
 
 export default function MobileTopBar() {
+  const { isLoggedIn } = useAuth();
   const pathname = usePathname();
   const { locState, locName, requestLocation } = useLocation();
 
@@ -80,9 +84,15 @@ export default function MobileTopBar() {
           />
         </Link>
 
-        {/* Right: Location Pill + Theme Toggle */}
+        {/* Right: Location Pill + Notification Bell + Theme Toggle */}
         <div className="flex items-center gap-2">
           <LocationPill />
+          {isLoggedIn && (
+            <div className="relative">
+              <NotificationBell className="h-8 w-8" />
+              <NotificationPanel />
+            </div>
+          )}
           <ThemeToggle className="h-8 w-8" size={15} />
         </div>
       </div>
