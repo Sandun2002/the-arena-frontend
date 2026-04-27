@@ -132,18 +132,18 @@ function PreferencesSkeleton() {
 export function NotificationPreferences() {
   const { preferences, updatePreferences, pushEnabled, pushSupported, requestPushPermission, disablePush } =
     useNotifications();
-  const { isCustomer, isVenueOwner, isVenueManager } = useAuth();
+  const { isVenueOwner, isVenueManager } = useAuth();
 
   const isBusiness = isVenueOwner || isVenueManager;
-  // Always show player groups when user has customer role; show business groups only for owners/managers.
+  // Every account is a player by default (any user can book courts).
+  // Player groups are shown to everyone; Business groups only to owners/managers.
   const visibleGroups = useMemo<GroupDef[]>(
     () =>
       GROUPED_TYPES.filter((g) => {
-        if (g.audience === "player") return isCustomer;
         if (g.audience === "business") return isBusiness;
-        return true; // system/security: everyone
+        return true; // player + system/security: everyone
       }),
-    [isCustomer, isBusiness]
+    [isBusiness]
   );
 
   const [mute, setMute] = useState(false);
@@ -216,28 +216,28 @@ export function NotificationPreferences() {
   if (!preferences) return <PreferencesSkeleton />;
 
   return (
-    <div className="space-y-6 pb-24">
-      {/* Global mute — only meaningful for users with player role */}
-      {isCustomer && (
-        <div className="bg-surface-raised border border-default rounded-2xl p-5">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3 min-w-0">
-              {mute ? (
-                <BellOff size={18} className="text-muted shrink-0" />
-              ) : (
-                <Bell size={18} className="text-emerald-500 shrink-0" />
-              )}
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-primary">Mute Player Notifications</p>
-                <p className="text-xs text-muted mt-0.5">
-                  Suppress all push and in-app notifications for player activity (bookings, XP, etc.)
-                </p>
-              </div>
+    <div className="space-y-6">
+      {/* Global mute — every account is a player by default; owners/managers can suppress player-side noise */}
+      <div className="bg-surface-raised border border-default rounded-2xl p-5">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            {mute ? (
+              <BellOff size={18} className="text-muted shrink-0" />
+            ) : (
+              <Bell size={18} className="text-emerald-500 shrink-0" />
+            )}
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-primary">Mute Player Notifications</p>
+              <p className="text-xs text-muted mt-0.5">
+                {isBusiness
+                  ? "Suppress all player-side push and in-app notifications (bookings, XP, etc.). Business notifications stay on."
+                  : "Suppress all push and in-app notifications for player activity (bookings, XP, etc.)."}
+              </p>
             </div>
-            <ToggleSwitch checked={mute} onChange={setMute} />
           </div>
+          <ToggleSwitch checked={mute} onChange={setMute} />
         </div>
-      )}
+      </div>
 
       {/* Device push toggle */}
       {pushSupported && (
@@ -317,35 +317,33 @@ export function NotificationPreferences() {
         );
       })}
 
-      {/* Sticky save bar */}
+      {/* Inline save bar — sits in normal flow above the footer */}
       <div
-        className={cn(
-          "fixed bottom-0 left-0 right-0 z-30 border-t border-default bg-surface-base/95 backdrop-blur-md transition-transform duration-200",
-          isDirty || saved ? "translate-y-0" : "translate-y-full"
-        )}
+        className="rounded-2xl border border-default bg-surface-raised p-4 flex items-center justify-between gap-3"
         role="region"
         aria-label="Save preferences"
       >
-        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-          <span className="text-sm text-muted">
-            {saved ? (
-              <span className="inline-flex items-center gap-1.5 text-emerald-500">
-                <Check size={14} /> Preferences saved
-              </span>
-            ) : isDirty ? (
-              "You have unsaved changes."
-            ) : (
-              ""
-            )}
-          </span>
-          <button
-            onClick={handleSave}
-            disabled={saving || !isDirty}
-            className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {saving ? "Saving..." : "Save Preferences"}
-          </button>
-        </div>
+        <span className="text-sm text-muted min-w-0 truncate">
+          {saved ? (
+            <span className="inline-flex items-center gap-1.5 text-emerald-500">
+              <Check size={14} /> Preferences saved
+            </span>
+          ) : isDirty ? (
+            <span className="inline-flex items-center gap-1.5 text-amber-500">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+              You have unsaved changes.
+            </span>
+          ) : (
+            "All changes saved."
+          )}
+        </span>
+        <button
+          onClick={handleSave}
+          disabled={saving || !isDirty}
+          className="shrink-0 px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {saving ? "Saving..." : "Save Preferences"}
+        </button>
       </div>
     </div>
   );
