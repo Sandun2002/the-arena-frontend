@@ -459,10 +459,10 @@ select:focus {
 
 /* Light-mode override: don't crush brightness as aggressively (looks harsh
    over a white surround). Saturation drop is enough to communicate "resting". */
-html.light .sport-card { filter: grayscale(70%) brightness(0.92); }
+html.light .sport-card { filter: grayscale(30%) brightness(1); }
 html.light .marquee-track:has(.sport-card:hover) .sport-card:not(:hover) {
-  filter: grayscale(100%) brightness(0.7);
-  opacity: 0.6;
+  filter: grayscale(80%) brightness(0.85);
+  opacity: 0.55;
 }
 
 .sport-card .sport-corner {

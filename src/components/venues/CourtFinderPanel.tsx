@@ -297,7 +297,7 @@ export default function CourtFinderPanel({ onSearch, initialSport = "All", initi
                                                 <span
                                                     className={`
                                                         relative z-10 px-3 pb-2.5 text-xs md:text-sm font-bold transition-all duration-300 leading-tight truncate w-full text-shadow-sm
-                                                        ${isSelected ? 'text-emerald-300' : 'text-primary'}
+                                                        ${isSelected ? 'text-emerald-300' : 'text-white'}
                                                     `}
                                                 >
                                                     {sport.name}

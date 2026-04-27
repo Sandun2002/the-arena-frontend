@@ -124,7 +124,7 @@ export default function ProfilePage() {
                                 <div className="h-3 bg-surface-overlay rounded-full overflow-hidden p-0.5 border border-subtle/50">
                                     <div
                                         className={`h-full bg-gradient-to-r ${tierStyle.bar} rounded-full transition-all duration-1000 ease-out`}
-                                        style={{ width: `${tierXpProgress}%`, boxShadow: "0 0 10px rgba(255,255,255,0.1)" }}
+                                        style={{ width: `${tierXpProgress}%`, boxShadow: "0 0 10px rgba(80,200,120,0.25)" }}
                                     ></div>
                                 </div>
                                 <p className="text-xs text-muted mt-2 text-right">
@@ -175,7 +175,7 @@ export default function ProfilePage() {
                         </div>
 
                         {/* Menu */}
-                        <div className="bg-surface-raised/50 border border-default rounded-3xl p-2 backdrop-blur-sm">
+                        <div className="bg-surface-raised dark:bg-surface-raised/50 border border-default rounded-3xl p-2 backdrop-blur-sm">
                             {(isVenueOwner || isVenueManager) && (
                                 <MenuLink href="/venue-dashboard" icon={<LayoutDashboard className="w-4 h-4" />} label="Manager Dashboard" />
                             )}
@@ -198,7 +198,7 @@ export default function ProfilePage() {
                     <div className="lg:col-span-2 space-y-6">
 
                         {/* Upcoming Games — merged from /dashboard */}
-                        <div className="bg-surface-raised/50 border border-default rounded-3xl p-6 backdrop-blur-sm">
+                        <div className="bg-surface-raised dark:bg-surface-raised/50 border border-default rounded-3xl p-6 backdrop-blur-sm">
                             <div className="flex justify-between items-center mb-5">
                                 <h3 className="text-lg font-bold text-primary flex items-center gap-2">
                                     <Calendar className="w-5 h-5 text-emerald-400" /> Upcoming Games
@@ -214,7 +214,7 @@ export default function ProfilePage() {
                                 <div className="space-y-3">
                                     {upcomingBookings.map(booking => (
                                         <Link href={`/bookings/${booking.id}`} key={booking.id} className="block group">
-                                            <div className="flex items-center gap-4 p-4 rounded-2xl bg-surface-base/40 border border-default hover:border-emerald-500/30 hover:bg-surface-overlay/50 transition-all">
+                                            <div className="flex items-center gap-4 p-4 rounded-2xl bg-surface-base/80 dark:bg-surface-base/40 border border-default hover:border-emerald-500/30 hover:bg-surface-overlay dark:hover:bg-surface-overlay/50 transition-all">
                                                 <div className="w-12 h-12 bg-surface-overlay rounded-xl flex flex-col items-center justify-center shrink-0 border border-subtle group-hover:border-emerald-500/30 transition-colors">
                                                     <span className="text-[9px] font-bold text-muted uppercase">{fmtMonthAbbr(booking.start_time)}</span>
                                                     <span className="text-lg font-black text-primary leading-none">{fmtDayNum(booking.start_time)}</span>
@@ -280,7 +280,7 @@ export default function ProfilePage() {
                         </Link>
 
                         {/* Recent Activity */}
-                        <div className="bg-surface-raised/50 border border-default rounded-3xl p-6 backdrop-blur-sm">
+                        <div className="bg-surface-raised dark:bg-surface-raised/50 border border-default rounded-3xl p-6 backdrop-blur-sm">
                             <h3 className="text-lg font-bold text-primary mb-5 flex items-center gap-2">
                                 <Activity className="w-5 h-5 text-secondary" /> Recent Activity
                             </h3>
@@ -289,7 +289,7 @@ export default function ProfilePage() {
                                 {bookings.length > 0 ? (
                                     bookings.map((booking) => (
                                         <Link href={`/bookings/${booking.id}`} key={booking.id} className="block">
-                                            <div className="flex items-center gap-4 p-4 rounded-2xl bg-surface-base/40 border border-default hover:bg-surface-overlay/50 transition-colors group">
+                                            <div className="flex items-center gap-4 p-4 rounded-2xl bg-surface-base/80 dark:bg-surface-base/40 border border-default hover:bg-surface-overlay dark:hover:bg-surface-overlay/50 transition-colors group">
                                                 <div className="w-10 h-10 bg-surface-overlay rounded-xl flex items-center justify-center text-muted text-[10px] font-bold uppercase shrink-0 group-hover:bg-surface-overlay transition-colors">
                                                     {fmtMonthAbbr(booking.start_time)} {fmtDayNum(booking.start_time)}
                                                 </div>

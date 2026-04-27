@@ -174,7 +174,7 @@ function ChallengeCard({ challenge, achievement, catConfig, animated }: {
                         {catConfig.icon} {catConfig.label}
                     </span>
                     {isPermanent && (
-                        <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[10px] font-black tracking-widest text-amber-300 uppercase">
+                        <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[10px] font-black tracking-widest text-amber-500 uppercase">
                             <InfinityIcon className="h-2.5 w-2.5" /> Permanent
                         </span>
                     )}
@@ -469,8 +469,8 @@ export default function ChallengesPage() {
                                                 : isNext
                                                     ? `${t.color}55`
                                                     : isUnlocked
-                                                        ? "rgba(63,63,70,0.7)"
-                                                        : "rgba(39,39,42,0.5)",
+                                                        ? "var(--border-default)"
+                                                        : "var(--border-faint)",
                                             boxShadow: isCurrent
                                                 ? `0 0 36px ${t.color}30, 0 0 0 1px ${t.color}44, inset 0 1px 0 ${t.color}22`
                                                 : isNext
@@ -512,7 +512,7 @@ export default function ChallengesPage() {
 
                                         {/* Name */}
                                         <span className="text-sm font-black"
-                                            style={{ color: isCurrent ? t.color : isNext ? "#a1a1aa" : isUnlocked ? "#d4d4d8" : "#3f3f46" }}>
+                                            style={{ color: isCurrent ? t.color : isNext ? "var(--text-secondary)" : isUnlocked ? "var(--text-muted)" : "var(--text-faint)" }}>
                                             {t.name}
                                         </span>
 
@@ -548,7 +548,7 @@ export default function ChallengesPage() {
 
                                         {/* Locked */}
                                         {!isUnlocked && !isNext && (
-                                            <span className="text-[10px] text-zinc-800">🔒</span>
+                                            <span className="text-[10px] text-faint">🔒</span>
                                         )}
                                     </div>
                                 );
@@ -567,9 +567,9 @@ export default function ChallengesPage() {
                                 onClick={() => setSelectedCategory(cat.key)}
                                 className="flex-shrink-0 flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold transition-all duration-200"
                                 style={{
-                                    background: isActive ? `${cat.tabBg}22` : "rgba(24,24,27,0.7)",
-                                    borderColor: isActive ? `${cat.tabBg}55` : "rgba(63,63,70,1)",
-                                    color: isActive ? "white" : "rgba(255,255,255,0.65)",
+                                    background: isActive ? `${cat.tabBg}22` : "var(--surface-raised)",
+                                    borderColor: isActive ? `${cat.tabBg}55` : "var(--border-subtle)",
+                                    color: isActive ? "var(--text-primary)" : "var(--text-secondary)",
                                 }}>
                                 <span>{cat.icon}</span>
                                 <span className="whitespace-nowrap">{cat.label}</span>
