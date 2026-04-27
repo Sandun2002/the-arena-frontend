@@ -9,9 +9,11 @@ import ThemeToggle from "@/components/ui/ThemeToggle";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { NotificationPanel } from "@/components/notifications/NotificationPanel";
 import { useAuth } from "@/services/authContext";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function MobileTopBar() {
   const { isLoggedIn } = useAuth();
+  const { resolvedTheme } = useTheme();
   const pathname = usePathname();
   const { locState, locName, requestLocation } = useLocation();
 
@@ -75,7 +77,7 @@ export default function MobileTopBar() {
         {/* Left: Logo */}
         <Link href="/" className="shrink-0">
           <Image
-            src="/logo-nav.png"
+            src={resolvedTheme === "dark" ? "/logo-nav.png" : "/logo-nav-for-light-mode.png"}
             alt="The Arena"
             width={144}
             height={63}

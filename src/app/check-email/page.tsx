@@ -4,10 +4,12 @@ import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Mail, RefreshCw, CheckCircle, ArrowRight } from "lucide-react";
+import { useTheme } from "@/contexts/ThemeContext";
 
 function CheckEmailContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { resolvedTheme } = useTheme();
   const email = searchParams.get("email") || "";
   const [isResending, setIsResending] = useState(false);
   const [resendStatus, setResendStatus] = useState<"idle" | "success" | "error">("idle");
@@ -51,7 +53,7 @@ function CheckEmailContent() {
       <div className="relative z-10 w-full max-w-md">
         <div className="text-center mb-10">
           <Link href="/" className="inline-block group">
-            <img src="/logo-full.png" alt="The Arena" className="h-20 w-auto mx-auto object-contain drop-shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-transform group-hover:scale-105" />
+            <img src={resolvedTheme === "dark" ? "/logo-full.png" : "/logo-full-for-light-mode.png"} alt="The Arena" className="h-20 w-auto mx-auto object-contain drop-shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-transform group-hover:scale-105" />
           </Link>
         </div>
 

@@ -9,6 +9,7 @@ import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
 import { useToast } from "@/components/ui/Toast";
 import { useGoogleLogin } from "@react-oauth/google";
+import { useTheme } from "@/contexts/ThemeContext";
 
 function LoginContent() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -16,6 +17,7 @@ function LoginContent() {
   const searchParams = useSearchParams();
   const { login, loginWithGoogle } = useAuth();
   const { addToast } = useToast();
+  const { resolvedTheme } = useTheme();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -130,7 +132,7 @@ function LoginContent() {
       <div className="login-card w-full max-w-md relative z-10">
         <div className="text-center mb-8">
           <Link href="/" className="inline-block mb-6 group">
-            <img src="/logo-full.png" alt="The Arena" className="h-20 w-auto mx-auto object-contain drop-shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-transform group-hover:scale-105" />
+            <img src={resolvedTheme === "dark" ? "/logo-full.png" : "/logo-full-for-light-mode.png"} alt="The Arena" className="h-20 w-auto mx-auto object-contain drop-shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-transform group-hover:scale-105" />
           </Link>
           <h1 className="text-2xl font-bold text-primary mb-2">Welcome Back</h1>
           <p className="text-secondary text-sm">Sign in to access your account</p>

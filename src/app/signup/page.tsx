@@ -6,9 +6,11 @@ import Link from "next/link";
 import gsap from "gsap";
 import { User, Building2, ArrowRight } from "lucide-react";
 import Button from "@/components/ui/Button";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function SignupSelectionPage() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const { resolvedTheme } = useTheme();
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -28,7 +30,7 @@ export default function SignupSelectionPage() {
 
       <div className="text-center mb-12 relative z-10">
         <Link href="/" className="inline-block mb-8 group">
-          <img src="/logo-full.png" alt="The Arena" className="h-20 w-auto mx-auto object-contain drop-shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-transform group-hover:scale-105" />
+          <img src={resolvedTheme === "dark" ? "/logo-full.png" : "/logo-full-for-light-mode.png"} alt="The Arena" className="h-20 w-auto mx-auto object-contain drop-shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-transform group-hover:scale-105" />
         </Link>
         <h1 className="text-3xl md:text-5xl font-black text-primary mb-4 uppercase tracking-tight">
           Join The <span className="text-emerald-500">Revolution</span>

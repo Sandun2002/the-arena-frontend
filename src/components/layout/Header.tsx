@@ -14,12 +14,14 @@ import VenueSwitcher from "@/components/venue/VenueSwitcher";
 import TierFrame from "@/components/ui/TierFrame";
 import { getTierFromXp } from "@/lib/tierUtils";
 import ThemeToggle from "@/components/ui/ThemeToggle";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function Header() {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
+  const { resolvedTheme } = useTheme();
   const { isLoggedIn, user, logout, isVenueOwner, isVenueManager } = useAuth();
 
   // Determine Context
@@ -40,7 +42,7 @@ export default function Header() {
         {/* Logo Area */}
         <div className="flex items-center gap-6 min-w-0 shrink-0">
           <Link href={isVenueContext ? "/venue-dashboard" : "/"} className="flex items-center gap-3 group">
-            <Image src="/logo-nav.png" alt="The Arena" width={160} height={70} priority className="h-10 md:h-12 w-auto object-contain" />
+            <Image src={resolvedTheme === "dark" ? "/logo-nav.png" : "/logo-nav-for-light-mode.png"} alt="The Arena" width={160} height={70} priority className="h-10 md:h-12 w-auto object-contain" />
             {isVenueContext && <span className="ml-2 text-[10px] font-bold bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded border border-blue-500/30 uppercase tracking-wide">Business</span>}
           </Link>
 
