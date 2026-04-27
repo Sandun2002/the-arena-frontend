@@ -207,7 +207,7 @@ export default function HeroCarousel({ venues }: HeroCarouselProps) {
 
       {/* Dots */}
       {n > 1 && (
-        <div className="mt-4 flex items-center justify-center gap-2">
+        <div className="mt-4 flex items-center justify-center gap-1.5">
           {venues.map((_, i) => {
             const activeDot = mod(active) === i;
             return (
@@ -216,12 +216,16 @@ export default function HeroCarousel({ venues }: HeroCarouselProps) {
                 type="button"
                 aria-label={`Show venue ${i + 1}`}
                 onClick={() => goTo(i)}
-                className={`p-3 -m-1.5 rounded-full transition-all duration-300 ${
-                  activeDot
-                    ? "w-6 bg-emerald-500 shadow-[0_0_10px_rgba(80,200,120,0.6)]"
-                    : "w-1.5 bg-subtle hover:bg-secondary"
-                }`}
-              />
+                className="p-2 -m-2 flex items-center justify-center"
+              >
+                <span
+                  className={`block rounded-full transition-all duration-300 ${
+                    activeDot
+                      ? "w-5 h-[3px] bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.7)]"
+                      : "w-[3px] h-[3px] bg-white/25 hover:bg-white/50"
+                  }`}
+                />
+              </button>
             );
           })}
         </div>
