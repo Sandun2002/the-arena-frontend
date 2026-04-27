@@ -30,6 +30,7 @@ const securityHeaders = [
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: blob: https:",
       "connect-src 'self' https://api.thearena.lk http://localhost:8000 https://accounts.google.com https://www.googleapis.com",
+      "worker-src 'self'",
       "frame-src https://accounts.google.com",
       "frame-ancestors 'none'",
       "base-uri 'self'",
