@@ -23,12 +23,27 @@ export default function BookingsPage() {
     const [selectedBookingForReview, setSelectedBookingForReview] = useState<Booking | null>(null);
 
     useEffect(() => {
-        if (user) {
+        if (!user) return;
+
+        const fetchBookings = () => {
             playerService.getBookings().then((data) => {
                 setBookings(data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()));
                 setIsLoading(false);
             });
-        }
+        };
+
+        fetchBookings();
+
+        // Re-fetch when the user returns to this tab/window (e.g. after completing payment).
+        const handleVisibility = () => { if (document.visibilityState === "visible") fetchBookings(); };
+        const handleFocus = () => fetchBookings();
+
+        document.addEventListener("visibilitychange", handleVisibility);
+        window.addEventListener("focus", handleFocus);
+        return () => {
+            document.removeEventListener("visibilitychange", handleVisibility);
+            window.removeEventListener("focus", handleFocus);
+        };
     }, [user]);
 
     const filteredBookings = bookings.filter((b) => {
