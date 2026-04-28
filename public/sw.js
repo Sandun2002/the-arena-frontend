@@ -1,8 +1,11 @@
-const CACHE_NAME = "the-arena-v1";
+const CACHE_NAME = "the-arena-v2";
 const API_HOST = "api.thearena.lk";
 
-// Core app shell pages to precache on install
-const PRECACHE_URLS = ["/", "/venues", "/bookings", "/profile", "/challenges"];
+// Core app shell pages to precache on install.
+// Keep this list minimal: only public routes belong here. Auth-protected
+// routes (e.g. /bookings, /profile) are intentionally excluded so SW
+// installs do not waste server CPU on pages that immediately redirect.
+const PRECACHE_URLS = ["/"];
 
 // ── Install: precache app shell ──────────────────────────────────────────────
 self.addEventListener("install", (event) => {
@@ -107,22 +110,28 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // 4. Navigation requests → network-first, fall back to cache then offline shell
+  // 4. Navigation requests → stale-while-revalidate.
+  // Returning PWA users get an instant cache hit; we refresh the cache
+  // in the background so the next visit is up to date. This avoids
+  // hitting the origin (and Vercel functions) on every in-app navigation.
   if (request.mode === "navigate") {
     event.respondWith(
-      fetch(request)
-        .then((response) => {
-          if (response.ok) {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-          }
-          return response;
-        })
-        .catch(() =>
-          caches
-            .match(request)
-            .then((cached) => cached || caches.match("/"))
-        )
+      caches.match(request).then((cached) => {
+        const networkFetch = fetch(request)
+          .then((response) => {
+            if (response.ok) {
+              const clone = response.clone();
+              caches
+                .open(CACHE_NAME)
+                .then((cache) => cache.put(request, clone));
+            }
+            return response;
+          })
+          .catch(() => cached || caches.match("/"));
+
+        // Serve cache immediately if we have it; otherwise wait for network.
+        return cached || networkFetch;
+      })
     );
     return;
   }

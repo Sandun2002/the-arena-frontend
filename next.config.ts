@@ -49,7 +49,10 @@ const nextConfig: NextConfig = {
     ];
   },
   images: {
-    formats: ['image/avif', 'image/webp'],
+    // AVIF intentionally disabled: encoding is 5-10x more CPU-intensive
+    // than WebP on Vercel image optimization, and every browser in our
+    // browserslist supports WebP. Keeps Fluid Active CPU low.
+    formats: ['image/webp'],
     minimumCacheTTL: 31536000,
     deviceSizes: [640, 750, 828, 1080],
     imageSizes: [16, 32, 48, 64, 96, 128, 256],

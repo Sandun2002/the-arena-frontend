@@ -1,0 +1,18 @@
+# https://www.thearena.lk
+# Block crawlers from auth-only and dynamic routes that would waste
+# server CPU on pages they cannot meaningfully index.
+
+User-agent: *
+Disallow: /api/
+Disallow: /bookings
+Disallow: /checkout
+Disallow: /profile
+Disallow: /settings
+Disallow: /venue-dashboard
+Disallow: /reset-password
+Disallow: /verify-email
+Disallow: /check-email
+Disallow: /forgot-password
+Allow: /
+
+Sitemap: https://www.thearena.lk/sitemap.xml

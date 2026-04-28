@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { headers } from "next/headers";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -35,17 +34,18 @@ export const viewport = {
   // theme bootstrap script + ThemeContext (light/dark aware).
 };
 
-export default async function RootLayout({
+// Force the root layout (and therefore every page that doesn't opt into
+// dynamic rendering itself) to be statically rendered. This eliminates
+// per-request Vercel function invocations for the HTML shell.
+// The /maintenance page overlays everything via `fixed inset-0 z-[9999]`,
+// so we no longer need the runtime `headers()` check.
+export const dynamic = "force-static";
+
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Read pathname forwarded from middleware so we can skip Header/Footer
-  // on the standalone /maintenance page (which renders its own full-screen UI).
-  const headersList = await headers();
-  const pathname = headersList.get("x-pathname") ?? "";
-  const isStandalone = pathname === "/maintenance";
-
   // FOUC-prevention: resolve theme synchronously before first paint.
   // Reads `arena-theme` from localStorage; falls back to OS preference.
   const themeBootstrap = `(function(){try{var s=localStorage.getItem('arena-theme');var t=(s==='light'||s==='dark')?s:(window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');var r=document.documentElement;r.classList.remove('light','dark');r.classList.add(t);var m=document.querySelector('meta[name="theme-color"]');if(!m){m=document.createElement('meta');m.name='theme-color';document.head.appendChild(m);}m.content=(t==='light')?'#ffffff':'#050505';}catch(e){document.documentElement.classList.add('dark');}})();`;
@@ -78,19 +78,15 @@ export default async function RootLayout({
         suppressHydrationWarning
       >
         <Providers>
-          {isStandalone ? (
-            children
-          ) : (
-            <SmoothScrolling>
-              <Header />
-              <MobileTopBar />
-              <MobileMainWrapper>
-                {children}
-              </MobileMainWrapper>
-              <Footer />
-              <MobileBottomNav />
-            </SmoothScrolling>
-          )}
+          <SmoothScrolling>
+            <Header />
+            <MobileTopBar />
+            <MobileMainWrapper>
+              {children}
+            </MobileMainWrapper>
+            <Footer />
+            <MobileBottomNav />
+          </SmoothScrolling>
           <PWARegister />
         </Providers>
       </body>
