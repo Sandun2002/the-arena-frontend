@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { fmtTime, fmtDateShort, fmtDateTime } from "@/lib/utils";
-import { ArrowLeft, Calendar, Clock, MapPin, Receipt, AlertCircle, CheckCircle, Download } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, MapPin, Receipt, AlertCircle, CheckCircle, CreditCard, Download } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
 import CancelBookingModal from "@/components/bookings/CancelBookingModal";
@@ -167,13 +167,33 @@ export default function BookingDetailPage() {
                             </div>
 
                             <div className="bg-surface-base/40 rounded-xl p-4 border border-default/50">
-                                <div className="flex items-center gap-2 mb-1">
-                                    <CheckCircle className="w-4 h-4 text-emerald-500" />
-                                    <span className="text-xs font-bold text-emerald-500 uppercase">Paid via {booking.payment_method}</span>
-                                </div>
-                                <p className="text-[10px] text-faint">
-                                    Transaction ID: {booking.payment_status === "paid" ? "TXN-882910" : "Pending"}
-                                </p>
+                                {booking.payment_status === "paid" ? (
+                                    <>
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <CheckCircle className="w-4 h-4 text-emerald-500" />
+                                            <span className="text-xs font-bold text-emerald-500 uppercase">Paid via {booking.payment_method}</span>
+                                        </div>
+                                        <p className="text-[10px] text-faint">
+                                            {/* Synthetic reference derived from booking ID until backend exposes a payment transaction ID */}
+                                            Transaction ID: {booking.paid_at ? `TXN-${booking.id.slice(-6).toUpperCase()}` : "Pending"}
+                                        </p>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <AlertCircle className="w-4 h-4 text-amber-500" />
+                                            <span className="text-xs font-bold text-amber-500 uppercase">Payment Pending</span>
+                                        </div>
+                                        {booking.status === "payment_pending" && (
+                                            <button
+                                                onClick={() => router.push(`/checkout/${booking.id}`)}
+                                                className="w-full mt-1 flex items-center justify-center gap-1.5 py-2 px-3 bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-bold rounded-lg transition-colors"
+                                            >
+                                                <CreditCard className="w-3.5 h-3.5" /> Complete Payment
+                                            </button>
+                                        )}
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>

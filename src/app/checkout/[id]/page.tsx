@@ -44,6 +44,7 @@ export default function CheckoutPage() {
   const [error, setError] = useState<string | null>(null);
   const [countdown, setCountdown] = useState<number | null>(null);
   const [sdkReady, setSdkReady] = useState(false);
+  const [sdkLoadError, setSdkLoadError] = useState(false);
 
   // ---- Load booking + checkout data --------------------------------------
   useEffect(() => {
@@ -109,6 +110,22 @@ export default function CheckoutPage() {
   }, [booking]);
 
   // ---- PayHere SDK handlers ----------------------------------------------
+  const pollForConfirmation = useCallback(async () => {
+    // Poll up to 10 times (10 seconds) waiting for webhook to confirm
+    for (let i = 0; i < 10; i++) {
+      await new Promise(r => setTimeout(r, 1000));
+      try {
+        const b = await playerService.getBookingById(id);
+        if (b.status === "confirmed") {
+          router.push(`/bookings/${id}/success`);
+          return;
+        }
+      } catch { /* ignore */ }
+    }
+    // Webhook may be delayed — redirect anyway, details page will show status
+    router.push(`/bookings/${id}/success`);
+  }, [id, router]);
+
   const attachPayHereHandlers = useCallback(() => {
     if (typeof window === "undefined" || !window.payhere) return;
 
@@ -128,23 +145,7 @@ export default function CheckoutPage() {
       setPaying(false);
       addToast(`Payment error: ${error}`, "error");
     };
-  }, [addToast]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const pollForConfirmation = useCallback(async () => {
-    // Poll up to 10 times (10 seconds) waiting for webhook to confirm
-    for (let i = 0; i < 10; i++) {
-      await new Promise(r => setTimeout(r, 1000));
-      try {
-        const b = await playerService.getBookingById(id);
-        if (b.status === "confirmed") {
-          router.push(`/bookings/${id}/success`);
-          return;
-        }
-      } catch { /* ignore */ }
-    }
-    // Webhook may be delayed — redirect anyway, details page will show status
-    router.push(`/bookings/${id}/success`);
-  }, [id, router]);
+  }, [addToast, pollForConfirmation]);
 
   // ---- Trigger PayHere payment -------------------------------------------
   const handlePay = () => {
@@ -215,7 +216,8 @@ export default function CheckoutPage() {
       <Script
         src="https://www.payhere.lk/lib/payhere.js"
         strategy="afterInteractive"
-        onLoad={() => setSdkReady(true)}
+        onLoad={() => { setSdkReady(true); setSdkLoadError(false); }}
+        onError={() => setSdkLoadError(true)}
       />
 
       <main className="min-h-screen bg-surface-base pt-24 pb-16 px-4">
@@ -322,12 +324,29 @@ export default function CheckoutPage() {
                   LKR {booking.total_price.toLocaleString()}
                 </div>
 
+                {/* SDK load error */}
+                {sdkLoadError && (
+                  <div className="mb-4 flex items-center gap-2 px-4 py-3 bg-red-900/20 border border-red-700/40 rounded-xl">
+                    <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0" />
+                    <span className="text-xs text-red-400">
+                      Failed to load the payment gateway. Please{" "}
+                      <button
+                        onClick={() => window.location.reload()}
+                        className="underline font-bold hover:text-red-300"
+                      >
+                        reload the page
+                      </button>{" "}
+                      and try again.
+                    </span>
+                  </div>
+                )}
+
                 {/* Pay Button */}
                 <button
                   onClick={handlePay}
-                  disabled={paying || isExpired || !sdkReady}
+                  disabled={paying || isExpired || !sdkReady || sdkLoadError}
                   className={`w-full py-3.5 rounded-xl font-bold text-base transition-all flex items-center justify-center gap-2 ${
-                    paying || isExpired || !sdkReady
+                    paying || isExpired || !sdkReady || sdkLoadError
                       ? "bg-surface-overlay text-muted cursor-not-allowed"
                       : "bg-emerald-500 text-black hover:bg-emerald-400 shadow-lg shadow-emerald-500/20"
                   }`}
@@ -339,6 +358,8 @@ export default function CheckoutPage() {
                     </>
                   ) : isExpired ? (
                     "Hold Expired"
+                  ) : sdkLoadError ? (
+                    "Payment Unavailable"
                   ) : !sdkReady ? (
                     "Loading…"
                   ) : (

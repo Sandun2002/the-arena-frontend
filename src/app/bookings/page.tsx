@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { fmtTime, fmtMonthAbbr, fmtDayNum } from "@/lib/utils";
 import { Calendar, Clock, MapPin, ChevronRight, Filter, Search } from "lucide-react";
@@ -22,18 +22,46 @@ export default function BookingsPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [selectedBookingForReview, setSelectedBookingForReview] = useState<Booking | null>(null);
 
+    const fetchBookings = useCallback(async () => {
+        const data = await playerService.getBookings();
+        setBookings(data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()));
+        setIsLoading(false);
+    }, []);
+
     useEffect(() => {
         if (user) {
-            playerService.getBookings().then((data) => {
-                setBookings(data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()));
-                setIsLoading(false);
-            });
+            fetchBookings();
         }
-    }, [user]);
+    }, [user, fetchBookings]);
+
+    // Auto-refresh while there are active payment_pending bookings whose hold hasn't expired yet,
+    // so the list updates once the backend cancels them after the 5-minute hold window.
+    useEffect(() => {
+        const now = Date.now();
+        const activePending = bookings.filter(
+            (b) =>
+                b.status === "payment_pending" &&
+                b.hold_expires_at &&
+                new Date(b.hold_expires_at).getTime() > now
+        );
+        if (activePending.length === 0) return;
+
+        // Find the earliest expiry among active pending bookings
+        const nextExpiry = Math.min(
+            ...activePending.map((b) => new Date(b.hold_expires_at!).getTime())
+        );
+        const delay = nextExpiry - now + 2000; // 2 seconds grace period after expiry
+        const timer = setTimeout(() => fetchBookings(), delay);
+        return () => clearTimeout(timer);
+    }, [bookings, fetchBookings]);
 
     const filteredBookings = bookings.filter((b) => {
         if (filter === "cancelled") return b.status === "cancelled" || b.status === "rejected";
         if (filter === "past") return b.status === "completed";
+        // Exclude payment_pending bookings whose hold has already expired (backend will cancel them)
+        if (b.status === "payment_pending" && b.hold_expires_at && new Date(b.hold_expires_at).getTime() <= Date.now()) {
+            return false;
+        }
         return ["confirmed", "payment_pending"].includes(b.status);
     });
 
@@ -46,7 +74,7 @@ export default function BookingsPage() {
 
                 {/* Tabs */}
                 <div className="flex items-center gap-1 mb-8 overflow-x-auto pb-2 scrollbar-hide">
-                    <TabButton active={filter === "upcoming"} onClick={() => setFilter("upcoming")} label="Upcoming" count={bookings.filter(b => ["confirmed", "payment_pending"].includes(b.status)).length} />
+                    <TabButton active={filter === "upcoming"} onClick={() => setFilter("upcoming")} label="Upcoming" count={bookings.filter(b => ["confirmed", "payment_pending"].includes(b.status) && !(b.status === "payment_pending" && b.hold_expires_at && new Date(b.hold_expires_at).getTime() <= Date.now())).length} />
                     <TabButton active={filter === "past"} onClick={() => setFilter("past")} label="History" />
                     <TabButton active={filter === "cancelled"} onClick={() => setFilter("cancelled")} label="Cancelled" />
                 </div>
