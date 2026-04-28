@@ -90,7 +90,7 @@ export const centerService = {
             params: {
                 venue_id: params.venue_id,
                 search: params.search,
-                status_filter: params.status,
+                status: params.status,
                 skip: params.skip,
                 limit: params.limit,
             }
@@ -112,16 +112,24 @@ export const centerService = {
         return normalizeBooking(response.data);
     },
 
-    confirmBooking: async (id: string) => {
-        await apiClient.post(`/center/bookings/${id}/confirm`);
+    confirmBooking: async (id: string, paymentMethod?: "cash" | "card" | "bank_transfer") => {
+        await apiClient.post(
+            `/center/bookings/${id}/confirm`,
+            null,
+            paymentMethod ? { params: { payment_method: paymentMethod } } : undefined,
+        );
     },
 
     cancelBooking: async (id: string, reason?: string) => {
         await apiClient.post(`/center/bookings/${id}/cancel`, null, { params: { reason } });
     },
 
-    markBookingPaid: async (id: string) => {
-        await apiClient.post(`/center/bookings/${id}/confirm`, null, { params: { payment_method: 'cash' } });
+    markBookingPaid: async (id: string, paymentMethod?: "cash" | "card" | "bank_transfer") => {
+        await apiClient.post(
+            `/center/bookings/${id}/confirm`,
+            null,
+            paymentMethod ? { params: { payment_method: paymentMethod } } : undefined,
+        );
     },
 
     toggleNoShow: async (id: string) => {

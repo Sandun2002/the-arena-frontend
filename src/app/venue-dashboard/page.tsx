@@ -225,14 +225,14 @@ export default function VenueDashboardPage() {
                             {[
                                 {
                                     label: "Platform",
-                                    count: todaySchedule.bookings.filter(b => !b.is_manual && b.status !== "blocked" && b.status !== "maintenance").length,
+                                    count: todaySchedule.bookings.filter(b => !b.is_manual && !b.is_blocked).length,
                                     icon: <Globe className="w-4 h-4 text-blue-400" />,
                                     color: "text-blue-400",
                                     bg: "bg-blue-500/10 border-blue-500/20",
                                 },
                                 {
                                     label: "Walk-ins",
-                                    count: todaySchedule.bookings.filter(b => b.is_manual && b.status !== "blocked" && b.status !== "maintenance").length,
+                                    count: todaySchedule.bookings.filter(b => b.is_manual && !b.is_blocked).length,
                                     icon: <UserPlus className="w-4 h-4 text-orange-400" />,
                                     color: "text-orange-400",
                                     bg: "bg-orange-500/10 border-orange-500/20",
@@ -246,7 +246,7 @@ export default function VenueDashboardPage() {
                                 },
                                 {
                                     label: "Blocked",
-                                    count: todaySchedule.bookings.filter(b => b.status === "blocked" || b.status === "maintenance").length,
+                                    count: todaySchedule.bookings.filter(b => b.is_blocked).length,
                                     icon: <Hammer className="w-4 h-4 text-secondary" />,
                                     color: "text-secondary",
                                     bg: "bg-surface-overlay/50 border-subtle/50",

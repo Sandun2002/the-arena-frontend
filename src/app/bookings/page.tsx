@@ -46,10 +46,17 @@ export default function BookingsPage() {
         };
     }, [user]);
 
+    const isLiveUpcoming = (b: Booking): boolean => {
+        if (b.status === "confirmed") return true;
+        if (b.status !== "payment_pending") return false;
+        if (!b.hold_expires_at) return true;
+        return new Date(b.hold_expires_at) > new Date();
+    };
+
     const filteredBookings = bookings.filter((b) => {
         if (filter === "cancelled") return b.status === "cancelled" || b.status === "rejected";
         if (filter === "past") return b.status === "completed";
-        return ["confirmed", "payment_pending"].includes(b.status);
+        return isLiveUpcoming(b);
     });
 
     if (isAuthPending || !user) return <AuthLoadingSpinner />;
@@ -61,9 +68,9 @@ export default function BookingsPage() {
 
                 {/* Tabs */}
                 <div className="flex items-center gap-1 mb-8 overflow-x-auto pb-2 scrollbar-hide">
-                    <TabButton active={filter === "upcoming"} onClick={() => setFilter("upcoming")} label="Upcoming" count={bookings.filter(b => ["confirmed", "payment_pending"].includes(b.status)).length} />
+                    <TabButton active={filter === "upcoming"} onClick={() => setFilter("upcoming")} label="Upcoming" count={bookings.filter(isLiveUpcoming).length} />
                     <TabButton active={filter === "past"} onClick={() => setFilter("past")} label="History" />
-                    <TabButton active={filter === "cancelled"} onClick={() => setFilter("cancelled")} label="Cancelled" />
+                    <TabButton active={filter === "cancelled"} onClick={() => setFilter("cancelled")} label="Cancelled / Rejected" />
                 </div>
 
                 {/* List */}
@@ -135,17 +142,15 @@ function TabButton({ active, onClick, label, count }: any) {
 }
 
 function BookingCard({ booking, onReviewClick }: { booking: Booking, onReviewClick: () => void }) {
-    const statusConfig = {
+    const statusConfig: Record<BookingStatus, { color: string; bg: string; border: string; label: string }> = {
         payment_pending: { color: "text-amber-500", bg: "bg-amber-500/10", border: "border-amber-500/20", label: "Payment Pending" },
         confirmed: { color: "text-emerald-500", bg: "bg-emerald-500/10", border: "border-emerald-500/20", label: "Confirmed" },
         completed: { color: "text-blue-500", bg: "bg-blue-500/10", border: "border-blue-500/20", label: "Completed" },
         cancelled: { color: "text-red-500", bg: "bg-red-500/10", border: "border-red-500/20", label: "Cancelled" },
-        rejected: { color: "text-red-500", bg: "bg-red-500/10", border: "border-red-500/20", label: "Rejected" },
-        blocked: { color: "text-muted", bg: "bg-zinc-500/10", border: "border-zinc-500/20", label: "Blocked" },
-        maintenance: { color: "text-orange-500", bg: "bg-orange-500/10", border: "border-orange-500/20", label: "Maintenance" },
+        rejected: { color: "text-red-500", bg: "bg-red-500/10", border: "border-red-500/20", label: "Rejected by Venue" },
     };
 
-    const status = statusConfig[booking.status];
+    const status = statusConfig[booking.status] ?? statusConfig.cancelled;
 
     return (
         <Link href={`/bookings/${booking.id}`} className="block group">

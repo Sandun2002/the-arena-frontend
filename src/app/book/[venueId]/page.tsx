@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { format, addDays, startOfToday, parseISO } from "date-fns";
-import { ArrowLeft, Calendar, Clock, MapPin, CheckCircle, CreditCard, Loader2, Info } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, MapPin, CheckCircle, CreditCard, Loader2, Info, Hammer, Repeat, Lock, Zap } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
 import { api } from "@/services/api";
@@ -34,6 +34,15 @@ export default function BookingPage() {
     const [loadingSlots, setLoadingSlots] = useState(false);
     const [pricing, setPricing] = useState<any>(null);
     const [submitting, setSubmitting] = useState(false);
+    const [isVenueClosed, setIsVenueClosed] = useState(false);
+    const [closureReason, setClosureReason] = useState<string | null>(null);
+    const [now, setNow] = useState<Date>(new Date());
+
+    // Tick clock every 30s so past-slots refresh on this page automatically
+    useEffect(() => {
+        const id = setInterval(() => setNow(new Date()), 30000);
+        return () => clearInterval(id);
+    }, []);
 
     useEffect(() => {
         const loadVenueData = async () => {
@@ -74,10 +83,37 @@ export default function BookingPage() {
             // Call api to get venue slots
             api.getVenueSlots(venueId, dateStr, selectedSport)
                 .then((res: any) => {
-                    const courtData = res.venue_slots?.find((cs: any) => cs.court.id === selectedCourt);
-                    setAvailability(courtData ? courtData.slots : []);
+                    setIsVenueClosed(!!res?.is_closed);
+                    setClosureReason(res?.closure_reason || null);
+                    if (res?.is_closed) {
+                        setAvailability([]);
+                        return;
+                    }
+                    const courtData = (res?.courts || []).find((cs: any) => cs.court_id === selectedCourt);
+                    if (!courtData || courtData.is_active === false) {
+                        setAvailability([]);
+                        return;
+                    }
+                    const slots: SlotAvailability[] = (courtData.slots || []).map((s: any) => ({
+                        start: `${s.date}T${s.start}`,
+                        end: `${s.date}T${s.end}`,
+                        status: s.status,
+                        is_peak: !!s.is_peak,
+                        price: s.effective_rate ?? courtData.hourly_rate ?? 0,
+                    }));
+                    setAvailability(slots);
+                    // If the previously selected slot is no longer available, clear it
+                    setSelectedSlot(prev => {
+                        if (!prev) return prev;
+                        const match = slots.find(s => s.start === prev.start);
+                        return match && match.status === "available" ? prev : null;
+                    });
                 })
-                .catch(() => setAvailability([]))
+                .catch(() => {
+                    setAvailability([]);
+                    setIsVenueClosed(false);
+                    setClosureReason(null);
+                })
                 .finally(() => setLoadingSlots(false));
         }
     }, [step, selectedCourt, selectedDate, venueId, selectedSport]);
@@ -233,29 +269,84 @@ export default function BookingPage() {
 
                                 {loadingSlots ? (
                                     <div className="flex justify-center p-8"><Loader2 className="w-8 h-8 animate-spin text-emerald-500" /></div>
-                                ) : (
-                                    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                                        {availability.map((slot, idx) => {
-                                            const startTime = format(parseISO(slot.start), "HH:mm");
-                                            const isSelected = selectedSlot?.start === slot.start;
-                                            const isAvailable = slot.status === "available";
-
-                                            return (
-                                                <button
-                                                    key={idx}
-                                                    disabled={!isAvailable}
-                                                    onClick={() => setSelectedSlot({ start: slot.start, end: slot.end })}
-                                                    className={`p-3 rounded-lg border text-sm font-bold transition-all
-                                                        ${!isAvailable ? 'bg-surface-raised border-default text-faint cursor-not-allowed line-through' :
-                                                            isSelected ? 'bg-emerald-500 text-black border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.4)]' :
-                                                                'bg-surface-base/40 border-default text-primary hover:border-emerald-500/50 hover:bg-emerald-500/5'}
-                                                    `}
-                                                >
-                                                    {startTime}
-                                                </button>
-                                            )
-                                        })}
+                                ) : isVenueClosed ? (
+                                    <div className="p-6 rounded-2xl border border-red-500/20 bg-red-500/5 text-center">
+                                        <Lock className="w-7 h-7 text-red-500/60 mx-auto mb-2" />
+                                        <p className="text-red-400 font-bold mb-1">Venue Closed</p>
+                                        <p className="text-sm text-secondary">{closureReason || "This venue is closed on the selected date."}</p>
                                     </div>
+                                ) : availability.length === 0 ? (
+                                    <p className="text-sm text-muted py-6 text-center">No slots available for this court on this date.</p>
+                                ) : (
+                                    <>
+                                        {/* Legend */}
+                                        <div className="flex flex-wrap gap-x-4 gap-y-2 text-[10px] text-secondary mb-4">
+                                            <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500" /> Available</div>
+                                            <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-red-500/60" /> Booked</div>
+                                            <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-indigo-500/60" /> Reserved</div>
+                                            <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-zinc-600/70" /> Maintenance</div>
+                                            <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full border border-subtle bg-surface-overlay/50" /> Past/Closed</div>
+                                            <div className="flex items-center gap-1.5"><Zap className="w-2.5 h-2.5 text-amber-400" /> Peak</div>
+                                        </div>
+                                        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                                            {availability.map((slot, idx) => {
+                                                const slotStart = parseISO(slot.start);
+                                                const startTime = format(slotStart, "HH:mm");
+                                                const isSelected = selectedSlot?.start === slot.start;
+                                                const isPast = slotStart < now;
+                                                const isBooked = slot.status === "booked";
+                                                const isMaintenance = slot.status === "maintenance";
+                                                const isRecurring = slot.status === "recurring";
+                                                const isClosed = slot.status === "closed";
+                                                const isUnavailable = isBooked || isMaintenance || isRecurring || isClosed || isPast || slot.status !== "available";
+                                                const isPeak = !!slot.is_peak;
+                                                const showPeakBadge = isPeak && !isUnavailable;
+
+                                                const label = isMaintenance ? "Maint."
+                                                    : isBooked ? "Booked"
+                                                    : isRecurring ? "Reserved"
+                                                    : isClosed ? "Closed"
+                                                    : isPast ? "Past"
+                                                    : startTime;
+
+                                                const title = isMaintenance ? "Under maintenance"
+                                                    : isBooked ? "Slot is booked"
+                                                    : isRecurring ? "Reserved by a recurring booking"
+                                                    : isClosed ? "Outside operating hours"
+                                                    : isPast ? "Past time slot"
+                                                    : isPeak && slot.price ? `Peak hour · LKR ${slot.price.toLocaleString()}/hr` : undefined;
+
+                                                const className = isMaintenance
+                                                    ? "bg-surface-overlay/30 border-subtle/50 text-secondary cursor-not-allowed"
+                                                    : isBooked
+                                                        ? "bg-red-900/20 border-red-900/50 text-red-500 cursor-not-allowed opacity-60 line-through"
+                                                        : isRecurring
+                                                            ? "bg-indigo-900/30 border-indigo-700/50 text-indigo-400 cursor-not-allowed"
+                                                            : isClosed || isPast
+                                                                ? "bg-surface-base/20 border-default/50 text-faint cursor-not-allowed"
+                                                                : isSelected
+                                                                    ? "bg-emerald-500 text-black border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.4)]"
+                                                                    : isPeak
+                                                                        ? "bg-amber-500/10 border-amber-500/30 text-amber-300 hover:border-amber-500/60 hover:bg-amber-500/20"
+                                                                        : "bg-surface-base/40 border-default text-primary hover:border-emerald-500/50 hover:bg-emerald-500/5";
+
+                                                return (
+                                                    <button
+                                                        key={idx}
+                                                        disabled={isUnavailable}
+                                                        title={title}
+                                                        onClick={() => setSelectedSlot({ start: slot.start, end: slot.end })}
+                                                        className={`relative p-3 rounded-lg border text-sm font-bold transition-all ${className}`}
+                                                    >
+                                                        {showPeakBadge && (
+                                                            <Zap className={`absolute top-1 right-1 w-2.5 h-2.5 ${isSelected ? "text-black/80" : "text-amber-400"}`} />
+                                                        )}
+                                                        {label}
+                                                    </button>
+                                                )
+                                            })}
+                                        </div>
+                                    </>
                                 )}
                             </div>
                         )}

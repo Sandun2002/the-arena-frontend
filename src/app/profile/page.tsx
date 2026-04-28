@@ -34,12 +34,20 @@ export default function ProfilePage() {
                 const sorted = [...all].sort(
                     (a, b) => new Date(b.start_time).getTime() - new Date(a.start_time).getTime()
                 );
-                // Upcoming: confirmed/pending future bookings
+                // Upcoming: confirmed bookings + payment_pending whose hold is still valid.
+                // (Bookings whose hold timer has expired are stale and will be auto-cancelled by
+                // the backend; don't surface them as "upcoming".)
+                const now = new Date();
                 const upcoming = all
-                    .filter(b =>
-                        ["confirmed", "payment_pending"].includes(b.status) &&
-                        new Date(b.start_time) > new Date()
-                    )
+                    .filter(b => {
+                        if (new Date(b.start_time) <= now) return false;
+                        if (b.status === "confirmed") return true;
+                        if (b.status === "payment_pending") {
+                            if (!b.hold_expires_at) return true;
+                            return new Date(b.hold_expires_at) > now;
+                        }
+                        return false;
+                    })
                     .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
 
                 setUpcomingBookings(upcoming.slice(0, 3));

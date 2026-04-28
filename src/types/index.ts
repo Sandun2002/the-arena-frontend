@@ -141,7 +141,8 @@ export interface ManagerInvitation {
 }
 
 // === Booking ===
-export type BookingStatus = "payment_pending" | "confirmed" | "completed" | "cancelled" | "rejected" | "blocked" | "maintenance";
+// Backend BookingStatus enum (models/base.py). Keep this in sync exactly.
+export type BookingStatus = "payment_pending" | "confirmed" | "completed" | "cancelled" | "rejected";
 export type PaymentStatus = "pending" | "paid" | "refunded" | "failed";
 export type PaymentMethod = "card" | "cash" | "bank_transfer";
 
@@ -191,10 +192,15 @@ export interface Booking {
   review?: Review | null;
 }
 
+// Slot statuses are computed by backend (api/v1/endpoints/venues.py).
+// `closed` is not currently emitted per-slot but is reserved for future use
+// (e.g. partially-closed days).
+export type SlotStatus = "available" | "booked" | "maintenance" | "recurring" | "closed";
+
 export interface SlotAvailability {
   start: string;
   end: string;
-  status: "available" | "booked" | "held" | "recurring";
+  status: SlotStatus;
   is_peak: boolean;
   price: number;
 }
@@ -302,7 +308,7 @@ export interface VenueSlotsResponse {
       start: string;
       end: string;
       date: string;
-      status: "available" | "booked" | "held" | "closed" | "recurring" | "maintenance";
+      status: SlotStatus;
       is_peak: boolean;
       effective_rate: number;
     }>;

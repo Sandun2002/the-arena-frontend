@@ -225,7 +225,9 @@ export default function BookingManagerPage() {
                 b.court_id === courtId &&
                 bStart < slotEnd &&
                 bEnd > slotStart &&
-                (b.status === "confirmed" || b.status === "payment_pending" || b.status === "completed" || b.status === "blocked" || b.status === "maintenance")
+                // Real backend BookingStatus values that occupy the slot.
+                // Maintenance/blocked is encoded via the is_blocked flag, not status.
+                (b.status === "confirmed" || b.status === "payment_pending" || b.status === "completed" || b.is_blocked === true)
             );
         });
     };
@@ -580,18 +582,23 @@ function BookingSlotCard({
     onCancel: (id: string) => void;
 }) {
     const type = getBookingType(booking);
-    const isConfirmed = booking.status === "confirmed" || booking.is_paid;
+    const isCompleted = booking.status === "completed";
+    const isConfirmed = booking.status === "confirmed";
     const isPending = booking.status === "payment_pending";
     const isMaintenance = type === "maintenance";
 
     const borderColor = isMaintenance
         ? "shadow-[inset_4px_0_0_0_rgba(161,161,170,0.8)]"
+        : isCompleted
+        ? "shadow-[inset_4px_0_0_0_rgba(96,165,250,1)]"
         : isConfirmed
         ? "shadow-[inset_4px_0_0_0_rgba(16,185,129,1)]"
         : "shadow-[inset_4px_0_0_0_rgba(245,158,11,1)]";
 
     const bgColor = isMaintenance
         ? "bg-surface-overlay/50 border-subtle/50 hover:bg-surface-overlay/70"
+        : isCompleted
+        ? "bg-blue-500/10 border-blue-500/20 hover:bg-blue-500/15"
         : isConfirmed
         ? "bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/15"
         : "bg-amber-500/10 border-amber-500/20 hover:bg-amber-500/15";
@@ -608,7 +615,7 @@ function BookingSlotCard({
                         </span>
                     )}
                 </div>
-                <p className={`text-xs mt-0.5 font-medium truncate ${isMaintenance ? "text-muted" : isConfirmed ? "text-emerald-500/70" : "text-amber-500/70"}`}>
+                <p className={`text-xs mt-0.5 font-medium truncate ${isMaintenance ? "text-muted" : isCompleted ? "text-blue-400/70" : isConfirmed ? "text-emerald-500/70" : "text-amber-500/70"}`}>
                     {activeCourt?.name}
                     {booking.customer_phone && <span className="text-faint ml-2">{booking.customer_phone}</span>}
                 </p>
@@ -635,6 +642,10 @@ function BookingSlotCard({
                     isPending ? (
                         <span className="text-[9px] font-bold px-2 py-0.5 rounded border bg-amber-500/20 text-amber-500 border-amber-500/30 uppercase tracking-wider">
                             Pending
+                        </span>
+                    ) : isCompleted ? (
+                        <span className="flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded border bg-blue-500/20 text-blue-400 border-blue-500/30 uppercase tracking-wider">
+                            <CheckCircle className="w-2.5 h-2.5" /> Completed
                         </span>
                     ) : (
                         <span className="flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded border bg-emerald-500/20 text-emerald-500 border-emerald-500/30 uppercase tracking-wider">

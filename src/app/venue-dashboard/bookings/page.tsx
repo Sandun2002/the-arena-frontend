@@ -4,7 +4,8 @@
 import { useEffect, useState, useCallback } from "react";
 import { format, isSameDay, isValid } from "date-fns";
 import { fmtTime, fmtDateShort } from "@/lib/utils";
-import { Search, CheckCircle, XCircle, DollarSign, UserX, AlertCircle, Calendar as CalendarIcon, ChevronLeft, ChevronRight, Globe, UserPlus, Hammer } from "lucide-react";
+import { Search, CheckCircle, XCircle, DollarSign, UserX, AlertCircle, Calendar as CalendarIcon, ChevronLeft, ChevronRight, Globe, UserPlus, Hammer, RefreshCw } from "lucide-react";
+import { PaymentStatus } from "@/types";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
 import { centerService } from "@/services/centerService";
@@ -29,7 +30,9 @@ export default function BookingsPage() {
 
     // Filters
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-    const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "confirmed" | "cancelled">("all");
+    const [statusFilter, setStatusFilter] = useState<
+        "all" | "payment_pending" | "confirmed" | "completed" | "cancelled" | "rejected"
+    >("all");
     const [sourceFilter, setSourceFilter] = useState<"all" | "platform" | "walkin" | "blocked">("all");
     const [searchQuery, setSearchQuery] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -74,7 +77,9 @@ export default function BookingsPage() {
     }, [loadBookings]);
 
     const getBookingSource = (b: Booking): "platform" | "walkin" | "blocked" => {
-        if (b.status === "blocked" || b.status === "maintenance") return "blocked";
+        // Maintenance/blocked is encoded via the is_blocked boolean,
+        // not via BookingStatus. Walk-in is is_manual.
+        if (b.is_blocked) return "blocked";
         if (b.is_manual) return "walkin";
         return "platform";
     };
@@ -174,17 +179,26 @@ export default function BookingsPage() {
                     </div>
 
                     {/* Status Filter */}
-                    <div className="flex bg-surface-raised p-1 rounded-xl border border-default">
-                        {(["all", "pending", "confirmed", "cancelled"] as const).map((s) => (
+                    <div className="flex bg-surface-raised p-1 rounded-xl border border-default flex-wrap">
+                        {(
+                            [
+                                { v: "all", label: "All" },
+                                { v: "payment_pending", label: "Pending" },
+                                { v: "confirmed", label: "Confirmed" },
+                                { v: "completed", label: "Completed" },
+                                { v: "cancelled", label: "Cancelled" },
+                                { v: "rejected", label: "Rejected" },
+                            ] as const
+                        ).map(({ v, label }) => (
                             <button
-                                key={s}
-                                onClick={() => setStatusFilter(s)}
-                                className={`px-4 py-1.5 text-xs font-bold rounded-lg capitalize transition-colors ${statusFilter === s
+                                key={v}
+                                onClick={() => setStatusFilter(v)}
+                                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${statusFilter === v
                                     ? "bg-surface-overlay text-primary shadow-sm"
                                     : "text-muted hover:text-secondary"
                                     }`}
                             >
-                                {s}
+                                {label}
                             </button>
                         ))}
                     </div>
@@ -200,7 +214,7 @@ export default function BookingsPage() {
                                     : "text-muted hover:text-secondary"
                                     }`}
                             >
-                                {s === "walkin" ? "Walk-in" : s === "all" ? "All Sources" : s.charAt(0).toUpperCase() + s.slice(1)}
+                                {s === "walkin" ? "Walk-in" : s === "all" ? "All Sources" : s === "blocked" ? "Maintenance" : s.charAt(0).toUpperCase() + s.slice(1)}
                             </button>
                         ))}
                     </div>
@@ -258,17 +272,7 @@ export default function BookingsPage() {
                                             <div className="flex flex-col gap-1">
                                                 <span className="text-primary font-bold text-sm">LKR {booking.total_price.toLocaleString()}</span>
                                                 <div className="flex items-center gap-1.5">
-                                                    {booking.payment_status === "paid" ? (
-                                                        <>
-                                                            <CheckCircle className="w-3 h-3 text-emerald-500" />
-                                                            <span className="text-[10px] font-bold text-emerald-500">PAID</span>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                                                            <span className="text-[10px] font-bold text-amber-500">PENDING</span>
-                                                        </>
-                                                    )}
+                                                    <PaymentStatusInline status={booking.payment_status} />
                                                 </div>
                                             </div>
                                         </td>
@@ -390,11 +394,45 @@ function StatusBadge({ status }: { status: string }) {
     );
 }
 
+function PaymentStatusInline({ status }: { status: PaymentStatus | string }) {
+    switch (status) {
+        case "paid":
+            return (
+                <>
+                    <CheckCircle className="w-3 h-3 text-emerald-500" />
+                    <span className="text-[10px] font-bold text-emerald-500">PAID</span>
+                </>
+            );
+        case "refunded":
+            return (
+                <>
+                    <RefreshCw className="w-3 h-3 text-blue-400" />
+                    <span className="text-[10px] font-bold text-blue-400">REFUNDED</span>
+                </>
+            );
+        case "failed":
+            return (
+                <>
+                    <XCircle className="w-3 h-3 text-red-500" />
+                    <span className="text-[10px] font-bold text-red-500">FAILED</span>
+                </>
+            );
+        case "pending":
+        default:
+            return (
+                <>
+                    <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                    <span className="text-[10px] font-bold text-amber-500">PENDING</span>
+                </>
+            );
+    }
+}
+
 function SourceBadge({ booking }: { booking: Booking }) {
-    if (booking.status === "blocked" || booking.status === "maintenance") {
+    if (booking.is_blocked) {
         return (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded border bg-surface-overlay/30 text-secondary border-subtle/50 text-[10px] font-bold uppercase tracking-wider">
-                <Hammer className="w-3 h-3" /> Blocked
+                <Hammer className="w-3 h-3" /> Maintenance
             </span>
         );
     }
