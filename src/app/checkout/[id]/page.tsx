@@ -131,18 +131,8 @@ export default function CheckoutPage() {
   }, [addToast]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const pollForConfirmation = useCallback(async () => {
-    // Poll up to 10 times (10 seconds) waiting for webhook to confirm
-    for (let i = 0; i < 10; i++) {
-      await new Promise(r => setTimeout(r, 1000));
-      try {
-        const b = await playerService.getBookingById(id);
-        if (b.status === "confirmed") {
-          router.push(`/bookings/${id}/success`);
-          return;
-        }
-      } catch { /* ignore */ }
-    }
-    // Webhook may be delayed — redirect anyway, details page will show status
+    // Navigate immediately — success page shows content right away and
+    // polls the status badge quietly in the background.
     router.push(`/bookings/${id}/success`);
   }, [id, router]);
 

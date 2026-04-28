@@ -1,46 +1,58 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState, useRef } from "react";
+import { useParams } from "next/navigation";
 import { fmtTime, fmtDateShort } from "@/lib/utils";
 import Link from "next/link";
-import { CheckCircle, Calendar, Clock, MapPin, ArrowRight, Download } from "lucide-react";
+import { CheckCircle, Calendar, Clock, MapPin, ArrowRight } from "lucide-react";
 import { playerService } from "@/services/playerService";
 import { Booking } from "@/types";
 
 export default function BookingSuccessPage() {
   const { id } = useParams<{ id: string }>();
-  const router = useRouter();
   const [booking, setBooking] = useState<Booking | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Only show the full-screen spinner on the very first load (no data yet).
+  // Once we have any booking data we show the success UI immediately and
+  // update the status badge silently in the background.
+  const [initialLoading, setInitialLoading] = useState(true);
+  const pollRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (!id) return;
-    // Poll for up to 15 seconds to handle webhook delay
+
     let attempts = 0;
+
     const poll = async () => {
       try {
         const b = await playerService.getBookingById(id);
         setBooking(b);
-        if (b.status === "confirmed" || attempts >= 14) {
-          setLoading(false);
-          return;
+
+        // First response received — immediately show the success page.
+        setInitialLoading(false);
+
+        // Keep polling silently until confirmed or 15 attempts exhausted.
+        if (b.status !== "confirmed" && attempts < 14) {
+          attempts++;
+          pollRef.current = setTimeout(poll, 1000);
         }
       } catch {
-        setLoading(false);
-        return;
+        // Can't reach the API — show whatever we have (or empty state).
+        setInitialLoading(false);
       }
-      attempts++;
-      setTimeout(poll, 1000);
     };
+
     poll();
+
+    return () => {
+      if (pollRef.current) clearTimeout(pollRef.current);
+    };
   }, [id]);
 
-  if (loading) {
+  if (initialLoading) {
     return (
       <main className="min-h-screen bg-surface-base flex flex-col items-center justify-center gap-4">
         <div className="animate-spin w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full" />
-        <p className="text-secondary text-sm">Confirming your booking…</p>
+        <p className="text-secondary text-sm">Loading your booking…</p>
       </main>
     );
   }
