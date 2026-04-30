@@ -8,7 +8,7 @@ import VenueCard from "@/components/ui/VenueCard";
 import CourtFinderPanel from "@/components/venues/CourtFinderPanel";
 import { Search } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
-import RequireAuth from "@/components/auth/RequireAuth";
+
 
 export default function VenuesPage() {
     const { addToast } = useToast();
@@ -83,7 +83,7 @@ export default function VenuesPage() {
     };
 
     return (
-        <RequireAuth>
+
         <main className="min-h-screen bg-background relative overflow-hidden">
 
             {/* Background Effects */}
@@ -214,6 +214,6 @@ export default function VenuesPage() {
 
             </div>
         </main>
-        </RequireAuth>
+
     );
 }
