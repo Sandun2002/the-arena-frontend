@@ -31,7 +31,7 @@ const securityHeaders = [
       "img-src 'self' data: blob: https:",
       "connect-src 'self' https://api.thearena.lk http://localhost:8000 https://accounts.google.com https://www.googleapis.com https://www.payhere.lk https://sandbox.payhere.lk",
       "worker-src 'self'",
-      "frame-src https://accounts.google.com https://www.payhere.lk https://sandbox.payhere.lk",
+      "frame-src https://accounts.google.com https://www.payhere.lk https://sandbox.payhere.lk https://maps.google.com https://www.google.com",
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",
