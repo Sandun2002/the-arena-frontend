@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { getAccessToken } from "@/services/apiClient";
 
 export default function PWARegister() {
   useEffect(() => {
@@ -13,6 +14,10 @@ export default function PWARegister() {
         const sub = await reg.pushManager.getSubscription();
         if (!sub) return;
 
+        // Skip if user has no access token — they're not logged in.
+        // This prevents unauthenticated subscribePush → 401 → refresh loop.
+        if (!getAccessToken()) return;
+
         const { default: notificationService } = await import(
           "@/services/notificationService"
         );
@@ -21,7 +26,7 @@ export default function PWARegister() {
           if (!enabled) return;
           await notificationService.subscribePush(sub);
         } catch {
-          // Silently no-op: user may not be logged in yet
+          // Silently no-op: user may not be logged in yet or token expired
         }
       })
       .catch((err) => console.error("[SW] Registration failed:", err));

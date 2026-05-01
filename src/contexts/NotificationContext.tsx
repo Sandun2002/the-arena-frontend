@@ -206,7 +206,7 @@ export const NotificationProvider: FunctionComponent<{
     }
   }, [pushSupport]);
 
-  // ── Detect push state on mount ───────────────────────────────────────────────
+  // ── Detect push state on mount (only when logged in) ─────────────────────
   useEffect(() => {
     if (!pushSupport) {
       setPushSupported(false);
@@ -216,6 +216,11 @@ export const NotificationProvider: FunctionComponent<{
     }
     setPushSupported(true);
     setPushPermission((Notification.permission as PushPermission) ?? "default");
+
+    // Only check VAPID + subscription state if the user is logged in.
+    // Without this guard, unauthenticated subscribePush calls trigger 401s
+    // that feed into the apiClient refresh interceptor, causing a loop.
+    if (!isLoggedIn) return;
 
     // Check VAPID availability on the server
     notificationService
@@ -232,7 +237,7 @@ export const NotificationProvider: FunctionComponent<{
         setPushEnabled(!!sub);
       })
       .catch(() => {});
-  }, [pushSupport]);
+  }, [pushSupport, isLoggedIn]);
 
   // ── Init + polling ───────────────────────────────────────────────────────────
   useEffect(() => {

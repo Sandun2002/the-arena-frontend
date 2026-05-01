@@ -57,6 +57,25 @@ interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
 let isRefreshing = false;
 let failedQueue: { resolve: (token: string) => void; reject: (error: unknown) => void }[] = [];
 
+// ─── Circuit breaker: prevent infinite refresh loops ───────────────────────
+// After a refresh failure, block further refresh attempts for this duration.
+const REFRESH_COOLDOWN_MS = 30_000; // 30 seconds
+let lastRefreshFailure = 0;
+
+/** URLs that should never trigger silent-refresh on 401 */
+const SKIP_REFRESH_PATTERNS = [
+    '/auth/cookie-refresh',
+    '/auth/login',
+    '/auth/signup',
+    '/auth/google',
+    '/notifications/push/subscribe',
+];
+
+const shouldSkipRefresh = (url?: string): boolean => {
+    if (!url) return false;
+    return SKIP_REFRESH_PATTERNS.some((p) => url.includes(p));
+};
+
 const processQueue = (error: unknown, token: string | null = null) => {
     failedQueue.forEach(prom => {
         if (error) prom.reject(error);
@@ -70,51 +89,64 @@ apiClient.interceptors.response.use(
     async (error: AxiosError) => {
         const originalRequest = error.config as CustomAxiosRequestConfig;
 
-        if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
-            if (isRefreshing) {
-                return new Promise((resolve, reject) => {
-                    failedQueue.push({ resolve, reject });
-                }).then(token => {
-                    if (originalRequest.headers) {
-                        originalRequest.headers.Authorization = `Bearer ${token}`;
-                    }
-                    return apiClient(originalRequest);
-                });
-            }
-
-            originalRequest._retry = true;
-            isRefreshing = true;
-
-            try {
-                // Cookie-based silent refresh — browser automatically sends httpOnly cookie
-                const { data } = await axios.post(
-                    `${API_URL}/auth/cookie-refresh`,
-                    {},
-                    { withCredentials: true }
-                );
-
-                const newAccessToken: string = data.access_token;
-                setAccessToken(newAccessToken);
-                processQueue(null, newAccessToken);
-
-                if (originalRequest.headers) {
-                    originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-                }
-                return apiClient(originalRequest);
-
-            } catch (refreshError) {
-                processQueue(refreshError, null);
-                clearAccessToken();
-                if (typeof window !== 'undefined') {
-                    window.location.href = '/login?session=expired';
-                }
-                return Promise.reject(refreshError);
-            } finally {
-                isRefreshing = false;
-            }
+        if (error.response?.status !== 401 || !originalRequest || originalRequest._retry) {
+            return Promise.reject(error);
         }
 
-        return Promise.reject(error);
+        // Don't attempt refresh for auth endpoints or push subscribe
+        if (shouldSkipRefresh(originalRequest.url)) {
+            return Promise.reject(error);
+        }
+
+        // Circuit breaker: if we recently failed a refresh, don't retry
+        if (Date.now() - lastRefreshFailure < REFRESH_COOLDOWN_MS) {
+            return Promise.reject(error);
+        }
+
+        if (isRefreshing) {
+            return new Promise((resolve, reject) => {
+                failedQueue.push({ resolve, reject });
+            }).then(token => {
+                if (originalRequest.headers) {
+                    originalRequest.headers.Authorization = `Bearer ${token}`;
+                }
+                return apiClient(originalRequest);
+            });
+        }
+
+        originalRequest._retry = true;
+        isRefreshing = true;
+
+        try {
+            // Cookie-based silent refresh — browser automatically sends httpOnly cookie
+            const { data } = await axios.post(
+                `${API_URL}/auth/cookie-refresh`,
+                {},
+                { withCredentials: true }
+            );
+
+            const newAccessToken: string = data.access_token;
+            setAccessToken(newAccessToken);
+            lastRefreshFailure = 0; // reset on success
+            processQueue(null, newAccessToken);
+
+            if (originalRequest.headers) {
+                originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+            }
+            return apiClient(originalRequest);
+
+        } catch (refreshError) {
+            lastRefreshFailure = Date.now();
+            processQueue(refreshError, null);
+            clearAccessToken();
+            // Only redirect if we're not already on the login page
+            if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
+                window.location.href = '/login?session=expired';
+            }
+            return Promise.reject(refreshError);
+        } finally {
+            isRefreshing = false;
+        }
     }
 );
 
