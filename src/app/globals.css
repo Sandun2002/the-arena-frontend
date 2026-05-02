@@ -717,3 +717,52 @@ html.light .marquee-track:has(.sport-card:hover) .sport-card:not(:hover) {
 }
 .tier-glow-titan { animation: tier-pulse-titan 2s ease-in-out infinite; will-change: filter; }
 
+
+/* ─── Mobile Bottom Nav — Premium Micro-Animations ──────────────────────────── */
+
+/* Shimmer sweep across active pill */
+@keyframes nav-pill-sweep {
+  0%   { transform: translateX(-130%) skewX(-12deg); opacity: 0; }
+  25%  { opacity: 0.7; }
+  75%  { opacity: 0.4; }
+  100% { transform: translateX(130%) skewX(-12deg); opacity: 0; }
+}
+
+.nav-pill-shimmer {
+  background: linear-gradient(105deg, transparent 30%, rgba(80,200,120,0.45) 50%, transparent 70%);
+  animation: nav-pill-sweep 0.6s ease-out 0.05s both;
+}
+html.light .nav-pill-shimmer {
+  background: linear-gradient(105deg, transparent 30%, rgba(4,120,87,0.22) 50%, transparent 70%);
+}
+
+/* Particle burst — 6 dots fly outward from icon center */
+@keyframes nav-p-fly {
+  0%   { transform: translate(0,0) scale(1.4); opacity: 1; }
+  100% { transform: translate(var(--px), var(--py)) scale(0); opacity: 0; }
+}
+
+.nav-particle {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 9999px;
+  background: #50C878;
+  box-shadow: 0 0 6px #50C878aa;
+  animation: nav-p-fly 0.55s ease-out forwards;
+  top: 50%;
+  left: 50%;
+  margin: -2.5px 0 0 -2.5px;
+}
+
+.nav-p0 { --px:  0px;  --py: -22px; }
+.nav-p1 { --px:  19px; --py: -12px; animation-delay: 0.02s; }
+.nav-p2 { --px:  19px; --py:  12px; animation-delay: 0.04s; }
+.nav-p3 { --px:  0px;  --py:  22px; animation-delay: 0.02s; }
+.nav-p4 { --px: -19px; --py:  12px; animation-delay: 0.03s; }
+.nav-p5 { --px: -19px; --py: -12px; animation-delay: 0.01s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-pill-shimmer { animation: none; }
+  .nav-particle     { animation: none; opacity: 0; }
+}
