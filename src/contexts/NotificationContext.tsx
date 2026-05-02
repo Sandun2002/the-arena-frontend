@@ -17,6 +17,14 @@ import { useAuth } from "@/services/authContext";
 
 const POLL_INTERVAL_MS = 30_000; // 30 seconds
 
+// Module-level VAPID key cache — fetched once per session, not on every login.
+let _vapidCache: { vapid_public_key: string | null; enabled: boolean } | null = null;
+async function getCachedVapidKey() {
+  if (_vapidCache) return _vapidCache;
+  _vapidCache = await notificationService.getVapidPublicKey();
+  return _vapidCache;
+}
+
 type PushPermission = "default" | "granted" | "denied" | "unsupported";
 
 interface NotificationContextType {
@@ -160,7 +168,7 @@ export const NotificationProvider: FunctionComponent<{
       setPushPermission(permission as PushPermission);
       if (permission !== "granted") return false;
 
-      const { vapid_public_key, enabled } = await notificationService.getVapidPublicKey();
+      const { vapid_public_key, enabled } = await getCachedVapidKey();
       if (!enabled || !vapid_public_key) {
         setPushAvailable(false);
         return false;
@@ -222,9 +230,8 @@ export const NotificationProvider: FunctionComponent<{
     // that feed into the apiClient refresh interceptor, causing a loop.
     if (!isLoggedIn) return;
 
-    // Check VAPID availability on the server
-    notificationService
-      .getVapidPublicKey()
+    // Check VAPID availability on the server (cached)
+    getCachedVapidKey()
       .then(({ enabled, vapid_public_key }) => {
         setPushAvailable(!!enabled && !!vapid_public_key);
       })
@@ -245,6 +252,19 @@ export const NotificationProvider: FunctionComponent<{
       setNotifications([]);
       setUnreadCount(0);
       if (pollTimerRef.current) clearInterval(pollTimerRef.current);
+      // Remove push subscription from backend when user logs out
+      if (pushSupport) {
+        navigator.serviceWorker.ready
+          .then(async (reg) => {
+            const sub = await reg.pushManager.getSubscription();
+            if (sub) {
+              await notificationService.unsubscribePush(sub.endpoint).catch(() => {});
+              await sub.unsubscribe().catch(() => {});
+            }
+          })
+          .catch(() => {});
+      }
+      setPushEnabled(false);
       return;
     }
 
@@ -255,7 +275,19 @@ export const NotificationProvider: FunctionComponent<{
     return () => {
       if (pollTimerRef.current) clearInterval(pollTimerRef.current);
     };
-  }, [isLoggedIn, refresh, pollUnread]);
+  }, [isLoggedIn, refresh, pollUnread, pushSupport]);
+
+  // ── Refresh unread count when the tab regains focus ───────────────────────
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        pollUnread();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, [isLoggedIn, pollUnread]);
 
   return (
     <NotificationContext.Provider

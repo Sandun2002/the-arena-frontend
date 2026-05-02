@@ -7,6 +7,13 @@ const API_HOST = "api.thearena.lk";
 // installs do not waste server CPU on pages that immediately redirect.
 const PRECACHE_URLS = ["/"];
 
+// ── Message: allow pages to force SW activation (skip waiting) ──────────────
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
 // ── Install: precache app shell ──────────────────────────────────────────────
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -46,9 +53,11 @@ self.addEventListener('push', (event) => {
   const title = data.title || 'TheArena.lk';
   const options = {
     body: data.body || '',
-    icon: '/android-chrome-192x192.png',
+    icon: data.icon ? data.icon : '/android-chrome-192x192.png',
     badge: '/badge-72x72.png',
     tag: data.tag || data.type || 'arena-notification',
+    renotify: true,
+    vibrate: [200, 100, 200],
     data: { action_url: data.action_url || '/' },
     requireInteraction: false,
   };

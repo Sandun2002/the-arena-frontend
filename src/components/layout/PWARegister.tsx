@@ -7,10 +7,33 @@ export default function PWARegister() {
   useEffect(() => {
     if (!("serviceWorker" in navigator)) return;
 
+    let reloading = false;
+
     navigator.serviceWorker
       .register("/sw.js", { scope: "/" })
-      .then(() => navigator.serviceWorker.ready)
+      .then((registration) => {
+        // If a new SW is waiting, activate it immediately so push events
+        // are handled by the latest service worker version.
+        if (registration.waiting) {
+          registration.waiting.postMessage({ type: "SKIP_WAITING" });
+        }
+
+        // When an updated SW moves into waiting, force it active.
+        registration.addEventListener("updatefound", () => {
+          const newWorker = registration.installing;
+          if (!newWorker) return;
+          newWorker.addEventListener("statechange", () => {
+            if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+              newWorker.postMessage({ type: "SKIP_WAITING" });
+            }
+          });
+        });
+
+        return navigator.serviceWorker.ready;
+      })
       .then(async (reg) => {
+        if (!reg) return;
+
         const sub = await reg.pushManager.getSubscription();
         if (!sub) return;
 
@@ -30,6 +53,13 @@ export default function PWARegister() {
         }
       })
       .catch((err) => console.error("[SW] Registration failed:", err));
+
+    // Reload once when a new SW takes control so the page runs fresh code.
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (reloading) return;
+      reloading = true;
+      window.location.reload();
+    });
   }, []);
 
   return null;
