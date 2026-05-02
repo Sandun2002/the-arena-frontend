@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { X, Check, Smartphone, Share2, MoreVertical, Download } from "lucide-react";
+import { X, Check, DeviceMobile, ShareNetwork, DotsThreeVertical, Download } from "@phosphor-icons/react";
 
 // Register ScrollTrigger
 gsap.registerPlugin(ScrollTrigger);
@@ -110,13 +110,13 @@ export default function PWAInstallGuide() {
           className="absolute top-4 right-4 p-2 text-muted hover:text-primary hover:bg-surface-overlay rounded-full transition-colors"
           aria-label="Dismiss"
         >
-          <X className="w-5 h-5" />
+          <X size={20} weight="bold" />
         </button>
 
         {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-3">
-            <Smartphone className="w-5 h-5 text-emerald-500" />
+            <DeviceMobile size={20} weight="bold" className="text-emerald-500" />
             <span className="text-xs font-black tracking-[0.2em] uppercase text-muted">
               Progressive Web App
             </span>
@@ -145,7 +145,7 @@ export default function PWAInstallGuide() {
                 <Step number={1} icon={<span className="text-secondary">Safari</span>}>
                   Open in Safari browser
                 </Step>
-                <Step number={2} icon={<Share2 className="w-4 h-4" />}>
+                <Step number={2} icon={<ShareNetwork size={16} weight="bold" />}>
                   Tap the <strong className="text-primary">Share</strong> button
                 </Step>
                 <Step number={3} text="Add to Home Screen">
@@ -175,13 +175,13 @@ export default function PWAInstallGuide() {
                     onClick={handleInstall}
                     className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-500 text-black font-bold hover:bg-emerald-400 transition-colors"
                   >
-                    <Download className="w-4 h-4" />
+                    <Download size={16} weight="bold" />
                     Install The Arena
                   </button>
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <Step number={1} icon={<MoreVertical className="w-4 h-4" />}>
+                  <Step number={1} icon={<DotsThreeVertical size={16} weight="bold" />}>
                     Tap the <strong className="text-primary">⋮</strong> menu (top right)
                   </Step>
                   <Step number={2} text="Install App">
@@ -236,7 +236,7 @@ function Step({
 function FeaturePill({ children }: { children: React.ReactNode }) {
   return (
     <div className="inline-flex items-center gap-1.5 bg-surface-raised/70 border border-default rounded-full px-3 py-1.5 text-xs text-secondary">
-      <Check className="w-3 h-3 text-emerald-500" />
+      <Check size={12} weight="bold" className="text-emerald-500" />
       {children}
     </div>
   );

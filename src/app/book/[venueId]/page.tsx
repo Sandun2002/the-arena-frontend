@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { format, addDays, startOfToday, parseISO } from "date-fns";
-import { ArrowLeft, Calendar, Clock, MapPin, CheckCircle, CreditCard, Loader2, Info, Hammer, Repeat, Lock, Zap } from "lucide-react";
+import { ArrowLeft, CalendarBlank, Clock, MapPin, CheckCircle, CreditCard, CircleNotch, Info, Hammer, Repeat, Lock, Lightning } from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
 import { api } from "@/services/api";
@@ -153,7 +153,7 @@ export default function BookingPage() {
         }
     };
 
-    if (loading) return <div className="min-h-screen bg-surface-base flex items-center justify-center text-emerald-500"><Loader2 className="w-8 h-8 animate-spin" /></div>;
+    if (loading) return <div className="min-h-screen bg-surface-base flex items-center justify-center text-emerald-500"><CircleNotch size={32} weight="bold" className="animate-spin" /></div>;
     if (!venue) return <div className="min-h-screen bg-surface-base pt-24 text-primary text-center">Venue not found</div>;
 
     return (
@@ -163,13 +163,13 @@ export default function BookingPage() {
                 {/* Header */}
                 <div className="flex items-center gap-4 mb-8">
                     <Link href={`/venues/${venueId}`} className="p-2 bg-surface-raised rounded-full text-secondary hover:text-primary transition-colors">
-                        <ArrowLeft className="w-5 h-5" />
+                        <ArrowLeft size={20} weight="bold" />
                     </Link>
                     <div>
                         <h1 className="text-2xl font-bold text-primary mb-1">Book {venue.name}</h1>
                         <div className="flex items-center gap-4 text-sm text-muted">
-                            <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> {venue.city}</span>
-                            <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> Step {step} of 3</span>
+                            <span className="flex items-center gap-1"><MapPin size={14} weight="fill" /> {venue.city}</span>
+                            <span className="flex items-center gap-1"><Clock size={14} weight="bold" /> Step {step} of 3</span>
                         </div>
                     </div>
                 </div>
@@ -268,10 +268,10 @@ export default function BookingPage() {
                                 <h3 className="text-lg font-bold text-primary mb-6">Available Slots for {format(selectedDate, "MMMM d")}</h3>
 
                                 {loadingSlots ? (
-                                    <div className="flex justify-center p-8"><Loader2 className="w-8 h-8 animate-spin text-emerald-500" /></div>
+                                    <div className="flex justify-center p-8"><CircleNotch size={32} weight="bold" className="animate-spin text-emerald-500" /></div>
                                 ) : isVenueClosed ? (
                                     <div className="p-6 rounded-2xl border border-red-500/20 bg-red-500/5 text-center">
-                                        <Lock className="w-7 h-7 text-red-500/60 mx-auto mb-2" />
+                                        <Lock size={28} weight="fill" className="text-red-500/60 mx-auto mb-2" />
                                         <p className="text-red-400 font-bold mb-1">Venue Closed</p>
                                         <p className="text-sm text-secondary">{closureReason || "This venue is closed on the selected date."}</p>
                                     </div>
@@ -286,7 +286,7 @@ export default function BookingPage() {
                                             <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-indigo-500/60" /> Reserved</div>
                                             <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-zinc-600/70" /> Maintenance</div>
                                             <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full border border-subtle bg-surface-overlay/50" /> Past/Closed</div>
-                                            <div className="flex items-center gap-1.5"><Zap className="w-2.5 h-2.5 text-amber-400" /> Peak</div>
+                                            <div className="flex items-center gap-1.5"><Lightning size={10} weight="fill" className="text-amber-400" /> Peak</div>
                                         </div>
                                         <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
                                             {availability.map((slot, idx) => {
@@ -339,7 +339,7 @@ export default function BookingPage() {
                                                         className={`relative p-3 rounded-lg border text-sm font-bold transition-all ${className}`}
                                                     >
                                                         {showPeakBadge && (
-                                                            <Zap className={`absolute top-1 right-1 w-2.5 h-2.5 ${isSelected ? "text-black/80" : "text-amber-400"}`} />
+                                                            <Lightning size={10} weight="fill" className={`absolute top-1 right-1 ${isSelected ? "text-black/80" : "text-amber-400"}`} />
                                                         )}
                                                         {label}
                                                     </button>
@@ -419,7 +419,7 @@ export default function BookingPage() {
                                 disabled={submitting}
                                 className="flex-1 bg-emerald-500 hover:bg-emerald-400 text-black font-bold py-6 text-lg shadow-[0_0_20px_rgba(16,185,129,0.2)]"
                             >
-                                {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <CreditCard className="w-5 h-5 mr-2" />}
+                                {submitting ? <CircleNotch size={20} weight="bold" className="animate-spin" /> : <CreditCard size={20} weight="bold" className="mr-2" />}
                                 Pay & Confirm
                             </Button>
                         </div>

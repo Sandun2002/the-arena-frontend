@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Star, ArrowRight } from "lucide-react";
+import { MapPin, Star, ArrowRight } from "@phosphor-icons/react";
 import { Venue, SearchParams } from "@/types";
 
 interface VenueCardProps {
@@ -52,13 +52,13 @@ export default function VenueCard({ venue, searchParams }: VenueCardProps) {
             {venue.name}
           </h3>
           <div className="flex items-center gap-1 text-yellow-400">
-            <Star className="h-4 w-4 fill-yellow-400" />
+            <Star size={16} weight="fill" className="text-yellow-400" />
             <span className="text-sm font-bold text-primary">{venue.rating.toFixed(1)}</span>
           </div>
         </div>
 
         <div className="mb-4 flex items-center gap-2 text-secondary text-sm">
-          <MapPin className="h-4 w-4" />
+          <MapPin size={16} weight="duotone" />
           <span className="truncate">{venue.city}</span>
         </div>
 
@@ -70,7 +70,7 @@ export default function VenueCard({ venue, searchParams }: VenueCardProps) {
           </div>
 
           <span className="flex items-center gap-2 text-sm font-bold text-brand-accent transition-transform group-hover:translate-x-1">
-            Details <ArrowRight className="h-4 w-4" />
+            Details <ArrowRight size={16} weight="bold" />
           </span>
         </div>
       </div>

@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { api } from "@/services/api";
 import { Venue } from "@/types";
 import HeroCarousel from "./HeroCarousel";
+import { ArrowRight } from "@phosphor-icons/react";
 
 export default function Hero() {
   const [venues, setVenues] = useState<Venue[]>([]);
@@ -107,9 +108,7 @@ export default function Hero() {
           >
             <span className="relative z-10 flex items-center gap-2">
               <span>Book Your Court Now</span>
-              <svg className="w-6 h-6 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
+              <ArrowRight size={24} weight="bold" className="group-hover:translate-x-1 transition-transform" />
             </span>
             {/* Subtle inner glow / border effect */}
             <div className="absolute inset-0 rounded-full border border-white/20"></div>

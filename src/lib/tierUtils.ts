@@ -8,6 +8,9 @@ export type TierName =
   | "Icon"
   | "Titan";
 
+import { ElementType } from "react";
+import { Medal, MedalMilitary, Trophy, Crown, Lightning, Sword, Fire, IconWeight } from "@phosphor-icons/react";
+
 const XP_THRESHOLDS: [TierName, number][] = [
   ["Rookie",    0],
   ["Contender", 500],
@@ -45,7 +48,8 @@ export interface TierFrameConfig {
   ornamentShape: "dot" | "diamond" | "star";
   ornamentPositions: "compass4" | "clock6" | "clock8" | "none";
   topAccent: "none" | "crown" | "swords" | "flame" | "trident";
-  icon: string;
+  icon: ElementType;
+  iconWeight: IconWeight;
 }
 
 export const TIER_FRAME_CONFIG: Record<TierName, TierFrameConfig> = {
@@ -63,7 +67,8 @@ export const TIER_FRAME_CONFIG: Record<TierName, TierFrameConfig> = {
     ornamentShape: "dot",
     ornamentPositions: "none",
     topAccent: "none",
-    icon: "🥉",
+    icon: Medal,
+    iconWeight: "light",
   },
   Contender: {
     color: "#9ca3af",
@@ -79,7 +84,8 @@ export const TIER_FRAME_CONFIG: Record<TierName, TierFrameConfig> = {
     ornamentShape: "dot",
     ornamentPositions: "compass4",
     topAccent: "none",
-    icon: "🥈",
+    icon: Medal,
+    iconWeight: "duotone",
   },
   Athlete: {
     color: "#10b981",
@@ -96,7 +102,8 @@ export const TIER_FRAME_CONFIG: Record<TierName, TierFrameConfig> = {
     ornamentShape: "diamond",
     ornamentPositions: "compass4",
     topAccent: "none",
-    icon: "🏅",
+    icon: MedalMilitary,
+    iconWeight: "duotone",
   },
   Champion: {
     color: "#f59e0b",
@@ -113,7 +120,8 @@ export const TIER_FRAME_CONFIG: Record<TierName, TierFrameConfig> = {
     ornamentShape: "diamond",
     ornamentPositions: "compass4",
     topAccent: "none",
-    icon: "🥇",
+    icon: Trophy,
+    iconWeight: "duotone",
   },
   Elite: {
     color: "#ef4444",
@@ -131,7 +139,8 @@ export const TIER_FRAME_CONFIG: Record<TierName, TierFrameConfig> = {
     ornamentShape: "dot",
     ornamentPositions: "clock6",
     topAccent: "flame",
-    icon: "🔥",
+    icon: Fire,
+    iconWeight: "fill",
   },
   Legend: {
     color: "#8b5cf6",
@@ -149,7 +158,8 @@ export const TIER_FRAME_CONFIG: Record<TierName, TierFrameConfig> = {
     ornamentShape: "star",
     ornamentPositions: "clock6",
     topAccent: "swords",
-    icon: "⚔️",
+    icon: Sword,
+    iconWeight: "duotone",
   },
   Icon: {
     color: "#f59e0b",
@@ -167,7 +177,8 @@ export const TIER_FRAME_CONFIG: Record<TierName, TierFrameConfig> = {
     ornamentShape: "star",
     ornamentPositions: "clock8",
     topAccent: "crown",
-    icon: "👑",
+    icon: Crown,
+    iconWeight: "fill",
   },
   Titan: {
     color: "#bae6fd",
@@ -185,7 +196,8 @@ export const TIER_FRAME_CONFIG: Record<TierName, TierFrameConfig> = {
     ornamentShape: "star",
     ornamentPositions: "clock8",
     topAccent: "trident",
-    icon: "⚡",
+    icon: Lightning,
+    iconWeight: "fill",
   },
 };
 

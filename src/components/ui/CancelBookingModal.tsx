@@ -1,6 +1,6 @@
 "use client";
 
-import { X } from "lucide-react";
+import { X } from "@phosphor-icons/react";
 import { useState } from "react";
 import { Booking } from "@/types";
 import { fmtTime, fmtDateShort } from "@/lib/utils";
@@ -52,7 +52,7 @@ export default function CancelBookingModal({ booking, isOpen, onClose, onConfirm
                     onClick={onClose}
                     className="absolute top-6 right-6 p-2 rounded-xl bg-surface-overlay/50 hover:bg-surface-overlay text-secondary hover:text-primary transition-all"
                 >
-                    <X className="h-5 w-5" />
+                    <X size={20} weight="bold" />
                 </button>
 
                 {/* Header */}

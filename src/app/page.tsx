@@ -9,11 +9,11 @@ import GamificationTeaser from "@/components/home/GamificationTeaser";
 import PWAInstallGuide from "@/components/home/PWAInstallGuide";
 import PartnerCTA from "@/components/home/PartnerCTA";
 import Link from "next/link";
-import { ArrowRight, PhoneOff, Lock, Gamepad2, ChevronRight } from "lucide-react";
+import { PhoneDisconnect, Lock, GameController, CaretRight } from "@phosphor-icons/react";
 
 const STEPS = [
   {
-    icon: PhoneOff,
+    icon: PhoneDisconnect,
     title: "Skip the Phone Calls",
     desc: "No more calling venues to check availability. Browse real-time court availability in seconds.",
     color: "emerald"
@@ -25,7 +25,7 @@ const STEPS = [
     color: "blue"
   },
   {
-    icon: Gamepad2,
+    icon: GameController,
     title: "Show Up & Play",
     desc: "No surprises. Your court is confirmed and waiting. Just bring your A-game.",
     color: "yellow"
@@ -72,7 +72,7 @@ export default function Home() {
                     step.color === 'blue' ? 'border-blue-500/30 group-hover:border-blue-500 shadow-[0_0_30px_rgba(37,99,235,0.2)]' :
                       'border-yellow-500/30 group-hover:border-yellow-500 shadow-[0_0_30px_rgba(234,179,8,0.2)]'}
                 `}>
-                  <step.icon className={`h-10 w-10 
+                  <step.icon size={40} weight="fill" className={`
                     ${step.color === 'emerald' ? 'text-emerald-500' :
                       step.color === 'blue' ? 'text-blue-500' :
                         'text-yellow-500'}
@@ -90,7 +90,7 @@ export default function Home() {
 
           <div className="mt-16 text-center">
             <Link href="/venues" className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-inverted font-bold hover:opacity-90 transition-opacity shadow-[0_0_20px_var(--shadow-elevation)]">
-              Get Started Now <ChevronRight className="h-4 w-4" />
+              Get Started Now <CaretRight size={16} weight="bold" />
             </Link>
           </div>
         </div>

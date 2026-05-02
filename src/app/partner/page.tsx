@@ -5,14 +5,14 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Button from "@/components/ui/Button";
 import {
-    TrendingUp,
+    TrendUp,
     Users,
     Shield,
-    Calendar,
-    BarChart3,
+    CalendarBlank,
+    ChartBar,
     Clock,
-    Settings
-} from "lucide-react";
+    Gear
+} from "@phosphor-icons/react";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -50,12 +50,12 @@ export default function PartnerPage() {
         {
             title: "Increase Sales & Outreach",
             desc: "Get access to the largest active sports community to boost your sales and increase outreach instantly.",
-            icon: TrendingUp
+            icon: TrendUp
         },
         {
             title: "Enable Advance Reservations",
             desc: "Empower your users and members to reserve in advance or pay online to increase court utilization and reduce no-shows.",
-            icon: Calendar
+            icon: CalendarBlank
         },
         {
             title: "Court Scheduling & Inventory",
@@ -65,12 +65,12 @@ export default function PartnerPage() {
         {
             title: "Financial & Transaction Reports",
             desc: "Track your sales, utilization and users with ease with easily downloadable tabular data and customized graphs.",
-            icon: BarChart3
+            icon: ChartBar
         },
         {
             title: "Flexible Pricing & Policies",
             desc: "Happy hour pricing? No problemo! Set your own cancellation and rescheduling policies based on sports and activities.",
-            icon: Settings
+            icon: Gear
         },
         {
             title: "Seamless Registration Management",
@@ -214,7 +214,7 @@ export default function PartnerPage() {
                         {features.map((feature, i) => (
                             <div key={i} className="group p-8 rounded-2xl bg-surface-raised/40 border border-default/50 hover:bg-surface-raised hover:border-emerald-500/30 transition-all duration-300">
                                 <div className="h-12 w-12 rounded-xl bg-surface-overlay flex items-center justify-center mb-6 group-hover:bg-emerald-500/20 group-hover:scale-110 transition-all duration-300">
-                                    <feature.icon className="h-6 w-6 text-emerald-400" />
+                                    <feature.icon size={24} weight="bold" className="text-emerald-400" />
                                 </div>
                                 <h3 className="text-xl font-bold text-primary mb-3">{feature.title}</h3>
                                 <p className="text-secondary leading-relaxed text-sm">{feature.desc}</p>

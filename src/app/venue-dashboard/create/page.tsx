@@ -4,7 +4,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { Building2, MapPin, Loader2, Info, CheckCircle, ArrowRight, ArrowLeft, Link2, ExternalLink } from "lucide-react";
+import { Buildings, MapPin, CircleNotch, Info, CheckCircle, ArrowRight, ArrowLeft, Link, ArrowSquareOut } from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import TimePicker from "@/components/ui/TimePicker";
 import { venueApiService } from "@/services/venueApiService";
@@ -219,7 +219,7 @@ export default function CreateVenuePage() {
                             <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300">
                                 <div className="flex items-center gap-3 mb-6 pb-4 border-b border-default">
                                     <div className="p-2 bg-emerald-500/10 rounded-lg">
-                                        <Building2 className="w-6 h-6 text-emerald-500" />
+                                        <Buildings size={24} weight="fill" className="text-emerald-500" />
                                     </div>
                                     <h2 className="text-xl font-bold text-primary">Venue Details</h2>
                                 </div>
@@ -281,7 +281,7 @@ export default function CreateVenuePage() {
                                 </div>
 
                                 <Button type="button" onClick={() => setStep("location")} className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-12 text-lg shadow-[0_0_20px_rgba(16,185,129,0.2)]">
-                                    Next: Location <ArrowRight className="w-5 h-5 ml-2" />
+                                    Next: Location <ArrowRight size={20} weight="bold" className="ml-2" />
                                 </Button>
                             </div>
                         )}
@@ -291,7 +291,7 @@ export default function CreateVenuePage() {
                             <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300">
                                 <div className="flex items-center gap-3 mb-6 pb-4 border-b border-default">
                                     <div className="p-2 bg-blue-500/10 rounded-lg">
-                                        <MapPin className="w-6 h-6 text-blue-500" />
+                                        <MapPin size={24} weight="fill" className="text-blue-500" />
                                     </div>
                                     <h2 className="text-xl font-bold text-primary">Location</h2>
                                 </div>
@@ -299,7 +299,7 @@ export default function CreateVenuePage() {
                                 {/* Google Maps Link Input */}
                                 <div className="space-y-2">
                                     <label className="text-xs font-bold text-muted uppercase tracking-wider flex items-center gap-1.5">
-                                        <Link2 className="w-3 h-3" /> Google Maps Location Link <span className="text-red-500">*</span>
+                                        <Link size={12} weight="bold" /> Google Maps Location Link <span className="text-red-500">*</span>
                                     </label>
                                     <div className="relative">
                                         <input
@@ -316,10 +316,10 @@ export default function CreateVenuePage() {
                                             placeholder="https://maps.google.com/maps?q=..."
                                         />
                                         {isResolvingMapLink && (
-                                            <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-400 animate-spin" />
+                                            <CircleNotch size={20} weight="bold" className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-400 animate-spin" />
                                         )}
                                         {!isResolvingMapLink && geoLat && (
-                                            <CheckCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-500" />
+                                            <CheckCircle size={20} weight="fill" className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-500" />
                                         )}
                                     </div>
                                     {isResolvingMapLink && <p className="text-blue-400 text-xs mt-1 animate-pulse">Resolving short link...</p>}
@@ -330,7 +330,7 @@ export default function CreateVenuePage() {
                                 {/* Coordinates Display */}
                                 {geoLat && geoLng && (
                                     <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 flex items-center gap-3">
-                                        <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+                                        <CheckCircle size={20} weight="fill" className="text-emerald-500 flex-shrink-0" />
                                         <div>
                                             <p className="text-sm font-bold text-emerald-400">Coordinates detected</p>
                                             <p className="text-xs text-emerald-300/70 font-mono mt-0.5">{geoLat.toFixed(6)}, {geoLng.toFixed(6)}</p>
@@ -363,16 +363,16 @@ export default function CreateVenuePage() {
                                 </div>
 
                                 <div className="bg-blue-500/10 p-4 rounded-xl flex gap-3 items-start border border-blue-500/20">
-                                    <Info className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                                    <Info size={20} weight="fill" className="text-blue-500 flex-shrink-0 mt-0.5" />
                                     <div className="text-sm text-blue-200/80 leading-relaxed">
                                         <span className="font-bold text-blue-400 block mb-1">How to get your Google Maps link</span>
-                                        Open <a href="https://maps.google.com" target="_blank" rel="noopener noreferrer" className="text-blue-400 underline inline-flex items-center gap-1">Google Maps <ExternalLink className="w-3 h-3" /></a>, search for your venue, right-click the exact location, and select &quot;Share&quot; → &quot;Copy link&quot;. Paste it above to auto-detect your coordinates.
+                                        Open <a href="https://maps.google.com" target="_blank" rel="noopener noreferrer" className="text-blue-400 underline inline-flex items-center gap-1">Google Maps <ArrowSquareOut size={12} weight="bold" /></a>, search for your venue, right-click the exact location, and select &quot;Share&quot; → &quot;Copy link&quot;. Paste it above to auto-detect your coordinates.
                                     </div>
                                 </div>
 
                                 <div className="flex gap-3 pt-4">
                                     <Button type="button" variant="ghost" onClick={() => setStep("details")} className="flex-1 h-12 text-secondary hover:text-primary">
-                                        <ArrowLeft className="w-5 h-5 mr-2" /> Back
+                                        <ArrowLeft size={20} weight="bold" className="mr-2" /> Back
                                     </Button>
                                     <Button
                                         type="button"
@@ -386,7 +386,7 @@ export default function CreateVenuePage() {
                                         }}
                                         className="flex-[2] bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-12 text-lg shadow-[0_0_20px_rgba(16,185,129,0.2)] disabled:opacity-50 disabled:shadow-none"
                                     >
-                                        Next: Amenities <ArrowRight className="w-5 h-5 ml-2" />
+                                        Next: Amenities <ArrowRight size={20} weight="bold" className="ml-2" />
                                     </Button>
                                 </div>
                             </div>
@@ -397,7 +397,7 @@ export default function CreateVenuePage() {
                             <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300">
                                 <div className="flex items-center gap-3 mb-6 pb-4 border-b border-default">
                                     <div className="p-2 bg-purple-500/10 rounded-lg">
-                                        <CheckCircle className="w-6 h-6 text-purple-500" />
+                                        <CheckCircle size={24} weight="fill" className="text-purple-500" />
                                     </div>
                                     <h2 className="text-xl font-bold text-primary">Facilities</h2>
                                 </div>
@@ -418,10 +418,10 @@ export default function CreateVenuePage() {
 
                                 <div className="flex gap-3 pt-6 border-t border-default mt-6">
                                     <Button type="button" variant="ghost" onClick={() => setStep("location")} className="flex-1 h-12 text-secondary hover:text-primary">
-                                        <ArrowLeft className="w-5 h-5 mr-2" /> Back
+                                        <ArrowLeft size={20} weight="bold" className="mr-2" /> Back
                                     </Button>
                                     <Button type="button" onClick={() => setStep("document")} className="flex-[2] bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-12 text-lg shadow-[0_0_20px_rgba(16,185,129,0.2)]">
-                                        Next: Verification <ArrowRight className="w-5 h-5 ml-2" />
+                                        Next: Verification <ArrowRight size={20} weight="bold" className="ml-2" />
                                     </Button>
                                 </div>
                             </div>
@@ -432,7 +432,7 @@ export default function CreateVenuePage() {
                             <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300">
                                 <div className="flex items-center gap-3 mb-6 pb-4 border-b border-default">
                                     <div className="p-2 bg-purple-500/10 rounded-lg">
-                                        <Info className="w-6 h-6 text-purple-500" />
+                                        <Info size={24} weight="fill" className="text-purple-500" />
                                     </div>
                                     <h2 className="text-xl font-bold text-primary">Verification</h2>
                                 </div>
@@ -456,7 +456,7 @@ export default function CreateVenuePage() {
 
                                     {brDocument && (
                                         <div className="bg-emerald-500/10 text-emerald-500 text-sm px-4 py-2 rounded-xl inline-flex items-center border border-emerald-500/20">
-                                            <CheckCircle className="w-4 h-4 mr-2" />
+                                            <CheckCircle size={16} weight="fill" className="mr-2" />
                                             "{brDocument.name}" ready to upload
                                         </div>
                                     )}
@@ -464,14 +464,14 @@ export default function CreateVenuePage() {
 
                                 <div className="flex gap-3 pt-6 border-t border-default mt-6">
                                     <Button type="button" variant="ghost" onClick={() => setStep("amenities")} className="flex-1 h-12 text-secondary hover:text-primary">
-                                        <ArrowLeft className="w-5 h-5 mr-2" /> Back
+                                        <ArrowLeft size={20} weight="bold" className="mr-2" /> Back
                                     </Button>
                                     <Button
                                         type="submit"
                                         disabled={isSubmitting || !brDocument}
                                         className="flex-[2] bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-12 text-lg shadow-[0_0_20px_rgba(16,185,129,0.2)] disabled:opacity-50 disabled:shadow-none"
                                     >
-                                        {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "Complete Registration"}
+                                        {isSubmitting ? <CircleNotch size={20} weight="bold" className="animate-spin mx-auto" /> : "Complete Registration"}
                                     </Button>
                                 </div>
                             </div>

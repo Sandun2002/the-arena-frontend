@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowLeft, Mail, Loader2 } from "lucide-react";
+import { ArrowLeft, EnvelopeSimple, CircleNotch } from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import { authService } from "@/services/authService";
 import { useToast } from "@/components/ui/Toast";
@@ -34,7 +34,7 @@ export default function ForgotPasswordPage() {
         <main className="min-h-screen bg-surface-base flex items-center justify-center p-4">
             <div className="w-full max-w-md">
                 <Link href="/login" className="mb-8 inline-flex items-center text-sm text-muted hover:text-primary transition-colors">
-                    <ArrowLeft className="mr-2 h-4 w-4" /> Back to Login
+                    <ArrowLeft size={16} weight="bold" className="mr-2" /> Back to Login
                 </Link>
 
                 <div className="rounded-3xl border border-default bg-surface-raised/50 p-8 backdrop-blur-xl shadow-2xl">
@@ -46,7 +46,7 @@ export default function ForgotPasswordPage() {
                             <div className="space-y-2">
                                 <label className="block text-xs font-bold text-muted uppercase">Email Address</label>
                                 <div className="relative group">
-                                    <Mail className="absolute left-4 top-3.5 h-5 w-5 text-muted group-focus-within:text-emerald-500 transition-colors" />
+                                    <EnvelopeSimple size={20} weight="duotone" className="absolute left-4 top-3.5 text-muted group-focus-within:text-emerald-500 transition-colors" />
                                     <input
                                         type="email"
                                         value={email}
@@ -63,13 +63,13 @@ export default function ForgotPasswordPage() {
                                 disabled={isSubmitting}
                                 className="w-full py-4 bg-emerald-500 hover:bg-emerald-400 text-black font-bold"
                             >
-                                {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "Send Reset Link"}
+                                {isSubmitting ? <CircleNotch size={20} weight="bold" className="animate-spin mx-auto" /> : "Send Reset Link"}
                             </Button>
                         </form>
                     ) : (
                         <div className="text-center py-8">
                             <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <Mail className="w-8 h-8 text-emerald-500" />
+                                <EnvelopeSimple size={32} weight="duotone" className="text-emerald-500" />
                             </div>
                             <h3 className="text-xl font-bold text-primary mb-2">Check your email</h3>
                             <p className="text-secondary text-sm mb-6">

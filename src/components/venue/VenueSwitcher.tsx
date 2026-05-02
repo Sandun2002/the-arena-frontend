@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, Check, Building2, Plus } from "lucide-react";
+import { CaretDown, Check, Buildings, Plus } from "@phosphor-icons/react";
 import { useVenue } from "./VenueContext";
 import Link from "next/link";
 
@@ -19,7 +19,7 @@ export default function VenueSwitcher({ hideCreateAction = false }: { hideCreate
         return (
             <Link href="/venue-dashboard/create" className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-surface-overlay transition-colors border border-default bg-surface-raised/50 w-full group">
                 <div className="w-8 h-8 rounded bg-emerald-500/10 flex items-center justify-center text-emerald-500 group-hover:bg-emerald-500 group-hover:text-black transition-colors">
-                    <Plus className="w-4 h-4" />
+                    <Plus size={16} weight="bold" />
                 </div>
                 <div className="text-left hidden md:block">
                     <div className="text-xs text-muted font-bold uppercase">Get Started</div>
@@ -36,7 +36,7 @@ export default function VenueSwitcher({ hideCreateAction = false }: { hideCreate
                 className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-surface-overlay transition-colors border border-default bg-surface-base/40 group"
             >
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-surface-overlay to-surface-raised border border-subtle flex items-center justify-center text-emerald-500 group-hover:border-emerald-500/50 transition-colors">
-                    <Building2 className="w-5 h-5" />
+                    <Buildings size={20} weight="fill" />
                 </div>
                 <div className="text-left flex-1 overflow-hidden">
                     <div className="text-[10px] text-muted font-bold uppercase tracking-wider">Current Venue</div>
@@ -44,7 +44,7 @@ export default function VenueSwitcher({ hideCreateAction = false }: { hideCreate
                         {currentVenue?.name || "Select Venue"}
                     </div>
                 </div>
-                <ChevronDown className={`w-4 h-4 text-muted transition-transform ${isOpen ? "rotate-180" : ""}`} />
+                <CaretDown size={16} weight="bold" className={`text-muted transition-transform ${isOpen ? "rotate-180" : ""}`} />
             </button>
 
             {isOpen && (
@@ -65,7 +65,7 @@ export default function VenueSwitcher({ hideCreateAction = false }: { hideCreate
                                         }`}
                                 >
                                     <span className="truncate">{venue.name}</span>
-                                    {currentVenue?.id === venue.id && <Check className="w-4 h-4" />}
+                                    {currentVenue?.id === venue.id && <Check size={16} weight="bold" />}
                                 </button>
                             ))}
                         </div>
@@ -76,7 +76,7 @@ export default function VenueSwitcher({ hideCreateAction = false }: { hideCreate
                                     onClick={() => setIsOpen(false)}
                                     className="flex items-center justify-center gap-2 w-full text-center text-xs font-bold text-secondary hover:text-primary hover:bg-surface-overlay py-2 rounded-lg transition-colors"
                                 >
-                                    <Plus className="w-3 h-3" /> Add New Venue
+                                    <Plus size={12} weight="bold" /> Add New Venue
                                 </Link>
                             </div>
                         )}

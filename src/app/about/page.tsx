@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Button from "@/components/ui/Button";
-import { MapPin, Zap, Target } from "lucide-react";
+import { MapPin, Lightning, Target } from "@phosphor-icons/react";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -85,7 +85,7 @@ export default function AboutPage() {
                         {/* Card 1 */}
                         <div className="bg-surface-base border border-default p-10 rounded-3xl hover:border-emerald-500/30 transition-colors group">
                             <div className="w-14 h-14 bg-surface-raised rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                                <MapPin className="w-7 h-7 text-emerald-400" />
+                                <MapPin size={28} weight="fill" className="text-emerald-400" />
                             </div>
                             <h4 className="text-2xl font-bold text-primary mb-4">Island-Wide Access</h4>
                             <p className="text-secondary leading-relaxed">
@@ -96,7 +96,7 @@ export default function AboutPage() {
                         {/* Card 2 */}
                         <div className="bg-surface-base border border-default p-10 rounded-3xl hover:border-emerald-500/30 transition-colors group">
                             <div className="w-14 h-14 bg-surface-raised rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                                <Zap className="w-7 h-7 text-emerald-400" />
+                                <Lightning size={28} weight="fill" className="text-emerald-400" />
                             </div>
                             <h4 className="text-2xl font-bold text-primary mb-4">Empowering Centers</h4>
                             <p className="text-secondary leading-relaxed">
@@ -111,7 +111,7 @@ export default function AboutPage() {
             <section className="py-32 md:py-48 relative overflow-hidden reveal-section">
                 <div className="absolute inset-0 bg-emerald-900/5 pointer-events-none" />
                 <div className="container mx-auto px-4 text-center max-w-4xl relative z-10">
-                    <Target className="w-16 h-16 text-emerald-500 mx-auto mb-8 animate-pulse" />
+                    <Target size={64} weight="fill" className="text-emerald-500 mx-auto mb-8 animate-pulse" />
 
                     <h2 className="text-4xl md:text-6xl font-black text-primary mb-10 leading-tight">
                         &ldquo;We are building the <span className="text-emerald-500">largest sports community</span> in Sri Lanka.&rdquo;

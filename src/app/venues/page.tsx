@@ -6,7 +6,7 @@ import { api } from "@/services/api";
 import { VenueSearchResult, SearchParams, Sport, City } from "@/types";
 import VenueCard from "@/components/ui/VenueCard";
 import CourtFinderPanel from "@/components/venues/CourtFinderPanel";
-import { Search } from "lucide-react";
+import { MagnifyingGlass } from "@phosphor-icons/react";
 import { useToast } from "@/components/ui/Toast";
 
 
@@ -184,7 +184,7 @@ export default function VenuesPage() {
                             /* Empty State */
                             <div className="flex flex-col items-center justify-center py-20 text-center">
                                 <div className="w-20 h-20 bg-surface-raised rounded-full flex items-center justify-center mb-6">
-                                    <Search className="w-10 h-10 text-faint" />
+                                    <MagnifyingGlass size={40} weight="bold" className="text-faint" />
                                 </div>
                                 <h3 className="text-xl font-bold text-primary mb-2">No venues found</h3>
                                 <p className="text-muted max-w-md">
@@ -201,7 +201,7 @@ export default function VenuesPage() {
                             /* Initial State - Search Prompt */
                             <div className="flex flex-col items-center justify-center py-24 text-center">
                                 <div className="w-20 h-20 bg-surface-raised rounded-full flex items-center justify-center mb-6">
-                                    <Search className="w-10 h-10 text-faint" />
+                                    <MagnifyingGlass size={40} weight="bold" className="text-faint" />
                                 </div>
                                 <h3 className="text-2xl font-black text-primary mb-3 uppercase tracking-tight">Find Your Court</h3>
                                 <p className="text-muted max-w-md">

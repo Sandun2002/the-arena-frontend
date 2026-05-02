@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Instagram, Twitter, Linkedin } from "lucide-react";
+import { InstagramLogo, TwitterLogo, LinkedinLogo } from "@phosphor-icons/react";
 import { usePathname } from "next/navigation";
 
 export default function Footer() {
@@ -48,13 +48,13 @@ export default function Footer() {
             <h4 className="mb-4 font-semibold text-primary">Follow Us</h4>
             <div className="flex gap-4">
               <Link href="#" aria-label="Follow us on Instagram" className="hover:text-brand-accent-hover transition-colors">
-                <Instagram className="h-5 w-5" />
+                <InstagramLogo size={20} weight="duotone" />
               </Link>
               <Link href="#" aria-label="Follow us on Twitter" className="hover:text-brand-accent-hover transition-colors">
-                <Twitter className="h-5 w-5" />
+                <TwitterLogo size={20} weight="duotone" />
               </Link>
               <Link href="#" aria-label="Follow us on LinkedIn" className="hover:text-brand-accent-hover transition-colors">
-                <Linkedin className="h-5 w-5" />
+                <LinkedinLogo size={20} weight="duotone" />
               </Link>
             </div>
           </div>

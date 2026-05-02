@@ -4,7 +4,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { format, isSameDay, isValid } from "date-fns";
 import { fmtTime, fmtDateShort } from "@/lib/utils";
-import { Search, CheckCircle, XCircle, DollarSign, UserX, AlertCircle, Calendar as CalendarIcon, ChevronLeft, ChevronRight, Globe, UserPlus, Hammer, RefreshCw } from "lucide-react";
+import { MagnifyingGlass, CheckCircle, XCircle, CurrencyDollar, UserMinus, WarningCircle, Calendar as CalendarIcon, CaretLeft, CaretRight, Globe, UserPlus, Hammer, ArrowsClockwise } from "@phosphor-icons/react";
 import { PaymentStatus } from "@/types";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
@@ -116,7 +116,7 @@ export default function BookingsPage() {
     if (!currentVenue) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
-                <AlertCircle className="w-12 h-12 text-faint mb-4" />
+                <WarningCircle size={48} weight="duotone" className="text-faint mb-4" />
                 <h2 className="text-xl font-bold text-primary mb-2">No Venue Selected</h2>
                 <p className="text-secondary">Please select a venue to view bookings.</p>
             </div>
@@ -137,7 +137,7 @@ export default function BookingsPage() {
                 <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto flex-wrap">
                     {/* Date filter (client-side) */}
                     <div className="relative overflow-hidden group hover:bg-surface-overlay bg-surface-raised border border-default rounded-xl px-4 py-2 flex items-center justify-center gap-2 transition-colors">
-                        <CalendarIcon className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                        <CalendarIcon size={16} weight="duotone" className="text-emerald-500 flex-shrink-0" />
                         <span className="text-primary text-sm font-medium">
                             {selectedDate ? format(selectedDate, "MMM dd, yyyy") : "All Dates"}
                         </span>
@@ -168,7 +168,7 @@ export default function BookingsPage() {
 
                     {/* Search */}
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
+                        <MagnifyingGlass size={16} weight="bold" className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
                         <input
                             type="text"
                             placeholder="Search name or ref..."
@@ -285,16 +285,16 @@ export default function BookingsPage() {
                                                 )}
                                                 {booking.payment_status !== "paid" && booking.status !== "cancelled" && (
                                                     <Button size="sm" variant="outline" onClick={() => handleAction("pay", booking.id)} className="h-8 border-subtle text-emerald-500 hover:bg-emerald-500/10 hover:text-emerald-400" title="Mark as paid">
-                                                        <DollarSign className="w-3 h-3" />
+                                                        <CurrencyDollar size={12} weight="bold" />
                                                     </Button>
                                                 )}
                                                 {booking.status !== "cancelled" && (
                                                     <>
                                                         <Button size="sm" variant="outline" onClick={() => handleAction("noshow", booking.id)} className={`h-8 border-subtle ${booking.is_no_show ? "bg-red-500/20 text-red-500 border-red-500/20" : "text-secondary hover:text-red-400 hover:bg-red-500/10"}`} title="Toggle no-show">
-                                                            <UserX className="w-3 h-3" />
+                                                            <UserMinus size={12} weight="bold" />
                                                         </Button>
                                                         <Button size="sm" variant="outline" onClick={() => handleAction("cancel", booking.id)} className="h-8 border-subtle text-secondary hover:text-red-400 hover:bg-red-500/10" title="Cancel booking">
-                                                            <XCircle className="w-3 h-3" />
+                                                            <XCircle size={12} weight="bold" />
                                                         </Button>
                                                     </>
                                                 )}
@@ -306,7 +306,7 @@ export default function BookingsPage() {
                                 <tr>
                                     <td colSpan={7} className="p-12 text-center">
                                         <div className="flex flex-col items-center justify-center text-muted">
-                                            <Search className="w-8 h-8 mb-3 opacity-20" />
+                                            <MagnifyingGlass size={32} weight="duotone" className="mb-3 opacity-20" />
                                             <p className="font-medium">No bookings found</p>
                                             <p className="text-xs mt-1">Try adjusting your filters</p>
                                         </div>
@@ -333,7 +333,7 @@ export default function BookingsPage() {
                                 className="p-2 rounded-lg bg-surface-overlay text-secondary hover:text-primary hover:bg-surface-overlay disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                                 title="Previous page"
                             >
-                                <ChevronLeft className="w-4 h-4" />
+                                <CaretLeft size={16} weight="bold" />
                             </button>
 
                             {/* Page number pills */}
@@ -368,7 +368,7 @@ export default function BookingsPage() {
                                 className="p-2 rounded-lg bg-surface-overlay text-secondary hover:text-primary hover:bg-surface-overlay disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                                 title="Next page"
                             >
-                                <ChevronRight className="w-4 h-4" />
+                                <CaretRight size={16} weight="bold" />
                             </button>
                         </div>
                     </div>
@@ -399,21 +399,21 @@ function PaymentStatusInline({ status }: { status: PaymentStatus | string }) {
         case "paid":
             return (
                 <>
-                    <CheckCircle className="w-3 h-3 text-emerald-500" />
+                    <CheckCircle size={12} weight="fill" className="text-emerald-500" />
                     <span className="text-[10px] font-bold text-emerald-500">PAID</span>
                 </>
             );
         case "refunded":
             return (
                 <>
-                    <RefreshCw className="w-3 h-3 text-blue-400" />
+                    <ArrowsClockwise size={12} weight="bold" className="text-blue-400" />
                     <span className="text-[10px] font-bold text-blue-400">REFUNDED</span>
                 </>
             );
         case "failed":
             return (
                 <>
-                    <XCircle className="w-3 h-3 text-red-500" />
+                    <XCircle size={12} weight="fill" className="text-red-500" />
                     <span className="text-[10px] font-bold text-red-500">FAILED</span>
                 </>
             );
@@ -432,20 +432,20 @@ function SourceBadge({ booking }: { booking: Booking }) {
     if (booking.is_blocked) {
         return (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded border bg-surface-overlay/30 text-secondary border-subtle/50 text-[10px] font-bold uppercase tracking-wider">
-                <Hammer className="w-3 h-3" /> Maintenance
+                <Hammer size={12} weight="fill" /> Maintenance
             </span>
         );
     }
     if (booking.is_manual) {
         return (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded border bg-orange-500/10 text-orange-400 border-orange-500/30 text-[10px] font-bold uppercase tracking-wider">
-                <UserPlus className="w-3 h-3" /> Walk-in
+                <UserPlus size={12} weight="fill" /> Walk-in
             </span>
         );
     }
     return (
         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded border bg-blue-500/10 text-blue-400 border-blue-500/30 text-[10px] font-bold uppercase tracking-wider">
-            <Globe className="w-3 h-3" /> Platform
+            <Globe size={12} weight="fill" /> Platform
         </span>
     );
 }

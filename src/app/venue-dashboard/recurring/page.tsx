@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Plus, Repeat, Calendar, Clock, Edit2, Play, Pause, Trash2, Layers, Phone, ArrowRight, CalendarRange } from "lucide-react";
+import { Plus, ArrowsClockwise, Calendar, Clock, PencilSimple, Play, Pause, Trash, Stack, Phone, ArrowRight, CalendarBlank } from "@phosphor-icons/react";
 import gsap from "gsap";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
@@ -97,7 +97,7 @@ export default function RecurringPage() {
     if (!currentVenue) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
-                <Repeat className="w-12 h-12 text-faint mb-4" />
+                <ArrowsClockwise size={48} weight="duotone" className="text-faint mb-4" />
                 <h2 className="text-xl font-bold text-primary mb-2">No Venue Selected</h2>
                 <p className="text-secondary">Please select a venue to manage recurring bookings.</p>
             </div>
@@ -130,7 +130,7 @@ export default function RecurringPage() {
                         <p className="text-secondary">Manage long-term slot reservations for academies and corporate clients.</p>
                     </div>
                     <Button onClick={handleCreate} className="bg-emerald-600 text-primary hover:bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.3)]">
-                        <Plus className="mr-2 h-4 w-4" /> Create Recurring
+                        <Plus size={16} weight="bold" className="mr-2" /> Create Recurring
                     </Button>
                 </div>
 
@@ -139,7 +139,7 @@ export default function RecurringPage() {
                         [1, 2].map(i => <div key={i} className="h-64 bg-surface-raised/30 rounded-2xl animate-pulse" />)
                     ) : bookings.length === 0 ? (
                         <div className="col-span-1 md:col-span-2 text-center py-16 bg-surface-raised/20 rounded-3xl border border-default border-dashed">
-                            <Repeat className="w-12 h-12 text-faint mx-auto mb-4" />
+                            <ArrowsClockwise size={48} weight="duotone" className="text-faint mx-auto mb-4" />
                             <h3 className="text-xl font-bold text-primary mb-2">No Recurring Bookings</h3>
                             <p className="text-muted mb-6">Set up your first ongoing reservation.</p>
                             <Button onClick={handleCreate}>Create Booking</Button>
@@ -155,13 +155,13 @@ export default function RecurringPage() {
                                     <div className="px-5 pt-5 pb-4 flex items-start justify-between gap-4">
                                         <div className="flex items-center gap-3 min-w-0">
                                             <div className="w-10 h-10 rounded-xl bg-surface-overlay flex items-center justify-center shrink-0">
-                                                <Repeat className="h-5 w-5 text-emerald-500" />
+                                                <ArrowsClockwise size={20} weight="bold" className="text-emerald-500" />
                                             </div>
                                             <div className="min-w-0">
                                                 <h3 className="font-bold text-primary text-lg leading-tight truncate">{booking.client_name}</h3>
                                                 {booking.client_phone && (
                                                     <span className="text-xs text-muted flex items-center gap-1 mt-0.5">
-                                                        <Phone className="h-3 w-3" />{booking.client_phone}
+                                                        <Phone size={12} weight="fill" />{booking.client_phone}
                                                     </span>
                                                 )}
                                             </div>
@@ -178,29 +178,29 @@ export default function RecurringPage() {
                                     <div className="grid grid-cols-2 gap-px bg-surface-overlay/40 border-t border-b border-default/60">
                                         <div className="bg-surface-raised/80 px-4 py-3">
                                             <p className="text-[10px] font-bold text-muted uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                                                <Calendar className="h-3 w-3" /> Day
+                                                <Calendar size={12} weight="bold" /> Day
                                             </p>
                                             <p className="text-primary font-semibold text-sm">Every {dayLabel}</p>
                                         </div>
                                         <div className="bg-surface-raised/80 px-4 py-3">
                                             <p className="text-[10px] font-bold text-muted uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                                                <Clock className="h-3 w-3" /> Time
+                                                <Clock size={12} weight="bold" /> Time
                                             </p>
                                             <p className="text-primary font-semibold text-sm">{booking.start_time} – {booking.end_time}</p>
                                         </div>
                                         <div className="bg-surface-raised/80 px-4 py-3">
                                             <p className="text-[10px] font-bold text-muted uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                                                <Layers className="h-3 w-3" /> Court
+                                                <Stack size={12} weight="bold" /> Court
                                             </p>
                                             <p className="text-primary font-semibold text-sm">{booking.court_name || "—"}</p>
                                         </div>
                                         <div className="bg-surface-raised/80 px-4 py-3">
                                             <p className="text-[10px] font-bold text-muted uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                                                <CalendarRange className="h-3 w-3" /> Valid Period
+                                                <CalendarBlank size={12} weight="bold" /> Valid Period
                                             </p>
                                             <p className="text-primary font-semibold text-sm flex items-center gap-1 flex-wrap">
                                                 {formatDateShort(booking.start_date)}
-                                                <ArrowRight className="h-3 w-3 text-muted shrink-0" />
+                                                <ArrowRight size={12} weight="bold" className="text-muted shrink-0" />
                                                 {formatDateShort(booking.end_date)}
                                             </p>
                                         </div>
@@ -224,14 +224,14 @@ export default function RecurringPage() {
                                                 className="p-1.5 rounded-lg bg-surface-overlay/60 hover:bg-surface-overlay text-secondary hover:text-primary transition-colors"
                                                 title={booking.status === 'paused' ? "Resume" : "Pause"}
                                             >
-                                                {booking.status === 'paused' ? <Play className="h-3.5 w-3.5" /> : <Pause className="h-3.5 w-3.5" />}
+                                                {booking.status === 'paused' ? <Play size={14} weight="fill" /> : <Pause size={14} weight="fill" />}
                                             </button>
                                             <button
                                                 onClick={() => handleEdit(booking)}
                                                 className="p-1.5 rounded-lg bg-surface-overlay/60 hover:bg-surface-overlay text-secondary hover:text-primary transition-colors"
                                                 title="Edit"
                                             >
-                                                <Edit2 className="h-3.5 w-3.5" />
+                                                <PencilSimple size={14} weight="bold" />
                                             </button>
                                             {isVenueOwner && (
                                                 <button
@@ -239,7 +239,7 @@ export default function RecurringPage() {
                                                     className="p-1.5 rounded-lg bg-surface-overlay/60 hover:bg-red-500/20 text-secondary hover:text-red-400 transition-colors"
                                                     title="Delete"
                                                 >
-                                                    <Trash2 className="h-3.5 w-3.5" />
+                                                    <Trash size={14} weight="bold" />
                                                 </button>
                                             )}
                                         </div>

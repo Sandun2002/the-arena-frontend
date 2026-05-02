@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell } from "lucide-react";
+import { Bell } from "@phosphor-icons/react";
 import { useNotifications } from "@/contexts/NotificationContext";
 import { cn } from "@/lib/utils";
 
@@ -22,7 +22,7 @@ export function NotificationBell({ className }: NotificationBellProps) {
         className
       )}
     >
-      <Bell size={18} strokeWidth={1.8} />
+      <Bell size={18} weight="bold" />
       {unreadCount > 0 && (
         <span
           className={cn(

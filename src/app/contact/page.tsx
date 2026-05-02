@@ -7,7 +7,7 @@ import { z } from "zod";
 import gsap from "gsap";
 import apiClient from "@/services/apiClient";
 import Button from "@/components/ui/Button";
-import { Mail, MapPin, Phone, MessageSquare, Send, CheckCircle, Loader2 } from "lucide-react";
+import { EnvelopeSimple, MapPin, Phone, ChatCircleText, PaperPlaneRight, CheckCircle, CircleNotch } from "@phosphor-icons/react";
 
 const contactSchema = z.object({
     first_name: z.string().min(1, "First name is required").max(50),
@@ -81,7 +81,7 @@ export default function ContactPage() {
                     <div className="space-y-8">
                         <div className="contact-anim group p-8 rounded-3xl bg-surface-raised/30 border border-default hover:border-emerald-500/50 hover:bg-surface-raised/50 transition-all duration-300">
                             <div className="w-12 h-12 bg-surface-overlay rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                                <Mail className="h-6 w-6 text-emerald-500" />
+                                <EnvelopeSimple size={24} weight="fill" className="text-emerald-500" />
                             </div>
                             <h3 className="text-2xl font-bold text-primary mb-2">Email Us</h3>
                             <p className="text-secondary mb-4">For general inquiries and support.</p>
@@ -100,7 +100,7 @@ export default function ContactPage() {
 
                         <div className="contact-anim group p-8 rounded-3xl bg-surface-raised/30 border border-default hover:border-emerald-500/50 hover:bg-surface-raised/50 transition-all duration-300">
                             <div className="w-12 h-12 bg-surface-overlay rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                                <Phone className="h-6 w-6 text-emerald-500" />
+                                <Phone size={24} weight="fill" className="text-emerald-500" />
                             </div>
                             <h3 className="text-2xl font-bold text-primary mb-2">Call Us</h3>
                             <p className="text-secondary mb-4">Available during business hours.</p>
@@ -116,7 +116,7 @@ export default function ContactPage() {
 
                         <div className="contact-anim group p-8 rounded-3xl bg-surface-raised/30 border border-default hover:border-emerald-500/50 hover:bg-surface-raised/50 transition-all duration-300">
                             <div className="w-12 h-12 bg-surface-overlay rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                                <MapPin className="h-6 w-6 text-emerald-500" />
+                                <MapPin size={24} weight="fill" className="text-emerald-500" />
                             </div>
                             <h3 className="text-2xl font-bold text-primary mb-2">Visit HQ</h3>
                             <p className="text-secondary">
@@ -133,7 +133,7 @@ export default function ContactPage() {
                             {submitted ? (
                                 <div className="flex flex-col items-center justify-center py-16 text-center gap-6">
                                     <div className="w-16 h-16 rounded-full bg-emerald-500/15 flex items-center justify-center">
-                                        <CheckCircle className="w-8 h-8 text-emerald-500" />
+                                        <CheckCircle size={32} weight="fill" className="text-emerald-500" />
                                     </div>
                                     <div>
                                         <h3 className="text-2xl font-bold text-primary mb-2">Message Sent!</h3>
@@ -143,7 +143,7 @@ export default function ContactPage() {
                             ) : (
                                 <>
                                     <div className="flex items-center gap-3 mb-8">
-                                        <MessageSquare className="w-6 h-6 text-emerald-500" />
+                                        <ChatCircleText size={24} weight="fill" className="text-emerald-500" />
                                         <h3 className="text-2xl font-bold text-primary">Send a Message</h3>
                                     </div>
 
@@ -215,13 +215,13 @@ export default function ContactPage() {
                                             <span className="flex items-center justify-center gap-2">
                                                 {isSubmitting ? (
                                                     <>
-                                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                                        <CircleNotch size={16} weight="bold" className="animate-spin" />
                                                         Sending…
                                                     </>
                                                 ) : (
                                                     <>
                                                         Send Message
-                                                        <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                                        <PaperPlaneRight size={16} weight="bold" className="group-hover:translate-x-1 transition-transform" />
                                                     </>
                                                 )}
                                             </span>

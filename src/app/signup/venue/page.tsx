@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "@/components/ui/Button";
-import { ArrowLeft, Loader2, Building2 } from "lucide-react";
+import { ArrowLeft, CircleNotch, Buildings } from "@phosphor-icons/react";
 import { authService } from "@/services/authService";
 import { useToast } from "@/components/ui/Toast";
 
@@ -81,13 +81,13 @@ export default function VenueSignupPage() {
     <main className="min-h-screen bg-surface-base flex flex-col items-center justify-start pt-24 pb-12 px-4">
       <div className="w-full max-w-md">
         <Link href="/signup" className="mb-8 inline-flex items-center text-sm text-muted hover:text-primary transition-colors">
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Selection
+          <ArrowLeft size={16} weight="bold" className="mr-2" /> Back to Selection
         </Link>
 
         <div className="rounded-3xl border border-default bg-surface-raised/50 p-8 backdrop-blur-xl shadow-blue-900/10 shadow-2xl">
           <div className="flex items-center gap-3 mb-2">
             <div className="p-2 bg-blue-500/10 rounded-lg">
-              <Building2 className="w-6 h-6 text-blue-500" />
+              <Buildings size={24} weight="duotone" className="text-blue-500" />
             </div>
             <h1 className="text-3xl font-bold text-primary">Venue Owner</h1>
           </div>
@@ -155,7 +155,7 @@ export default function VenueSignupPage() {
               disabled={isSubmitting}
               className="w-full py-4 mt-6 bg-blue-600 hover:bg-blue-500 text-primary font-bold border-none"
             >
-              {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "Register Owner Account"}
+              {isSubmitting ? <CircleNotch size={20} weight="bold" className="animate-spin mx-auto" /> : "Register Owner Account"}
             </Button>
           </form>
         </div>

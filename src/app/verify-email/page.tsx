@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, XCircle } from "@phosphor-icons/react";
 import { useTheme } from "@/contexts/ThemeContext";
 
 function VerifyEmailContent() {
@@ -87,7 +87,7 @@ function VerifyEmailContent() {
           {status === "success" && (
             <>
               <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-emerald-500/20">
-                <CheckCircle className="w-10 h-10 text-emerald-500" />
+                <CheckCircle size={40} weight="fill" className="text-emerald-500" />
               </div>
               <h1 className="text-2xl font-bold text-primary mb-3">Email Verified!</h1>
               <p className="text-secondary text-sm mb-6 leading-relaxed">{message}</p>
@@ -105,7 +105,7 @@ function VerifyEmailContent() {
           {status === "error" && (
             <>
               <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-red-500/20">
-                <XCircle className="w-10 h-10 text-red-500" />
+                <XCircle size={40} weight="fill" className="text-red-500" />
               </div>
               <h1 className="text-2xl font-bold text-primary mb-3">Verification Failed</h1>
               <p className="text-secondary text-sm mb-8 leading-relaxed">{message}</p>

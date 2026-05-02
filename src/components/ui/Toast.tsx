@@ -2,7 +2,7 @@
 "use client";
 
 import { createContext, useContext, useState, useCallback, useEffect } from "react";
-import { X, CheckCircle, AlertTriangle, Info, AlertCircle } from "lucide-react";
+import { X, CheckCircle, Warning, Info, WarningCircle } from "@phosphor-icons/react";
 
 type ToastType = "success" | "error" | "warning" | "info";
 
@@ -58,10 +58,10 @@ function ToastItem({ type, message, onDismiss }: Toast & { onDismiss: () => void
     }, []);
 
     const icons = {
-        success: <CheckCircle className="w-5 h-5 text-emerald-400" />,
-        error: <AlertCircle className="w-5 h-5 text-red-400" />,
-        warning: <AlertTriangle className="w-5 h-5 text-yellow-400" />,
-        info: <Info className="w-5 h-5 text-blue-400" />,
+        success: <CheckCircle size={20} weight="fill" className="text-emerald-400" />,
+        error: <WarningCircle size={20} weight="fill" className="text-red-400" />,
+        warning: <Warning size={20} weight="fill" className="text-yellow-400" />,
+        info: <Info size={20} weight="fill" className="text-blue-400" />,
     };
 
     const bgColors = {
@@ -83,7 +83,7 @@ function ToastItem({ type, message, onDismiss }: Toast & { onDismiss: () => void
             {icons[type]}
             <p className="flex-1 text-sm font-medium text-primary">{message}</p>
             <button onClick={onDismiss} className="text-secondary hover:text-primary transition-colors">
-                <X className="w-4 h-4" />
+                <X size={16} weight="bold" />
             </button>
         </div>
     );

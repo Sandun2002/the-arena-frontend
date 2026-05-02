@@ -1,6 +1,6 @@
 "use client";
 
-import { User as UserIcon } from "lucide-react";
+import { User as UserIcon } from "@phosphor-icons/react";
 import { getTierConfig, TierName } from "@/lib/tierUtils";
 
 export type FrameSize = "sm" | "md" | "lg" | "xl";
@@ -166,6 +166,7 @@ export default function TierFrame({
             <>{placeholder}</>
           ) : (
             <UserIcon
+              weight="duotone"
               style={{ width: s.avatar * 0.45, height: s.avatar * 0.45, color: "#71717a" }}
             />
           )}

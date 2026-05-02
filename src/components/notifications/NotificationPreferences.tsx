@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { Bell, BellOff, Smartphone, Monitor, Check, AlertCircle, Loader2 } from "lucide-react";
+import { Bell, BellSlash, DeviceMobile, Monitor, Check, WarningCircle, CircleNotch } from "@phosphor-icons/react";
 import { useNotifications } from "@/contexts/NotificationContext";
 import { useAuth } from "@/services/authContext";
 import { NotificationPreferenceItem } from "@/services/notificationService";
@@ -229,9 +229,9 @@ export function NotificationPreferences() {
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             {mute ? (
-              <BellOff size={18} className="text-muted shrink-0" />
+              <BellSlash size={18} weight="duotone" className="text-muted shrink-0" />
             ) : (
-              <Bell size={18} className="text-emerald-500 shrink-0" />
+              <Bell size={18} weight="duotone" className="text-emerald-500 shrink-0" />
             )}
             <div className="min-w-0">
               <p className="text-sm font-semibold text-primary">Mute Player Notifications</p>
@@ -273,8 +273,8 @@ export function NotificationPreferences() {
                 {group.group}
               </h3>
               <div className="flex items-center gap-4 pr-1">
-                <ChannelHeader icon={<Smartphone size={11} />} label="Push" />
-                <ChannelHeader icon={<Monitor size={11} />} label="In-app" />
+                <ChannelHeader icon={<DeviceMobile size={12} weight="bold" />} label="Push" />
+                <ChannelHeader icon={<Monitor size={12} weight="bold" />} label="In-app" />
               </div>
             </div>
             {groupMuted && (
@@ -321,7 +321,7 @@ export function NotificationPreferences() {
         <span className="text-sm text-muted min-w-0 truncate">
           {saved ? (
             <span className="inline-flex items-center gap-1.5 text-emerald-500">
-              <Check size={14} /> Preferences saved
+              <Check size={14} weight="bold" /> Preferences saved
             </span>
           ) : isDirty ? (
             <span className="inline-flex items-center gap-1.5 text-amber-500">
@@ -371,7 +371,7 @@ function DevicePushCard({
     return (
       <div className="bg-surface-raised border border-amber-500/30 rounded-2xl p-5">
         <div className="flex items-start gap-3">
-          <AlertCircle size={18} className="text-amber-500 shrink-0 mt-0.5" />
+          <WarningCircle size={18} weight="fill" className="text-amber-500 shrink-0 mt-0.5" />
           <div className="min-w-0">
             <p className="text-sm font-semibold text-primary">Push Blocked in Browser</p>
             <p className="text-xs text-muted mt-1">
@@ -400,7 +400,7 @@ function DevicePushCard({
     <div className="bg-surface-raised border border-default rounded-2xl p-5">
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3 min-w-0">
-          <Smartphone size={18} className="text-secondary shrink-0" />
+          <DeviceMobile size={18} weight="duotone" className="text-secondary shrink-0" />
           <div className="min-w-0">
             <p className="text-sm font-semibold text-primary">Push Notifications on This Device</p>
             <p className="text-xs text-muted mt-0.5">
@@ -422,7 +422,7 @@ function DevicePushCard({
             busy && "opacity-60 cursor-wait"
           )}
         >
-          {busy && <Loader2 size={12} className="animate-spin" />}
+          {busy && <CircleNotch size={12} weight="bold" className="animate-spin" />}
           {pushEnabled ? "Disable on This Device" : "Enable Push"}
         </button>
       </div>

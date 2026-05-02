@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { Wrench, Clock, Mail } from "lucide-react";
+import { Wrench, Clock, EnvelopeSimple } from "@phosphor-icons/react";
 
 export default function MaintenancePage() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -103,7 +103,7 @@ export default function MaintenancePage() {
         <div className="w-full max-w-3xl text-center perspective-[1000px]">
           {/* Icon */}
           <div className="m-card inline-flex items-center justify-center w-20 h-20 md:w-24 md:h-24 rounded-3xl bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-500/20 mb-8 shadow-[0_0_40px_rgba(16,185,129,0.15)]">
-            <Wrench className="w-9 h-9 md:w-11 md:h-11 text-emerald-400" />
+            <Wrench size={44} weight="fill" className="text-emerald-400" />
           </div>
 
           {/* Headline */}
@@ -130,7 +130,7 @@ export default function MaintenancePage() {
             <div className="m-card bg-surface-raised/60 backdrop-blur-xl border border-default/60 rounded-2xl p-4 md:p-5 text-left hover:border-emerald-500/30 transition-colors">
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                  <Clock className="w-4 h-4 text-emerald-400" />
+                  <Clock size={16} weight="bold" className="text-emerald-400" />
                 </div>
                 <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-secondary">
                   Status
@@ -147,7 +147,7 @@ export default function MaintenancePage() {
             >
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                  <Mail className="w-4 h-4 text-emerald-400" />
+                  <EnvelopeSimple size={16} weight="bold" className="text-emerald-400" />
                 </div>
                 <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-secondary">
                   Questions?

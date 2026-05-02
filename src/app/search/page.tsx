@@ -4,7 +4,7 @@ import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Filter, MapPin, Search } from "lucide-react";
+import { Faders, MapPin, MagnifyingGlass } from "@phosphor-icons/react";
 import gsap from "gsap";
 import Button from "@/components/ui/Button";
 import TimePicker from "@/components/ui/TimePicker";
@@ -131,7 +131,7 @@ function SearchContent() {
                     <aside className="filter-sidebar lg:col-span-1 space-y-6">
                         <div className="rounded-[2rem] border border-default bg-surface-raised/40 backdrop-blur-sm p-6 sticky top-24">
                             <div className="flex items-center gap-2 mb-6 text-primary font-bold text-lg">
-                                <Filter className="h-5 w-5 text-emerald-500" />
+                                <Faders size={20} weight="bold" className="text-emerald-500" />
                                 Filters
                             </div>
 
@@ -249,7 +249,7 @@ function SearchContent() {
                                                 <div>
                                                     <h3 className="text-2xl font-bold text-primary mb-1">{venue.venue_name}</h3>
                                                     <div className="flex items-center gap-2 text-secondary text-sm mb-2">
-                                                        <MapPin className="h-4 w-4 text-emerald-500" />
+                                                        <MapPin size={16} weight="fill" className="text-emerald-500" />
                                                         {venue.city}
                                                     </div>
                                                     <p className="text-sm text-muted">{venue.address}</p>
@@ -280,7 +280,7 @@ function SearchContent() {
                                             <div className="flex justify-between items-center gap-4">
                                                 <p className="text-xs text-muted">Search window: {selectedDate} · {startTime} - {endTime}</p>
                                                 <Link href={`/venues/${venue.venue_id}?${queryStr}`} className="text-sm font-bold text-primary hover:text-emerald-400 transition-colors flex items-center gap-1">
-                                                    View Venue Details <Search className="h-4 w-4" />
+                                                    View Venue Details <MagnifyingGlass size={16} weight="bold" />
                                                 </Link>
                                             </div>
                                         </div>

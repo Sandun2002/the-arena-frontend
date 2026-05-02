@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Bell, X } from "lucide-react";
+import { Bell, X } from "@phosphor-icons/react";
 import { useNotifications } from "@/contexts/NotificationContext";
 import { useAuth } from "@/services/authContext";
 
@@ -41,7 +41,7 @@ export function PushPromptBanner() {
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100vw-32px)] max-w-md animate-in slide-in-from-bottom-4 fade-in-0 duration-300">
       <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 shadow-2xl shadow-black/60 flex items-start gap-3">
         <div className="w-9 h-9 rounded-xl bg-emerald-950/60 border border-emerald-900/40 flex items-center justify-center flex-shrink-0">
-          <Bell size={16} className="text-emerald-400" />
+          <Bell size={16} weight="duotone" className="text-emerald-400" />
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-zinc-100">Enable Push Notifications</p>
@@ -69,7 +69,7 @@ export function PushPromptBanner() {
           className="p-1 text-zinc-600 hover:text-zinc-400 transition-colors flex-shrink-0"
           aria-label="Dismiss"
         >
-          <X size={14} />
+          <X size={14} weight="bold" />
         </button>
       </div>
     </div>

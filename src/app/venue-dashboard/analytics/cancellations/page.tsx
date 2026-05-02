@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowLeft, Loader2, XCircle, UserX, AlertTriangle, Ban, AlertCircle } from "lucide-react";
+import { ArrowLeft, CircleNotch, XCircle, UserMinus, Warning, Prohibit, WarningCircle } from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
 import { centerService } from "@/services/centerService";
@@ -53,14 +53,14 @@ export default function CancellationsAnalyticsPage() {
             <div className="container mx-auto max-w-5xl relative z-10">
                 <div className="mb-6">
                     <Button variant="ghost" onClick={() => router.back()} className="text-secondary hover:text-primary pl-0">
-                        <ArrowLeft className="w-4 h-4 mr-2" /> Back to Analytics
+                        <ArrowLeft size={16} weight="bold" className="mr-2" /> Back to Analytics
                     </Button>
                 </div>
 
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                     <div>
                         <h1 className="text-3xl font-bold text-primary mb-2 flex items-center gap-2">
-                            <XCircle className="w-8 h-8 text-red-500" /> Cancellations & No-Shows
+                            <XCircle size={32} weight="fill" className="text-red-500" /> Cancellations & No-Shows
                         </h1>
                         <p className="text-secondary">Booking cancellation stats for <span className="text-emerald-500">{currentVenue.name}</span>.</p>
                     </div>
@@ -83,7 +83,7 @@ export default function CancellationsAnalyticsPage() {
 
                 {isLoading && !data ? (
                     <div className="h-96 flex items-center justify-center">
-                        <Loader2 className="w-8 h-8 animate-spin text-muted" />
+                        <CircleNotch size={32} weight="bold" className="animate-spin text-muted" />
                     </div>
                 ) : (
                     <div className="space-y-6">
@@ -93,7 +93,7 @@ export default function CancellationsAnalyticsPage() {
                             <div className="bg-surface-raised/40 border border-default rounded-3xl p-8 backdrop-blur-sm">
                                 <div className="flex items-start justify-between mb-4">
                                     <div className="p-3 bg-red-500/10 rounded-xl">
-                                        <XCircle className="w-6 h-6 text-red-500" />
+                                        <XCircle size={24} weight="fill" className="text-red-500" />
                                     </div>
                                 </div>
                                 <h3 className="text-4xl font-bold text-primary mb-1">{data?.total_cancellations || 0}</h3>
@@ -104,7 +104,7 @@ export default function CancellationsAnalyticsPage() {
                             <div className="bg-surface-raised/40 border border-default rounded-3xl p-8 backdrop-blur-sm">
                                 <div className="flex items-start justify-between mb-4">
                                     <div className="p-3 bg-orange-500/10 rounded-xl">
-                                        <AlertTriangle className="w-6 h-6 text-orange-500" />
+                                        <Warning size={24} weight="fill" className="text-orange-500" />
                                     </div>
                                 </div>
                                 <h3 className="text-4xl font-bold text-primary mb-1">{data?.cancellation_rate || 0}%</h3>
@@ -116,7 +116,7 @@ export default function CancellationsAnalyticsPage() {
                             <div className="bg-surface-raised/40 border border-default rounded-3xl p-8 backdrop-blur-sm">
                                 <div className="flex items-start justify-between mb-4">
                                     <div className="p-3 bg-surface-overlay rounded-xl">
-                                        <UserX className="w-6 h-6 text-secondary" />
+                                        <UserMinus size={24} weight="fill" className="text-secondary" />
                                     </div>
                                 </div>
                                 <h3 className="text-4xl font-bold text-primary mb-1">{data?.no_show_count || 0}</h3>
@@ -128,7 +128,7 @@ export default function CancellationsAnalyticsPage() {
                             <div className="bg-surface-raised/40 border border-default rounded-3xl p-8 backdrop-blur-sm">
                                 <div className="flex items-start justify-between mb-4">
                                     <div className="p-3 bg-yellow-500/10 rounded-xl">
-                                        <Ban className="w-6 h-6 text-yellow-500" />
+                                        <Prohibit size={24} weight="fill" className="text-yellow-500" />
                                     </div>
                                 </div>
                                 <h3 className="text-4xl font-bold text-primary mb-1">{data?.rejected_bookings || 0}</h3>
@@ -142,7 +142,7 @@ export default function CancellationsAnalyticsPage() {
                         {data?.cancellation_reasons && Object.keys(data.cancellation_reasons).length > 0 && (
                             <div className="bg-surface-raised/40 border border-default rounded-3xl p-8 backdrop-blur-sm">
                                 <h3 className="text-lg font-bold text-primary mb-6 flex items-center gap-2">
-                                    <AlertCircle className="w-5 h-5 text-muted" /> Cancellation Reasons
+                                    <WarningCircle size={20} weight="bold" className="text-muted" /> Cancellation Reasons
                                 </h3>
                                 <div className="space-y-4">
                                     {Object.entries(data.cancellation_reasons).map(([reason, count], i) => {

@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Loader2 } from "lucide-react";
+import { CircleNotch } from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import { venueApiService } from "@/services/venueApiService";
 import { centerService } from "@/services/centerService";
@@ -219,7 +219,7 @@ export default function CourtFormModal({ venueId, existingCourt, onClose, onSucc
                 disabled={isSubmitting || loadingSports}
                 className="w-full py-3.5 bg-emerald-500 hover:bg-emerald-400 text-black font-bold rounded-xl mt-4"
             >
-                {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : (existingCourt ? "Update Court" : "Create Court")}
+                {isSubmitting ? <CircleNotch size={20} weight="bold" className="animate-spin mx-auto" /> : (existingCourt ? "Update Court" : "Create Court")}
             </Button>
         </form>
     );

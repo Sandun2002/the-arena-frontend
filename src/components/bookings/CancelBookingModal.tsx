@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { AlertTriangle, Loader2 } from "lucide-react";
+import { Warning, CircleNotch } from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import { Booking } from "@/types";
 import { playerService } from "@/services/playerService";
@@ -41,7 +41,7 @@ export default function CancelBookingModal({ booking, onClose, onSuccess }: Canc
     return (
         <div className="space-y-6">
             <div className="flex items-start gap-4 p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
-                <AlertTriangle className="w-6 h-6 text-red-500 flex-shrink-0 mt-0.5" />
+                <Warning size={24} weight="duotone" className="text-red-500 flex-shrink-0 mt-0.5" />
                 <div>
                     <h3 className="text-sm font-bold text-red-500 mb-1">Cancellation Policy</h3>
                     <p className="text-xs text-red-200/70 leading-relaxed">
@@ -73,7 +73,7 @@ export default function CancelBookingModal({ booking, onClose, onSuccess }: Canc
                     disabled={isSubmitting}
                     className="flex-1 bg-red-600 hover:bg-red-700 text-primary border-none"
                 >
-                    {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Confirm Cancellation"}
+                    {isSubmitting ? <CircleNotch size={16} weight="bold" className="animate-spin" /> : "Confirm Cancellation"}
                 </Button>
             </div>
         </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Star, Loader2, AlertTriangle } from "lucide-react";
+import { Star, CircleNotch, Warning } from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import { playerService } from "@/services/playerService";
 import { useAuth } from "@/services/authContext";
@@ -88,7 +88,7 @@ export default function ReviewFormModal({ venueId, bookingId, onClose, onSuccess
     if (error) {
         return (
             <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-center">
-                <AlertTriangle className="w-8 h-8 text-red-500 mx-auto mb-2" />
+                <Warning size={32} weight="duotone" className="text-red-500 mx-auto mb-2" />
                 <p className="text-red-400 font-bold mb-1">Cannot Submit Review</p>
                 <p className="text-red-200/70 text-sm mb-4">{error}</p>
                 <Button variant="ghost" onClick={onClose} className="w-full text-red-400 hover:bg-red-500/10 hover:text-red-300">Close</Button>
@@ -99,7 +99,7 @@ export default function ReviewFormModal({ venueId, bookingId, onClose, onSuccess
     if (!bookingId) {
         return (
             <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl text-center">
-                <AlertTriangle className="w-8 h-8 text-amber-400 mx-auto mb-2" />
+                <Warning size={32} weight="duotone" className="text-amber-400 mx-auto mb-2" />
                 <p className="text-amber-200 font-bold mb-1">Booking Required</p>
                 <p className="text-amber-100/70 text-sm mb-4">Reviews can only be submitted for completed bookings.</p>
                 <Button variant="ghost" onClick={onClose} className="w-full text-amber-200 hover:bg-amber-500/10 hover:text-amber-100">Close</Button>
@@ -119,7 +119,8 @@ export default function ReviewFormModal({ venueId, bookingId, onClose, onSuccess
                             className="transition-transform hover:scale-110 focus:outline-none"
                         >
                             <Star
-                                className={`w-8 h-8 ${rating >= star ? "text-yellow-500 fill-yellow-500" : "text-faint"}`}
+                                size={32} weight={rating >= star ? "fill" : "regular"}
+                                className={rating >= star ? "text-yellow-500" : "text-faint"}
                             />
                         </button>
                     ))}
@@ -142,7 +143,7 @@ export default function ReviewFormModal({ venueId, bookingId, onClose, onSuccess
                 disabled={isSubmitting}
                 className="w-full py-4 bg-emerald-500 hover:bg-emerald-400 text-black font-bold"
             >
-                {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "Submit Review"}
+                {isSubmitting ? <CircleNotch size={20} weight="bold" className="animate-spin mx-auto" /> : "Submit Review"}
             </Button>
         </div>
     );

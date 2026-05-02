@@ -3,9 +3,9 @@
 
 import { useEffect, useState } from "react";
 import {
-    TrendingUp, DollarSign, Calendar, Users,
-    BarChart2, Clock, Loader2, ArrowRight, Receipt, XCircle, Zap
-} from "lucide-react";
+    TrendUp, CurrencyDollar, Calendar, Users,
+    ChartBar, CircleNotch, ArrowRight, Receipt, XCircle, Lightning
+} from "@phosphor-icons/react";
 import { useAuth } from "@/services/authContext";
 import { centerService } from "@/services/centerService";
 import { DashboardStats, AnalyticsRevenue, AnalyticsUtilization } from "@/types";
@@ -104,7 +104,7 @@ export default function AnalyticsPage() {
 
                 {isLoading && !stats ? (
                     <div className="h-96 flex items-center justify-center">
-                        <Loader2 className="w-8 h-8 animate-spin text-muted" />
+                        <CircleNotch size={32} weight="bold" className="animate-spin text-muted" />
                     </div>
                 ) : (
                     <>
@@ -114,9 +114,9 @@ export default function AnalyticsPage() {
                                 <Link href="/venue-dashboard/analytics/revenue" className="bg-surface-raised/40 border border-default hover:border-emerald-500/50 p-4 rounded-xl backdrop-blur-sm transition-all group">
                                     <div className="flex items-center justify-between mb-2">
                                         <div className="p-2 bg-emerald-500/10 rounded-lg group-hover:bg-emerald-500/20 transition-colors">
-                                            <BarChart2 className="w-5 h-5 text-emerald-500" />
+                                            <ChartBar size={20} weight="fill" className="text-emerald-500" />
                                         </div>
-                                        <ArrowRight className="w-4 h-4 text-faint group-hover:text-emerald-500 transition-colors" />
+                                        <ArrowRight size={16} weight="bold" className="text-faint group-hover:text-emerald-500 transition-colors" />
                                     </div>
                                     <h3 className="text-primary font-bold text-sm">Revenue Report</h3>
                                     <p className="text-muted text-xs mt-1">Detailed sales breakdown</p>
@@ -126,9 +126,9 @@ export default function AnalyticsPage() {
                             <Link href="/venue-dashboard/analytics/utilization" className="bg-surface-raised/40 border border-default hover:border-blue-500/50 p-4 rounded-xl backdrop-blur-sm transition-all group">
                                 <div className="flex items-center justify-between mb-2">
                                     <div className="p-2 bg-blue-500/10 rounded-lg group-hover:bg-blue-500/20 transition-colors">
-                                        <Zap className="w-5 h-5 text-blue-500" />
+                                        <Lightning size={20} weight="fill" className="text-blue-500" />
                                     </div>
-                                    <ArrowRight className="w-4 h-4 text-faint group-hover:text-blue-500 transition-colors" />
+                                    <ArrowRight size={16} weight="bold" className="text-faint group-hover:text-blue-500 transition-colors" />
                                 </div>
                                 <h3 className="text-primary font-bold text-sm">Utilization Report</h3>
                                 <p className="text-muted text-xs mt-1">Occupancy & peak hours</p>
@@ -138,9 +138,9 @@ export default function AnalyticsPage() {
                                 <Link href="/venue-dashboard/analytics/fees" className="bg-surface-raised/40 border border-default hover:border-red-500/50 p-4 rounded-xl backdrop-blur-sm transition-all group">
                                     <div className="flex items-center justify-between mb-2">
                                         <div className="p-2 bg-red-500/10 rounded-lg group-hover:bg-red-500/20 transition-colors">
-                                            <Receipt className="w-5 h-5 text-red-500" />
+                                            <Receipt size={20} weight="fill" className="text-red-500" />
                                         </div>
-                                        <ArrowRight className="w-4 h-4 text-faint group-hover:text-red-500 transition-colors" />
+                                        <ArrowRight size={16} weight="bold" className="text-faint group-hover:text-red-500 transition-colors" />
                                     </div>
                                     <h3 className="text-primary font-bold text-sm">Fees & Payouts</h3>
                                     <p className="text-muted text-xs mt-1">Commissions & earnings</p>
@@ -150,9 +150,9 @@ export default function AnalyticsPage() {
                             <Link href="/venue-dashboard/analytics/cancellations" className="bg-surface-raised/40 border border-default hover:border-orange-500/50 p-4 rounded-xl backdrop-blur-sm transition-all group">
                                 <div className="flex items-center justify-between mb-2">
                                     <div className="p-2 bg-orange-500/10 rounded-lg group-hover:bg-orange-500/20 transition-colors">
-                                        <XCircle className="w-5 h-5 text-orange-500" />
+                                        <XCircle size={20} weight="fill" className="text-orange-500" />
                                     </div>
-                                    <ArrowRight className="w-4 h-4 text-faint group-hover:text-orange-500 transition-colors" />
+                                    <ArrowRight size={16} weight="bold" className="text-faint group-hover:text-orange-500 transition-colors" />
                                 </div>
                                 <h3 className="text-primary font-bold text-sm">Cancellations</h3>
                                 <p className="text-muted text-xs mt-1">No-shows & refunds</p>
@@ -165,13 +165,13 @@ export default function AnalyticsPage() {
                             <div className="bg-surface-raised/40 border border-default rounded-2xl p-6 backdrop-blur-sm">
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="p-3 bg-emerald-500/10 rounded-xl">
-                                        <DollarSign className="w-6 h-6 text-emerald-500" />
+                                        <CurrencyDollar size={24} weight="fill" className="text-emerald-500" />
                                     </div>
                                     <span className={`text-xs font-bold px-2 py-1 rounded flex items-center gap-1 ${(revenueData?.trend_percentage || 0) >= 0
                                         ? "bg-emerald-500/10 text-emerald-500"
                                         : "bg-red-500/10 text-red-500"
                                         }`}>
-                                        <TrendingUp className={`w-3 h-3 ${(revenueData?.trend_percentage || 0) < 0 ? "rotate-180" : ""}`} />
+                                        <TrendUp size={12} weight="bold" className={`${(revenueData?.trend_percentage || 0) < 0 ? "rotate-180" : ""}`} />
                                         {Math.abs(revenueData?.trend_percentage || 0)}%
                                     </span>
                                 </div>
@@ -184,10 +184,10 @@ export default function AnalyticsPage() {
                             <div className="bg-surface-raised/40 border border-default rounded-2xl p-6 backdrop-blur-sm">
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="p-3 bg-blue-500/10 rounded-xl">
-                                        <Calendar className="w-6 h-6 text-blue-500" />
+                                        <Calendar size={24} weight="fill" className="text-blue-500" />
                                     </div>
                                     <span className="bg-blue-500/10 text-blue-500 text-xs font-bold px-2 py-1 rounded flex items-center gap-1">
-                                        <TrendingUp className="w-3 h-3" /> --
+                                        <TrendUp size={12} weight="bold" /> --
                                     </span>
                                 </div>
                                 <p className="text-3xl font-bold text-primary mb-1">{stats?.today_bookings || 0}</p>
@@ -197,7 +197,7 @@ export default function AnalyticsPage() {
                             <div className="bg-surface-raised/40 border border-default rounded-2xl p-6 backdrop-blur-sm">
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="p-3 bg-purple-500/10 rounded-xl">
-                                        <Users className="w-6 h-6 text-purple-500" />
+                                        <Users size={24} weight="fill" className="text-purple-500" />
                                     </div>
                                 </div>
                                 <p className="text-3xl font-bold text-primary">{utilizationData?.overall_percentage || 0}%</p>
@@ -209,7 +209,7 @@ export default function AnalyticsPage() {
                         <div className="grid md:grid-cols-2 gap-8">
                             <div className="bg-surface-raised/40 border border-default rounded-2xl p-6 backdrop-blur-sm">
                                 <h3 className="text-lg font-bold text-primary mb-6 flex items-center gap-2">
-                                    <BarChart2 className="w-5 h-5 text-muted" /> Revenue Trend
+                                    <ChartBar size={20} weight="bold" className="text-muted" /> Revenue Trend
                                 </h3>
                                 {isVenueOwner ? (
                                     chartData.length > 0 ? (
@@ -247,7 +247,7 @@ export default function AnalyticsPage() {
 
                             <div className="bg-surface-raised/40 border border-default rounded-2xl p-6 backdrop-blur-sm">
                                 <h3 className="text-lg font-bold text-primary mb-6 flex items-center gap-2">
-                                    <BarChart2 className="w-5 h-5 text-muted" /> Booking Status
+                                    <ChartBar size={20} weight="bold" className="text-muted" /> Booking Status
                                 </h3>
                                 <div className="space-y-4">
                                     {utilizationData?.status_breakdown && utilizationData.status_breakdown.length > 0 ? (

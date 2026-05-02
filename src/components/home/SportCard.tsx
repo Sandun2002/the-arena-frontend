@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from "@phosphor-icons/react";
 import { Sport } from "@/types";
 import { getSportImage } from "@/services/normalizers";
 
@@ -59,7 +59,7 @@ export default function SportCard({ sport, priority = false }: SportCardProps) {
         {/* CTA — slides in on hover */}
         <div className="sport-cta mt-2 flex items-center gap-1 text-emerald-400 text-[11px] md:text-xs font-semibold">
           <span>View courts</span>
-          <ArrowRight className="w-3 h-3 md:w-3.5 md:h-3.5" />
+          <ArrowRight size={14} weight="bold" className="md:w-3.5 md:h-3.5" />
         </div>
       </div>
     </Link>

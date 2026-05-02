@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Clock, BarChart2, ArrowLeft, Loader2, Zap } from "lucide-react";
+import { Clock, ChartBar, ArrowLeft, CircleNotch, Lightning } from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
 import { centerService } from "@/services/centerService";
@@ -53,14 +53,14 @@ export default function UtilizationAnalyticsPage() {
             <div className="container mx-auto max-w-5xl relative z-10">
                 <div className="mb-6">
                     <Button variant="ghost" onClick={() => router.back()} className="text-secondary hover:text-primary pl-0">
-                        <ArrowLeft className="w-4 h-4 mr-2" /> Back to Analytics
+                        <ArrowLeft size={16} weight="bold" className="mr-2" /> Back to Analytics
                     </Button>
                 </div>
 
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                     <div>
                         <h1 className="text-3xl font-bold text-primary mb-2 flex items-center gap-2">
-                            <Zap className="w-8 h-8 text-blue-500" /> Utilization Analytics
+                            <Lightning size={32} weight="fill" className="text-blue-500" /> Utilization Analytics
                         </h1>
                         <p className="text-secondary">Court usage and peak hours for <span className="text-emerald-500">{currentVenue.name}</span>.</p>
                     </div>
@@ -83,7 +83,7 @@ export default function UtilizationAnalyticsPage() {
 
                 {isLoading && !data ? (
                     <div className="h-96 flex items-center justify-center">
-                        <Loader2 className="w-8 h-8 animate-spin text-muted" />
+                        <CircleNotch size={32} weight="bold" className="animate-spin text-muted" />
                     </div>
                 ) : (
                     <div className="space-y-6">
@@ -111,7 +111,7 @@ export default function UtilizationAnalyticsPage() {
                             {/* Booking Status Breakdown */}
                             <div className="bg-surface-raised/40 border border-default rounded-3xl p-8 backdrop-blur-sm">
                                 <h3 className="text-lg font-bold text-primary mb-6 flex items-center gap-2">
-                                    <BarChart2 className="w-5 h-5 text-muted" /> Booking Status
+                                    <ChartBar size={20} weight="bold" className="text-muted" /> Booking Status
                                 </h3>
                                 <div className="space-y-4">
                                     {data?.status_breakdown && data.status_breakdown.length > 0 ? (
@@ -150,7 +150,7 @@ export default function UtilizationAnalyticsPage() {
                             {/* Court Breakdown */}
                             <div className="bg-surface-raised/40 border border-default rounded-3xl p-8 backdrop-blur-sm">
                                 <h3 className="text-lg font-bold text-primary mb-6 flex items-center gap-2">
-                                    <BarChart2 className="w-5 h-5 text-muted" /> By Court
+                                    <ChartBar size={20} weight="bold" className="text-muted" /> By Court
                                 </h3>
                                 <div className="space-y-4">
                                     {data?.court_breakdown && data.court_breakdown.length > 0 ? (

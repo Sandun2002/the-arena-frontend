@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
-import { Clock, ChevronDown } from "lucide-react";
+import { Clock, CaretDown } from "@phosphor-icons/react";
 
 const HEADER_HEIGHT = 72; // px — keep dropdown below sticky nav
 
@@ -167,9 +167,9 @@ export default function TimePicker({
                 className={`w-full flex items-center gap-3 bg-surface-inset border rounded-xl px-4 py-3 text-primary transition-all group ${
                     isOpen ? "border-emerald-500 shadow-[0_0_12px_rgba(80,200,120,0.15)]" : "border-subtle hover:border-emerald-500/40"
                 }`}>
-                <Clock className={`w-4 h-4 transition-colors ${isOpen ? "text-emerald-500" : "text-muted group-hover:text-secondary"}`} />
+                <Clock size={16} weight="duotone" className={`transition-colors ${isOpen ? "text-emerald-500" : "text-muted group-hover:text-secondary"}`} />
                 <span className="flex-1 text-left font-medium text-sm">{value ? formatDisplay(selectedHour) : "Select time"}</span>
-                <ChevronDown className={`w-4 h-4 text-muted transition-transform duration-200 ${isOpen ? "rotate-180 text-emerald-500" : ""}`} />
+                <CaretDown size={16} weight="bold" className={`text-muted transition-transform duration-200 ${isOpen ? "rotate-180 text-emerald-500" : ""}`} />
             </button>
             {dropdown}
         </div>

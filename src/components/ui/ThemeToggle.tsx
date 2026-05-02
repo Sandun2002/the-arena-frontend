@@ -1,6 +1,6 @@
 "use client";
 
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun } from "@phosphor-icons/react";
 import { useTheme } from "@/contexts/ThemeContext";
 
 interface ThemeToggleProps {
@@ -39,14 +39,14 @@ export default function ThemeToggle({
         className="absolute inset-0 flex items-center justify-center transition-all duration-300 opacity-100 rotate-0 scale-100 dark:opacity-0 dark:rotate-90 dark:scale-50"
         aria-hidden="true"
       >
-        <Sun size={size} strokeWidth={1.75} />
+        <Sun size={size} weight="bold" />
       </span>
       {/* Moon: visible in DARK mode (when html has .dark class). */}
       <span
         className="absolute inset-0 flex items-center justify-center transition-all duration-300 opacity-0 -rotate-90 scale-50 dark:opacity-100 dark:rotate-0 dark:scale-100"
         aria-hidden="true"
       >
-        <Moon size={size} strokeWidth={1.75} />
+        <Moon size={size} weight="bold" />
       </span>
     </button>
   );

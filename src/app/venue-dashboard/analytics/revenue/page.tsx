@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { DollarSign, TrendingUp, BarChart2, ArrowLeft, Loader2 } from "lucide-react";
+import { CurrencyDollar, TrendUp, ChartBar, ArrowLeft, CircleNotch } from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
 import { centerService } from "@/services/centerService";
@@ -60,14 +60,14 @@ export default function RevenueAnalyticsPage() {
             <div className="container mx-auto max-w-5xl relative z-10">
                 <div className="mb-6">
                     <Button variant="ghost" onClick={() => router.back()} className="text-secondary hover:text-primary pl-0">
-                        <ArrowLeft className="w-4 h-4 mr-2" /> Back to Analytics
+                        <ArrowLeft size={16} weight="bold" className="mr-2" /> Back to Analytics
                     </Button>
                 </div>
 
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                     <div>
                         <h1 className="text-3xl font-bold text-primary mb-2 flex items-center gap-2">
-                            <DollarSign className="w-8 h-8 text-emerald-500" /> Revenue Analytics
+                            <CurrencyDollar size={32} weight="fill" className="text-emerald-500" /> Revenue Analytics
                         </h1>
                         <p className="text-secondary">Detailed revenue breakdown for <span className="text-emerald-500">{currentVenue.name}</span>.</p>
                     </div>
@@ -90,7 +90,7 @@ export default function RevenueAnalyticsPage() {
 
                 {isLoading && !data ? (
                     <div className="h-96 flex items-center justify-center">
-                        <Loader2 className="w-8 h-8 animate-spin text-muted" />
+                        <CircleNotch size={32} weight="bold" className="animate-spin text-muted" />
                     </div>
                 ) : (
                     <div className="space-y-6">
@@ -105,7 +105,7 @@ export default function RevenueAnalyticsPage() {
                                         ? "bg-emerald-500/10 text-emerald-500"
                                         : "bg-red-500/10 text-red-500"
                                     }`}>
-                                    <TrendingUp className={`w-5 h-5 ${(data?.trend_percentage || 0) < 0 ? "rotate-180" : ""}`} />
+                                    <TrendUp size={20} weight="bold" className={`${(data?.trend_percentage || 0) < 0 ? "rotate-180" : ""}`} />
                                     <span className="font-bold text-lg">{Math.abs(data?.trend_percentage || 0)}%</span>
                                 </div>
                             </div>
@@ -114,7 +114,7 @@ export default function RevenueAnalyticsPage() {
                         {/* Chart */}
                         <div className="bg-surface-raised/40 border border-default rounded-3xl p-8 backdrop-blur-sm">
                             <h3 className="text-lg font-bold text-primary mb-6 flex items-center gap-2">
-                                <BarChart2 className="w-5 h-5 text-muted" /> Revenue Trend
+                                <ChartBar size={20} weight="bold" className="text-muted" /> Revenue Trend
                             </h3>
                             {chartData.length > 0 ? (
                                 <div className="h-80 flex items-end justify-between gap-4 px-2">

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Shield, Smartphone, QrCode, CheckCircle, XCircle } from "lucide-react";
+import { ArrowLeft, Shield, DeviceMobile, QrCode, CheckCircle, XCircle } from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
 import { authService } from "@/services/authService";
@@ -66,13 +66,13 @@ export default function MfaPage() {
             <div className="container mx-auto max-w-3xl">
 
                 <Link href="/profile" className="inline-flex items-center text-sm font-medium text-muted hover:text-primary mb-8 transition-colors group">
-                    <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" /> Back to Profile
+                    <ArrowLeft size={16} weight="bold" className="mr-2 group-hover:-translate-x-1 transition-transform" /> Back to Profile
                 </Link>
 
                 <div className="bg-surface-raised/50 border border-default rounded-3xl p-8 backdrop-blur-md shadow-2xl">
                     <div className="flex gap-4 mb-8">
                         <div className="p-3 bg-emerald-500/10 rounded-2xl text-emerald-500 border border-emerald-500/20">
-                            <Shield className="w-8 h-8" />
+                            <Shield size={32} weight="duotone" />
                         </div>
                         <div>
                             <h1 className="text-2xl font-bold text-primary">Two-Factor Authentication</h1>
@@ -91,11 +91,11 @@ export default function MfaPage() {
                             <div>
                                 {user.is_mfa_enabled ? (
                                     <span className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-500 text-xs font-bold border border-emerald-500/20">
-                                        <CheckCircle className="w-4 h-4" /> Enabled
+                                        <CheckCircle size={16} weight="fill" /> Enabled
                                     </span>
                                 ) : (
                                     <span className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-overlay text-secondary text-xs font-bold border border-subtle">
-                                        <XCircle className="w-4 h-4" /> Disabled
+                                        <XCircle size={16} weight="fill" /> Disabled
                                     </span>
                                 )}
                             </div>
@@ -104,12 +104,12 @@ export default function MfaPage() {
                         {!user.is_mfa_enabled ? (
                             !isSetupOpen ? (
                                 <Button onClick={handleSetupMfa} className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold py-6 text-lg shadow-[0_0_20px_rgba(16,185,129,0.2)]">
-                                    <Smartphone className="w-5 h-5 mr-2" /> Setup 2FA Now
+                                    <DeviceMobile size={20} weight="bold" className="mr-2" /> Setup 2FA Now
                                 </Button>
                             ) : (
                                 <div className="bg-surface-base/50 p-6 rounded-2xl border border-default animate-in fade-in slide-in-from-top-4 duration-300">
                                     <h3 className="text-primary font-bold mb-4 flex items-center gap-2">
-                                        <QrCode className="w-5 h-5 text-emerald-500" />
+                                        <QrCode size={20} weight="bold" className="text-emerald-500" />
                                         Scan QR Code
                                     </h3>
                                     <div className="flex flex-col md:flex-row gap-8 items-center">

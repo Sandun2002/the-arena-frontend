@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { MapPin, Loader2, MapPinOff } from "lucide-react";
+import { MapPin, CircleNotch } from "@phosphor-icons/react";
 import { useLocation } from "@/contexts/LocationContext";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
@@ -28,7 +28,7 @@ export default function MobileTopBar() {
     if (locState === "loading") {
       return (
         <span className={`${base} bg-surface-overlay/60 border-subtle/40 text-secondary pointer-events-none`}>
-          <Loader2 className="w-3 h-3 animate-spin shrink-0" />
+          <CircleNotch size={12} weight="bold" className="animate-spin shrink-0" />
           <span className="truncate">Locating…</span>
         </span>
       );
@@ -40,7 +40,7 @@ export default function MobileTopBar() {
           onClick={requestLocation}
           className={`${base} bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 hover:border-emerald-500/50`}
         >
-          <MapPin className="w-3 h-3 shrink-0" />
+          <MapPin size={12} weight="fill" className="shrink-0" />
           <span className="truncate">{locName}</span>
         </button>
       );
@@ -52,7 +52,7 @@ export default function MobileTopBar() {
           onClick={requestLocation}
           className={`${base} bg-surface-overlay/60 border-subtle/40 text-secondary hover:border-subtle hover:text-primary`}
         >
-          <MapPinOff className="w-3 h-3 shrink-0" />
+          <MapPin size={12} weight="duotone" className="shrink-0 opacity-50" />
           <span className="truncate">No location</span>
         </button>
       );
@@ -64,7 +64,7 @@ export default function MobileTopBar() {
         onClick={requestLocation}
         className={`${base} bg-surface-overlay/60 border-subtle/40 text-secondary hover:border-emerald-500/30 hover:text-emerald-400 hover:bg-emerald-500/5`}
       >
-        <MapPin className="w-3 h-3 shrink-0" />
+        <MapPin size={12} weight="duotone" className="shrink-0" />
         <span className="truncate">Set location</span>
       </button>
     );

@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Clock, Info, CheckCircle2 } from "lucide-react";
+import { Clock, Info, CheckCircle } from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import { format } from "date-fns";
 import { Venue } from "@/types";
@@ -22,7 +22,7 @@ export default function VenuePendingVerification({ venue }: VenuePendingVerifica
                 
                 <div className="flex flex-col items-center text-center relative z-10">
                     <div className="w-20 h-20 bg-emerald-500/10 rounded-3xl flex items-center justify-center mb-8 ring-1 ring-emerald-500/20 shadow-[0_0_30px_rgba(16,185,129,0.1)]">
-                        <Clock className="w-10 h-10 text-emerald-500 animate-pulse" />
+                        <Clock size={40} weight="fill" className="text-emerald-500 animate-pulse" />
                     </div>
 
                     <h1 className="text-3xl md:text-4xl font-black text-primary uppercase tracking-tight mb-4 leading-tight">
@@ -36,7 +36,7 @@ export default function VenuePendingVerification({ venue }: VenuePendingVerifica
                     <div className="w-full space-y-4 mb-10">
                         <div className="bg-surface-base/40 border border-default/50 rounded-2xl p-4 flex gap-4 items-start text-left">
                             <div className="mt-1 p-1 bg-blue-500/20 rounded-lg">
-                                <Info className="w-4 h-4 text-blue-400" />
+                                <Info size={16} weight="fill" className="text-blue-400" />
                             </div>
                             <div>
                                 <p className="text-sm font-bold text-primary mb-1">Why is this required?</p>
@@ -48,7 +48,7 @@ export default function VenuePendingVerification({ venue }: VenuePendingVerifica
 
                         <div className="bg-surface-base/40 border border-default/50 rounded-2xl p-4 flex gap-4 items-start text-left">
                             <div className="mt-1 p-1 bg-emerald-500/20 rounded-lg">
-                                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                                <CheckCircle size={16} weight="fill" className="text-emerald-400" />
                             </div>
                             <div>
                                 <p className="text-sm font-bold text-primary mb-1">What's next?</p>

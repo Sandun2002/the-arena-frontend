@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Calendar, Clock, Lock, MapPin, ShieldCheck, User } from "lucide-react";
+import { ArrowLeft, CalendarBlank, Clock, Lock, MapPin, ShieldCheck, User } from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import { api } from "@/services/api";
 import { bookingService } from "@/services/bookingService";
@@ -102,7 +102,7 @@ function CheckoutContent() {
             <div className="absolute inset-0 pointer-events-none"><div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[120px]" /></div>
 
             <div className="container mx-auto px-4 max-w-4xl relative z-10">
-                <Link href={`/venues/${venue.id}`} className="inline-flex items-center text-muted hover:text-primary mb-8 transition-colors group"><ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" /> Back to Venue</Link>
+                <Link href={`/venues/${venue.id}`} className="inline-flex items-center text-muted hover:text-primary mb-8 transition-colors group"><ArrowLeft size={16} weight="bold" className="mr-2 group-hover:-translate-x-1 transition-transform" /> Back to Venue</Link>
 
                 <div className="grid md:grid-cols-3 gap-8">
                     <div className="md:col-span-2 space-y-6">
@@ -110,15 +110,15 @@ function CheckoutContent() {
                                 <div className="p-6 border-b border-default">
                                     <h1 className="text-3xl font-black text-primary mb-1 uppercase tracking-tight">{venue.name}</h1>
                                     <div className="flex items-center gap-2 text-secondary text-sm font-medium">
-                                        <MapPin className="h-4 w-4 text-emerald-500" />
+                                        <MapPin size={16} weight="fill" className="text-emerald-500" />
                                         {venue.city} · {court.name}
                                     </div>
                                 </div>
 
                                 <div className="p-6">
                                     <div className="grid grid-cols-2 gap-4 mb-6">
-                                        <div className="bg-surface-base/40 p-4 rounded-xl border border-default flex items-center gap-3"><Calendar className="h-5 w-5 text-emerald-500" /><div><p className="text-xs text-muted font-bold uppercase">Date</p><p className="text-primary font-medium">{date}</p></div></div>
-                                        <div className="bg-surface-base/40 p-4 rounded-xl border border-default flex items-center gap-3"><Clock className="h-5 w-5 text-emerald-500" /><div><p className="text-xs text-muted font-bold uppercase">Time</p><p className="text-primary font-medium">{startTime} - {endTime}</p></div></div>
+                                        <div className="bg-surface-base/40 p-4 rounded-xl border border-default flex items-center gap-3"><CalendarBlank size={20} weight="bold" className="text-emerald-500" /><div><p className="text-xs text-muted font-bold uppercase">Date</p><p className="text-primary font-medium">{date}</p></div></div>
+                                        <div className="bg-surface-base/40 p-4 rounded-xl border border-default flex items-center gap-3"><Clock size={20} weight="bold" className="text-emerald-500" /><div><p className="text-xs text-muted font-bold uppercase">Time</p><p className="text-primary font-medium">{startTime} - {endTime}</p></div></div>
                                     </div>
 
                                     <div className="space-y-3 border-t border-default pt-6">
@@ -135,12 +135,12 @@ function CheckoutContent() {
                                 <div className="rounded-[2rem] border border-default bg-surface-raised/60 backdrop-blur-xl p-6 shadow-xl">
                                     <h3 className="text-lg font-bold text-primary mb-4">Confirm Booking</h3>
                                     <div className="mb-6 space-y-2">
-                                        <div className="flex items-center gap-2 text-sm text-secondary"><ShieldCheck className="h-4 w-4 text-emerald-500" /><span>Authenticated booking flow</span></div>
-                                        <div className="flex items-center gap-2 text-sm text-secondary"><User className="h-4 w-4 text-emerald-500" /><span>Instant reservation creation</span></div>
+                                        <div className="flex items-center gap-2 text-sm text-secondary"><ShieldCheck size={16} weight="fill" className="text-emerald-500" /><span>Authenticated booking flow</span></div>
+                                        <div className="flex items-center gap-2 text-sm text-secondary"><User size={16} weight="fill" className="text-emerald-500" /><span>Instant reservation creation</span></div>
                                     </div>
 
                                     <Button onClick={handleBook} disabled={submitting} className="w-full py-4 text-sm bg-emerald-500 text-black hover:bg-emerald-400 font-bold flex items-center justify-center gap-2">
-                                        {submitting ? "Creating booking..." : <><Lock className="h-4 w-4" /> Confirm LKR {(pricing?.total_price || 0).toLocaleString()}</>}
+                                        {submitting ? "Creating booking..." : <><Lock size={16} weight="bold" /> Confirm LKR {(pricing?.total_price || 0).toLocaleString()}</>}
                                     </Button>
 
                                     <p className="text-xs text-muted text-center mt-4">By confirming, you agree to the <Link href="/terms" className="underline hover:text-primary">Terms of Service</Link>.</p>

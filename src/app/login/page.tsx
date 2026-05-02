@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, Suspense, Fragment } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import gsap from "gsap";
-import { ArrowRight, Lock, Mail, Shield } from "lucide-react";
+import { ArrowRight, Lock, EnvelopeSimple, ShieldCheck } from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
 import { useToast } from "@/components/ui/Toast";
@@ -144,7 +144,7 @@ function LoginContent() {
             <div className="space-y-2">
               <label className="text-xs font-bold text-muted uppercase ml-1">Email Address</label>
               <div className="relative group">
-                <Mail className="absolute left-4 top-3.5 h-5 w-5 text-muted group-focus-within:text-emerald-500 transition-colors" />
+                <EnvelopeSimple size={20} weight="duotone" className="absolute left-4 top-3.5 text-muted group-focus-within:text-emerald-500 transition-colors" />
                 <input
                   type="email"
                   value={email}
@@ -164,7 +164,7 @@ function LoginContent() {
                 </Link>
               </div>
               <div className="relative group">
-                <Lock className="absolute left-4 top-3.5 h-5 w-5 text-muted group-focus-within:text-emerald-500 transition-colors" />
+                <Lock size={20} weight="duotone" className="absolute left-4 top-3.5 text-muted group-focus-within:text-emerald-500 transition-colors" />
                 <input
                   type="password"
                   value={password}
@@ -189,7 +189,7 @@ function LoginContent() {
               ) : (
                 <div className="flex items-center justify-center gap-2">
                   <span>Log In</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight size={16} weight="bold" />
                 </div>
               )}
             </Button>
@@ -233,7 +233,7 @@ function LoginContent() {
           {emailNotVerified && (
             <div className="mt-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4">
               <div className="flex items-start gap-3">
-                <Mail className="w-5 h-5 text-amber-400 mt-0.5 flex-shrink-0" />
+                <EnvelopeSimple size={20} weight="duotone" className="text-amber-400 mt-0.5 flex-shrink-0" />
                 <div className="flex-1">
                   <p className="text-amber-300 text-sm font-semibold mb-1">Email Not Verified</p>
                   <p className="text-secondary text-xs leading-relaxed mb-3">
@@ -263,10 +263,10 @@ function LoginContent() {
         {/* Security Badge */}
         <div className="mt-8 flex justify-center gap-6 opacity-50">
           <div className="flex items-center gap-2 text-faint text-xs">
-            <Shield className="w-3 h-3" /> Secure SSL
+            <ShieldCheck size={12} weight="duotone" /> Secure SSL
           </div>
           <div className="flex items-center gap-2 text-faint text-xs">
-            <Lock className="w-3 h-3" /> Encrypted
+            <Lock size={12} weight="duotone" /> Encrypted
           </div>
         </div>
       </div>

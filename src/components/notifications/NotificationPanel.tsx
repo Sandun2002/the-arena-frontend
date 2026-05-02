@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { X, Check, CheckCheck, Trash2, ExternalLink, Bell, BellOff } from "lucide-react";
+import { X, Check, Checks, Trash, ArrowUpRight, Bell, BellSlash } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import { useNotifications } from "@/contexts/NotificationContext";
 import { useAuth } from "@/services/authContext";
@@ -71,7 +71,7 @@ function NotificationItem({
             className="p-1.5 rounded text-muted hover:text-emerald-500 hover:bg-emerald-500/20 transition-colors"
             aria-label="Mark as read"
           >
-            <Check size={13} />
+            <Check size={14} weight="bold" />
           </button>
         )}
         {notification.action_url && (
@@ -80,7 +80,7 @@ function NotificationItem({
             className="p-1.5 rounded text-muted hover:text-primary hover:bg-surface-overlay transition-colors"
             aria-label="Open"
           >
-            <ExternalLink size={13} />
+            <ArrowUpRight size={14} weight="bold" />
           </button>
         )}
         <button
@@ -88,7 +88,7 @@ function NotificationItem({
           className="p-1.5 rounded text-muted hover:text-red-500 hover:bg-red-500/20 transition-colors"
           aria-label="Delete"
         >
-          <Trash2 size={13} />
+          <Trash size={14} weight="bold" />
         </button>
       </div>
     </div>
@@ -147,7 +147,7 @@ export function NotificationPanel() {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-default">
         <div className="flex items-center gap-2">
-          <Bell size={15} className="text-secondary" />
+          <Bell size={16} weight="bold" className="text-secondary" />
           <span className="text-sm font-semibold text-primary">Notifications</span>
           {unreadCount > 0 && (
             <span className="text-xs bg-emerald-500/20 text-emerald-500 px-1.5 py-0.5 rounded-full font-medium">
@@ -161,7 +161,7 @@ export function NotificationPanel() {
               onClick={() => markAllRead(activeTab)}
               className="flex items-center gap-1 px-2 py-1 text-xs text-muted hover:text-emerald-500 hover:bg-emerald-500/20 rounded-lg transition-colors"
             >
-              <CheckCheck size={13} />
+              <Checks size={14} weight="bold" />
               <span>Mark all read</span>
             </button>
           )}
@@ -169,7 +169,7 @@ export function NotificationPanel() {
             onClick={closePanel}
             className="p-1.5 rounded-lg text-muted hover:text-primary hover:bg-surface-overlay transition-colors"
           >
-            <X size={15} />
+            <X size={16} weight="bold" />
           </button>
         </div>
       </div>
@@ -218,7 +218,7 @@ export function NotificationPanel() {
           </div>
         ) : filteredNotifications.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 gap-3 text-faint">
-            <BellOff size={24} strokeWidth={1.5} />
+            <BellSlash size={24} weight="duotone" />
             <span className="text-sm">No notifications</span>
           </div>
         ) : (

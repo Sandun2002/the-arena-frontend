@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Mail, RefreshCw, CheckCircle, ArrowRight } from "lucide-react";
+import { EnvelopeSimple, ArrowsClockwise, CheckCircle, ArrowRight } from "@phosphor-icons/react";
 import { useTheme } from "@/contexts/ThemeContext";
 
 function CheckEmailContent() {
@@ -61,7 +61,7 @@ function CheckEmailContent() {
         <div className="bg-surface-raised/60 border border-default rounded-3xl p-8 backdrop-blur-sm text-center">
           {/* Icon */}
           <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-emerald-500/20">
-            <Mail className="w-10 h-10 text-emerald-500" />
+            <EnvelopeSimple size={40} weight="fill" className="text-emerald-500" />
           </div>
 
           <h1 className="text-2xl font-bold text-primary mb-3">Check Your Email</h1>
@@ -80,7 +80,7 @@ function CheckEmailContent() {
           {/* Resend status */}
           {resendStatus === "success" && (
             <div className="flex items-center justify-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm px-4 py-3 rounded-xl mb-6">
-              <CheckCircle className="w-4 h-4" />
+              <CheckCircle size={16} weight="fill" />
               New verification email sent!
             </div>
           )}
@@ -96,7 +96,7 @@ function CheckEmailContent() {
             disabled={isResending || countdown > 0 || !email}
             className="w-full flex items-center justify-center gap-2 bg-surface-overlay hover:bg-surface-overlay disabled:opacity-50 disabled:cursor-not-allowed text-primary font-semibold px-6 py-3 rounded-xl transition-colors text-sm mb-4"
           >
-            <RefreshCw className={`w-4 h-4 ${isResending ? "animate-spin" : ""}`} />
+            <ArrowsClockwise size={16} weight="bold" className={`${isResending ? "animate-spin" : ""}`} />
             {countdown > 0
               ? `Resend again in ${countdown}s`
               : isResending
@@ -108,7 +108,7 @@ function CheckEmailContent() {
             href="/login"
             className="inline-flex items-center gap-2 text-muted hover:text-primary text-sm transition-colors"
           >
-            Go to Login <ArrowRight className="w-4 h-4" />
+            Go to Login <ArrowRight size={16} weight="bold" />
           </Link>
         </div>
 

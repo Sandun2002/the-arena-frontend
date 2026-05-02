@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { format, addDays, isSameDay } from "date-fns";
-import { ChevronLeft, ChevronRight, Loader2, Calendar as CalendarIcon, Clock, DollarSign, CheckCircle, XCircle, MapPin, Hammer, Globe, UserPlus, UserCheck, Repeat, Zap, RefreshCcw } from "lucide-react";
+import { CaretLeft, CaretRight, CircleNotch, Calendar as CalendarIcon, Clock, CurrencyDollar, CheckCircle, XCircle, MapPin, Hammer, Globe, UserPlus, UserCheck, ArrowsClockwise, Lightning, ArrowsCounterClockwise } from "@phosphor-icons/react";
 import { useForm } from "react-hook-form";
 import { useAuth } from "@/services/authContext";
 import { centerService } from "@/services/centerService";
@@ -267,7 +267,7 @@ export default function BookingManagerPage() {
                     <div className="flex items-center gap-3">
                         <p className="text-secondary">Manage slots for <span className="text-emerald-500 font-bold">{activeCourt?.name || "the venue"}</span></p>
                         <span className="flex items-center gap-1.5 text-[10px] text-faint font-medium">
-                            <RefreshCcw className="w-3 h-3" />
+                            <ArrowsCounterClockwise size={12} weight="bold" />
                             {format(lastSynced, "HH:mm:ss")}
                         </span>
                     </div>
@@ -276,11 +276,11 @@ export default function BookingManagerPage() {
                 {/* Date Picker (Top Right) */}
                 <div className="flex items-center bg-surface-raised border border-default rounded-xl p-1 shadow-lg shadow-[var(--shadow-elevation)]">
                     <button onClick={handlePrevDay} className="p-3 hover:bg-surface-overlay rounded-lg text-secondary hover:text-primary transition-colors active:scale-95">
-                        <ChevronLeft className="w-5 h-5" />
+                        <CaretLeft size={20} weight="bold" />
                     </button>
 
                     <div className="px-2 relative cursor-pointer group hover:bg-surface-overlay rounded-lg transition-colors py-2 flex items-center gap-2" onClick={() => (document.getElementById('date-picker') as HTMLInputElement)?.showPicker()}>
-                        <CalendarIcon className="w-4 h-4 text-emerald-500 group-hover:scale-110 transition-transform" />
+                        <CalendarIcon size={16} weight="duotone" className="text-emerald-500 group-hover:scale-110 transition-transform" />
                         <span className="text-primary font-bold text-sm tracking-wide">{format(selectedDate, "MM/dd/yyyy")}</span>
                         {isSameDay(selectedDate, new Date()) && (
                             <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">TODAY</span>
@@ -302,7 +302,7 @@ export default function BookingManagerPage() {
                     </div>
 
                     <button onClick={handleNextDay} className="p-3 hover:bg-surface-overlay rounded-lg text-secondary hover:text-primary transition-colors active:scale-95">
-                        <ChevronRight className="w-5 h-5" />
+                        <CaretRight size={20} weight="bold" />
                     </button>
                 </div>
             </div>
@@ -321,7 +321,7 @@ export default function BookingManagerPage() {
                                 }
                             `}
                         >
-                            <MapPin className={`w-4 h-4 ${activeCourtId === court.id ? "text-emerald-500" : "text-muted"}`} />
+                            <MapPin size={16} weight={activeCourtId === court.id ? "fill" : "bold"} className={activeCourtId === court.id ? "text-emerald-500" : "text-muted"} />
                             {court.name}
                         </button>
                     ))}
@@ -332,12 +332,12 @@ export default function BookingManagerPage() {
             <div className="bg-surface-raised/40 border border-default rounded-3xl p-6 md:p-8 backdrop-blur-sm min-h-[60vh]">
                 {isLoading ? (
                     <div className="flex flex-col items-center justify-center h-full text-muted py-20">
-                        <Loader2 className="w-8 h-8 animate-spin mb-4 text-emerald-500" />
+                        <CircleNotch size={32} weight="bold" className="animate-spin mb-4 text-emerald-500" />
                         <p>Loading slots...</p>
                     </div>
                 ) : isVenueClosed || hours.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full text-red-500/80 py-20 border border-red-500/10 rounded-2xl bg-red-500/5">
-                        <CalendarIcon className="w-12 h-12 mb-4 text-red-500/60" />
+                        <CalendarIcon size={48} weight="duotone" className="mb-4 text-red-500/60" />
                         <h2 className="text-xl font-bold mb-2 text-red-400">Venue Closed</h2>
                         <p className="text-red-400/80">{closureReason || `The venue is not operating on ${format(selectedDate, "MMM dd, yyyy")}.`}</p>
                     </div>
@@ -351,23 +351,23 @@ export default function BookingManagerPage() {
                         <div className="flex flex-wrap items-center gap-4 mb-6 pb-4 border-b border-default/60">
                             <span className="text-[10px] font-bold text-faint uppercase tracking-widest">Legend</span>
                             <div className="flex items-center gap-1.5 text-[11px] text-secondary">
-                                <Globe className="w-3 h-3 text-blue-400" />
+                                <Globe size={12} weight="bold" className="text-blue-400" />
                                 <span>Platform</span>
                             </div>
                             <div className="flex items-center gap-1.5 text-[11px] text-secondary">
-                                <UserPlus className="w-3 h-3 text-orange-400" />
+                                <UserPlus size={12} weight="bold" className="text-orange-400" />
                                 <span>Walk-in</span>
                             </div>
                             <div className="flex items-center gap-1.5 text-[11px] text-secondary">
-                                <Repeat className="w-3 h-3 text-indigo-400" />
+                                <ArrowsClockwise size={12} weight="bold" className="text-indigo-400" />
                                 <span>Recurring</span>
                             </div>
                             <div className="flex items-center gap-1.5 text-[11px] text-secondary">
-                                <Hammer className="w-3 h-3 text-muted" />
+                                <Hammer size={12} weight="bold" className="text-muted" />
                                 <span>Maintenance</span>
                             </div>
                             <div className="flex items-center gap-1.5 text-[11px] text-secondary">
-                                <Zap className="w-3 h-3 text-green-400" />
+                                <Lightning size={12} weight="bold" className="text-green-400" />
                                 <span>Live Now</span>
                             </div>
                         </div>
@@ -454,14 +454,14 @@ export default function BookingManagerPage() {
                         <div className="space-y-2">
                             <label className="text-xs font-bold text-muted uppercase tracking-wider">Date</label>
                             <div className="w-full bg-surface-raised border border-default rounded-xl px-4 py-3 text-primary opacity-70 flex items-center gap-2">
-                                <CalendarIcon className="w-4 h-4 text-emerald-500" />
+                                <CalendarIcon size={16} weight="duotone" className="text-emerald-500" />
                                 {format(selectedDate, "MMM dd, yyyy")}
                             </div>
                         </div>
                         <div className="space-y-2">
                             <label className="text-xs font-bold text-muted uppercase tracking-wider">Start Time</label>
                             <div className="w-full bg-surface-raised border border-default rounded-xl px-4 py-3 text-primary opacity-70 flex items-center gap-2">
-                                <Clock className="w-4 h-4 text-emerald-500" />
+                                <Clock size={16} weight="duotone" className="text-emerald-500" />
                                 {format(new Date().setHours(selectedHour, 0, 0, 0), "h:mm a")}
                             </div>
                         </div>
@@ -545,7 +545,7 @@ export default function BookingManagerPage() {
                         <div className="bg-surface-raised border border-default rounded-2xl p-4 mb-6 flex justify-between items-center">
                             <div className="flex items-center gap-3">
                                 <div className="p-2 bg-emerald-500/10 rounded-lg">
-                                    <DollarSign className="w-5 h-5 text-emerald-500" />
+                                    <CurrencyDollar size={20} weight="bold" className="text-emerald-500" />
                                 </div>
                                 <div>
                                     <p className="text-xs text-muted font-bold uppercase tracking-wider">Total Due</p>
@@ -559,7 +559,7 @@ export default function BookingManagerPage() {
                             disabled={isSubmitting}
                             className="w-full py-4 bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-lg rounded-xl shadow-lg shadow-emerald-500/20 active:scale-[0.98] transition-all"
                         >
-                            {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "Confirm Receipt & Book"}
+                            {isSubmitting ? <CircleNotch size={20} weight="bold" className="animate-spin mx-auto" /> : "Confirm Receipt & Book"}
                         </Button>
                     </div>
                 </form>
@@ -625,15 +625,15 @@ function BookingSlotCard({
                 {/* Source badge */}
                 {isMaintenance ? (
                     <span className="flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded border bg-surface-overlay/30 text-secondary border-subtle/50 uppercase tracking-wider">
-                        <Hammer className="w-2.5 h-2.5" /> Maintenance
+                        <Hammer size={10} weight="bold" /> Maintenance
                     </span>
                 ) : type === "walkin" ? (
                     <span className="flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded border bg-orange-500/10 text-orange-400 border-orange-500/30 uppercase tracking-wider">
-                        {isConfirmed ? <UserCheck className="w-2.5 h-2.5" /> : <UserPlus className="w-2.5 h-2.5" />} Walk-in
+                        {isConfirmed ? <UserCheck size={10} weight="bold" /> : <UserPlus size={10} weight="bold" />} Walk-in
                     </span>
                 ) : (
                     <span className="flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded border bg-blue-500/10 text-blue-400 border-blue-500/30 uppercase tracking-wider">
-                        <Globe className="w-2.5 h-2.5" /> Platform
+                        <Globe size={10} weight="bold" /> Platform
                     </span>
                 )}
 
@@ -645,11 +645,11 @@ function BookingSlotCard({
                         </span>
                     ) : isCompleted ? (
                         <span className="flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded border bg-blue-500/20 text-blue-400 border-blue-500/30 uppercase tracking-wider">
-                            <CheckCircle className="w-2.5 h-2.5" /> Completed
+                            <CheckCircle size={10} weight="bold" /> Completed
                         </span>
                     ) : (
                         <span className="flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded border bg-emerald-500/20 text-emerald-500 border-emerald-500/30 uppercase tracking-wider">
-                            <CheckCircle className="w-2.5 h-2.5" /> Confirmed
+                            <CheckCircle size={10} weight="bold" /> Confirmed
                         </span>
                     )
                 )}
@@ -662,14 +662,14 @@ function BookingSlotCard({
                             title="Mark as Paid"
                             className="p-2 bg-emerald-500/20 text-emerald-500 hover:bg-emerald-500 hover:text-black rounded-xl transition-all shadow-lg active:scale-95"
                         >
-                            <CheckCircle className="w-4 h-4" />
+                            <CheckCircle size={16} weight="bold" />
                         </button>
                         <button
                             onClick={() => onCancel(booking.id)}
                             title="Cancel Booking"
                             className="p-2 bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-primary rounded-xl transition-all shadow-lg active:scale-95"
                         >
-                            <XCircle className="w-4 h-4" />
+                            <XCircle size={16} weight="bold" />
                         </button>
                     </div>
                 )}
@@ -695,7 +695,7 @@ function RecurringSlotCard({ recurring, isLive }: { recurring: RecurringBlock; i
             </div>
             <div className="flex-shrink-0 ml-3">
                 <span className="flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded border bg-indigo-500/10 text-indigo-400 border-indigo-500/30 uppercase tracking-wider">
-                    <Repeat className="w-2.5 h-2.5" /> Recurring
+                    <ArrowsClockwise size={10} weight="bold" /> Recurring
                 </span>
             </div>
         </div>

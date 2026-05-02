@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Trophy, MapPin, Calendar, User, LayoutDashboard } from "lucide-react";
+import { House, Trophy, MapPin, CalendarBlank, User, SquaresFour } from "@phosphor-icons/react";
+import LordIcon from "@/components/ui/LordIcon";
 import { useAuth } from "@/services/authContext";
 
 function NavItem({
   path,
   label,
-  icon: Icon,
+  icon: FallbackIcon,
   pathname,
 }: {
   path: string;
@@ -29,11 +30,15 @@ function NavItem({
           isActive ? "bg-emerald-500/15" : "group-hover:bg-surface-overlay/40"
         }`}
       >
-        <Icon
+        <LordIcon
+          icon={null} // TODO: Add Lordicon JSON when available
+          fallback={FallbackIcon}
+          size={isActive ? 20 : 18}
+          trigger="morph"
           className={`transition-all duration-300 ${
             isActive
-              ? "w-[19px] h-[19px] text-emerald-400"
-              : "w-[18px] h-[18px] text-muted group-hover:text-secondary"
+              ? "text-emerald-400"
+              : "text-muted group-hover:text-secondary"
           }`}
         />
       </div>
@@ -69,7 +74,7 @@ export default function MobileBottomNav() {
           href="/venue-dashboard"
           className="fixed bottom-[5.5rem] right-4 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full bg-glass-bg backdrop-blur-xl border border-blue-500/40 text-blue-400 text-xs font-bold shadow-lg hover:border-blue-400/60 hover:text-blue-300 active:scale-95 transition-all md:hidden"
         >
-          <LayoutDashboard className="w-3.5 h-3.5" />
+          <SquaresFour weight="duotone" size={14} />
           Manager Dashboard
         </Link>
       )}
@@ -99,14 +104,14 @@ export default function MobileBottomNav() {
                     : "bg-gradient-to-br from-emerald-400 via-emerald-500 to-emerald-700 shadow-[0_0_18px_rgba(16,185,129,0.65)]"
                 }`}
               >
-                <MapPin className="w-5 h-5 text-black drop-shadow-sm" strokeWidth={2.5} />
+                <MapPin size={20} weight="fill" className="text-black drop-shadow-sm" />
               </div>
             </Link>
           </div>
 
           {/* Nav Items */}
           <div className="grid grid-cols-5 h-[60px] px-1">
-            <NavItem path="/" label="Home" icon={Home} pathname={pathname} />
+            <NavItem path="/" label="Home" icon={House} pathname={pathname} />
             <NavItem
               path="/challenges"
               label="Challenges"
@@ -126,7 +131,7 @@ export default function MobileBottomNav() {
             <NavItem
               path="/bookings"
               label="Bookings"
-              icon={Calendar}
+              icon={CalendarBlank}
               pathname={pathname}
             />
             <NavItem

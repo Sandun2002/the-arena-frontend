@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
-    User as UserIcon, Trophy, Calendar, MapPin, Edit2, Shield,
-    Activity, TrendingUp, Mail, ChevronRight, Star, Lock, LogOut,
-    Clock, Plus, Zap, LayoutDashboard
-} from "lucide-react";
+    User, Trophy, CalendarBlank, MapPin, PencilSimple, Shield,
+    Pulse, TrendUp, EnvelopeSimple, CaretRight, Star, Lock, SignOut,
+    Clock, Plus, Lightning, SquaresFour
+} from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import { useRequireAuth, AuthLoadingSpinner } from "@/components/auth/RequireAuth";
 import { useAuth } from "@/services/authContext";
@@ -112,14 +112,14 @@ export default function ProfilePage() {
                             <h1 className="text-3xl md:text-5xl font-bold text-primary mb-2 tracking-tight">{user.full_name}</h1>
                             <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 text-secondary text-sm mb-5">
                                 <span className="flex items-center gap-1.5 bg-surface-raised/50 px-3 py-1 rounded-full border border-default">
-                                    <Mail className="w-3.5 h-3.5" /> {user.email}
+                                    <EnvelopeSimple size={14} weight="bold" /> {user.email}
                                 </span>
                                 <span className="flex items-center gap-1.5 bg-surface-raised/50 px-3 py-1 rounded-full border border-default">
-                                    <Calendar className="w-3.5 h-3.5" /> Joined {fmtMonthYear(user.created_at)}
+                                    <CalendarBlank size={14} weight="bold" /> Joined {fmtMonthYear(user.created_at)}
                                 </span>
                                 {/* Tier Badge */}
                                 <span className={`flex items-center gap-1.5 px-3 py-1 rounded-full border ${tierStyle.badge}`}>
-                                    <Zap className="w-3.5 h-3.5" /> {tier}
+                                    <Lightning size={14} weight="fill" /> {tier}
                                 </span>
                             </div>
 
@@ -148,7 +148,7 @@ export default function ProfilePage() {
                         <div className="hidden md:block">
                             <Link href="/profile/settings">
                                 <Button variant="outline" className="border-subtle hover:bg-surface-overlay">
-                                    <Edit2 className="w-4 h-4 mr-2" /> Edit Profile
+                                    <PencilSimple size={16} weight="bold" className="mr-2" /> Edit Profile
                                 </Button>
                             </Link>
                         </div>
@@ -162,19 +162,19 @@ export default function ProfilePage() {
                         {/* Stats Grid */}
                         <div className="grid grid-cols-2 gap-3">
                             <StatsCard
-                                icon={<Trophy className="w-5 h-5 text-yellow-500" />}
+                                icon={<Trophy size={20} weight="fill" className="text-yellow-500" />}
                                 label="Challenges"
                                 value={`${completedChallengesCount}/${totalChallengesCount}`}
                                 subtext="Completed"
                             />
                             <StatsCard
-                                icon={<Activity className="w-5 h-5 text-emerald-500" />}
+                                icon={<Pulse size={20} weight="bold" className="text-emerald-500" />}
                                 label="Bookings"
                                 value={stats?.total_bookings || 0}
                                 subtext="Total games"
                             />
                             <StatsCard
-                                icon={<TrendingUp className="w-5 h-5 text-purple-500" />}
+                                icon={<TrendUp size={20} weight="bold" className="text-purple-500" />}
                                 label="Play Time"
                                 value={`${stats?.hours_played || 0}h`}
                                 subtext="Hours on court"
@@ -185,18 +185,18 @@ export default function ProfilePage() {
                         {/* Menu */}
                         <div className="bg-surface-raised dark:bg-surface-raised/50 border border-default rounded-3xl p-2 backdrop-blur-sm">
                             {(isVenueOwner || isVenueManager) && (
-                                <MenuLink href="/venue-dashboard" icon={<LayoutDashboard className="w-4 h-4" />} label="Manager Dashboard" />
+                                <MenuLink href="/venue-dashboard" icon={<SquaresFour size={16} weight="bold" />} label="Manager Dashboard" />
                             )}
-                            <MenuLink href="/profile/settings" icon={<Edit2 className="w-4 h-4" />} label="Edit Profile" />
-                            <MenuLink href="/settings/sessions" icon={<Shield className="w-4 h-4" />} label="Security & Sessions" />
-                            <MenuLink href="/profile/password" icon={<Lock className="w-4 h-4" />} label="Change Password" />
-                            <MenuLink href="/reviews" icon={<Star className="w-4 h-4" />} label="My Reviews" />
+                            <MenuLink href="/profile/settings" icon={<PencilSimple size={16} weight="bold" />} label="Edit Profile" />
+                            <MenuLink href="/settings/sessions" icon={<Shield size={16} weight="bold" />} label="Security & Sessions" />
+                            <MenuLink href="/profile/password" icon={<Lock size={16} weight="bold" />} label="Change Password" />
+                            <MenuLink href="/reviews" icon={<Star size={16} weight="bold" />} label="My Reviews" />
                             <button
                                 onClick={logout}
                                 className="w-full flex items-center justify-between p-4 rounded-2xl text-red-500 hover:bg-red-500/10 transition-colors"
                             >
                                 <span className="flex items-center gap-3 font-medium">
-                                    <LogOut className="w-4 h-4" /> Log Out
+                                    <SignOut size={16} weight="bold" /> Log Out
                                 </span>
                             </button>
                         </div>
@@ -209,11 +209,11 @@ export default function ProfilePage() {
                         <div className="bg-surface-raised dark:bg-surface-raised/50 border border-default rounded-3xl p-6 backdrop-blur-sm">
                             <div className="flex justify-between items-center mb-5">
                                 <h3 className="text-lg font-bold text-primary flex items-center gap-2">
-                                    <Calendar className="w-5 h-5 text-emerald-400" /> Upcoming Games
+                                    <CalendarBlank size={20} weight="duotone" className="text-emerald-400" /> Upcoming Games
                                 </h3>
                                 <Link href="/venues">
                                     <Button size="sm" className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-8 px-4 text-xs">
-                                        <Plus className="w-3.5 h-3.5 mr-1" /> Book
+                                        <Plus size={14} weight="bold" className="mr-1" /> Book
                                     </Button>
                                 </Link>
                             </div>
@@ -232,10 +232,10 @@ export default function ProfilePage() {
                                                         {booking.court?.sport_type?.name || booking.sport || "Sport"}
                                                     </h4>
                                                     <p className="text-xs text-muted flex items-center gap-1.5 truncate">
-                                                        <MapPin className="w-3 h-3 flex-shrink-0" />{booking.court?.venue_name}
+                                                        <MapPin size={12} weight="fill" className="flex-shrink-0 mr-1" />{booking.court?.venue_name}
                                                     </p>
                                                     <p className="text-xs text-secondary flex items-center gap-1.5 font-mono mt-0.5">
-                                                        <Clock className="w-3 h-3 flex-shrink-0" />
+                                                        <Clock size={12} weight="bold" className="flex-shrink-0" />
                                                         {fmtTime(booking.start_time)}
                                                     </p>
                                                 </div>
@@ -252,7 +252,7 @@ export default function ProfilePage() {
                                 </div>
                             ) : (
                                 <div className="text-center py-8 text-muted">
-                                    <Calendar className="w-10 h-10 text-faint mx-auto mb-3" />
+                                    <CalendarBlank size={40} weight="duotone" className="text-faint mx-auto mb-3" />
                                     <p className="text-sm text-secondary mb-4">No upcoming bookings.</p>
                                     <Link href="/venues">
                                         <Button variant="outline" size="sm">Find a Court</Button>
@@ -270,18 +270,18 @@ export default function ProfilePage() {
                         <Link href="/challenges" className="block">
                             <div className="bg-gradient-to-br from-surface-raised to-surface-base border border-default rounded-3xl p-6 relative overflow-hidden group hover:border-emerald-500/50 transition-colors cursor-pointer">
                                 <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
-                                    <Trophy className="w-32 h-32 text-emerald-500" />
+                                    <Trophy size={128} weight="duotone" className="text-emerald-500" />
                                 </div>
                                 <div className="relative z-10">
                                     <h3 className="text-xl font-bold text-primary mb-2 flex items-center gap-2">
-                                        <Trophy className="w-5 h-5 text-emerald-500" />
+                                        <Trophy size={20} weight="fill" className="text-emerald-500" />
                                         Achievements & Challenges
                                     </h3>
                                     <p className="text-secondary mb-4 max-w-md">
                                         Complete daily challenges to earn XP, unlock badges, and climb the tiers.
                                     </p>
                                     <div className="flex items-center gap-4 text-sm font-bold text-emerald-500 group-hover:translate-x-1 transition-transform">
-                                        View All Challenges <ChevronRight className="w-4 h-4" />
+                                        View All Challenges <CaretRight size={16} weight="bold" />
                                     </div>
                                 </div>
                             </div>
@@ -290,7 +290,7 @@ export default function ProfilePage() {
                         {/* Recent Activity */}
                         <div className="bg-surface-raised dark:bg-surface-raised/50 border border-default rounded-3xl p-6 backdrop-blur-sm">
                             <h3 className="text-lg font-bold text-primary mb-5 flex items-center gap-2">
-                                <Activity className="w-5 h-5 text-secondary" /> Recent Activity
+                                <Pulse size={20} weight="bold" className="text-secondary" /> Recent Activity
                             </h3>
 
                             <div className="space-y-3">
@@ -362,7 +362,7 @@ function MenuLink({ href, icon, label }: any) {
                 <span className="group-hover:text-emerald-500 transition-colors">{icon}</span>
                 {label}
             </span>
-            <ChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
+            <CaretRight size={16} weight="bold" className="opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
         </Link>
     )
 }

@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
-import { MapPin, ChevronDown, X, Loader2, Check } from "lucide-react";
+import { MapPin, CaretDown, X, CircleNotch, Check } from "@phosphor-icons/react";
 import { City } from "@/types";
 
 const HEADER_HEIGHT = 72;
@@ -209,7 +209,7 @@ export default function CityCombobox({
             >
               <span className="truncate">{opt.name}</span>
               {isSelected && (
-                <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 ml-2" />
+                <Check size={16} weight="bold" className="text-emerald-500 flex-shrink-0 ml-2" />
               )}
             </li>
           );
@@ -241,7 +241,8 @@ export default function CityCombobox({
         `}
       >
         <MapPin
-          className={`w-4 h-4 flex-shrink-0 transition-colors ${
+          size={16} weight="duotone"
+          className={`flex-shrink-0 transition-colors ${
             isOpen || value ? "text-emerald-500" : "text-muted"
           }`}
         />
@@ -273,7 +274,7 @@ export default function CityCombobox({
 
         <div className="flex items-center gap-1 flex-shrink-0">
           {loading ? (
-            <Loader2 className="w-4 h-4 text-muted animate-spin" />
+            <CircleNotch size={16} weight="bold" className="text-muted animate-spin" />
           ) : (
             <>
               {isActive && value && !(allowAll && value === "") && (
@@ -284,11 +285,12 @@ export default function CityCombobox({
                   aria-label="Clear selection"
                   className="w-5 h-5 flex items-center justify-center rounded-full text-muted hover:text-primary hover:bg-surface-overlay transition-colors"
                 >
-                  <X className="w-3 h-3" />
+                  <X size={12} weight="bold" />
                 </button>
               )}
-              <ChevronDown
-                className={`w-4 h-4 text-secondary transition-transform duration-200 ${
+              <CaretDown
+                size={16} weight="bold"
+                className={`text-secondary transition-transform duration-200 ${
                   isOpen ? "rotate-180" : ""
                 }`}
               />

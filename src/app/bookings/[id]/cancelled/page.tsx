@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { XCircle, RefreshCw, ArrowLeft } from "lucide-react";
+import { XCircle, ArrowsClockwise, ArrowLeft } from "@phosphor-icons/react";
 import { playerService } from "@/services/playerService";
 import { Booking } from "@/types";
 
@@ -43,7 +43,7 @@ export default function BookingCancelledPage() {
 
         {/* Icon */}
         <div className="inline-flex w-20 h-20 rounded-full bg-surface-overlay/60 border border-subtle items-center justify-center mb-6">
-          <XCircle className="w-10 h-10 text-secondary" strokeWidth={1.5} />
+          <XCircle size={40} weight="fill" className="text-secondary" />
         </div>
 
         <h1 className="text-2xl font-bold text-primary mb-3">Payment Cancelled</h1>
@@ -58,7 +58,7 @@ export default function BookingCancelledPage() {
                 onClick={() => router.push(`/checkout/${id}`)}
                 className="w-full py-3.5 bg-emerald-500 text-black font-bold rounded-xl hover:bg-emerald-400 transition flex items-center justify-center gap-2"
               >
-                <RefreshCw className="w-4 h-4" /> Try Again
+                <ArrowsClockwise size={16} weight="bold" /> Try Again
               </button>
               <Link
                 href="/venues"
@@ -77,7 +77,7 @@ export default function BookingCancelledPage() {
               href="/venues"
               className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-500 text-black font-bold rounded-xl hover:bg-emerald-400 transition"
             >
-              <ArrowLeft className="w-4 h-4" /> Find Another Venue
+              <ArrowLeft size={16} weight="bold" /> Find Another Venue
             </Link>
           </>
         )}

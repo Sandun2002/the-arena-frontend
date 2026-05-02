@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Receipt, ArrowLeft, Loader2, DollarSign, Wallet, TrendingUp } from "lucide-react";
+import { Receipt, ArrowLeft, CircleNotch, CurrencyDollar, Wallet, TrendUp } from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
 import { centerService } from "@/services/centerService";
@@ -57,14 +57,14 @@ export default function FeesAnalyticsPage() {
             <div className="container mx-auto max-w-5xl relative z-10">
                 <div className="mb-6">
                     <Button variant="ghost" onClick={() => router.back()} className="text-secondary hover:text-primary pl-0">
-                        <ArrowLeft className="w-4 h-4 mr-2" /> Back to Analytics
+                        <ArrowLeft size={16} weight="bold" className="mr-2" /> Back to Analytics
                     </Button>
                 </div>
 
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                     <div>
                         <h1 className="text-3xl font-bold text-primary mb-2 flex items-center gap-2">
-                            <Receipt className="w-8 h-8 text-red-500" /> Fees &amp; Payouts
+                            <Receipt size={32} weight="fill" className="text-red-500" /> Fees &amp; Payouts
                         </h1>
                         <p className="text-secondary">Platform commissions and net earnings for <span className="text-emerald-500">{currentVenue.name}</span>.</p>
                     </div>
@@ -87,7 +87,7 @@ export default function FeesAnalyticsPage() {
 
                 {isLoading && !data ? (
                     <div className="h-96 flex items-center justify-center">
-                        <Loader2 className="w-8 h-8 animate-spin text-muted" />
+                        <CircleNotch size={32} weight="bold" className="animate-spin text-muted" />
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -97,7 +97,7 @@ export default function FeesAnalyticsPage() {
                             <div className="flex items-start justify-between">
                                 <div>
                                     <div className="flex items-center gap-3 mb-2">
-                                        <Wallet className="w-6 h-6 text-emerald-500" />
+                                        <Wallet size={24} weight="fill" className="text-emerald-500" />
                                         <p className="text-secondary font-medium">Net Payout</p>
                                     </div>
                                     <h2 className="text-5xl font-bold text-primary mb-2">LKR {(data?.net_payout || 0).toLocaleString()}</h2>
@@ -120,7 +120,7 @@ export default function FeesAnalyticsPage() {
                         <div className="bg-surface-raised/40 border border-default rounded-3xl p-8 backdrop-blur-sm">
                             <div className="flex items-start justify-between mb-4">
                                 <div className="p-3 bg-emerald-500/10 rounded-xl">
-                                    <TrendingUp className="w-6 h-6 text-emerald-500" />
+                                    <TrendUp size={24} weight="bold" className="text-emerald-500" />
                                 </div>
                             </div>
                             <h3 className="text-2xl font-bold text-primary mb-1">LKR {(data?.total_platform_revenue || 0).toLocaleString()}</h3>
@@ -132,7 +132,7 @@ export default function FeesAnalyticsPage() {
                         <div className="bg-surface-raised/40 border border-default rounded-3xl p-8 backdrop-blur-sm">
                             <div className="flex items-start justify-between mb-4">
                                 <div className="p-3 bg-red-500/10 rounded-xl">
-                                    <Receipt className="w-6 h-6 text-red-500" />
+                                    <Receipt size={24} weight="fill" className="text-red-500" />
                                 </div>
                             </div>
                             <h3 className="text-2xl font-bold text-primary mb-1">LKR {(data?.venue_commission || 0).toLocaleString()}</h3>
@@ -144,7 +144,7 @@ export default function FeesAnalyticsPage() {
                         <div className="bg-surface-raised/40 border border-default rounded-3xl p-8 backdrop-blur-sm">
                             <div className="flex items-start justify-between mb-4">
                                 <div className="p-3 bg-blue-500/10 rounded-xl">
-                                    <DollarSign className="w-6 h-6 text-blue-500" />
+                                    <CurrencyDollar size={24} weight="fill" className="text-blue-500" />
                                 </div>
                             </div>
                             <h3 className="text-2xl font-bold text-primary mb-1">LKR {(data?.pending_payout || 0).toLocaleString()}</h3>
@@ -155,7 +155,7 @@ export default function FeesAnalyticsPage() {
                         {/* Booking Breakdown */}
                         <div className="bg-surface-raised/40 border border-default rounded-3xl p-8 backdrop-blur-sm flex flex-col justify-center md:col-span-3">
                             <h4 className="text-primary font-bold mb-4 flex items-center gap-2">
-                                <Receipt className="w-5 h-5 text-muted" /> Booking Breakdown
+                                <Receipt size={20} weight="bold" className="text-muted" /> Booking Breakdown
                             </h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="bg-surface-base/30 p-4 rounded-2xl border border-default/50">

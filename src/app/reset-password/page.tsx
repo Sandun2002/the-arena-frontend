@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Lock, Loader2, CheckCircle } from "lucide-react";
+import { Lock, CircleNotch, CheckCircle } from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import { authService } from "@/services/authService";
 import { useToast } from "@/components/ui/Toast";
@@ -69,7 +69,7 @@ export default function ResetPasswordPage() {
                                 <div className="space-y-2">
                                     <label className="block text-xs font-bold text-muted uppercase">New Password</label>
                                     <div className="relative group">
-                                        <Lock className="absolute left-4 top-3.5 h-5 w-5 text-muted group-focus-within:text-emerald-500 transition-colors" />
+                                        <Lock size={20} weight="duotone" className="absolute left-4 top-3.5 text-muted group-focus-within:text-emerald-500 transition-colors" />
                                         <input
                                             type="password"
                                             value={password}
@@ -85,7 +85,7 @@ export default function ResetPasswordPage() {
                                 <div className="space-y-2">
                                     <label className="block text-xs font-bold text-muted uppercase">Confirm Password</label>
                                     <div className="relative group">
-                                        <Lock className="absolute left-4 top-3.5 h-5 w-5 text-muted group-focus-within:text-emerald-500 transition-colors" />
+                                        <Lock size={20} weight="duotone" className="absolute left-4 top-3.5 text-muted group-focus-within:text-emerald-500 transition-colors" />
                                         <input
                                             type="password"
                                             value={confirmPassword}
@@ -102,14 +102,14 @@ export default function ResetPasswordPage() {
                                     disabled={isSubmitting || !token}
                                     className="w-full py-4 bg-emerald-500 hover:bg-emerald-400 text-black font-bold mt-4"
                                 >
-                                    {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "Reset Password"}
+                                    {isSubmitting ? <CircleNotch size={20} weight="bold" className="animate-spin mx-auto" /> : "Reset Password"}
                                 </Button>
                             </form>
                         </>
                     ) : (
                         <div className="text-center py-8">
                             <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <CheckCircle className="w-8 h-8 text-emerald-500" />
+                                <CheckCircle size={32} weight="fill" className="text-emerald-500" />
                             </div>
                             <h3 className="text-xl font-bold text-primary mb-2">Password Reset!</h3>
                             <p className="text-secondary text-sm mb-6">

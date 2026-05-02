@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { X } from "lucide-react";
+import { X } from "@phosphor-icons/react";
 
 interface ModalProps {
     isOpen: boolean;
@@ -73,7 +73,7 @@ export default function Modal({ isOpen, onClose, children, title, size = "md" }:
                         onClick={onClose}
                         className="p-2 -mr-2 text-muted hover:text-primary hover:bg-surface-overlay rounded-lg transition-colors"
                     >
-                        <X className="w-5 h-5" />
+                        <X size={20} weight="bold" />
                     </button>
                 </div>
 

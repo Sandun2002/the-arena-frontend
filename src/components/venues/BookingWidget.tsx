@@ -3,7 +3,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { Venue } from "@/types";
 import Button from "@/components/ui/Button";
 import DatePicker from "@/components/ui/DatePicker";
-import { Check, LogIn, Loader2, Calendar, Hammer, Zap, AlertCircle, RefreshCw } from "lucide-react";
+import { Check, SignIn, CircleNotch, CalendarBlank, Hammer, Lightning, WarningCircle, ArrowsClockwise } from "@phosphor-icons/react";
 import { useAuth } from "@/services/authContext";
 import { api } from "@/services/api";
 import { bookingService } from "@/services/bookingService";
@@ -235,7 +235,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
     return (
       <div className="w-full rounded-2xl bg-surface-raised/80 border border-emerald-500 p-8 backdrop-blur-md shadow-xl text-center">
         <div className="w-16 h-16 rounded-full bg-emerald-500 flex items-center justify-center mx-auto mb-4">
-          <Check className="h-8 w-8 text-black" />
+          <Check size={32} weight="bold" className="text-black" />
         </div>
         <h3 className="text-xl font-bold text-primary mb-2">Booking Confirmed!</h3>
         <p className="text-secondary text-sm mb-4">Redirecting to your bookings...</p>
@@ -249,7 +249,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
     return (
       <div className="w-full rounded-2xl bg-surface-raised/80 border border-default p-8 backdrop-blur-md shadow-xl text-center">
         <div className="w-16 h-16 rounded-full bg-surface-overlay flex items-center justify-center mx-auto mb-4">
-          <LogIn className="h-8 w-8 text-emerald-500" />
+          <SignIn size={32} weight="duotone" className="text-emerald-500" />
         </div>
         <h3 className="text-xl font-bold text-primary mb-2">Login Required</h3>
         <p className="text-secondary text-sm mb-6">Please sign in to complete your booking.</p>
@@ -281,7 +281,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
       {/* Peak Hours Banner */}
       {peakConfig?.has_peak_config && (
         <div className="mb-4 p-3 rounded-xl bg-gradient-to-r from-amber-500/10 to-amber-500/5 border border-amber-500/20 flex items-center gap-2">
-          <Zap className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
+          <Lightning size={14} weight="fill" className="text-amber-400 flex-shrink-0" />
           <p className="text-[11px] text-amber-400/90 leading-snug">
             <span className="font-bold">Peak hours {peakConfig.peak_start_time}&ndash;{peakConfig.peak_end_time}</span>
             {peakConfig.peak_days ? ` on selected days` : ` (every day)`}
@@ -344,7 +344,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
           <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-zinc-600/70 border border-zinc-500/40"></span> Maintenance</div>
           <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full border border-subtle bg-surface-overlay/50"></span> Past/Closed</div>
           <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-zinc-600"></span> Available</div>
-          <div className="flex items-center gap-1"><Zap className="w-2.5 h-2.5 text-amber-400" /> Peak</div>
+          <div className="flex items-center gap-1"><Lightning size={10} weight="fill" className="text-amber-400" /> Peak</div>
         </div>
       )}
 
@@ -352,7 +352,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
       {!isVenueClosed && maintenanceCourts.length > 0 && (
         <div className="mb-6 p-4 rounded-xl border border-amber-500/20 bg-amber-500/5">
           <div className="flex items-center gap-2 mb-3">
-            <Hammer className="w-4 h-4 text-amber-500" />
+            <Hammer size={16} weight="duotone" className="text-amber-500" />
             <h4 className="text-amber-500 font-bold text-sm uppercase tracking-wider">
               Courts Under Maintenance
             </h4>
@@ -381,7 +381,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
       {/* Time Slots Grid */}
       {isVenueClosed ? (
         <div className="mb-8 p-6 rounded-xl border border-red-500/20 bg-red-500/5 text-center">
-          <Calendar className="w-8 h-8 text-red-500/50 mx-auto mb-3" />
+          <CalendarBlank size={32} weight="duotone" className="text-red-500/50 mx-auto mb-3" />
           <h4 className="text-red-400 font-bold mb-1">Venue Closed</h4>
           <p className="text-secondary text-sm">
             {closureReason || "This venue is closed on the selected date. Please choose another date."}
@@ -397,13 +397,13 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
             </>
           ) : slotsError ? (
             <div className="col-span-4 flex flex-col items-center justify-center gap-3 py-6 text-sm text-muted">
-              <AlertCircle className="w-5 h-5 text-red-400" />
+              <WarningCircle size={20} weight="duotone" className="text-red-400" />
               <span>Failed to load availability.</span>
               <button
                 onClick={loadSlots}
                 className="inline-flex items-center gap-1.5 text-emerald-400 font-bold hover:underline text-xs"
               >
-                <RefreshCw className="w-3.5 h-3.5" /> Retry
+                <ArrowsClockwise size={14} weight="bold" /> Retry
               </button>
             </div>
           ) : (
@@ -456,8 +456,10 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
                   `}
                 >
                   {showPeakBadge && (
-                    <Zap
-                      className={`absolute top-1 right-1 w-2.5 h-2.5 ${
+                    <Lightning
+                      size={10}
+                      weight="fill"
+                      className={`absolute top-1 right-1 ${
                         isSelected ? "text-black/80" : "text-amber-400"
                       }`}
                     />
@@ -503,7 +505,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
             : "bg-surface-overlay hover:bg-surface-overlay text-primary border-subtle"
             } disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center`}
         >
-          {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : (selectedSlots.length > 0 ? "Proceed to Pay" : "Select Slots")}
+          {submitting ? <CircleNotch size={20} weight="bold" className="animate-spin" /> : (selectedSlots.length > 0 ? "Proceed to Pay" : "Select Slots")}
         </Button>
       </div>
 

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { fmtTime, fmtDateShort, fmtDateTime } from "@/lib/utils";
-import { ArrowLeft, Calendar, Clock, MapPin, Receipt, AlertCircle, CheckCircle, Download, CreditCard, RefreshCw, XCircle, Timer } from "lucide-react";
+import { ArrowLeft, CalendarBlank, Clock, MapPin, Receipt, WarningCircle, CheckCircle, DownloadSimple, CreditCard, ArrowsClockwise, XCircle, Timer } from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
 import CancelBookingModal from "@/components/bookings/CancelBookingModal";
@@ -48,7 +48,7 @@ export default function BookingDetailPage() {
             <div className="container mx-auto max-w-3xl">
 
                 <Link href="/bookings" className="inline-flex items-center text-sm text-muted hover:text-primary mb-8 transition-colors">
-                    <ArrowLeft className="w-4 h-4 mr-2" /> Back to Bookings
+                    <ArrowLeft size={16} weight="bold" className="mr-2" /> Back to Bookings
                 </Link>
 
                 <div className="flex flex-col md:flex-row gap-8">
@@ -87,13 +87,13 @@ export default function BookingDetailPage() {
                             <div className="grid grid-cols-2 gap-4 py-6 border-y border-default mb-6">
                                 <div>
                                     <p className="text-xs font-bold text-muted uppercase mb-1 flex items-center gap-1.5">
-                                        <Calendar className="w-3.5 h-3.5" /> Date
+                                        <CalendarBlank size={14} weight="bold" /> Date
                                     </p>
                                     <p className="text-primary font-medium">{fmtDateShort(booking.start_time)}</p>
                                 </div>
                                 <div className="text-right">
                                     <p className="text-xs font-bold text-muted uppercase mb-1 flex items-center justify-end gap-1.5">
-                                        <Clock className="w-3.5 h-3.5" /> Time
+                                        <Clock size={14} weight="bold" /> Time
                                     </p>
                                     <p className="text-primary font-medium">
                                         {fmtTime(booking.start_time)} - {fmtTime(booking.end_time)}
@@ -117,11 +117,11 @@ export default function BookingDetailPage() {
                                             className="flex-1 bg-emerald-500 hover:bg-emerald-400 text-black font-bold"
                                             onClick={() => router.push(`/checkout/${booking.id}`)}
                                         >
-                                            <CreditCard className="w-4 h-4 mr-2" /> Complete Payment
+                                            <CreditCard size={16} weight="bold" className="mr-2" /> Complete Payment
                                         </Button>
                                     ) : (
                                         <Button className="flex-1 bg-surface-overlay hover:bg-surface-overlay text-primary border-subtle" variant="outline">
-                                            <Download className="w-4 h-4 mr-2" /> Ticket
+                                            <DownloadSimple size={16} weight="bold" className="mr-2" /> Ticket
                                         </Button>
                                     )}
                                     <Button
@@ -173,7 +173,7 @@ export default function BookingDetailPage() {
                     <div className="w-full md:w-80 space-y-6">
                         <div className="bg-surface-raised/50 border border-default rounded-3xl p-6 backdrop-blur-sm sticky top-24">
                             <h3 className="text-lg font-bold text-primary mb-6 flex items-center gap-2">
-                                <Receipt className="w-5 h-5 text-emerald-500" /> Payment Summary
+                                <Receipt size={20} weight="fill" className="text-emerald-500" /> Payment Summary
                             </h3>
 
                             <div className="space-y-3 mb-6">
@@ -250,7 +250,7 @@ function HoldTimer({
     if (isExpired) {
         return (
             <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-4 flex items-start gap-3">
-                <XCircle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
+                <XCircle size={20} weight="fill" className="text-red-500 mt-0.5 flex-shrink-0" />
                 <div className="flex-1">
                     <p className="text-sm font-bold text-red-400">Payment hold expired</p>
                     <p className="text-xs text-red-400/80 mt-0.5">
@@ -261,7 +261,7 @@ function HoldTimer({
                     onClick={() => router.refresh()}
                     className="text-xs font-bold text-red-300 hover:text-red-200 flex items-center gap-1 flex-shrink-0"
                 >
-                    <RefreshCw className="w-3.5 h-3.5" /> Refresh
+                    <ArrowsClockwise size={14} weight="bold" /> Refresh
                 </button>
             </div>
         );
@@ -275,7 +275,7 @@ function HoldTimer({
                     : "border-amber-500/30 bg-amber-500/10"
             }`}
         >
-            <Timer className={`w-5 h-5 flex-shrink-0 ${isUrgent ? "text-red-400" : "text-amber-400"}`} />
+            <Timer size={20} weight="fill" className={`flex-shrink-0 ${isUrgent ? "text-red-400" : "text-amber-400"}`} />
             <div className="flex-1">
                 <p className={`text-sm font-bold ${isUrgent ? "text-red-300" : "text-amber-300"}`}>
                     Complete payment within{" "}
@@ -299,7 +299,7 @@ function PaymentStatusPanel({ booking }: { booking: Booking }) {
         return (
             <div className="bg-surface-base/40 rounded-xl p-4 border border-emerald-500/20">
                 <div className="flex items-center gap-2 mb-1">
-                    <CheckCircle className="w-4 h-4 text-emerald-500" />
+                    <CheckCircle size={16} weight="fill" className="text-emerald-500" />
                     <span className="text-xs font-bold text-emerald-500 uppercase">
                         Paid via {methodLabel}
                     </span>
@@ -317,7 +317,7 @@ function PaymentStatusPanel({ booking }: { booking: Booking }) {
         return (
             <div className="bg-surface-base/40 rounded-xl p-4 border border-blue-500/20">
                 <div className="flex items-center gap-2 mb-1">
-                    <RefreshCw className="w-4 h-4 text-blue-400" />
+                    <ArrowsClockwise size={16} weight="bold" className="text-blue-400" />
                     <span className="text-xs font-bold text-blue-400 uppercase">Refunded</span>
                 </div>
                 <p className="text-[10px] text-faint">
@@ -331,7 +331,7 @@ function PaymentStatusPanel({ booking }: { booking: Booking }) {
         return (
             <div className="bg-surface-base/40 rounded-xl p-4 border border-red-500/30">
                 <div className="flex items-center gap-2 mb-1">
-                    <XCircle className="w-4 h-4 text-red-500" />
+                    <XCircle size={16} weight="fill" className="text-red-500" />
                     <span className="text-xs font-bold text-red-500 uppercase">Payment Failed</span>
                 </div>
                 <p className="text-[10px] text-faint">
@@ -346,7 +346,7 @@ function PaymentStatusPanel({ booking }: { booking: Booking }) {
         return (
             <div className="bg-surface-base/40 rounded-xl p-4 border border-amber-500/20">
                 <div className="flex items-center gap-2 mb-1">
-                    <Timer className="w-4 h-4 text-amber-400" />
+                    <Timer size={16} weight="fill" className="text-amber-400" />
                     <span className="text-xs font-bold text-amber-400 uppercase">Awaiting Payment</span>
                 </div>
                 <p className="text-[10px] text-faint">
@@ -359,7 +359,7 @@ function PaymentStatusPanel({ booking }: { booking: Booking }) {
     return (
         <div className="bg-surface-base/40 rounded-xl p-4 border border-default/50">
             <div className="flex items-center gap-2 mb-1">
-                <AlertCircle className="w-4 h-4 text-muted" />
+                <WarningCircle size={16} weight="fill" className="text-muted" />
                 <span className="text-xs font-bold text-muted uppercase">No Payment Recorded</span>
             </div>
             <p className="text-[10px] text-faint">

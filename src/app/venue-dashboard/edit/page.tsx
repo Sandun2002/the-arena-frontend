@@ -4,7 +4,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { Building2, MapPin, Loader2, Info, ArrowRight, ArrowLeft } from "lucide-react";
+import { Buildings, MapPin, CircleNotch, Info, ArrowRight, ArrowLeft } from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import { venueApiService } from "@/services/venueApiService";
 import { useToast } from "@/components/ui/Toast";
@@ -133,7 +133,7 @@ export default function EditVenuePage() {
                             <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300">
                                 <div className="flex items-center gap-3 mb-6 pb-4 border-b border-default">
                                     <div className="p-2 bg-emerald-500/10 rounded-lg">
-                                        <Building2 className="w-6 h-6 text-emerald-500" />
+                                        <Buildings size={24} weight="fill" className="text-emerald-500" />
                                     </div>
                                     <h2 className="text-xl font-bold text-primary">Venue Details</h2>
                                 </div>
@@ -187,7 +187,7 @@ export default function EditVenuePage() {
                                 </div>
 
                                 <Button type="button" onClick={() => setStep("location")} className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-12 text-lg shadow-[0_0_20px_rgba(16,185,129,0.2)]">
-                                    Next: Location <ArrowRight className="w-5 h-5 ml-2" />
+                                    Next: Location <ArrowRight size={20} weight="bold" className="ml-2" />
                                 </Button>
                             </div>
                         )}
@@ -197,7 +197,7 @@ export default function EditVenuePage() {
                             <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300">
                                 <div className="flex items-center gap-3 mb-6 pb-4 border-b border-default">
                                     <div className="p-2 bg-blue-500/10 rounded-lg">
-                                        <MapPin className="w-6 h-6 text-blue-500" />
+                                        <MapPin size={24} weight="fill" className="text-blue-500" />
                                     </div>
                                     <h2 className="text-xl font-bold text-primary">Location</h2>
                                 </div>
@@ -224,7 +224,7 @@ export default function EditVenuePage() {
                                 </div>
 
                                 <div className="bg-blue-500/10 p-4 rounded-xl flex gap-3 items-start border border-blue-500/20">
-                                    <Info className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                                    <Info size={20} weight="fill" className="text-blue-500 flex-shrink-0 mt-0.5" />
                                     <div className="text-sm text-blue-200/80 leading-relaxed">
                                         <span className="font-bold text-blue-400 block mb-1">Map Coordinates</span>
                                         Coordinates (Lat/Lng) are managed automatically.
@@ -233,14 +233,14 @@ export default function EditVenuePage() {
 
                                 <div className="flex gap-3 pt-4">
                                     <Button type="button" variant="ghost" onClick={() => setStep("details")} className="flex-1 h-12 text-secondary hover:text-primary">
-                                        <ArrowLeft className="w-5 h-5 mr-2" /> Back
+                                        <ArrowLeft size={20} weight="bold" className="mr-2" /> Back
                                     </Button>
                                     <Button
                                         type="submit"
                                         disabled={isSubmitting}
                                         className="flex-[2] bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-12 text-lg shadow-[0_0_20px_rgba(16,185,129,0.2)]"
                                     >
-                                        {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "Save Changes"}
+                                        {isSubmitting ? <CircleNotch size={20} weight="bold" className="animate-spin mx-auto" /> : "Save Changes"}
                                     </Button>
                                 </div>
                             </div>

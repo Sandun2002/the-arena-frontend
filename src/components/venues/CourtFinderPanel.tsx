@@ -11,14 +11,14 @@ import DatePicker from "@/components/ui/DatePicker";
 import CityCombobox from "@/components/ui/CityCombobox";
 import {
     MapPin,
-    Search,
-    Navigation,
-    Loader2,
-    Sparkles,
-    Locate,
+    MagnifyingGlass,
+    NavigationArrow,
+    CircleNotch,
+    Sparkle,
+    Crosshair,
     Check,
-    AlertCircle
-} from "lucide-react";
+    WarningCircle
+} from "@phosphor-icons/react";
 
 interface CourtFinderPanelProps {
     onSearch: (params: SearchParams) => void;
@@ -213,7 +213,7 @@ export default function CourtFinderPanel({ onSearch, initialSport = "All", initi
                             <div className="flex flex-col gap-1">
                                 <div className="flex items-center gap-3">
                                     <div className="p-2.5 rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 border border-emerald-500/20 shadow-[0_0_15px_rgba(80,200,120,0.2)]">
-                                        <Sparkles className="w-5 h-5 text-emerald-400" />
+                                        <Sparkle size={20} weight="fill" className="text-emerald-400" />
                                     </div>
                                     <h1 className="text-2xl md:text-3xl font-extrabold text-primary tracking-tight">
                                         Find Your{' '}
@@ -253,7 +253,7 @@ export default function CourtFinderPanel({ onSearch, initialSport = "All", initi
                                 </div>
                             ) : sportsError ? (
                                 <div className="flex items-center justify-center gap-3 py-8 text-sm text-muted">
-                                    <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+                                    <WarningCircle size={16} weight="duotone" className="text-red-400 shrink-0" />
                                     <span>Failed to load sports.</span>
                                     <button
                                         onClick={() => { setSportsError(false); setLoadingSports(true); setRetryCount(c => c + 1); }}
@@ -310,7 +310,7 @@ export default function CourtFinderPanel({ onSearch, initialSport = "All", initi
                                                 {/* Checkmark Badge */}
                                                 {isSelected && (
                                                     <div className="absolute top-2 right-2 w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center shadow-lg shadow-emerald-500/40 z-20 animate-fade-in">
-                                                        <Check className="w-3.5 h-3.5 text-black stroke-[3]" />
+                                                        <Check size={14} weight="bold" className="text-black" />
                                                     </div>
                                                 )}
 
@@ -412,9 +412,9 @@ export default function CourtFinderPanel({ onSearch, initialSport = "All", initi
                                     `}
                                 >
                                     {fetchingLocation ? (
-                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                        <CircleNotch size={20} weight="bold" className="animate-spin" />
                                     ) : (
-                                        <Locate className={`w-5 h-5 transition-all duration-300 ${useMyLocation ? 'text-emerald-400' : ''}`} />
+                                        <Crosshair size={20} weight="duotone" className={`transition-all duration-300 ${useMyLocation ? 'text-emerald-400' : ''}`} />
                                     )}
                                     <span className="text-sm font-bold hidden md:inline">
                                         {fetchingLocation ? 'Locating...' : useMyLocation ? 'Live ✓' : 'Live'}
@@ -471,9 +471,9 @@ export default function CourtFinderPanel({ onSearch, initialSport = "All", initi
                                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-[150%] group-hover:translate-x-[150%] transition-transform duration-1000 ease-in-out" />
                                 
                                 {isSearching ? (
-                                    <Loader2 className="w-5 h-5 animate-spin relative z-10" />
+                                    <CircleNotch size={20} weight="bold" className="animate-spin relative z-10" />
                                 ) : (
-                                    <Search className="w-5 h-5 relative z-10 group-hover:rotate-12 transition-transform duration-300" />
+                                    <MagnifyingGlass size={20} weight="bold" className="relative z-10 group-hover:rotate-12 transition-transform duration-300" />
                                 )}
                                 <span className="relative z-10">{isSearching ? 'Searching...' : 'Search Courts'}</span>
                                 

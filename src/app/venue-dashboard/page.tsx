@@ -4,10 +4,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
-    Building2, Users, Receipt, Calendar, CalendarCheck,
-    AlertTriangle, Clock, Plus, ArrowUpRight, ArrowDownRight,
-    Globe, UserPlus, Repeat, Hammer
-} from "lucide-react";
+    Buildings, Users, Receipt, Calendar, CalendarCheck,
+    Warning, Clock, Plus, ArrowUpRight, ArrowDownRight,
+    Globe, UserPlus, ArrowsClockwise, Hammer
+} from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
 import { centerService as venueService } from "@/services/centerService";
@@ -108,7 +108,7 @@ export default function VenueDashboardPage() {
                 {isVenueOwner && (
                     <Link href="/venue-dashboard/create">
                         <Button className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold">
-                            <Plus className="w-4 h-4 mr-2" /> Add Venue
+                            <Plus size={16} weight="bold" className="mr-2" /> Add Venue
                         </Button>
                     </Link>
                 )}
@@ -118,7 +118,7 @@ export default function VenueDashboardPage() {
             {currentVenue?.status === "pending" && (
                 <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-2xl p-4 flex items-center gap-4">
                     <div className="p-2 bg-yellow-500/20 rounded-xl">
-                        <Clock className="w-6 h-6 text-yellow-500" />
+                        <Clock size={24} weight="duotone" className="text-yellow-500" />
                     </div>
                     <div className="flex-grow">
                         <h3 className="text-lg font-bold text-primary mb-1">Verification Pending</h3>
@@ -132,7 +132,7 @@ export default function VenueDashboardPage() {
             {(currentVenue?.status === "suspended" || currentVenue?.status === "blocked") && (
                 <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 flex items-center gap-4">
                     <div className="p-2 bg-red-500/20 rounded-xl">
-                        <AlertTriangle className="w-6 h-6 text-red-500" />
+                        <Warning size={24} weight="duotone" className="text-red-500" />
                     </div>
                     <div className="flex-grow">
                         <h3 className="text-lg font-bold text-primary mb-1">Venue {currentVenue?.status === "suspended" ? "Suspended" : "Blocked"}</h3>
@@ -145,7 +145,7 @@ export default function VenueDashboardPage() {
             {upcomingClosures.length > 0 && (
                 <div className="bg-orange-500/10 border border-orange-500/20 rounded-2xl p-4 flex items-center gap-4">
                     <div className="p-2 bg-orange-500/20 rounded-xl flex-shrink-0">
-                        <AlertTriangle className="w-6 h-6 text-orange-500" />
+                        <Warning size={24} weight="duotone" className="text-orange-500" />
                     </div>
                     <div className="flex-grow min-w-0">
                         <h3 className="text-sm font-bold text-primary mb-0.5">Upcoming Venue Closure{upcomingClosures.length > 1 ? `s (${upcomingClosures.length})` : ""}</h3>
@@ -162,10 +162,10 @@ export default function VenueDashboardPage() {
                 {/* Bookings Today */}
                 <div className="bg-surface-raised/50 border border-default rounded-3xl p-6 backdrop-blur-sm">
                     <div className="flex justify-between mb-6">
-                        <div className="p-3 bg-blue-500/10 rounded-2xl"><Calendar className="w-6 h-6 text-blue-500" /></div>
+                        <div className="p-3 bg-blue-500/10 rounded-2xl"><Calendar size={24} weight="duotone" className="text-blue-500" /></div>
                         {stats?.bookings_trend ? (
                             <div className={`flex items-center text-xs font-bold ${stats.bookings_trend >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
-                                {stats.bookings_trend >= 0 ? <ArrowUpRight className="w-3 h-3 mr-1" /> : <ArrowDownRight className="w-3 h-3 mr-1" />}
+                                {stats.bookings_trend >= 0 ? <ArrowUpRight size={12} weight="bold" className="mr-1" /> : <ArrowDownRight size={12} weight="bold" className="mr-1" />}
                                 {Math.abs(stats.bookings_trend)}%
                             </div>
                         ) : null}
@@ -177,10 +177,10 @@ export default function VenueDashboardPage() {
                 {/* Revenue */}
                 <div className="bg-surface-raised/50 border border-default rounded-3xl p-6 backdrop-blur-sm">
                     <div className="flex justify-between mb-6">
-                        <div className="p-3 bg-emerald-500/10 rounded-2xl"><Receipt className="w-6 h-6 text-emerald-500" /></div>
+                        <div className="p-3 bg-emerald-500/10 rounded-2xl"><Receipt size={24} weight="duotone" className="text-emerald-500" /></div>
                         {stats?.revenue_trend ? (
                             <div className={`flex items-center text-xs font-bold ${stats.revenue_trend >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
-                                {stats.revenue_trend >= 0 ? <ArrowUpRight className="w-3 h-3 mr-1" /> : <ArrowDownRight className="w-3 h-3 mr-1" />}
+                                {stats.revenue_trend >= 0 ? <ArrowUpRight size={12} weight="bold" className="mr-1" /> : <ArrowDownRight size={12} weight="bold" className="mr-1" />}
                                 {Math.abs(stats.revenue_trend)}%
                             </div>
                         ) : null}
@@ -195,7 +195,7 @@ export default function VenueDashboardPage() {
                 {/* Active Courts */}
                 <div className="bg-surface-raised/50 border border-default rounded-3xl p-6 backdrop-blur-sm">
                     <div className="flex justify-between mb-6">
-                        <div className="p-3 bg-purple-500/10 rounded-2xl"><Building2 className="w-6 h-6 text-purple-500" /></div>
+                        <div className="p-3 bg-purple-500/10 rounded-2xl"><Buildings size={24} weight="duotone" className="text-purple-500" /></div>
                     </div>
                     <p className="text-4xl font-black text-primary mb-1">{loadingStats ? "..." : stats?.active_courts || 0}<span className="text-xl text-faint font-bold">/{stats?.total_courts || 0}</span></p>
                     <p className="text-sm font-bold text-muted uppercase tracking-wide">Active Courts</p>
@@ -204,7 +204,7 @@ export default function VenueDashboardPage() {
                 {/* All Time Bookings */}
                 <div className="bg-surface-raised/50 border border-default rounded-3xl p-6 backdrop-blur-sm">
                     <div className="flex justify-between mb-6">
-                        <div className="p-3 bg-orange-500/10 rounded-2xl"><Users className="w-6 h-6 text-orange-500" /></div>
+                        <div className="p-3 bg-orange-500/10 rounded-2xl"><Users size={24} weight="duotone" className="text-orange-500" /></div>
                     </div>
                     <p className="text-4xl font-black text-primary mb-1">{loadingStats ? "..." : stats?.total_bookings || 0}</p>
                     <p className="text-sm font-bold text-muted uppercase tracking-wide">Total Bookings</p>
@@ -226,28 +226,28 @@ export default function VenueDashboardPage() {
                                 {
                                     label: "Platform",
                                     count: todaySchedule.bookings.filter(b => !b.is_manual && !b.is_blocked).length,
-                                    icon: <Globe className="w-4 h-4 text-blue-400" />,
+                                    icon: <Globe size={16} weight="bold" className="text-blue-400" />,
                                     color: "text-blue-400",
                                     bg: "bg-blue-500/10 border-blue-500/20",
                                 },
                                 {
                                     label: "Walk-ins",
                                     count: todaySchedule.bookings.filter(b => b.is_manual && !b.is_blocked).length,
-                                    icon: <UserPlus className="w-4 h-4 text-orange-400" />,
+                                    icon: <UserPlus size={16} weight="bold" className="text-orange-400" />,
                                     color: "text-orange-400",
                                     bg: "bg-orange-500/10 border-orange-500/20",
                                 },
                                 {
                                     label: "Recurring",
                                     count: todaySchedule.recurringBlocks.length,
-                                    icon: <Repeat className="w-4 h-4 text-indigo-400" />,
+                                    icon: <ArrowsClockwise size={16} weight="bold" className="text-indigo-400" />,
                                     color: "text-indigo-400",
                                     bg: "bg-indigo-500/10 border-indigo-500/20",
                                 },
                                 {
                                     label: "Blocked",
                                     count: todaySchedule.bookings.filter(b => b.is_blocked).length,
-                                    icon: <Hammer className="w-4 h-4 text-secondary" />,
+                                    icon: <Hammer size={16} weight="bold" className="text-secondary" />,
                                     color: "text-secondary",
                                     bg: "bg-surface-overlay/50 border-subtle/50",
                                 },
@@ -273,7 +273,7 @@ export default function VenueDashboardPage() {
                         <Link href="/venue-dashboard/booking-manager">
                             <div className="group h-full p-6 bg-surface-base/40 border border-default rounded-2xl hover:border-emerald-500/50 hover:bg-emerald-500/5 transition-all cursor-pointer flex items-center gap-4">
                                 <div className="p-3 bg-emerald-500/10 rounded-xl group-hover:scale-110 transition-transform duration-300">
-                                    <Calendar className="w-6 h-6 text-emerald-500" />
+                                    <Calendar size={24} weight="duotone" className="text-emerald-500" />
                                 </div>
                                 <div>
                                     <h3 className="font-bold text-primary mb-1">Booking Manager</h3>
@@ -284,7 +284,7 @@ export default function VenueDashboardPage() {
                         <Link href="/venue-dashboard/bookings">
                             <div className="group h-full p-6 bg-surface-base/40 border border-default rounded-2xl hover:border-blue-500/50 hover:bg-blue-500/5 transition-all cursor-pointer flex items-center gap-4">
                                 <div className="p-3 bg-blue-500/10 rounded-xl group-hover:scale-110 transition-transform duration-300">
-                                    <CalendarCheck className="w-6 h-6 text-blue-500" />
+                                    <CalendarCheck size={24} weight="duotone" className="text-blue-500" />
                                 </div>
                                 <div>
                                     <h3 className="font-bold text-primary mb-1">All Bookings</h3>
@@ -295,7 +295,7 @@ export default function VenueDashboardPage() {
                         <Link href="/venue-dashboard/courts">
                             <div className="group h-full p-6 bg-surface-base/40 border border-default rounded-2xl hover:border-purple-500/50 hover:bg-purple-500/5 transition-all cursor-pointer flex items-center gap-4">
                                 <div className="p-3 bg-purple-500/10 rounded-xl group-hover:scale-110 transition-transform duration-300">
-                                    <Building2 className="w-6 h-6 text-purple-500" />
+                                    <Buildings size={24} weight="duotone" className="text-purple-500" />
                                 </div>
                                 <div>
                                     <h3 className="font-bold text-primary mb-1">Manage Courts</h3>
@@ -307,7 +307,7 @@ export default function VenueDashboardPage() {
                             <Link href="/venue-dashboard/managers">
                                 <div className="group h-full p-6 bg-surface-base/40 border border-default rounded-2xl hover:border-orange-500/50 hover:bg-orange-500/5 transition-all cursor-pointer flex items-center gap-4">
                                     <div className="p-3 bg-orange-500/10 rounded-xl group-hover:scale-110 transition-transform duration-300">
-                                        <Users className="w-6 h-6 text-orange-500" />
+                                        <Users size={24} weight="duotone" className="text-orange-500" />
                                     </div>
                                     <div>
                                         <h3 className="font-bold text-primary mb-1">Staff Access</h3>

@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { ArrowLeft, Save, Loader2, Lock, Eye, EyeOff, ShieldCheck } from "lucide-react";
+import { ArrowLeft, FloppyDisk, CircleNotch, Lock, Eye, EyeSlash, ShieldCheck } from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
 import { playerService } from "@/services/playerService";
@@ -51,13 +51,13 @@ export default function ChangePasswordPage() {
             <div className="container mx-auto max-w-xl">
 
                 <Link href="/profile" className="inline-flex items-center text-sm font-medium text-muted hover:text-primary mb-8 transition-colors group">
-                    <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" /> Back to Profile
+                    <ArrowLeft size={16} weight="bold" className="mr-2 group-hover:-translate-x-1 transition-transform" /> Back to Profile
                 </Link>
 
                 <div className="bg-surface-raised/50 border border-default rounded-3xl p-8 backdrop-blur-md shadow-2xl">
                     <div className="flex items-center gap-4 mb-8">
                         <div className="p-3 bg-emerald-500/10 rounded-2xl text-emerald-500 border border-emerald-500/20">
-                            <ShieldCheck className="w-8 h-8" />
+                            <ShieldCheck size={32} weight="duotone" />
                         </div>
                         <div>
                             <h1 className="text-2xl font-bold text-primary">Change Password</h1>
@@ -70,7 +70,7 @@ export default function ChangePasswordPage() {
                         <div className="space-y-2">
                             <label className="text-xs font-bold text-muted uppercase tracking-wider">Current Password</label>
                             <div className="relative">
-                                <Lock className="absolute left-4 top-3.5 w-4 h-4 text-muted" />
+                                <Lock size={16} weight="bold" className="absolute left-4 top-3.5 text-muted" />
                                 <input
                                     type={showCurrent ? "text" : "password"}
                                     {...register("current_password", { required: "Current password is required" })}
@@ -82,7 +82,7 @@ export default function ChangePasswordPage() {
                                     onClick={() => setShowCurrent(!showCurrent)}
                                     className="absolute right-4 top-3.5 text-muted hover:text-primary transition-colors"
                                 >
-                                    {showCurrent ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                    {showCurrent ? <EyeSlash size={16} weight="bold" /> : <Eye size={16} weight="bold" />}
                                 </button>
                             </div>
                             {errors.current_password && <p className="text-red-500 text-xs mt-1">{errors.current_password.message as string}</p>}
@@ -91,7 +91,7 @@ export default function ChangePasswordPage() {
                         <div className="space-y-2">
                             <label className="text-xs font-bold text-muted uppercase tracking-wider">New Password</label>
                             <div className="relative">
-                                <Lock className="absolute left-4 top-3.5 w-4 h-4 text-muted" />
+                                <Lock size={16} weight="bold" className="absolute left-4 top-3.5 text-muted" />
                                 <input
                                     type={showNew ? "text" : "password"}
                                     {...register("new_password", {
@@ -106,7 +106,7 @@ export default function ChangePasswordPage() {
                                     onClick={() => setShowNew(!showNew)}
                                     className="absolute right-4 top-3.5 text-muted hover:text-primary transition-colors"
                                 >
-                                    {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                    {showNew ? <EyeSlash size={16} weight="bold" /> : <Eye size={16} weight="bold" />}
                                 </button>
                             </div>
                             {errors.new_password && <p className="text-red-500 text-xs mt-1">{errors.new_password.message as string}</p>}
@@ -115,7 +115,7 @@ export default function ChangePasswordPage() {
                         <div className="space-y-2">
                             <label className="text-xs font-bold text-muted uppercase tracking-wider">Confirm New Password</label>
                             <div className="relative">
-                                <Lock className="absolute left-4 top-3.5 w-4 h-4 text-muted" />
+                                <Lock size={16} weight="bold" className="absolute left-4 top-3.5 text-muted" />
                                 <input
                                     type={showConfirm ? "text" : "password"}
                                     {...register("confirm_password", {
@@ -129,7 +129,7 @@ export default function ChangePasswordPage() {
                                     onClick={() => setShowConfirm(!showConfirm)}
                                     className="absolute right-4 top-3.5 text-muted hover:text-primary transition-colors"
                                 >
-                                    {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                    {showConfirm ? <EyeSlash size={16} weight="bold" /> : <Eye size={16} weight="bold" />}
                                 </button>
                             </div>
                             {errors.confirm_password && <p className="text-red-500 text-xs mt-1">{errors.confirm_password.message as string}</p>}
@@ -144,7 +144,7 @@ export default function ChangePasswordPage() {
                                 disabled={isSubmitting}
                                 className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold px-8 shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] transition-all"
                             >
-                                {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
+                                {isSubmitting ? <CircleNotch size={16} weight="bold" className="animate-spin mr-2" /> : <FloppyDisk size={16} weight="bold" className="mr-2" />}
                                 Update Password
                             </Button>
                         </div>

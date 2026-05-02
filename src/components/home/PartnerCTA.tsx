@@ -1,19 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { CalendarDays, BarChart3, CreditCard, Building2, ArrowRight } from "lucide-react";
+import { CalendarBlank, ChartBar, CreditCard, Buildings, ArrowRight } from "@phosphor-icons/react";
 
 // Set to true when ready to show the partner CTA
 const SHOW_PARTNER_CTA = false;
 
 const FEATURES = [
   {
-    icon: CalendarDays,
+    icon: CalendarBlank,
     title: "Booking System",
     description: "Automated scheduling with real-time availability",
   },
   {
-    icon: BarChart3,
+    icon: ChartBar,
     title: "Analytics Dashboard",
     description: "Track bookings, revenue, and court utilization",
   },
@@ -35,7 +35,7 @@ export default function PartnerCTA() {
           {/* Header */}
           <div className="text-center mb-8 md:mb-10">
             <div className="inline-flex items-center gap-2 mb-3">
-              <Building2 className="w-5 h-5 text-emerald-500" />
+              <Buildings size={20} weight="fill" className="text-emerald-500" />
               <span className="text-xs font-black tracking-[0.2em] uppercase text-muted">
                 For Venue Owners
               </span>
@@ -60,7 +60,7 @@ export default function PartnerCTA() {
                 className="bg-surface-raised/50 border border-default rounded-2xl p-5 text-center hover:border-emerald-500/30 hover:shadow-[0_0_20px_rgba(80,200,120,0.1)] transition-all duration-300 group"
               >
                 <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <feature.icon className="w-6 h-6 text-emerald-500" />
+                  <feature.icon size={24} weight="bold" className="text-emerald-500" />
                 </div>
                 <h3 className="text-sm font-bold text-primary mb-1">
                   {feature.title}
@@ -77,7 +77,7 @@ export default function PartnerCTA() {
               className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-black font-bold hover:shadow-[0_0_30px_rgba(80,200,120,0.4)] hover:scale-105 transition-all duration-300 group"
             >
               List Your Venue
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight size={16} weight="bold" className="group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
               href="/contact"

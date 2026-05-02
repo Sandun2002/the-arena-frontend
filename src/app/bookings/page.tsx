@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { fmtTime, fmtMonthAbbr, fmtDayNum } from "@/lib/utils";
-import { Calendar, Clock, MapPin, ChevronRight, Filter, Search } from "lucide-react";
+import { CalendarBlank, Clock, MapPin, CaretRight, Faders, MagnifyingGlass } from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
 import { useToast } from "@/components/ui/Toast";
@@ -87,7 +87,7 @@ export default function BookingsPage() {
                         ))
                     ) : (
                         <div className="text-center py-12 bg-surface-raised/30 rounded-3xl border border-default">
-                            <Calendar className="w-12 h-12 text-faint mx-auto mb-4" />
+                            <CalendarBlank size={48} weight="bold" className="text-faint mx-auto mb-4" />
                             <h3 className="text-xl font-bold text-primary mb-2">No bookings found</h3>
                             <p className="text-muted mb-6">You don&apos;t have any {filter} bookings.</p>
                             {filter === "upcoming" && (
@@ -179,11 +179,11 @@ function BookingCard({ booking, onReviewClick }: { booking: Booking, onReviewCli
 
                     <div className="flex flex-wrap gap-4 text-xs font-medium text-secondary">
                         <div className="flex items-center gap-1.5">
-                            <Clock className="w-3.5 h-3.5" />
+                            <Clock size={14} weight="bold" />
                             {fmtTime(booking.start_time)} - {fmtTime(booking.end_time)}
                         </div>
                         <div className="flex items-center gap-1.5">
-                            <MapPin className="w-3.5 h-3.5" />
+                            <MapPin size={14} weight="fill" />
                             {booking.court?.name}
                         </div>
                     </div>
@@ -213,7 +213,7 @@ function BookingCard({ booking, onReviewClick }: { booking: Booking, onReviewCli
                     )}
 
                     <div className="p-2 rounded-full border border-default bg-surface-raised text-secondary group-hover:bg-emerald-500 group-hover:text-black group-hover:border-emerald-500 transition-colors">
-                        <ChevronRight className="w-4 h-4" />
+                        <CaretRight size={16} weight="bold" />
                     </div>
                 </div>
 

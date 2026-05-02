@@ -8,7 +8,7 @@ import { formatDistanceToNow } from "date-fns";
 import { api } from "@/services/api";
 import { Review, Venue } from "@/types";
 import BookingWidget from "@/components/venues/BookingWidget";
-import { CheckCircle, MapPin, Star, Trophy } from "lucide-react";
+import { CheckCircle, MapPin, Star, Trophy } from "@phosphor-icons/react";
 
 import TierFrame from "@/components/ui/TierFrame";
 import { getTierFromXp } from "@/lib/tierUtils";
@@ -99,11 +99,11 @@ export default function VenueDetailsPage() {
             <h1 className="text-4xl md:text-6xl font-black mb-4 tracking-tight uppercase">{venue.name}</h1>
             <div className="flex flex-wrap items-center gap-6 text-sm text-secondary font-medium">
               <div className="flex items-center gap-2">
-                <MapPin className="h-5 w-5 text-emerald-500" />
+                <MapPin size={20} weight="fill" className="text-emerald-500" />
                 {venue.city}
               </div>
               <div className="flex items-center gap-2">
-                <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
+                <Star size={20} weight="fill" className="text-yellow-500" />
                 <span className="text-primary font-bold text-lg">{venue.rating.toFixed(1)}</span>
                 <span className="underline decoration-zinc-700 underline-offset-4">({venue.review_count} reviews)</span>
               </div>
@@ -180,7 +180,7 @@ export default function VenueDetailsPage() {
                           <p className="text-xs text-muted">{formatDistanceToNow(new Date(review.created_at), { addSuffix: true })}</p>
                         </div>
                       </div>
-                      <div className="flex gap-1">{[...Array(5)].map((_, index) => <Star key={index} className={`h-3 w-3 ${index < review.rating ? "text-yellow-500 fill-yellow-500" : "text-faint"}`} />)}</div>
+                      <div className="flex gap-1">{[...Array(5)].map((_, index) => <Star key={index} size={12} weight={index < review.rating ? "fill" : "regular"} className={index < review.rating ? "text-yellow-500" : "text-faint"} />)}</div>
                     </div>
                     {review.title && <p className="mb-2 text-sm font-bold text-primary">{review.title}</p>}
                     <p className="text-secondary text-sm italic">"{review.comment}"</p>
@@ -203,7 +203,7 @@ export default function VenueDetailsPage() {
                 ) : null}
                 <div className="p-8">
                   <div className="flex items-start gap-3">
-                    <MapPin className="mt-1 h-5 w-5 text-emerald-500" />
+                    <MapPin size={20} weight="fill" className="mt-1 text-emerald-500" />
                     <div>
                       <p className="text-sm font-bold uppercase tracking-wider text-emerald-500">Address</p>
                       <p className="mt-2 text-lg font-bold text-primary">{venue.address}</p>
@@ -220,7 +220,7 @@ export default function VenueDetailsPage() {
 
             <div className="p-6 rounded-[2rem] bg-gradient-to-br from-surface-raised to-surface-raised/50 border border-default text-center">
               <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-4 text-emerald-500">
-                <CheckCircle className="h-6 w-6" />
+                <CheckCircle size={24} weight="fill" />
               </div>
               <h4 className="font-bold text-primary mb-2">{venue.is_verified ? "Verified Venue" : "Venue Listed"}</h4>
               <p className="text-xs text-muted">{venue.is_verified ? "This venue meets Arena's standards for quality and safety." : "Venue information is available and bookable through Arena."}</p>
@@ -228,7 +228,7 @@ export default function VenueDetailsPage() {
 
             {venue.available_sports && venue.available_sports.length > 0 && (
               <div className="rounded-[2rem] border border-default bg-surface-raised/40 p-6">
-                <div className="mb-3 flex items-center gap-2 text-primary font-bold"><Trophy className="h-4 w-4 text-emerald-500" /> Sports Available</div>
+                <div className="mb-3 flex items-center gap-2 text-primary font-bold"><Trophy size={16} weight="fill" className="text-emerald-500" /> Sports Available</div>
                 <div className="flex flex-wrap gap-2">{venue.available_sports.map((sport) => <span key={sport} className="rounded-full border border-subtle px-3 py-1 text-xs text-secondary">{sport}</span>)}</div>
               </div>
             )}

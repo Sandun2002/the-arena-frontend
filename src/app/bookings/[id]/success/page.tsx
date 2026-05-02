@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
 import { fmtTime, fmtDateShort } from "@/lib/utils";
 import Link from "next/link";
-import { CheckCircle, Calendar, Clock, MapPin, ArrowRight } from "lucide-react";
+import { CheckCircle, CalendarBlank, Clock, MapPin, ArrowRight } from "@phosphor-icons/react";
 import { playerService } from "@/services/playerService";
 import { Booking } from "@/types";
 
@@ -66,7 +66,7 @@ export default function BookingSuccessPage() {
           <div className="relative inline-flex">
             <div className="w-24 h-24 rounded-full bg-emerald-500/20 flex items-center justify-center">
               <div className="w-16 h-16 rounded-full bg-emerald-500/30 flex items-center justify-center">
-                <CheckCircle className="w-10 h-10 text-emerald-400" strokeWidth={1.5} />
+                <CheckCircle size={40} weight="fill" className="text-emerald-400" />
               </div>
             </div>
           </div>
@@ -101,17 +101,17 @@ export default function BookingSuccessPage() {
 
             <div className="border-t border-default pt-4 space-y-3">
               <div className="flex items-center gap-3 text-sm">
-                <Calendar className="w-4 h-4 text-muted" />
+                <CalendarBlank size={16} weight="bold" className="text-muted" />
                 <span className="text-primary">{fmtDateShort(booking.start_time)}</span>
               </div>
               <div className="flex items-center gap-3 text-sm">
-                <Clock className="w-4 h-4 text-muted" />
+                <Clock size={16} weight="bold" className="text-muted" />
                 <span className="text-primary">
                   {fmtTime(booking.start_time)} – {fmtTime(booking.end_time)}
                 </span>
               </div>
               <div className="flex items-center gap-3 text-sm">
-                <MapPin className="w-4 h-4 text-muted" />
+                <MapPin size={16} weight="fill" className="text-muted" />
                 <span className="text-primary">{booking.court?.name}</span>
               </div>
             </div>
@@ -128,7 +128,7 @@ export default function BookingSuccessPage() {
             href={`/bookings/${id}`}
             className="w-full py-3.5 bg-emerald-500 text-black font-bold rounded-xl text-center hover:bg-emerald-400 transition flex items-center justify-center gap-2"
           >
-            View Booking <ArrowRight className="w-4 h-4" />
+            View Booking <ArrowRight size={16} weight="bold" />
           </Link>
           <Link
             href="/bookings"

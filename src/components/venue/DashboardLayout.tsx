@@ -5,11 +5,11 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-    LayoutDashboard, Calendar, CalendarCheck, Users, Settings,
-    LogOut, Menu, X, Building2, Image as ImageIcon,
-    Hammer, Repeat, ChevronRight, BarChart2, DollarSign,
-    PieChart, Activity, Clock, XCircle
-} from "lucide-react";
+    SquaresFour, Calendar, CalendarCheck, Users, GearSix,
+    SignOut, List, X, Buildings, Image as ImageIcon,
+    Hammer, ArrowsClockwise, CaretRight, ChartBar, CurrencyDollar,
+    ChartPieSlice, Pulse, Clock, XCircle
+} from "@phosphor-icons/react";
 import { useAuth } from "@/services/authContext";
 import { useVenue } from "./VenueContext";
 import VenueSwitcher from "./VenueSwitcher";
@@ -72,21 +72,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }, []);
 
     const routes = [
-        { name: "Dashboard", path: "/venue-dashboard", icon: LayoutDashboard },
+        { name: "Dashboard", path: "/venue-dashboard", icon: SquaresFour },
         { name: "Booking Manager", path: "/venue-dashboard/booking-manager", icon: Calendar, verifiedOnly: true },
         { name: "Bookings", path: "/venue-dashboard/bookings", icon: CalendarCheck, verifiedOnly: true },
-        { name: "Courts", path: "/venue-dashboard/courts", icon: Building2, verifiedOnly: true },
-        { name: "Recurring", path: "/venue-dashboard/recurring", icon: Repeat, verifiedOnly: true },
+        { name: "Courts", path: "/venue-dashboard/courts", icon: Buildings, verifiedOnly: true },
+        { name: "Recurring", path: "/venue-dashboard/recurring", icon: ArrowsClockwise, verifiedOnly: true },
         { name: "Closures", path: "/venue-dashboard/closures", icon: Hammer, verifiedOnly: true },
         { name: "Gallery", path: "/venue-dashboard/gallery", icon: ImageIcon, verifiedOnly: true },
-        { name: "Settings", path: "/venue-dashboard/settings", icon: Settings, verifiedOnly: true },
+        { name: "Settings", path: "/venue-dashboard/settings", icon: GearSix, verifiedOnly: true },
     ];
 
     const analyticsRoutes = [
-        { name: "Overview", path: "/venue-dashboard/analytics", icon: BarChart2, verifiedOnly: true },
-        { name: "Revenue", path: "/venue-dashboard/analytics/revenue", icon: DollarSign, ownerOnly: true, verifiedOnly: true },
-        { name: "Utilization", path: "/venue-dashboard/analytics/utilization", icon: Activity, verifiedOnly: true },
-        { name: "Fees", path: "/venue-dashboard/analytics/fees", icon: PieChart, ownerOnly: true, verifiedOnly: true },
+        { name: "Overview", path: "/venue-dashboard/analytics", icon: ChartBar, verifiedOnly: true },
+        { name: "Revenue", path: "/venue-dashboard/analytics/revenue", icon: CurrencyDollar, ownerOnly: true, verifiedOnly: true },
+        { name: "Utilization", path: "/venue-dashboard/analytics/utilization", icon: Pulse, verifiedOnly: true },
+        { name: "Fees", path: "/venue-dashboard/analytics/fees", icon: ChartPieSlice, ownerOnly: true, verifiedOnly: true },
         { name: "Cancellations", path: "/venue-dashboard/analytics/cancellations", icon: XCircle, verifiedOnly: true },
     ];
 
@@ -117,7 +117,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     className="p-2 rounded-lg bg-surface-overlay text-secondary hover:text-primary hover:bg-surface-overlay transition-colors"
                     aria-label="Open sidebar"
                 >
-                    <Menu className="w-5 h-5" />
+                    <List size={20} weight="bold" />
                 </button>
                 <span className="text-sm font-bold text-primary truncate px-3">
                     {currentVenue?.name ? `${currentVenue.name} — ${currentRouteName}` : currentRouteName}
@@ -155,7 +155,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             className="lg:hidden p-2 text-secondary hover:text-primary bg-surface-base/40 rounded-xl"
                             onClick={() => setIsSidebarOpen(false)}
                         >
-                            <X className="w-5 h-5" />
+                            <X size={20} weight="bold" />
                         </button>
                     </div>
 
@@ -186,10 +186,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                     `}
                                 >
                                     {isActive && <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-transparent pointer-events-none" />}
-                                    <route.icon className={`w-5 h-5 relative z-10 ${isActive ? "text-emerald-400" : isDisabled ? "text-faint" : "text-muted group-hover:text-emerald-500 transition-colors"}`} />
+                                    <route.icon size={20} weight={isActive ? "fill" : "bold"} className={`relative z-10 ${isActive ? "text-emerald-400" : isDisabled ? "text-faint" : "text-muted group-hover:text-emerald-500 transition-colors"}`} />
                                     <span className="relative z-10">{route.name}</span>
-                                    {isActive && <ChevronRight className="ml-auto w-4 h-4 text-emerald-500/80 relative z-10" />}
-                                    {isDisabled && <Clock className="ml-auto w-3 h-3 text-faint" />}
+                                    {isActive && <CaretRight size={16} weight="bold" className="ml-auto text-emerald-500/80 relative z-10" />}
+                                    {isDisabled && <Clock size={12} weight="bold" className="ml-auto text-faint" />}
                                 </Link>
                             );
                         })}
@@ -222,9 +222,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                         `}
                                     >
                                         {isActive && <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent pointer-events-none" />}
-                                        <route.icon className={`w-5 h-5 relative z-10 ${isActive ? "text-blue-400" : isDisabled ? "text-faint" : "text-muted group-hover:text-blue-500 transition-colors"}`} />
+                                        <route.icon size={20} weight={isActive ? "fill" : "bold"} className={`relative z-10 ${isActive ? "text-blue-400" : isDisabled ? "text-faint" : "text-muted group-hover:text-blue-500 transition-colors"}`} />
                                         <span className="relative z-10">{route.name}</span>
-                                        {isActive && <ChevronRight className="ml-auto w-4 h-4 text-blue-500/80 relative z-10" />}
+                                        {isActive && <CaretRight size={16} weight="bold" className="ml-auto text-blue-500/80 relative z-10" />}
                                     </Link>
                                 );
                             })}
@@ -245,7 +245,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                     `}
                                 >
                                     {pathname === "/venue-dashboard/managers" && <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-transparent pointer-events-none" />}
-                                    <Users className={`w-5 h-5 relative z-10 ${pathname === "/venue-dashboard/managers" ? "text-purple-400" : "text-muted group-hover:text-purple-500 transition-colors"}`} />
+                                    <Users size={20} weight={pathname === "/venue-dashboard/managers" ? "fill" : "bold"} className={`relative z-10 ${pathname === "/venue-dashboard/managers" ? "text-purple-400" : "text-muted group-hover:text-purple-500 transition-colors"}`} />
                                     <span className="relative z-10">Managers</span>
                                 </Link>
                             </div>
@@ -257,7 +257,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                 href="/"
                                 className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden text-secondary hover:bg-surface-overlay/40 hover:text-primary"
                             >
-                                <LayoutDashboard className="w-5 h-5 relative z-10 text-muted group-hover:text-primary transition-colors" />
+                                <SquaresFour size={20} weight="bold" className="relative z-10 text-muted group-hover:text-primary transition-colors" />
                                 <span className="relative z-10 font-medium tracking-wide text-sm">Return to Player View</span>
                             </Link>
                         </div>
@@ -278,7 +278,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             onClick={logout}
                             className="w-full flex items-center justify-center gap-2 p-2 text-red-500 hover:bg-red-500/10 hover:border hover:border-red-500/20 rounded-lg transition-all text-sm font-bold"
                         >
-                            <LogOut className="w-4 h-4" /> Sign Out
+                            <SignOut size={16} weight="bold" className="mr-2" /> Sign Out
                         </button>
                     </div>
                 </div>

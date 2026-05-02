@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Edit2, Trash2, MapPin, Building2, User, DollarSign, Layers } from "lucide-react";
+import { Plus, PencilSimple, Trash, MapPin, Buildings, User, CurrencyDollar, Stack } from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
 import CourtFormModal from "@/components/venue/CourtFormModal";
@@ -76,7 +76,7 @@ export default function CourtsPage() {
     if (!currentVenue) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
-                <Building2 className="w-12 h-12 text-faint mb-4" />
+                <Buildings size={48} weight="duotone" className="text-faint mb-4" />
                 <h2 className="text-xl font-bold text-primary mb-2">No Venue Selected</h2>
                 <p className="text-secondary">Please select a venue to manage courts.</p>
             </div>
@@ -93,7 +93,7 @@ export default function CourtsPage() {
                 </div>
 
                 <Button onClick={handleCreate} className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-12 px-6 rounded-xl shadow-lg shadow-emerald-500/20 active:scale-95 transition-all">
-                    <Plus className="w-5 h-5 mr-2" /> Add New Court
+                    <Plus size={20} weight="bold" className="mr-2" /> Add New Court
                 </Button>
             </div>
 
@@ -109,7 +109,7 @@ export default function CourtsPage() {
                                     <img src={court.cover_image} alt={court.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                                 ) : (
                                     <div className="w-full h-full flex flex-col items-center justify-center text-faint bg-surface-raised/50 pattern-grid-lg">
-                                        <Layers className="w-12 h-12 mb-2 opacity-50" />
+                                        <Stack size={48} weight="duotone" className="mb-2 opacity-50" />
                                         <span className="text-xs font-bold uppercase tracking-widest opacity-50">No Image</span>
                                     </div>
                                 )}
@@ -117,10 +117,10 @@ export default function CourtsPage() {
                                 {/* Actions Overlay */}
                                 <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200 translate-y-[-10px] group-hover:translate-y-0">
                                     <button onClick={() => handleEdit(court)} className="bg-surface-base/80 hover:bg-primary hover:text-inverted text-primary p-2 rounded-xl backdrop-blur-md transition-all">
-                                        <Edit2 className="w-4 h-4" />
+                                        <PencilSimple size={16} weight="bold" />
                                     </button>
                                     <button onClick={() => handleDelete(court.id)} className="bg-surface-base/80 hover:bg-red-500 text-primary p-2 rounded-xl backdrop-blur-md transition-all">
-                                        <Trash2 className="w-4 h-4" />
+                                        <Trash size={16} weight="bold" />
                                     </button>
                                 </div>
 
@@ -146,7 +146,7 @@ export default function CourtsPage() {
                                 <div className="mt-auto space-y-3 pt-4 border-t border-default/50">
                                     <div className="flex justify-between items-center text-sm">
                                         <span className="text-muted font-medium flex items-center gap-2">
-                                            <div className="p-1 bg-emerald-500/10 rounded"><DollarSign className="w-3 h-3 text-emerald-500" /></div>
+                                            <div className="p-1 bg-emerald-500/10 rounded"><CurrencyDollar size={12} weight="bold" className="text-emerald-500" /></div>
                                             Hourly Rate
                                         </span>
                                         <span className="text-primary font-bold bg-surface-overlay/50 px-2 py-1 rounded-lg">LKR {court.hourly_rate.toLocaleString()}</span>
@@ -154,7 +154,7 @@ export default function CourtsPage() {
                                     {court.peak_hourly_rate != null && (
                                         <div className="flex justify-between items-center text-sm">
                                             <span className="text-muted font-medium flex items-center gap-2">
-                                                <div className="p-1 bg-amber-500/10 rounded"><DollarSign className="w-3 h-3 text-amber-500" /></div>
+                                                <div className="p-1 bg-amber-500/10 rounded"><CurrencyDollar size={12} weight="bold" className="text-amber-500" /></div>
                                                 Peak Rate
                                             </span>
                                             <span className="text-amber-400 font-bold bg-surface-overlay/50 px-2 py-1 rounded-lg">LKR {court.peak_hourly_rate.toLocaleString()}</span>
@@ -167,7 +167,7 @@ export default function CourtsPage() {
                 ) : (
                     <div className="col-span-full py-16 text-center bg-surface-raised/20 rounded-3xl border border-default border-dashed flex flex-col items-center justify-center">
                         <div className="w-16 h-16 bg-surface-overlay/50 rounded-full flex items-center justify-center mb-4">
-                            <Layers className="w-8 h-8 text-faint" />
+                            <Stack size={32} weight="duotone" className="text-faint" />
                         </div>
                         <h3 className="text-xl font-bold text-primary mb-2">No courts added yet</h3>
                         <p className="text-muted mb-6 max-w-sm mx-auto">Add your first court or facility to start accepting bookings and managing your schedule.</p>

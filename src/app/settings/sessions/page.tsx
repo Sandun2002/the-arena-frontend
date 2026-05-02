@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Monitor, Smartphone, Laptop, Clock } from "lucide-react";
+import { ArrowLeft, Monitor, DeviceMobile, Laptop, Clock } from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
 import { authService } from "@/services/authService";
@@ -45,13 +45,13 @@ export default function SessionsPage() {
             <div className="container mx-auto max-w-3xl">
 
                 <Link href="/profile" className="inline-flex items-center text-sm font-medium text-muted hover:text-primary mb-8 transition-colors group">
-                    <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" /> Back to Profile
+                    <ArrowLeft size={16} weight="bold" className="mr-2 group-hover:-translate-x-1 transition-transform" /> Back to Profile
                 </Link>
 
                 <div className="bg-surface-raised/50 border border-default rounded-3xl p-8 backdrop-blur-md shadow-2xl">
                     <div className="flex gap-4 mb-8">
                         <div className="p-3 bg-blue-500/10 rounded-2xl text-blue-500 border border-blue-500/20">
-                            <Monitor className="w-8 h-8" />
+                            <Monitor size={32} weight="duotone" />
                         </div>
                         <div>
                             <h1 className="text-2xl font-bold text-primary">Active Sessions</h1>
@@ -73,7 +73,7 @@ export default function SessionsPage() {
                                 <div key={session.id} className="flex flex-col md:flex-row md:items-center justify-between p-5 bg-surface-base/40 border border-default rounded-2xl hover:bg-surface-overlay/30 transition-colors">
                                     <div className="flex items-center gap-4 mb-4 md:mb-0">
                                         <div className="w-12 h-12 bg-surface-overlay rounded-xl flex items-center justify-center shrink-0">
-                                            {session.user_agent.toLowerCase().includes("mobile") ? <Smartphone className="w-6 h-6 text-secondary" /> : <Laptop className="w-6 h-6 text-secondary" />}
+                                            {session.user_agent.toLowerCase().includes("mobile") ? <DeviceMobile size={24} weight="duotone" className="text-secondary" /> : <Laptop size={24} weight="duotone" className="text-secondary" />}
                                         </div>
                                         <div>
                                             <p className="text-primary font-bold flex items-center gap-2">
@@ -82,7 +82,7 @@ export default function SessionsPage() {
                                             </p>
                                             <div className="flex items-center gap-4 mt-1">
                                                 <span className="text-xs text-muted flex items-center gap-1.5 align-middle">
-                                                    <Clock className="w-3.5 h-3.5" /> Active {formatDistanceToNow(new Date(session.created_at))} ago
+                                                    <Clock size={14} weight="bold" /> Active {formatDistanceToNow(new Date(session.created_at))} ago
                                                 </span>
                                                 <span className="text-xs text-faint">Token {session.token_hint}</span>
                                             </div>

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Star, ArrowRight, BadgeCheck, Quote } from "lucide-react";
+import { Star, ArrowRight, SealCheck, Quotes } from "@phosphor-icons/react";
 import { api } from "@/services/api";
 import type { Review } from "@/types";
 import TierFrame from "@/components/ui/TierFrame";
@@ -96,7 +96,7 @@ export default function ReviewsTeaser() {
         {/* Header */}
         <div className="text-center mb-10 md:mb-14">
           <div className="inline-flex items-center gap-2 mb-3">
-            <Star className="w-4 h-4 text-emerald-400 fill-emerald-400" />
+            <Star size={16} weight="fill" className="text-emerald-400" />
             <span className="text-[11px] font-black tracking-[0.2em] uppercase text-muted">
               Loved by Players
             </span>
@@ -137,11 +137,9 @@ export default function ReviewsTeaser() {
                       {Array.from({ length: 5 }).map((_, i) => (
                         <Star
                           key={i}
-                          className={`w-3.5 h-3.5 ${
-                            i < r.rating
-                              ? "text-emerald-400 fill-emerald-400"
-                              : "text-faint"
-                          }`}
+                          weight={i < r.rating ? "fill" : "regular"}
+                          size={14}
+                          className={i < r.rating ? "text-emerald-400" : "text-faint"}
                         />
                       ))}
                     </div>
@@ -152,7 +150,7 @@ export default function ReviewsTeaser() {
 
                   {/* Comment */}
                   <div className="relative">
-                    <Quote className="absolute -top-1 -left-1 w-4 h-4 text-emerald-500/20" />
+                    <Quotes size={16} weight="fill" className="absolute -top-1 -left-1 text-emerald-500/20" />
                     <p className="text-sm text-primary leading-relaxed line-clamp-4 pl-5">
                       {r.comment}
                     </p>
@@ -176,14 +174,14 @@ export default function ReviewsTeaser() {
                       <div className="flex items-center gap-1 text-sm text-primary font-semibold truncate">
                         <span className="truncate">{r.user_name}</span>
                         {r.is_verified && (
-                          <BadgeCheck className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                          <SealCheck size={14} weight="fill" className="text-emerald-400 flex-shrink-0" />
                         )}
                       </div>
                       <div className="text-[11px] text-secondary truncate group-hover:text-emerald-400 transition-colors">
                         {r.venue_name}
                       </div>
                     </div>
-                    <ArrowRight className="w-4 h-4 text-muted group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                    <ArrowRight size={16} weight="bold" className="text-muted group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
                   </div>
                 </Link>
               ))}
@@ -198,7 +196,7 @@ export default function ReviewsTeaser() {
             className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-black font-bold hover:shadow-[0_0_30px_rgba(80,200,120,0.4)] hover:scale-[1.03] transition-all duration-300 group"
           >
             Book Your Game & Add Your Review
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            <ArrowRight size={16} weight="bold" className="group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
       </div>

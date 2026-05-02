@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { format } from "date-fns";
-import { Star, Trash2, MessageSquare } from "lucide-react";
+import { Star, Trash, ChatCircleText } from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
 import { playerService } from "@/services/playerService";
@@ -64,7 +64,7 @@ export default function MyReviewsPage() {
                                             <h3 className="text-lg font-bold text-primary">{review.venue_name}</h3>
                                             <div className="flex items-center gap-1">
                                                 {[...Array(5)].map((_, i) => (
-                                                    <Star key={i} className={`w-3.5 h-3.5 ${i < review.rating ? "text-yellow-500 fill-yellow-500" : "text-faint"}`} />
+                                                    <Star key={i} size={14} weight={i < review.rating ? "fill" : "regular"} className={i < review.rating ? "text-yellow-500" : "text-faint"} />
                                                 ))}
                                                 <span className="text-xs text-muted ml-2">{format(new Date(review.created_at), "MMM dd, yyyy")}</span>
                                             </div>
@@ -73,7 +73,7 @@ export default function MyReviewsPage() {
 
                                     <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <Button size="sm" variant="ghost" className="text-secondary hover:text-red-400" onClick={() => handleDelete(review.id)}>
-                                            <Trash2 className="w-4 h-4" />
+                                            <Trash size={16} weight="bold" />
                                         </Button>
                                     </div>
                                 </div>
@@ -85,7 +85,7 @@ export default function MyReviewsPage() {
                         ))
                     ) : (
                         <div className="text-center py-12 bg-surface-raised/30 rounded-3xl border border-default">
-                            <MessageSquare className="w-12 h-12 text-faint mx-auto mb-4" />
+                            <ChatCircleText size={48} weight="bold" className="text-faint mx-auto mb-4" />
                             <h3 className="text-xl font-bold text-primary mb-2">No reviews yet</h3>
                             <p className="text-muted mb-6">Book a court and share your experience!</p>
                             <Link href="/venues">

@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { Plus, Trash2, Calendar, AlertTriangle, CloudRain, Hammer, XCircle } from "lucide-react";
+import { Plus, Trash, Calendar, Warning, CloudRain, Hammer, XCircle } from "@phosphor-icons/react";
 import gsap from "gsap";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
@@ -95,11 +95,11 @@ export default function ClosuresPage() {
     };
 
     const getIcon = (closure: any) => {
-        if (closure._type === "court") return <Hammer className="h-5 w-5 text-amber-500" />;
+        if (closure._type === "court") return <Hammer size={20} weight="fill" className="text-amber-500" />;
         const reason = (closure.reason || "").toLowerCase();
-        if (reason.includes("holiday") || reason.includes("public")) return <Calendar className="h-5 w-5 text-purple-500" />;
-        if (reason.includes("weather") || reason.includes("rain")) return <CloudRain className="h-5 w-5 text-blue-500" />;
-        return <AlertTriangle className="h-5 w-5 text-red-500" />;
+        if (reason.includes("holiday") || reason.includes("public")) return <Calendar size={20} weight="fill" className="text-purple-500" />;
+        if (reason.includes("weather") || reason.includes("rain")) return <CloudRain size={20} weight="fill" className="text-blue-500" />;
+        return <Warning size={20} weight="fill" className="text-red-500" />;
     }
 
     if (!user) return null;
@@ -107,7 +107,7 @@ export default function ClosuresPage() {
     if (!currentVenue) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
-                <XCircle className="w-12 h-12 text-faint mb-4" />
+                <XCircle size={48} weight="duotone" className="text-faint mb-4" />
                 <h2 className="text-xl font-bold text-primary mb-2">No Venue Selected</h2>
                 <p className="text-secondary">Please select a venue to manage closures.</p>
             </div>
@@ -131,7 +131,7 @@ export default function ClosuresPage() {
                         <p className="text-secondary">Schedule maintenance, holidays, or unexpected closures for {currentVenue.name}.</p>
                     </div>
                     <Button onClick={() => setIsModalOpen(true)} className="bg-red-600 text-primary hover:bg-red-500 shadow-[0_0_20px_rgba(220,38,38,0.3)]">
-                        <Plus className="mr-2 h-4 w-4" /> Add Closure
+                        <Plus size={16} weight="bold" className="mr-2" /> Add Closure
                     </Button>
                 </div>
 
@@ -153,7 +153,7 @@ export default function ClosuresPage() {
                                         <h3 className="font-bold text-primary text-lg mb-1">{closure.displayTitle}</h3>
                                         <div className="flex flex-wrap gap-4 text-sm text-secondary">
                                             <span className="flex items-center gap-2">
-                                                <Calendar className="h-4 w-4 text-faint" />
+                                                <Calendar size={16} weight="duotone" className="text-faint" />
                                                 {closure._type === "court"
                                                     ? `${fmtDateShort(closure.start_time)} ${fmtTime(closure.start_time)} – ${fmtTime(closure.end_time)}`
                                                     : (closure.closure_date ? format(new Date(closure.closure_date), "MMM dd, yyyy") : "Unknown Date")
@@ -179,7 +179,7 @@ export default function ClosuresPage() {
                                         </div>
                                     </div>
                                     <Button onClick={() => handleDelete(closure)} variant="outline" className="border-red-900/30 text-red-500 hover:bg-red-900/10 hover:border-red-900/50 px-4 py-2 h-auto rounded-xl flex items-center gap-2">
-                                        <Trash2 className="h-4 w-4" />
+                                        <Trash size={16} weight="bold" />
                                         <span className="text-sm font-bold">Cancel Closure</span>
                                     </Button>
                                 </div>

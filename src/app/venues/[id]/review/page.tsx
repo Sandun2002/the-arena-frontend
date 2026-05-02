@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Star, Send, Loader2 } from "lucide-react"; 
+import { ArrowLeft, Star, PaperPlaneRight, CircleNotch } from "@phosphor-icons/react"; 
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
 import { api } from "@/services/api";
@@ -83,7 +83,7 @@ export default function ReviewPage() {
             <div className="container mx-auto max-w-2xl">
 
                 <Link href={`/venues/${venueId}`} className="inline-flex items-center text-sm font-medium text-muted hover:text-primary mb-8 transition-colors group">
-                    <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" /> Back to Venue
+                    <ArrowLeft size={16} weight="bold" className="mr-2 group-hover:-translate-x-1 transition-transform" /> Back to Venue
                 </Link>
 
                 <div className="bg-surface-raised/50 border border-default rounded-3xl p-8 backdrop-blur-md shadow-2xl">
@@ -114,10 +114,9 @@ export default function ReviewPage() {
                                         className="p-1 transition-transform hover:scale-110 focus:outline-none"
                                     >
                                         <Star
-                                            className={`w-10 h-10 transition-colors ${star <= (hoveredRating || rating)
-                                                ? "text-yellow-400 fill-yellow-400"
-                                                : "text-faint"
-                                                }`}
+                                            size={40}
+                                            weight={star <= (hoveredRating || rating) ? "fill" : "regular"}
+                                            className={`transition-colors ${star <= (hoveredRating || rating) ? "text-yellow-400" : "text-faint"}`}
                                         />
                                     </button>
                                 ))}
@@ -148,7 +147,7 @@ export default function ReviewPage() {
                             disabled={submitting || rating === 0 || !bookingId}
                             className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold py-4 text-lg shadow-[0_0_20px_rgba(16,185,129,0.2)]"
                         >
-                            {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}
+                            {submitting ? <CircleNotch size={20} weight="bold" className="animate-spin" /> : <PaperPlaneRight size={16} weight="bold" className="mr-2" />}
                             Submit Review
                         </Button>
 

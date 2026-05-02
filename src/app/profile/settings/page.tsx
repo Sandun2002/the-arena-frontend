@@ -4,7 +4,7 @@ import { useState, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { ArrowLeft, Save, Loader2, Camera, Upload, X } from "lucide-react";
+import { ArrowLeft, FloppyDisk, CircleNotch, Upload, PencilSimple } from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
 import { playerService } from "@/services/playerService";
@@ -78,12 +78,12 @@ export default function ProfileSettingsPage() {
             <div className="container mx-auto max-w-2xl">
 
                 <Link href="/profile" className="inline-flex items-center text-sm font-medium text-muted hover:text-primary mb-8 transition-colors group">
-                    <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" /> Back to Profile
+                    <ArrowLeft size={16} weight="bold" className="mr-2 group-hover:-translate-x-1 transition-transform" /> Back to Profile
                 </Link>
 
                 <div className="bg-surface-raised/50 border border-default rounded-3xl p-8 backdrop-blur-md shadow-2xl">
                     <h1 className="text-2xl font-bold text-primary mb-8 flex items-center gap-3">
-                        <span className="bg-emerald-500/10 p-2 rounded-xl text-emerald-500"><Edit2Icon className="w-6 h-6" /></span>
+                        <span className="bg-emerald-500/10 p-2 rounded-xl text-emerald-500"><PencilSimple size={24} weight="bold" /></span>
                         Edit Profile
                     </h1>
 
@@ -102,11 +102,11 @@ export default function ProfileSettingsPage() {
                             />
                             {uploadingAvatar && (
                                 <div className="absolute inset-0 rounded-full bg-surface-base/60 flex items-center justify-center z-30">
-                                    <Loader2 className="w-6 h-6 text-emerald-500 animate-spin" />
+                                    <CircleNotch size={24} weight="bold" className="text-emerald-500 animate-spin" />
                                 </div>
                             )}
                             <div className="absolute inset-0 rounded-full bg-surface-base/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-30">
-                                <Upload className="w-8 h-8 text-primary" />
+                                <Upload size={32} weight="duotone" className="text-primary" />
                             </div>
                             <input
                                 type="file"
@@ -171,7 +171,7 @@ export default function ProfileSettingsPage() {
                                 disabled={isSubmitting}
                                 className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold px-8 shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] transition-all"
                             >
-                                {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
+                                {isSubmitting ? <CircleNotch size={16} weight="bold" className="animate-spin mr-2" /> : <FloppyDisk size={16} weight="bold" className="mr-2" />}
                                 Save Changes
                             </Button>
                         </div>
@@ -183,21 +183,3 @@ export default function ProfileSettingsPage() {
     );
 }
 
-function Edit2Icon(props: any) {
-    return (
-        <svg
-            {...props}
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        >
-            <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
-        </svg>
-    )
-}

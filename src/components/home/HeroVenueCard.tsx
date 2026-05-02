@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, ArrowRight, Sparkles } from "lucide-react";
+import { MapPin, ArrowRight, Sparkle } from "@phosphor-icons/react";
 import { useRef } from "react";
 import { Venue } from "@/types";
 
@@ -82,7 +82,7 @@ export default function HeroVenueCard({ venue, isActive, priority }: HeroVenueCa
         className={`absolute top-3 left-3 md:top-4 md:left-4 transition-opacity duration-500 ${isActive ? "opacity-100" : "opacity-80"}`}
       >
         <span className="inline-flex items-center gap-1 bg-emerald-500 text-black text-[10px] md:text-xs font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-md shadow-lg">
-          <Sparkles className="w-3 h-3" />
+          <Sparkle size={12} weight="fill" />
           Featured
         </span>
       </div>
@@ -100,12 +100,12 @@ export default function HeroVenueCard({ venue, isActive, priority }: HeroVenueCa
         {/* Location + CTA */}
         <div className="mt-2 flex items-center justify-between gap-2">
           <div className="flex items-center gap-1.5 text-zinc-300 text-xs md:text-sm min-w-0">
-            <MapPin className="w-3 h-3 md:w-3.5 md:h-3.5 text-emerald-400 flex-shrink-0" />
+            <MapPin size={14} weight="fill" className="text-emerald-400 flex-shrink-0" />
             <span className="truncate">{venue.city}</span>
           </div>
           <div className="hero-cta flex items-center gap-1 text-emerald-400 text-xs md:text-sm font-semibold flex-shrink-0">
             <span className="hidden sm:inline">View</span>
-            <ArrowRight className="w-3.5 h-3.5 md:w-4 md:h-4" />
+            <ArrowRight size={16} weight="bold" />
           </div>
         </div>
       </div>

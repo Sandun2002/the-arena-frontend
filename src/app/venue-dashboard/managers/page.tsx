@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Users, UserPlus, Trash2, Shield, Loader2 } from "lucide-react";
+import { Users, UserPlus, Trash, Shield, CircleNotch } from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
 import { useAuth } from "@/services/authContext";
@@ -55,7 +55,7 @@ function InviteManagerForm({ venueId, onClose, onSuccess }: { venueId: string, o
                     disabled={isSubmitting}
                     className="flex-1 bg-emerald-500 hover:bg-emerald-400 text-black font-bold"
                 >
-                    {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Add Manager"}
+                    {isSubmitting ? <CircleNotch size={16} weight="bold" className="animate-spin mx-auto" /> : "Add Manager"}
                 </Button>
             </div>
         </form>
@@ -111,7 +111,7 @@ export default function ManagersPage() {
     if (!currentVenue) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[50vh] text-center pt-24">
-                <Users className="w-12 h-12 text-faint mb-4" />
+                <Users size={48} weight="duotone" className="text-faint mb-4" />
                 <h2 className="text-xl font-bold text-primary mb-2">No Venue Selected</h2>
                 <p className="text-secondary">Please select a venue to manage staff.</p>
             </div>
@@ -133,14 +133,14 @@ export default function ManagersPage() {
 
                     <div className="flex items-center gap-4">
                         <Button onClick={() => setIsInviteModalOpen(true)} className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-10 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
-                            <UserPlus className="w-4 h-4 mr-2" /> Add Manager
+                            <UserPlus size={16} weight="bold" className="mr-2" /> Add Manager
                         </Button>
                     </div>
                 </div>
 
                 <div>
                     <h2 className="text-lg font-bold text-primary mb-4 flex items-center gap-2">
-                        <Shield className="w-5 h-5 text-emerald-500" /> Active Managers
+                        <Shield size={20} weight="fill" className="text-emerald-500" /> Active Managers
                     </h2>
                     <div className="space-y-3">
                         {isLoading ? (
@@ -166,7 +166,7 @@ export default function ManagersPage() {
                                     </div>
                                     {manager.user_id !== user.id && (
                                         <Button size="sm" variant="ghost" onClick={() => handleRemoveManager(manager.user_id)} className="text-secondary hover:text-red-400 hover:bg-red-500/10">
-                                            <Trash2 className="w-4 h-4 mr-2" /> Remove
+                                            <Trash size={16} weight="bold" className="mr-2" /> Remove
                                         </Button>
                                     )}
                                 </div>

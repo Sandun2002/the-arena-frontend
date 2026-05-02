@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
-import { Calendar, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { CalendarBlank, CaretDown, CaretLeft, CaretRight } from "@phosphor-icons/react";
 
 const HEADER_HEIGHT = 72;
 const DAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
@@ -170,14 +170,14 @@ export default function DatePicker({
                 <div className="flex items-center justify-between mb-4">
                     <button type="button" onClick={prevMonth}
                         className="p-1.5 rounded-lg text-secondary hover:bg-surface-overlay hover:text-primary transition-all">
-                        <ChevronLeft className="w-4 h-4" />
+                        <CaretLeft size={16} weight="bold" />
                     </button>
                     <span className="text-sm font-bold text-primary">
                         {MONTHS[viewMonth]} {viewYear}
                     </span>
                     <button type="button" onClick={nextMonth}
                         className="p-1.5 rounded-lg text-secondary hover:bg-surface-overlay hover:text-primary transition-all">
-                        <ChevronRight className="w-4 h-4" />
+                        <CaretRight size={16} weight="bold" />
                     </button>
                 </div>
 
@@ -242,11 +242,11 @@ export default function DatePicker({
                 className={`w-full flex items-center gap-3 bg-surface-inset border rounded-xl px-4 py-3 text-primary transition-all group ${
                     isOpen ? "border-emerald-500 shadow-[0_0_12px_rgba(80,200,120,0.15)]" : "border-subtle hover:border-emerald-500/40"
                 }`}>
-                <Calendar className={`w-4 h-4 transition-colors flex-shrink-0 ${isOpen ? "text-emerald-500" : "text-muted group-hover:text-secondary"}`} />
+                <CalendarBlank size={16} weight="duotone" className={`flex-shrink-0 transition-colors ${isOpen ? "text-emerald-500" : "text-muted group-hover:text-secondary"}`} />
                 <span className={`flex-1 text-left font-medium text-sm ${!value ? "text-muted" : "text-primary"}`}>
                     {value ? formatDisplay(value) : placeholder}
                 </span>
-                <ChevronDown className={`w-4 h-4 text-muted transition-transform duration-200 flex-shrink-0 ${isOpen ? "rotate-180 text-emerald-500" : ""}`} />
+                <CaretDown size={16} weight="bold" className={`text-muted transition-transform duration-200 flex-shrink-0 ${isOpen ? "rotate-180 text-emerald-500" : ""}`} />
             </button>
             {dropdown}
         </div>

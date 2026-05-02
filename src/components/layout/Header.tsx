@@ -6,7 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import Button from "../ui/Button";
-import { Menu, X, User, LogOut, Calendar, Settings, Shield } from "lucide-react";
+import { List, X, User, SignOut, CalendarBlank, Gear, Shield } from "@phosphor-icons/react";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { NotificationPanel } from "@/components/notifications/NotificationPanel";
 import { useAuth } from "@/services/authContext";
@@ -121,16 +121,16 @@ export default function Header() {
                       </div>
                       <div className="p-2">
                         <Link href="/profile" className="flex items-center gap-2 px-3 py-2 text-sm text-secondary hover:text-primary hover:bg-surface-overlay rounded-lg transition-colors">
-                          <User className="w-4 h-4" /> My Profile
+                          <User size={16} weight="duotone" /> My Profile
                         </Link>
                         <Link href="/bookings" className="flex items-center gap-2 px-3 py-2 text-sm text-secondary hover:text-primary hover:bg-surface-overlay rounded-lg transition-colors">
-                          <Calendar className="w-4 h-4" /> My Bookings
+                          <CalendarBlank size={16} weight="duotone" /> My Bookings
                         </Link>
                         <Link href="/settings/sessions" className="flex items-center gap-2 px-3 py-2 text-sm text-secondary hover:text-primary hover:bg-surface-overlay rounded-lg transition-colors">
-                          <Shield className="w-4 h-4" /> Security
+                          <Shield size={16} weight="duotone" /> Security
                         </Link>
                         <Link href="/settings/notifications" className="flex items-center gap-2 px-3 py-2 text-sm text-secondary hover:text-primary hover:bg-surface-overlay rounded-lg transition-colors">
-                          <Settings className="w-4 h-4" /> Notifications
+                          <Gear size={16} weight="duotone" /> Notifications
                         </Link>
                       </div>
                       <div className="p-2 border-t border-default">
@@ -138,7 +138,7 @@ export default function Header() {
                           onClick={logout}
                           className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors"
                         >
-                          <LogOut className="w-4 h-4" /> Log Out
+                          <SignOut size={16} weight="duotone" /> Log Out
                         </button>
                       </div>
                     </div>
@@ -166,7 +166,7 @@ export default function Header() {
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           aria-label="Toggle mobile menu"
         >
-          {isMobileMenuOpen ? <X /> : <Menu />}
+          {isMobileMenuOpen ? <X size={24} weight="bold" /> : <List size={24} weight="bold" />}
         </button>
       </div>
 

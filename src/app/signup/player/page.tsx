@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "@/components/ui/Button";
-import { ArrowLeft, Loader2, Check } from "lucide-react";
+import { ArrowLeft, CircleNotch, Check } from "@phosphor-icons/react";
 import { authService } from "@/services/authService";
 import { useToast } from "@/components/ui/Toast";
 import { useGoogleLogin } from "@react-oauth/google";
@@ -109,7 +109,7 @@ export default function PlayerSignupPage() {
     <main className="min-h-screen bg-surface-base flex flex-col items-center justify-start pt-16 pb-24 px-4">
       <div className="w-full max-w-md">
         <Link href="/signup" className="mb-6 inline-flex items-center text-sm text-muted hover:text-primary transition-colors">
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Selection
+          <ArrowLeft size={16} weight="bold" className="mr-2" /> Back to Selection
         </Link>
 
         <div className="rounded-3xl border border-default bg-surface-raised/50 p-6 sm:p-8 backdrop-blur-xl shadow-2xl">
@@ -223,7 +223,7 @@ export default function PlayerSignupPage() {
               disabled={isSubmitting}
               className="w-full py-4 mt-2 bg-emerald-500 hover:bg-emerald-400 text-black font-bold tracking-wide"
             >
-              {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "Create Account"}
+              {isSubmitting ? <CircleNotch size={20} weight="bold" className="animate-spin mx-auto" /> : "Create Account"}
             </Button>
           </form>
 

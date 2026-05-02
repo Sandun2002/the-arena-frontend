@@ -3,7 +3,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
-import { Save, Loader2, MapPin, Phone, Clock, FileText, Calendar, Globe, AlertCircle, CheckCircle2, Search, Shield, Sun, Zap } from "lucide-react";
+import { FloppyDisk, CircleNotch, MapPin, Phone, Clock, FileText, Calendar, Globe, WarningCircle, CheckCircle, MagnifyingGlass, Shield, Sun, Lightning } from "@phosphor-icons/react";
 import Script from "next/script";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
@@ -317,15 +317,15 @@ export default function VenueSettingsPage() {
                         {/* Visibility Status */}
                         <div className="mb-10 pb-8 border-b border-default">
                             <h2 className="text-lg font-bold text-primary flex items-center gap-2 mb-4">
-                                <Globe className="w-5 h-5 text-emerald-500" /> Search Visibility
+                                <Globe size={20} weight="bold" className="text-emerald-500" /> Search Visibility
                             </h2>
                             
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className={`p-4 rounded-2xl flex gap-3 items-start border ${currentVenue.is_verified ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-amber-500/10 border-amber-500/20'}`}>
                                     {currentVenue.is_verified ? (
-                                        <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
+                                        <CheckCircle size={20} weight="fill" className="text-emerald-500 flex-shrink-0 mt-0.5" />
                                     ) : (
-                                        <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                                        <WarningCircle size={20} weight="fill" className="text-amber-500 flex-shrink-0 mt-0.5" />
                                     )}
                                     <div>
                                         <p className="font-bold text-primary text-sm">Verification Status</p>
@@ -339,9 +339,9 @@ export default function VenueSettingsPage() {
                                 
                                 <div className={`p-4 rounded-2xl flex gap-3 items-start border ${(geoLat && geoLng) ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-amber-500/10 border-amber-500/20'}`}>
                                     {(geoLat && geoLng) ? (
-                                        <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
+                                        <CheckCircle size={20} weight="fill" className="text-emerald-500 flex-shrink-0 mt-0.5" />
                                     ) : (
-                                        <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                                        <WarningCircle size={20} weight="fill" className="text-amber-500 flex-shrink-0 mt-0.5" />
                                     )}
                                     <div>
                                         <p className="font-bold text-primary text-sm">Location Data</p>
@@ -356,7 +356,7 @@ export default function VenueSettingsPage() {
 
                             {!currentVenue.is_verified && (
                                 <p className="mt-4 text-xs text-muted italic flex items-center gap-2">
-                                    <AlertCircle className="w-3 h-3" /> Note: Even with GPS set, venues must be verified to appear in the public search.
+                                    <WarningCircle size={12} weight="bold" /> Note: Even with GPS set, venues must be verified to appear in the public search.
                                 </p>
                             )}
                         </div>
@@ -364,7 +364,7 @@ export default function VenueSettingsPage() {
                         {/* Basic Info */}
                         <div className="space-y-4 mb-8">
                             <h2 className="text-lg font-bold text-primary flex items-center gap-2 border-b border-default pb-2">
-                                <FileText className="w-5 h-5 text-emerald-500" /> Basic Information
+                                <FileText size={20} weight="bold" className="text-emerald-500" /> Basic Information
                             </h2>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -405,13 +405,13 @@ export default function VenueSettingsPage() {
                         {/* Contact & Location */}
                         <div className="space-y-4">
                             <h2 className="text-lg font-bold text-primary flex items-center gap-2 border-b border-default pb-2">
-                                <MapPin className="w-5 h-5 text-blue-500" /> Location & Contact
+                                <MapPin size={20} weight="bold" className="text-blue-500" /> Location & Contact
                             </h2>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
                                     <label className="text-xs font-bold text-muted uppercase tracking-wider flex items-center gap-1">
-                                        <Phone className="w-3 h-3" /> Contact Number
+                                        <Phone size={12} weight="bold" /> Contact Number
                                     </label>
                                     <input
                                         {...register("phone_contact", { required: "Contact number is required" })}
@@ -421,7 +421,7 @@ export default function VenueSettingsPage() {
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-xs font-bold text-muted uppercase tracking-wider flex items-center gap-1">
-                                        <Clock className="w-3 h-3" /> Operating Hours (Summary)
+                                        <Clock size={12} weight="bold" /> Operating Hours (Summary)
                                     </label>
                                     <input
                                         {...register("operating_hours_summary")}
@@ -438,7 +438,7 @@ export default function VenueSettingsPage() {
                                     <span className="text-[10px] text-faint">Syncs address & Coordinates</span>
                                 </label>
                                 <div className="relative group">
-                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted group-focus-within:text-emerald-500 transition-colors" />
+                                    <MagnifyingGlass size={20} weight="bold" className="absolute left-4 top-1/2 -translate-y-1/2 text-muted group-focus-within:text-emerald-500 transition-colors" />
                                     <input
                                         ref={searchInputRef}
                                         type="text"
@@ -504,7 +504,7 @@ export default function VenueSettingsPage() {
                     <div className="bg-surface-raised/40 border border-default rounded-3xl p-8 backdrop-blur-sm">
                         <div className="border-b border-default pb-2 mb-6">
                             <h2 className="text-lg font-bold text-primary flex items-center gap-2">
-                                <Shield className="w-5 h-5 text-emerald-500" /> Facilities & Amenities
+                                <Shield size={20} weight="bold" className="text-emerald-500" /> Facilities & Amenities
                             </h2>
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -526,7 +526,7 @@ export default function VenueSettingsPage() {
                     <div className="bg-surface-raised/40 border border-default rounded-3xl p-8 backdrop-blur-sm">
                         <div className="flex items-center justify-between border-b border-default pb-2 mb-6">
                             <h2 className="text-lg font-bold text-primary flex items-center gap-2">
-                                <Zap className="w-5 h-5 text-amber-500" /> Peak Hours & Pricing
+                                <Lightning size={20} weight="fill" className="text-amber-500" /> Peak Hours & Pricing
                             </h2>
                             {peakLoading && <div className="h-2 w-16 rounded-full bg-surface-overlay animate-pulse" />}
                         </div>
@@ -617,7 +617,7 @@ export default function VenueSettingsPage() {
                                         disabled={peakSaving || !peakForm.start || !peakForm.end || peakForm.start === peakForm.end}
                                         className="bg-amber-500 hover:bg-amber-400 text-black font-bold px-6 h-11 rounded-xl disabled:opacity-50"
                                     >
-                                        {peakSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save Peak Hours'}
+                                        {peakSaving ? <CircleNotch size={16} weight="bold" className="animate-spin" /> : 'Save Peak Hours'}
                                     </Button>
                                     {peakHours.has_peak_config && (
                                         <button type="button" onClick={clearPeakHours} disabled={peakSaving} className="px-4 h-11 text-sm text-red-400 hover:text-red-300 font-bold">
@@ -634,7 +634,7 @@ export default function VenueSettingsPage() {
                                 <div className="flex items-start justify-between gap-4 p-5 rounded-2xl bg-gradient-to-br from-amber-500/10 to-amber-500/5 border border-amber-500/20">
                                     <div className="space-y-3 min-w-0 flex-1">
                                         <div className="flex items-center gap-2 text-sm">
-                                            <Sun className="w-4 h-4 text-amber-400" />
+                                            <Sun size={16} weight="fill" className="text-amber-400" />
                                             <span className="text-amber-400 text-xs font-bold uppercase tracking-wider">Active</span>
                                             <span className="text-primary font-bold">
                                                 {peakHours.peak_start_time} &ndash; {peakHours.peak_end_time}
@@ -688,7 +688,7 @@ export default function VenueSettingsPage() {
                     <div className="bg-surface-raised/40 border border-default rounded-3xl p-8 backdrop-blur-sm">
                         <div className="flex items-center justify-between border-b border-default pb-2 mb-6">
                             <h2 className="text-lg font-bold text-primary flex items-center gap-2">
-                                <Calendar className="w-5 h-5 text-purple-500" /> Weekly Schedule
+                                <Calendar size={20} weight="bold" className="text-purple-500" /> Weekly Schedule
                             </h2>
                             {isLoadingProfile && <div className="h-2 w-16 rounded-full bg-surface-overlay animate-pulse" />}
                         </div>
@@ -734,7 +734,7 @@ export default function VenueSettingsPage() {
                             disabled={isSubmitting}
                             className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold px-8 h-12 text-lg shadow-[0_0_20px_rgba(16,185,129,0.2)] rounded-xl"
                         >
-                            {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
+                            {isSubmitting ? <CircleNotch size={20} weight="bold" className="animate-spin mr-2" /> : <FloppyDisk size={16} weight="bold" className="mr-2" />}
                             Save All Changes
                         </Button>
                     </div>

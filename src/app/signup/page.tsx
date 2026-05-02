@@ -4,7 +4,7 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import gsap from "gsap";
-import { User, Building2, ArrowRight } from "lucide-react";
+import { User, Buildings, ArrowRight } from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import { useTheme } from "@/contexts/ThemeContext";
 
@@ -46,19 +46,19 @@ export default function SignupSelectionPage() {
         <Link href="/signup/player" className="role-card group">
           <div className="h-full bg-surface-raised/50 border border-default rounded-3xl p-8 backdrop-blur-sm hover:bg-surface-raised hover:border-emerald-500/50 transition-all duration-300 relative overflow-hidden">
             <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
-              <User className="w-32 h-32 text-emerald-500 transform rotate-12 group-hover:scale-110 transition-transform duration-500" />
+              <User size={128} weight="duotone" className="text-emerald-500 transform rotate-12 group-hover:scale-110 transition-transform duration-500" />
             </div>
 
             <div className="relative z-10 flex flex-col h-full">
               <div className="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <User className="w-7 h-7 text-emerald-500" />
+                <User size={28} weight="duotone" className="text-emerald-500" />
               </div>
               <h2 className="text-2xl font-bold text-primary mb-2">I&apos;m a Player</h2>
               <p className="text-secondary text-sm mb-8 flex-grow">
                 Book courts, join open games, track your stats, and compete in leagues.
               </p>
               <div className="flex items-center text-emerald-500 font-bold group-hover:translate-x-2 transition-transform">
-                Create Player Account <ArrowRight className="ml-2 w-4 h-4" />
+                Create Player Account <ArrowRight size={16} weight="bold" className="ml-2" />
               </div>
             </div>
           </div>
@@ -68,19 +68,19 @@ export default function SignupSelectionPage() {
         <Link href="/signup/venue" className="role-card group">
           <div className="h-full bg-surface-raised/50 border border-default rounded-3xl p-8 backdrop-blur-sm hover:bg-surface-raised hover:border-blue-500/50 transition-all duration-300 relative overflow-hidden">
             <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
-              <Building2 className="w-32 h-32 text-blue-500 transform -rotate-12 group-hover:scale-110 transition-transform duration-500" />
+              <Buildings size={128} weight="duotone" className="text-blue-500 transform -rotate-12 group-hover:scale-110 transition-transform duration-500" />
             </div>
 
             <div className="relative z-10 flex flex-col h-full">
               <div className="w-14 h-14 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <Building2 className="w-7 h-7 text-blue-500" />
+                <Buildings size={28} weight="duotone" className="text-blue-500" />
               </div>
               <h2 className="text-2xl font-bold text-primary mb-2">I&apos;m a Venue Owner</h2>
               <p className="text-secondary text-sm mb-8 flex-grow">
                 Manage bookings, optimize revenue, and grow your sports business.
               </p>
               <div className="flex items-center text-blue-500 font-bold group-hover:translate-x-2 transition-transform">
-                Register Venue <ArrowRight className="ml-2 w-4 h-4" />
+                Register Venue <ArrowRight size={16} weight="bold" className="ml-2" />
               </div>
             </div>
           </div>

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { format } from "date-fns";
-import { Loader2, Calendar, MapPin, Clock } from "lucide-react";
+import { CircleNotch, Calendar, MapPin, Clock } from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import DatePicker from "@/components/ui/DatePicker";
 import { centerService } from "@/services/centerService";
@@ -113,13 +113,13 @@ export default function ClosureFormModal({ venueId, courts, onClose, onSuccess }
                     onClick={() => setClosureLevel("venue")}
                     className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold transition-all relative z-10 ${closureLevel === "venue" ? "text-primary" : "text-muted hover:text-secondary"}`}
                 >
-                    <MapPin className="w-4 h-4" /> Venue
+                    <MapPin size={16} weight="bold" /> Venue
                 </button>
                 <button
                     onClick={() => setClosureLevel("court")}
                     className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold transition-all relative z-10 ${closureLevel === "court" ? "text-primary" : "text-muted hover:text-secondary"}`}
                 >
-                    <Clock className="w-4 h-4" /> Court
+                    <Clock size={16} weight="bold" /> Court
                 </button>
                 <div
                     className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-surface-overlay rounded-lg transition-transform duration-300 ${closureLevel === "venue" ? "translate-x-0" : "translate-x-full left-1"}`}
@@ -236,7 +236,7 @@ export default function ClosureFormModal({ venueId, courts, onClose, onSuccess }
                     disabled={isSubmitting}
                     className="w-full py-3.5 bg-red-600 hover:bg-red-500 text-primary font-bold rounded-xl mt-4 shadow-[0_0_20px_rgba(220,38,38,0.2)]"
                 >
-                    {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "Confirm Closure"}
+                    {isSubmitting ? <CircleNotch size={20} weight="bold" className="animate-spin mx-auto" /> : "Confirm Closure"}
                 </Button>
             </form>
         </div>

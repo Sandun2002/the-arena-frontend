@@ -7,21 +7,21 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useAuth } from "@/services/authContext";
 import HScrollArea from "@/components/ui/HScrollArea";
 import TierFrame from "@/components/ui/TierFrame";
-import { ArrowRight, Trophy, Zap } from "lucide-react";
+import { ArrowRight, Trophy, Lightning, TennisBall, GlobeHemisphereWest, Fire } from "@phosphor-icons/react";
+import { getTierConfig } from "@/lib/tierUtils";
 
 // Register ScrollTrigger
 gsap.registerPlugin(ScrollTrigger);
 
-// Tier Ladder data - matches challenges page
 const TIER_LADDER = [
-  { name: "Rookie", minXp: 0, icon: "🥉", color: "#71717a" },
-  { name: "Contender", minXp: 500, icon: "🥈", color: "#3b82f6" },
-  { name: "Athlete", minXp: 1200, icon: "🏅", color: "#10b981" },
-  { name: "Champion", minXp: 2500, icon: "🥇", color: "#eab308" },
-  { name: "Elite", minXp: 4500, icon: "🔥", color: "#f97316" },
-  { name: "Legend", minXp: 7500, icon: "⚔️", color: "#ef4444" },
-  { name: "Icon", minXp: 12000, icon: "👑", color: "#a855f7" },
-  { name: "Titan", minXp: 25000, icon: "⚡", color: "#7dd3fc" },
+  { name: "Rookie", minXp: 0, color: "#71717a" },
+  { name: "Contender", minXp: 500, color: "#3b82f6" },
+  { name: "Athlete", minXp: 1200, color: "#10b981" },
+  { name: "Champion", minXp: 2500, color: "#eab308" },
+  { name: "Elite", minXp: 4500, color: "#f97316" },
+  { name: "Legend", minXp: 7500, color: "#ef4444" },
+  { name: "Icon", minXp: 12000, color: "#a855f7" },
+  { name: "Titan", minXp: 25000, color: "#7dd3fc" },
 ];
 
 // Rarity config - matches challenges page
@@ -40,19 +40,19 @@ function getRarity(xp: number) {
 // Sample challenges for preview
 const SAMPLE_CHALLENGES = [
   {
-    icon: "🏸",
+    icon: <TennisBall weight="duotone" size={24} />,
     title: "Play Your First Game",
     xp: 25,
     rarity: "common",
   },
   {
-    icon: "🌍",
+    icon: <GlobeHemisphereWest weight="duotone" size={24} />,
     title: "Try 3 Different Sports",
     xp: 125,
     rarity: "epic",
   },
   {
-    icon: "🔥",
+    icon: <Fire weight="fill" size={24} />,
     title: "Book 3 Games This Week",
     xp: 50,
     rarity: "rare",
@@ -125,7 +125,7 @@ export default function GamificationTeaser() {
           {/* Header */}
           <div className="text-center mb-10 animate-in">
             <div className="inline-flex items-center gap-2 mb-4">
-              <Trophy className="w-5 h-5 text-amber-500" />
+              <Trophy size={20} weight="duotone" className="text-amber-500" />
               <span className="text-xs font-black tracking-[0.2em] uppercase text-muted">
                 Gamification
               </span>
@@ -145,7 +145,7 @@ export default function GamificationTeaser() {
           {/* Tier Ladder */}
           <div className="mb-12 animate-in">
             <div className="flex items-center gap-2 mb-4">
-              <Zap className="w-4 h-4 text-emerald-500" />
+              <Lightning size={16} weight="fill" className="text-emerald-500" />
               <span className="text-xs font-bold tracking-widest uppercase text-muted">
                 8 Tiers to Unlock
               </span>
@@ -181,7 +181,13 @@ export default function GamificationTeaser() {
                       size="md"
                       hideBadge
                       placeholder={
-                        <span style={{ fontSize: 20 }}>{tier.icon}</span>
+                        <span style={{ fontSize: 20 }}>
+                          {(() => {
+                            const cfg = getTierConfig(tier.name);
+                            const IconCmp = cfg.icon;
+                            return <IconCmp weight={cfg.iconWeight as any} />;
+                          })()}
+                        </span>
                       }
                     />
 
@@ -296,7 +302,7 @@ export default function GamificationTeaser() {
               className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-black font-bold hover:shadow-[0_0_30px_rgba(80,200,120,0.4)] hover:scale-105 transition-all duration-300 group"
             >
               {user ? "Start Earning XP" : "Start Earning XP"}
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight size={16} weight="bold" className="group-hover:translate-x-1 transition-transform" />
             </Link>
             <p className="text-muted text-xs mt-3">
               {user

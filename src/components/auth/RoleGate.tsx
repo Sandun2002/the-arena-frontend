@@ -3,7 +3,7 @@
 
 import { ReactNode } from "react";
 import { useAuth } from "@/services/authContext";
-import { AlertTriangle } from "lucide-react";
+import { Warning } from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import Link from "next/link";
 
@@ -24,7 +24,7 @@ export default function RoleGate({ children, allowedRoles, showError = true }: R
         if (showError) {
             return (
                 <div className="min-h-[50vh] flex flex-col items-center justify-center p-8 text-center">
-                    <AlertTriangle className="w-12 h-12 text-faint mb-4" />
+                    <Warning size={48} weight="duotone" className="text-faint mb-4" />
                     <h2 className="text-xl font-bold text-primary mb-2">Login Required</h2>
                     <p className="text-muted mb-6">You need to sign in to access this page.</p>
                     <Link href="/login">
@@ -43,7 +43,7 @@ export default function RoleGate({ children, allowedRoles, showError = true }: R
             return (
                 <div className="min-h-[50vh] flex flex-col items-center justify-center p-8 text-center">
                     <div className="bg-red-500/10 p-4 rounded-full mb-4">
-                        <AlertTriangle className="w-8 h-8 text-red-500" />
+                        <Warning size={32} weight="duotone" className="text-red-500" />
                     </div>
                     <h2 className="text-xl font-bold text-primary mb-2">Access Denied</h2>
                     <p className="text-muted mb-6 max-w-md">

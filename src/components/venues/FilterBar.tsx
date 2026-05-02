@@ -1,6 +1,6 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { MagnifyingGlass } from "@phosphor-icons/react";
 
 interface FilterBarProps {
     searchTerm: string;
@@ -23,7 +23,7 @@ export default function FilterBar({
 
                 {/* 1. Search Input */}
                 <div className="relative w-full md:w-1/3">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted" />
+                    <MagnifyingGlass size={16} weight="bold" className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
                     <input
                         type="text"
                         placeholder="Search venues, locations..."

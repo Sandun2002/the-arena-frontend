@@ -8,11 +8,11 @@ import {
   Clock,
   Shield,
   MapPin,
-  Calendar,
-  AlertTriangle,
-  RefreshCw,
+  CalendarBlank,
+  Warning,
+  ArrowsClockwise,
   ArrowLeft,
-} from "lucide-react";
+} from "@phosphor-icons/react";
 import { bookingService, PayHereCheckoutData } from "@/services/bookingService";
 import { playerService } from "@/services/playerService";
 import { Booking } from "@/types";
@@ -183,7 +183,7 @@ export default function CheckoutPage() {
     return (
       <main className="min-h-screen bg-surface-base flex items-center justify-center p-4">
         <div className="max-w-md w-full text-center bg-surface-raised/80 border border-red-900/40 rounded-3xl p-10">
-          <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+          <Warning size={48} weight="fill" className="text-red-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-primary mb-2">Checkout Unavailable</h2>
           <p className="text-secondary mb-6">{error ?? "Something went wrong."}</p>
           <button
@@ -216,7 +216,7 @@ export default function CheckoutPage() {
             onClick={() => router.back()}
             className="inline-flex items-center text-sm text-muted hover:text-primary mb-8 transition-colors"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" /> Back
+            <ArrowLeft size={16} weight="bold" className="mr-2" /> Back
           </button>
 
           <h1 className="text-3xl font-bold text-primary mb-2">Complete Payment</h1>
@@ -233,7 +233,7 @@ export default function CheckoutPage() {
                 ? "bg-amber-900/20 border-amber-700/40 text-amber-400"
                 : "bg-surface-raised/60 border-subtle/40 text-secondary"
             }`}>
-              <Clock className={`w-5 h-5 flex-shrink-0 ${isExpired ? "text-red-500" : countdown < 60 ? "text-amber-400" : "text-emerald-400"}`} />
+              <Clock size={20} weight="bold" className={`flex-shrink-0 ${isExpired ? "text-red-500" : countdown < 60 ? "text-amber-400" : "text-emerald-400"}`} />
               {isExpired ? (
                 <span className="font-medium">Hold expired — slot released</span>
               ) : (
@@ -251,7 +251,7 @@ export default function CheckoutPage() {
               <h2 className="text-base font-bold text-primary mb-5">Booking Summary</h2>
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
-                  <MapPin className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
+                  <MapPin size={16} weight="fill" className="text-emerald-400 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="text-xs text-muted uppercase mb-0.5">Venue</p>
                     <p className="text-sm font-medium text-primary">{booking.court?.venue_name}</p>
@@ -260,7 +260,7 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <Calendar className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
+                  <CalendarBlank size={16} weight="bold" className="text-emerald-400 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="text-xs text-muted uppercase mb-0.5">Date</p>
                     <p className="text-sm font-medium text-primary">
@@ -270,7 +270,7 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <Clock className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
+                  <Clock size={16} weight="bold" className="text-emerald-400 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="text-xs text-muted uppercase mb-0.5">Time</p>
                     <p className="text-sm font-medium text-primary">
@@ -304,7 +304,7 @@ export default function CheckoutPage() {
                 <h2 className="text-base font-bold text-primary mb-4">Payment via PayHere</h2>
 
                 <div className="flex items-center gap-2 mb-5">
-                  <Shield className="w-4 h-4 text-emerald-400" />
+                  <Shield size={16} weight="fill" className="text-emerald-400" />
                   <span className="text-xs text-secondary">Secured by PayHere · SSL Encrypted</span>
                 </div>
 
@@ -324,7 +324,7 @@ export default function CheckoutPage() {
                 >
                   {paying ? (
                     <>
-                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      <ArrowsClockwise size={16} weight="bold" className="animate-spin" />
                       Opening PayHere…
                     </>
                   ) : isExpired ? (

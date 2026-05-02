@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle, XCircle, Calendar, MapPin, FileText, Home, CreditCard } from "lucide-react";
+import { CheckCircle, XCircle, CalendarBlank, MapPin, FileText, House, CreditCard } from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import { playerService } from "@/services/playerService";
 import { Booking } from "@/types";
@@ -43,7 +43,7 @@ export default function BookingConfirmationPage() {
                     {isCancelled ? (
                         <>
                             <div className="w-24 h-24 bg-red-500/10 border border-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                                <XCircle className="w-12 h-12 text-red-500" />
+                                <XCircle size={48} weight="fill" className="text-red-500" />
                             </div>
                             <h1 className="text-3xl md:text-5xl font-bold text-primary mb-2">Booking Cancelled</h1>
                             <p className="text-secondary">This booking has been cancelled or rejected.</p>
@@ -51,7 +51,7 @@ export default function BookingConfirmationPage() {
                     ) : (
                         <>
                             <div className="w-24 h-24 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_40px_rgba(16,185,129,0.4)]">
-                                <CheckCircle className="w-12 h-12 text-black" />
+                                <CheckCircle size={48} weight="fill" className="text-black" />
                             </div>
                             <h1 className="text-3xl md:text-5xl font-bold text-primary mb-2">Booking Confirmed!</h1>
                             <p className="text-secondary">Your court is reserved. Get ready to play.</p>
@@ -81,14 +81,14 @@ export default function BookingConfirmationPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <h3 className="text-primary font-bold mb-4 flex items-center gap-2">
-                                    <MapPin className="w-4 h-4 text-emerald-500" /> Venue
+                                    <MapPin size={16} weight="fill" className="text-emerald-500" /> Venue
                                 </h3>
                                 <p className="text-secondary font-medium">{booking.court?.venue_name}</p>
                                 <p className="text-muted text-sm">{booking.court?.name}</p>
                             </div>
                             <div>
                                 <h3 className="text-primary font-bold mb-4 flex items-center gap-2">
-                                    <Calendar className="w-4 h-4 text-emerald-500" /> Date & Time
+                                    <CalendarBlank size={16} weight="bold" className="text-emerald-500" /> Date & Time
                                 </h3>
                                 <p className="text-secondary font-medium">
                                     {fmtDateShort(booking.start_time)}
@@ -101,7 +101,7 @@ export default function BookingConfirmationPage() {
 
                         <div className="pt-6 border-t border-default">
                             <h3 className="text-primary font-bold mb-4 flex items-center gap-2">
-                                <FileText className="w-4 h-4 text-emerald-500" /> Payment Details
+                                <FileText size={16} weight="fill" className="text-emerald-500" /> Payment Details
                             </h3>
                             <div className="space-y-2">
                                 <div className="flex justify-between text-sm">
@@ -135,13 +135,13 @@ export default function BookingConfirmationPage() {
                     {isCancelled ? (
                         <Link href="/venues" className="w-full md:w-auto">
                             <Button className="w-full bg-emerald-500 text-black hover:bg-emerald-400 font-bold">
-                                <CreditCard className="w-4 h-4 mr-2" /> Book Again
+                                <CreditCard size={16} weight="bold" className="mr-2" /> Book Again
                             </Button>
                         </Link>
                     ) : (
                         <Link href="/" className="w-full md:w-auto">
                             <Button className="w-full bg-primary text-inverted hover:opacity-90 font-bold">
-                                <Home className="w-4 h-4 mr-2" /> Back to Home
+                                <House size={16} weight="bold" className="mr-2" /> Back to Home
                             </Button>
                         </Link>
                     )}

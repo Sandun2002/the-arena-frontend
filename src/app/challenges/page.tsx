@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import { ArrowLeft, Trophy, Zap, CheckCircle, Clock, Infinity as InfinityIcon } from "lucide-react";
+import { ArrowLeft, Trophy, Lightning, CheckCircle, Clock, Infinity as InfinityIcon, Sparkle, Fire, GlobeHemisphereWest, Heart, Timer, LockSimple, Medal, MedalMilitary, Sword, Crown, MapPin, Check } from "@phosphor-icons/react";
 import { useAuth } from "@/services/authContext";
 import { playerService } from "@/services/playerService";
 import { Challenge, UserAchievement } from "@/types";
@@ -10,20 +10,52 @@ import { gsap } from "gsap";
 import { useRequireAuth, AuthLoadingSpinner } from "@/components/auth/RequireAuth";
 import HScrollArea from "@/components/ui/HScrollArea";
 import TierFrame from "@/components/ui/TierFrame";
+import { getTierConfig } from "@/lib/tierUtils";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Emoji to Icon Mapping
+// ─────────────────────────────────────────────────────────────────────────────
+const EMOJI_TO_ICON: Record<string, { icon: React.ElementType, weight: string }> = {
+    "🏆": { icon: Trophy, weight: "duotone" },
+    "🥇": { icon: Medal, weight: "fill" },
+    "🥈": { icon: Medal, weight: "duotone" },
+    "🥉": { icon: Medal, weight: "light" },
+    "🏅": { icon: MedalMilitary, weight: "duotone" },
+    "⚡": { icon: Lightning, weight: "fill" },
+    "🔥": { icon: Fire, weight: "fill" },
+    "⚔️": { icon: Sword, weight: "duotone" },
+    "👑": { icon: Crown, weight: "fill" },
+    "🔒": { icon: LockSimple, weight: "duotone" },
+    "✅": { icon: CheckCircle, weight: "fill" },
+    "✨": { icon: Sparkle, weight: "duotone" },
+    "🌍": { icon: GlobeHemisphereWest, weight: "duotone" },
+    "❤️": { icon: Heart, weight: "fill" },
+    "⏰": { icon: Timer, weight: "duotone" },
+    "📍": { icon: MapPin, weight: "duotone" }
+};
+
+function renderEmojiAsIcon(emoji: string, className?: string, style?: any) {
+    const mapped = EMOJI_TO_ICON[emoji.trim()];
+    if (mapped) {
+        const IconComponent = mapped.icon;
+        return <IconComponent weight={mapped.weight as any} className={className} style={style} size="1em" />;
+    }
+    return <span className={className} style={style}>{emoji}</span>;
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Category Configuration
 // ─────────────────────────────────────────────────────────────────────────────
 type Category = "all" | "weekly" | "explorer" | "loyalty" | "streak" | "timing" | "milestone";
 
-const CATEGORIES: { key: Category; label: string; icon: string; accentColor: string; gradientFrom: string; gradientTo: string; borderColor: string; glowColor: string; tabBg: string; barFrom: string; barTo: string }[] = [
-    { key: "all",       label: "All",               icon: "✨", accentColor: "text-primary",       gradientFrom: "#0a0a0f", gradientTo: "#111118",   borderColor: "rgba(255,255,255,0.1)",  glowColor: "rgba(255,255,255,0.1)", tabBg: "#374151", barFrom: "#10b981", barTo: "#06b6d4" },
-    { key: "weekly",    label: "Weekly Grind",       icon: "🔥", accentColor: "text-blue-400",    gradientFrom: "#030720", gradientTo: "#0a1a4a",   borderColor: "rgba(59,130,246,0.35)",  glowColor: "rgba(59,130,246,0.3)", tabBg: "#2563eb", barFrom: "#3b82f6", barTo: "#06b6d4" },
-    { key: "explorer",  label: "Explorer",           icon: "🌍", accentColor: "text-purple-400",  gradientFrom: "#0d0520", gradientTo: "#1a0a40",   borderColor: "rgba(168,85,247,0.35)",  glowColor: "rgba(168,85,247,0.3)", tabBg: "#7c3aed", barFrom: "#a855f7", barTo: "#818cf8" },
-    { key: "loyalty",   label: "Loyalty",            icon: "❤️", accentColor: "text-rose-400",   gradientFrom: "#200510", gradientTo: "#3d0a1a",   borderColor: "rgba(244,63,94,0.35)",   glowColor: "rgba(244,63,94,0.3)",  tabBg: "#e11d48", barFrom: "#f43f5e", barTo: "#fb7185" },
-    { key: "streak",    label: "Streak",             icon: "⚡", accentColor: "text-orange-400", gradientFrom: "#1a0a00", gradientTo: "#3d1a00",   borderColor: "rgba(249,115,22,0.35)",  glowColor: "rgba(249,115,22,0.3)", tabBg: "#ea580c", barFrom: "#f97316", barTo: "#fbbf24" },
-    { key: "timing",    label: "Timing",             icon: "⏰", accentColor: "text-teal-400",   gradientFrom: "#001a18", gradientTo: "#003830",   borderColor: "rgba(20,184,166,0.35)",  glowColor: "rgba(20,184,166,0.3)", tabBg: "#0f766e", barFrom: "#14b8a6", barTo: "#34d399" },
-    { key: "milestone", label: "Milestones",         icon: "🏆", accentColor: "text-amber-400",  gradientFrom: "#1a1000", gradientTo: "#3d2800",   borderColor: "rgba(245,158,11,0.35)",  glowColor: "rgba(245,158,11,0.3)", tabBg: "#d97706", barFrom: "#f59e0b", barTo: "#fde68a" },
+const CATEGORIES: { key: Category; label: string; icon: React.ElementType; iconWeight: string; accentColor: string; gradientFrom: string; gradientTo: string; borderColor: string; glowColor: string; tabBg: string; barFrom: string; barTo: string }[] = [
+    { key: "all",       label: "All",               icon: Sparkle, iconWeight: "duotone", accentColor: "text-primary",       gradientFrom: "#0a0a0f", gradientTo: "#111118",   borderColor: "rgba(255,255,255,0.1)",  glowColor: "rgba(255,255,255,0.1)", tabBg: "#374151", barFrom: "#10b981", barTo: "#06b6d4" },
+    { key: "weekly",    label: "Weekly Grind",       icon: Fire, iconWeight: "fill", accentColor: "text-blue-400",    gradientFrom: "#030720", gradientTo: "#0a1a4a",   borderColor: "rgba(59,130,246,0.35)",  glowColor: "rgba(59,130,246,0.3)", tabBg: "#2563eb", barFrom: "#3b82f6", barTo: "#06b6d4" },
+    { key: "explorer",  label: "Explorer",           icon: GlobeHemisphereWest, iconWeight: "duotone", accentColor: "text-purple-400",  gradientFrom: "#0d0520", gradientTo: "#1a0a40",   borderColor: "rgba(168,85,247,0.35)",  glowColor: "rgba(168,85,247,0.3)", tabBg: "#7c3aed", barFrom: "#a855f7", barTo: "#818cf8" },
+    { key: "loyalty",   label: "Loyalty",            icon: Heart, iconWeight: "fill", accentColor: "text-rose-400",   gradientFrom: "#200510", gradientTo: "#3d0a1a",   borderColor: "rgba(244,63,94,0.35)",   glowColor: "rgba(244,63,94,0.3)",  tabBg: "#e11d48", barFrom: "#f43f5e", barTo: "#fb7185" },
+    { key: "streak",    label: "Streak",             icon: Lightning, iconWeight: "fill", accentColor: "text-orange-400", gradientFrom: "#1a0a00", gradientTo: "#3d1a00",   borderColor: "rgba(249,115,22,0.35)",  glowColor: "rgba(249,115,22,0.3)", tabBg: "#ea580c", barFrom: "#f97316", barTo: "#fbbf24" },
+    { key: "timing",    label: "Timing",             icon: Timer, iconWeight: "duotone", accentColor: "text-teal-400",   gradientFrom: "#001a18", gradientTo: "#003830",   borderColor: "rgba(20,184,166,0.35)",  glowColor: "rgba(20,184,166,0.3)", tabBg: "#0f766e", barFrom: "#14b8a6", barTo: "#34d399" },
+    { key: "milestone", label: "Milestones",         icon: Trophy, iconWeight: "duotone", accentColor: "text-amber-400",  gradientFrom: "#1a1000", gradientTo: "#3d2800",   borderColor: "rgba(245,158,11,0.35)",  glowColor: "rgba(245,158,11,0.3)", tabBg: "#d97706", barFrom: "#f59e0b", barTo: "#fde68a" },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -44,29 +76,29 @@ function getRarity(xp: number) {
 // ─────────────────────────────────────────────────────────────────────────────
 // Tier display config
 // ─────────────────────────────────────────────────────────────────────────────
-const TIER_STYLES: Record<string, { glow: string; gradient: string; icon: string }> = {
-    Rookie:    { glow: "rgba(113,113,122,0.5)",  gradient: "linear-gradient(135deg,#71717a,#52525b)",  icon: "🥉" },
-    Contender: { glow: "rgba(59,130,246,0.5)",   gradient: "linear-gradient(135deg,#3b82f6,#1d4ed8)",  icon: "🥈" },
-    Athlete:   { glow: "rgba(16,185,129,0.5)",   gradient: "linear-gradient(135deg,#10b981,#059669)",  icon: "🏅" },
-    Champion:  { glow: "rgba(234,179,8,0.5)",    gradient: "linear-gradient(135deg,#eab308,#ca8a04)",  icon: "🥇" },
-    Elite:     { glow: "rgba(249,115,22,0.55)",  gradient: "linear-gradient(135deg,#f97316,#ea580c)",  icon: "🔥" },
-    Legend:    { glow: "rgba(239,68,68,0.55)",   gradient: "linear-gradient(135deg,#ef4444,#dc2626)",  icon: "⚔️" },
-    Icon:      { glow: "rgba(168,85,247,0.6)",   gradient: "linear-gradient(135deg,#a855f7,#7c3aed)",  icon: "👑" },
-    Titan:     { glow: "rgba(125,211,252,0.65)",   gradient: "linear-gradient(135deg,#0c4a6e,#38bdf8,#e0f2fe,#ffffff,#e0f2fe,#38bdf8)", icon: "⚡" },
+const TIER_STYLES: Record<string, { glow: string; gradient: string }> = {
+    Rookie:    { glow: "rgba(113,113,122,0.5)",  gradient: "linear-gradient(135deg,#71717a,#52525b)" },
+    Contender: { glow: "rgba(59,130,246,0.5)",   gradient: "linear-gradient(135deg,#3b82f6,#1d4ed8)" },
+    Athlete:   { glow: "rgba(16,185,129,0.5)",   gradient: "linear-gradient(135deg,#10b981,#059669)" },
+    Champion:  { glow: "rgba(234,179,8,0.5)",    gradient: "linear-gradient(135deg,#eab308,#ca8a04)" },
+    Elite:     { glow: "rgba(249,115,22,0.55)",  gradient: "linear-gradient(135deg,#f97316,#ea580c)" },
+    Legend:    { glow: "rgba(239,68,68,0.55)",   gradient: "linear-gradient(135deg,#ef4444,#dc2626)" },
+    Icon:      { glow: "rgba(168,85,247,0.6)",   gradient: "linear-gradient(135deg,#a855f7,#7c3aed)" },
+    Titan:     { glow: "rgba(125,211,252,0.65)",   gradient: "linear-gradient(135deg,#0c4a6e,#38bdf8,#e0f2fe,#ffffff,#e0f2fe,#38bdf8)" },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Tier Ladder data
 // ─────────────────────────────────────────────────────────────────────────────
 const TIER_LADDER = [
-    { name: "Rookie",    minXp: 0,     nextXp: 500,   icon: "🥉", color: "#71717a" },
-    { name: "Contender", minXp: 500,   nextXp: 1200,  icon: "🥈", color: "#3b82f6" },
-    { name: "Athlete",   minXp: 1200,  nextXp: 2500,  icon: "🏅", color: "#10b981" },
-    { name: "Champion",  minXp: 2500,  nextXp: 4500,  icon: "🥇", color: "#eab308" },
-    { name: "Elite",     minXp: 4500,  nextXp: 7500,  icon: "🔥", color: "#f97316" },
-    { name: "Legend",    minXp: 7500,  nextXp: 12000, icon: "⚔️", color: "#ef4444" },
-    { name: "Icon",      minXp: 12000, nextXp: 25000, icon: "👑", color: "#a855f7" },
-    { name: "Titan",     minXp: 25000, nextXp: null,  icon: "⚡",   color: "#7dd3fc" },
+    { name: "Rookie",    minXp: 0,     nextXp: 500,   color: "#71717a" },
+    { name: "Contender", minXp: 500,   nextXp: 1200,  color: "#3b82f6" },
+    { name: "Athlete",   minXp: 1200,  nextXp: 2500,  color: "#10b981" },
+    { name: "Champion",  minXp: 2500,  nextXp: 4500,  color: "#eab308" },
+    { name: "Elite",     minXp: 4500,  nextXp: 7500,  color: "#f97316" },
+    { name: "Legend",    minXp: 7500,  nextXp: 12000, color: "#ef4444" },
+    { name: "Icon",      minXp: 12000, nextXp: 25000, color: "#a855f7" },
+    { name: "Titan",     minXp: 25000, nextXp: null,  color: "#7dd3fc" },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -135,11 +167,11 @@ function ChallengeCard({ challenge, achievement, catConfig, animated }: {
                             background: `${completed ? rarity.text : catConfig.tabBg}18`,
                             borderColor: completed ? rarity.border : `${catConfig.tabBg}55`,
                         }}>
-                        {challenge.icon}
+                        {renderEmojiAsIcon(challenge.icon || "")}
                         {completed && (
                             <div className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border border-[color:var(--surface-raised)]"
                                 style={{ background: rarity.glow, borderColor: rarity.border }}>
-                                <CheckCircle className="h-2.5 w-2.5" style={{ color: rarity.text }} />
+                                <CheckCircle weight="fill" size={10} style={{ color: rarity.text }} />
                             </div>
                         )}
                     </div>
@@ -171,11 +203,11 @@ function ChallengeCard({ challenge, achievement, catConfig, animated }: {
                 <div className="flex flex-wrap items-center gap-1.5">
                     <span className="rounded-full border px-2 py-0.5 text-[10px] font-black tracking-widest uppercase"
                         style={{ background: `${catConfig.tabBg}18`, color: catConfig.tabBg, borderColor: `${catConfig.tabBg}44` }}>
-                        {catConfig.icon} {catConfig.label}
+                        <catConfig.icon weight={catConfig.iconWeight as any} className="inline-block mb-0.5 mr-0.5" /> {catConfig.label}
                     </span>
                     {isPermanent && (
                         <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[10px] font-black tracking-widest text-amber-500 uppercase">
-                            <InfinityIcon className="h-2.5 w-2.5" /> Permanent
+                            <InfinityIcon size={10} weight="bold" /> Permanent
                         </span>
                     )}
                 </div>
@@ -208,7 +240,7 @@ function ChallengeCard({ challenge, achievement, catConfig, animated }: {
                         <div>
                             {completed && (
                                 <span className="inline-flex items-center gap-1 text-emerald-400">
-                                    <CheckCircle className="h-3 w-3" /> Obtained
+                                    <CheckCircle size={12} weight="fill" /> Obtained
                                 </span>
                             )}
                             {!completed && nudge && (
@@ -217,7 +249,7 @@ function ChallengeCard({ challenge, achievement, catConfig, animated }: {
                             {!completed && !nudge && isWeekly && !isPermanent && (
                                 <span className="inline-flex items-center gap-1"
                                     style={{ color: daysLeft <= 2 ? "#ef4444" : daysLeft <= 4 ? "#f59e0b" : "#52525b" }}>
-                                    <Clock className="h-3 w-3" /> {daysLeft}d left
+                                    <Clock size={12} weight="duotone" /> {daysLeft}d left
                                 </span>
                             )}
                         </div>
@@ -353,10 +385,10 @@ export default function ChallengesPage() {
                 {/* Nav */}
                 <div className="flex items-center justify-between mb-8">
                     <Link href="/profile" className="inline-flex items-center text-sm font-medium text-muted hover:text-primary transition-colors group">
-                        <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" /> Profile
+                        <ArrowLeft size={16} weight="bold" className="mr-2 group-hover:-translate-x-1 transition-transform" /> Profile
                     </Link>
                     <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-default bg-surface-raised/80 backdrop-blur-sm">
-                        <Zap className="w-3.5 h-3.5 text-yellow-400" />
+                        <Lightning weight="fill" className="w-3.5 h-3.5 text-yellow-400" />
                         <span className="text-xs font-black text-primary">{xp.toLocaleString()} XP</span>
                     </div>
                 </div>
@@ -373,7 +405,11 @@ export default function ChallengesPage() {
                         <div className="flex shrink-0 items-center gap-3">
                             <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-default text-2xl shadow-lg"
                                 style={{ background: tierStyle.gradient, boxShadow: `0 4px 18px ${tierStyle.glow}` }}>
-                                {tierStyle.icon}
+                                {(() => {
+                                    const cfg = getTierConfig(tier);
+                                    const IconCmp = cfg.icon;
+                                    return <IconCmp weight={cfg.iconWeight as any} />;
+                                })()}
                             </div>
                             <div>
                                 <div className="text-[10px] font-black uppercase tracking-[0.2em] text-muted">Tier</div>
@@ -435,7 +471,7 @@ export default function ChallengesPage() {
                         </div>
                         {nextTier && (
                             <div className="hidden shrink-0 items-center gap-1.5 rounded-full border border-amber-500/25 bg-amber-500/10 px-3 py-1.5 sm:flex">
-                                <Zap className="h-3 w-3 text-amber-400" />
+                                <Lightning weight="fill" className="h-3 w-3 text-amber-400" />
                                 <span className="text-[11px] font-black text-amber-300">{xpToNextTier} XP to {nextTier}</span>
                             </div>
                         )}
@@ -506,7 +542,13 @@ export default function ChallengesPage() {
                                                 src={null}
                                                 size="md"
                                                 hideBadge
-                                                placeholder={<span style={{ fontSize: 22 }}>{t.icon}</span>}
+                                                placeholder={<span style={{ fontSize: 22 }}>
+                                                    {(() => {
+                                                        const cfg = getTierConfig(t.name);
+                                                        const IconCmp = cfg.icon;
+                                                        return <IconCmp weight={cfg.iconWeight as any} />;
+                                                    })()}
+                                                </span>}
                                             />
                                         </div>
 
@@ -571,7 +613,7 @@ export default function ChallengesPage() {
                                     borderColor: isActive ? `${cat.tabBg}55` : "var(--border-subtle)",
                                     color: isActive ? "var(--text-primary)" : "var(--text-secondary)",
                                 }}>
-                                <span>{cat.icon}</span>
+                                <span><cat.icon weight={cat.iconWeight as any} /></span>
                                 <span className="whitespace-nowrap">{cat.label}</span>
                                 {counts && (
                                     <span className="rounded-full bg-surface-base/30 px-1.5 py-0.5 text-[10px] font-black text-secondary">
@@ -595,7 +637,7 @@ export default function ChallengesPage() {
                                         <div className="flex items-center gap-3 min-w-0">
                                             <div className="flex h-8 w-8 items-center justify-center rounded-xl border text-lg"
                                                 style={{ background: `${cat.tabBg}14`, borderColor: `${cat.tabBg}33` }}>
-                                                {cat.icon}
+                                                <cat.icon weight={cat.iconWeight as any} />
                                             </div>
                                             <h2 className="truncate text-lg font-black tracking-tight text-primary">{cat.label}</h2>
                                             <span className="rounded-full border px-2 py-0.5 text-xs font-bold"
@@ -630,7 +672,7 @@ export default function ChallengesPage() {
                         </HScrollArea>
                         {orderedChallenges.length === 0 && (
                             <div className="text-center py-20 text-faint">
-                                <Trophy className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                                <Trophy size={48} weight="duotone" className="mx-auto mb-3 opacity-30" />
                                 <p className="text-sm">No challenges in this category yet.</p>
                             </div>
                         )}
@@ -645,7 +687,7 @@ export default function ChallengesPage() {
 function StatPill({ icon, value, label }: { icon: string; value: string; label: string }) {
     return (
         <div className="flex items-center gap-2 rounded-full border border-default bg-surface-base/30 px-3 py-1.5 text-xs">
-            <span>{icon}</span>
+            <span>{renderEmojiAsIcon(icon)}</span>
             <span className="font-black text-primary">{value}</span>
             <span className="text-muted">{label}</span>
         </div>

@@ -3,7 +3,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { Plus, Trash2, Image as ImageIcon, Move, Star, Loader2, UploadCloud } from "lucide-react";
+import { Plus, Trash, Image as ImageIcon, ArrowsOut, Star, CircleNotch, CloudArrowUp } from "@phosphor-icons/react";
 import gsap from "gsap";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
@@ -93,7 +93,7 @@ export default function GalleryPage() {
     if (!currentVenue) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
-                <ImageIcon className="w-12 h-12 text-faint mb-4" />
+                <ImageIcon size={48} weight="duotone" className="text-faint mb-4" />
                 <h2 className="text-xl font-bold text-primary mb-2">No Venue Selected</h2>
                 <p className="text-secondary">Please select a venue to manage gallery.</p>
             </div>
@@ -129,7 +129,7 @@ export default function GalleryPage() {
                             disabled={isUploading}
                             className="bg-primary text-inverted hover:opacity-90 font-bold shadow-[0_0_20px_var(--shadow-elevation)]"
                         >
-                            {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UploadCloud className="mr-2 h-4 w-4" />}
+                            {isUploading ? <CircleNotch size={16} weight="bold" className="mr-2 animate-spin" /> : <CloudArrowUp size={16} weight="bold" className="mr-2" />}
                             {isUploading ? "Uploading..." : "Upload Photos"}
                         </Button>
                     </div>
@@ -146,7 +146,7 @@ export default function GalleryPage() {
                             className="aspect-square rounded-3xl border-2 border-dashed border-default bg-surface-raised/20 hover:bg-surface-raised/40 hover:border-pink-500/50 transition-all flex flex-col items-center justify-center cursor-pointer group col-span-1"
                         >
                             <div className="w-16 h-16 rounded-full bg-surface-overlay group-hover:bg-pink-600/20 text-muted group-hover:text-pink-500 flex items-center justify-center mb-4 transition-colors">
-                                <Plus className="h-8 w-8" />
+                                <Plus size={32} weight="bold" />
                             </div>
                             <span className="text-sm font-bold text-secondary group-hover:text-primary">Add First Photo</span>
                         </div>
@@ -171,14 +171,14 @@ export default function GalleryPage() {
                                         className="p-2 rounded-full bg-surface-base/60 text-primary hover:bg-red-500/80 backdrop-blur-sm transition-colors"
                                         title="Delete"
                                     >
-                                        <Trash2 className="h-4 w-4" />
+                                        <Trash size={16} weight="bold" />
                                     </button>
                                 </div>
 
                                 <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 translate-y-2 group-hover:translate-y-0">
                                     {img.is_cover && (
                                         <span className="bg-emerald-500 text-black text-[10px] font-bold px-2 py-1 rounded-md flex items-center gap-1 shadow-lg shadow-emerald-500/20">
-                                            <Star className="h-3 w-3 fill-black" /> Cover
+                                            <Star size={12} weight="fill" className="fill-black" /> Cover
                                         </span>
                                     )}
                                 </div>
