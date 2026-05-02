@@ -63,6 +63,13 @@
   /* Subtle interactive tint (e.g. hover highlights on flat surfaces). */
   --color-tint-hover: var(--tint-hover);
 
+  /* ── Premium Font Stack ──────────────────────────────────────────────
+     Registered so Tailwind utilities `font-sans` and `font-display` work
+     anywhere in the component tree via className. */
+  --font-family-sans: var(--font-jakarta), "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-family-display: var(--font-syne), "Syne", system-ui, sans-serif;
+  --font-family-mono: ui-monospace, "Cascadia Code", "Fira Code", monospace;
+
   /* Custom Animations */
   --animate-fade-in: fadeIn 0.7s ease-out forwards;
   --animate-slide-up: slideUp 0.7s ease-out forwards;
@@ -216,16 +223,29 @@ html {
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /* Plus Jakarta Sans — premium, modern body font */
+  font-family: var(--font-jakarta), "Plus Jakarta Sans", system-ui, sans-serif;
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
   overflow-x: clip; /* Prevent horizontal scroll without breaking scroll observers */
   
   /* Premium Font Rendering */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 
   /* Mobile tap highlight — emerald-tinted instead of default semi-transparent black
      (which is harsh on light surfaces and barely visible on dark surfaces). */
   -webkit-tap-highlight-color: rgba(80, 200, 120, 0.18);
+}
+
+/* ── Display / Heading font: Syne ────────────────────────────────────────────
+   Applied to all h1–h6 globally. Syne's geometric boldness gives headings a
+   premium, distinctive look without losing legibility. Individual components
+   can still use font-sans via className to override back to Jakarta Sans. */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-syne), "Syne", system-ui, sans-serif;
+  font-feature-settings: "kern" 1, "liga" 1;
+  letter-spacing: -0.01em;
 }
 
 /* ── Browser autofill override ─────────────────────────────────────────────

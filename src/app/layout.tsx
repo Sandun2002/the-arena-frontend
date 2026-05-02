@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans, Syne } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -11,14 +11,23 @@ import SmoothScrolling from "@/components/layout/SmoothScrolling";
 import Providers from "@/components/Providers";
 import PWARegister from "@/components/layout/PWARegister";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// ── Premium Font Stack ────────────────────────────────────────────────────────
+// Plus Jakarta Sans — modern, geometric sans-serif for body & UI text.
+// Very readable at small sizes, premium feel at large sizes.
+const jakartaSans = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+// Syne — geometric display font for headings and brand moments.
+// Sharp, distinctive, unmistakably premium.
+const syne = Syne({
+  variable: "--font-syne",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -74,7 +83,7 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground flex flex-col min-h-screen`}
+        className={`${jakartaSans.variable} ${syne.variable} antialiased bg-background text-foreground flex flex-col min-h-screen`}
         suppressHydrationWarning
       >
         <Providers>
