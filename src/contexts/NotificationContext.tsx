@@ -64,7 +64,10 @@ export const NotificationProvider: FunctionComponent<{
   const [loading, setLoading] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"player" | "business" | "system">("player");
-  const [pushEnabled, setPushEnabled] = useState(false);
+  const [pushEnabled, setPushEnabled] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("arena_push_enabled") === "1";
+  });
   const [pushSupported, setPushSupported] = useState(false);
   const [pushAvailable, setPushAvailable] = useState(false);
   const [pushPermission, setPushPermission] = useState<PushPermission>("default");
@@ -76,6 +79,14 @@ export const NotificationProvider: FunctionComponent<{
   const pushSupport = typeof window !== "undefined"
     && "serviceWorker" in navigator
     && "PushManager" in window;
+
+  const writePushEnabled = useCallback((val: boolean) => {
+    setPushEnabled(val);
+    try {
+      if (val) localStorage.setItem("arena_push_enabled", "1");
+      else localStorage.removeItem("arena_push_enabled");
+    } catch {}
+  }, []);
 
   // ── Fetch feed ──────────────────────────────────────────────────────────────
   const refresh = useCallback(async () => {
@@ -181,7 +192,7 @@ export const NotificationProvider: FunctionComponent<{
       const existing = await reg.pushManager.getSubscription();
       if (existing) {
         await notificationService.subscribePush(existing);
-        setPushEnabled(true);
+        writePushEnabled(true);
         return true;
       }
 
@@ -191,7 +202,7 @@ export const NotificationProvider: FunctionComponent<{
       });
 
       await notificationService.subscribePush(sub, navigator.userAgent.slice(0, 100));
-      setPushEnabled(true);
+      writePushEnabled(true);
       return true;
     } catch (e) {
       console.error("Push subscription failed:", e);
@@ -208,11 +219,11 @@ export const NotificationProvider: FunctionComponent<{
         await notificationService.unsubscribePush(sub.endpoint);
         await sub.unsubscribe();
       }
-      setPushEnabled(false);
+      writePushEnabled(false);
     } catch (e) {
       console.error("Push unsubscribe failed:", e);
     }
-  }, [pushSupport]);
+  }, [pushSupport, writePushEnabled]);
 
   // ── Detect push state on mount (only when logged in) ─────────────────────
   useEffect(() => {
@@ -241,8 +252,8 @@ export const NotificationProvider: FunctionComponent<{
       .then(async (reg) => {
         swRegRef.current = reg;
         const sub = await reg.pushManager.getSubscription();
-        if (!sub) { setPushEnabled(false); return; }
-        setPushEnabled(true);
+        if (!sub) { writePushEnabled(false); return; }
+        writePushEnabled(true);
         // Silently re-register with the backend on every login / session restore.
         // This keeps the backend record in sync after a page refresh, token
         // expiry, or any other event that temporarily cleared isLoggedIn.
@@ -271,7 +282,7 @@ export const NotificationProvider: FunctionComponent<{
           })
           .catch(() => {});
       }
-      setPushEnabled(false);
+      writePushEnabled(false);
       return;
     }
 
