@@ -416,20 +416,25 @@ function DevicePushCard({
   };
 
   return (
-    <div className="bg-surface-raised border border-default rounded-2xl p-5">
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3 min-w-0">
-          <DeviceMobile size={18} weight="duotone" className="text-secondary shrink-0" />
-          <div className="min-w-0">
-            <p className="text-sm font-semibold text-primary">Push Notifications on This Device</p>
-            <p className="text-xs text-muted mt-0.5">
+    <div className="bg-surface-raised border border-default rounded-2xl p-4 sm:p-5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        {/* Icon + Text - stacked on mobile, row on desktop */}
+        <div className="flex items-start sm:items-center gap-3 min-w-0">
+          <div className="w-10 h-10 sm:w-9 sm:h-9 rounded-xl bg-surface-sunken border border-default flex items-center justify-center shrink-0">
+            <DeviceMobile size={20} weight="duotone" className="text-brand-accent" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold text-primary leading-tight">Push Notifications</p>
+            <p className="text-xs text-muted mt-0.5 leading-relaxed">
               {pushEnabled
                 ? "Real-time push notifications are enabled on this device."
                 : "Get real-time alerts on this browser even when the tab is closed."}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
+
+        {/* Buttons - full width on mobile, auto on desktop */}
+        <div className="flex items-center gap-2 sm:shrink-0">
           {pushEnabled && (
             <button
               type="button"
@@ -437,7 +442,7 @@ function DevicePushCard({
               disabled={testing}
               title="Send a test push notification to verify delivery"
               className={cn(
-                "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors border",
+                "flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2.5 sm:py-1.5 rounded-lg text-xs font-semibold transition-colors border min-w-[80px]",
                 testResult === "success" && "border-emerald-500/50 text-emerald-400 bg-emerald-950/30",
                 testResult === "error" && "border-red-500/50 text-red-400 bg-red-950/30",
                 testResult === null && "border-default bg-surface-sunken hover:bg-surface-overlay text-secondary",
@@ -457,15 +462,15 @@ function DevicePushCard({
             onClick={handleClick}
             disabled={busy}
             className={cn(
-              "shrink-0 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors",
+              "flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2.5 sm:py-1.5 rounded-lg text-xs font-semibold transition-colors min-w-[120px]",
               pushEnabled
                 ? "bg-surface-sunken hover:bg-surface-overlay text-primary border border-default"
-                : "bg-emerald-600 hover:bg-emerald-500 text-white",
+                : "bg-brand-accent hover:bg-brand-accent-hover text-inverted",
               busy && "opacity-60 cursor-wait"
             )}
           >
             {busy && <CircleNotch size={12} weight="bold" className="animate-spin" />}
-            {pushEnabled ? "Disable on This Device" : "Enable Push"}
+            {pushEnabled ? "Disable" : "Enable Push"}
           </button>
         </div>
       </div>
