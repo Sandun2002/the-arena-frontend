@@ -50,13 +50,6 @@ export default function BookingsPage() {
 
     const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
-    // Close dropdown when clicking outside
-    useEffect(() => {
-        if (!openMenuId) return;
-        const handler = () => setOpenMenuId(null);
-        document.addEventListener("mousedown", handler);
-        return () => document.removeEventListener("mousedown", handler);
-    }, [openMenuId]);
 
     // Debounce search input
     useEffect(() => {
@@ -343,7 +336,10 @@ export default function BookingsPage() {
                                                 if (items.length === 0) return <div className="w-8 h-8" />;
 
                                                 return (
-                                                    <div className="relative flex justify-end" onClick={(e) => e.stopPropagation()}>
+                                                    <div className="relative flex justify-end">
+                                                        {openMenuId === booking.id && (
+                                                            <div className="fixed inset-0 z-40" onClick={() => setOpenMenuId(null)} />
+                                                        )}
                                                         <button
                                                             onClick={() => setOpenMenuId(openMenuId === booking.id ? null : booking.id)}
                                                             className="w-8 h-8 rounded-lg flex items-center justify-center text-muted hover:text-primary hover:bg-surface-overlay transition-colors"
@@ -351,7 +347,7 @@ export default function BookingsPage() {
                                                             <DotsThreeVertical size={18} weight="bold" />
                                                         </button>
                                                         {openMenuId === booking.id && (
-                                                            <div className="absolute right-0 top-full mt-1 z-50 bg-surface-raised border border-default rounded-xl shadow-2xl py-1.5 min-w-[180px]" onMouseDown={(e) => e.stopPropagation()}>
+                                                            <div className="absolute right-0 top-full mt-1 z-50 bg-surface-raised border border-default rounded-xl shadow-2xl py-1.5 min-w-[180px]">
                                                                 {items.map((item, i) => (
                                                                     <button
                                                                         key={i}
