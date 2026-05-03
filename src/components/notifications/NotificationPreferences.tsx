@@ -376,7 +376,7 @@ function DevicePushCard({
     try {
       const { data } = await apiClient.post('/notifications/push/test');
       setTestResult(data.sent > 0 ? "success" : "error");
-      console.log('[push] Test result:', data);
+      console.log('[push] Test result:', JSON.stringify(data, null, 2));
     } catch (e) {
       console.error('[push] Test failed:', e);
       setTestResult("error");
