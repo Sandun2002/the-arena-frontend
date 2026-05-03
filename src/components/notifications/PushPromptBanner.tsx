@@ -13,11 +13,12 @@ export function PushPromptBanner() {
   const [visible, setVisible] = useState(false);
   const [requesting, setRequesting] = useState(false);
 
-  // Clear stale dismissed flag when VAPID becomes available so users who
-  // dismissed the banner before push was configured on the server get re-prompted.
+  // Clear stale dismissed flag only when VAPID becomes available and the user
+  // hasn't already enabled push — so users who dismissed before the server had
+  // VAPID configured get re-prompted, but users with push enabled are left alone.
   useEffect(() => {
-    if (pushAvailable) localStorage.removeItem(DISMISSED_KEY);
-  }, [pushAvailable]);
+    if (pushAvailable && !pushEnabled) localStorage.removeItem(DISMISSED_KEY);
+  }, [pushAvailable, pushEnabled]);
 
   useEffect(() => {
     if (!isLoggedIn || !pushSupported || !pushAvailable || pushEnabled || pushPermission === "denied") return;

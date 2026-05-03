@@ -252,23 +252,16 @@ export const NotificationProvider: FunctionComponent<{
       setNotifications([]);
       setUnreadCount(0);
       if (pollTimerRef.current) clearInterval(pollTimerRef.current);
-      // Remove push subscription from backend when user logs out.
-      // Only unsubscribe from the browser if the backend DELETE succeeds —
-      // if the token is already expired the DELETE will 401, in which case we
-      // keep the browser subscription so PWARegister can silently re-register
-      // it on the next login without requiring the user to click Enable again.
+      // On logout, remove the backend subscription record so the server stops
+      // sending pushes to this device. The browser subscription itself is kept
+      // intact — PWARegister will silently re-register it on the next login so
+      // the user never has to click "Enable Push" again.
       if (pushSupport) {
         navigator.serviceWorker.ready
           .then(async (reg) => {
             const sub = await reg.pushManager.getSubscription();
             if (sub) {
-              try {
-                await notificationService.unsubscribePush(sub.endpoint);
-                await sub.unsubscribe().catch(() => {});
-              } catch {
-                // Token expired — leave the browser subscription intact so it
-                // can be re-registered on next login automatically.
-              }
+              notificationService.unsubscribePush(sub.endpoint).catch(() => {});
             }
           })
           .catch(() => {});
