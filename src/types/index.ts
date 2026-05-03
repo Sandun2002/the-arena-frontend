@@ -40,6 +40,11 @@ export interface User {
   level?: number;
   created_at: string;
   updated_at: string | null;
+  // Cash booking enforcement
+  can_book_cash?: boolean;
+  cash_no_show_count?: number;
+  cash_cooldown_until?: string | null;
+  cash_blacklisted_at?: string | null;
 }
 
 export interface Session {
@@ -90,6 +95,8 @@ export interface Venue {
   deleted_at: string | null;
   created_at?: string;
   updated_at?: string | null;
+  // Cash booking settings
+  max_unpaid_cash_bookings?: number;
 }
 
 export interface Court {
@@ -184,12 +191,19 @@ export interface Booking {
     venue_id: string;
     sport_type: { id: string; name: string };
     cover_image: string | null;
+    venue?: { id: string; name: string; owner_id: string } | null;
   } | null;
   user?: {
     full_name: string;
     phone_number: string;
+    email?: string;
   } | null;
   review?: Review | null;
+  // Cash booking fields
+  is_cash_booking?: boolean;
+  is_cash_unpaid?: boolean;
+  can_free_cancel?: boolean;
+  total_platform_fees?: number;
 }
 
 // Slot statuses are computed by backend (api/v1/endpoints/venues.py).
@@ -380,9 +394,10 @@ export interface AnalyticsFees {
   pending_payout: number;
   venue_commission: number;
   total_revenue: number;
-  total_platform_revenue: number;  // Subtotal of platform bookings (what centre received before commission)
+  total_platform_revenue: number;
   breakdown?: {
-    platform_bookings: { count: number; revenue: number; platform_fees: number; venue_commission: number; venue_payout: number };
+    card_bookings: { count: number; revenue: number; platform_fees: number; venue_commission: number; venue_payout: number };
+    cash_bookings: { count: number; revenue: number; platform_fees: number; venue_commission: number; venue_payout: number; collected_count: number; collected_revenue: number };
     manual_bookings: { count: number; revenue: number; platform_fees: number; venue_commission: number; venue_payout: number };
   };
 }

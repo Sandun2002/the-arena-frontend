@@ -3,7 +3,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { Venue } from "@/types";
 import Button from "@/components/ui/Button";
 import DatePicker from "@/components/ui/DatePicker";
-import { Check, SignIn, CircleNotch, CalendarBlank, Hammer, Lightning, WarningCircle, ArrowsClockwise } from "@phosphor-icons/react";
+import { Check, SignIn, CircleNotch, CalendarBlank, Hammer, Lightning, WarningCircle, ArrowsClockwise, Money, CreditCard, HandCoins } from "@phosphor-icons/react";
 import { useAuth } from "@/services/authContext";
 import { api } from "@/services/api";
 import { bookingService } from "@/services/bookingService";
@@ -47,6 +47,10 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
 
   const [showSuccess, setShowSuccess] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<"card" | "cash">("card");
+  const [cashBookingRef, setCashBookingRef] = useState<string | null>(null);
+  const [cashBookingAmount, setCashBookingAmount] = useState<number>(0);
+  const [cashBookingTime, setCashBookingTime] = useState<string>("");
 
   useEffect(() => {
     if (!rqDate) {
@@ -201,11 +205,19 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
         court_id: selectedCourtId,
         start_time: startTime,
         end_time: endTime,
-        payment_method: "card"
+        payment_method: paymentMethod,
       });
 
-      // Redirect to checkout to complete payment
-      router.push(`/checkout/${booking.id}`);
+      if (paymentMethod === "cash") {
+        // Cash booking: show confirmation panel — no redirect to PayHere
+        setCashBookingRef(booking.booking_reference);
+        setCashBookingAmount(booking.total_price);
+        setCashBookingTime(format(new Date(startTime), "dd MMM yyyy, HH:mm"));
+        setShowSuccess(true);
+      } else {
+        // Card booking: redirect to checkout
+        router.push(`/checkout/${booking.id}`);
+      }
     } catch (e: any) {
       if (e.response?.status === 409) {
          addToast("This time slot was just booked. Please select another.", "error");
@@ -230,7 +242,31 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
     }
   };
 
-  // Success overlay
+  // Cash booking success overlay
+  if (showSuccess && paymentMethod === "cash") {
+    return (
+      <div className="w-full rounded-2xl bg-surface-raised/80 border border-yellow-500/40 p-8 backdrop-blur-md shadow-xl text-center">
+        <div className="w-16 h-16 rounded-full bg-yellow-500/20 border border-yellow-500/40 flex items-center justify-center mx-auto mb-4">
+          <HandCoins size={32} weight="duotone" className="text-yellow-400" />
+        </div>
+        <h3 className="text-xl font-bold text-primary mb-1">Reservation Confirmed!</h3>
+        <p className="text-secondary text-sm mb-4">Pay <span className="font-bold text-primary">LKR {cashBookingAmount.toLocaleString()}</span> at the venue on arrival.</p>
+        <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4 mb-5 text-left space-y-1.5">
+          <div className="flex justify-between text-xs"><span className="text-muted">Reference</span><span className="font-mono font-bold text-primary">{cashBookingRef}</span></div>
+          <div className="flex justify-between text-xs"><span className="text-muted">Session</span><span className="text-secondary">{cashBookingTime}</span></div>
+          <div className="flex justify-between text-xs"><span className="text-muted">Payment</span><span className="font-bold text-yellow-400">Cash at Venue 💵</span></div>
+        </div>
+        <button
+          onClick={() => router.push("/bookings")}
+          className="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-black rounded-xl font-bold text-sm transition-colors"
+        >
+          View My Bookings
+        </button>
+      </div>
+    );
+  }
+
+  // Card booking success overlay (redirect already happened; fallback)
   if (showSuccess) {
     return (
       <div className="w-full rounded-2xl bg-surface-raised/80 border border-emerald-500 p-8 backdrop-blur-md shadow-xl text-center">
@@ -497,15 +533,59 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
           </span>
         </div>
 
+        {/* Payment Method Toggle */}
+        {selectedSlots.length > 0 && pricing && (
+          <div className="mb-4">
+            <label className="mb-2 block text-xs font-bold text-muted uppercase tracking-wider">How will you pay?</label>
+            <div className="flex bg-surface-sunken p-1 rounded-xl border border-default gap-1">
+              <button
+                onClick={() => setPaymentMethod("card")}
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition-all ${
+                  paymentMethod === "card"
+                    ? "bg-emerald-500 text-black shadow"
+                    : "text-muted hover:text-secondary"
+                }`}
+              >
+                <CreditCard size={14} weight="bold" /> Pay by Card
+              </button>
+              <button
+                onClick={() => setPaymentMethod("cash")}
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition-all ${
+                  paymentMethod === "cash"
+                    ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/40 shadow"
+                    : "text-muted hover:text-secondary"
+                }`}
+              >
+                <Money size={14} weight="bold" /> Pay at Venue
+              </button>
+            </div>
+            {paymentMethod === "cash" && (
+              <p className="mt-2 text-[11px] text-yellow-400/80 leading-snug">
+                💡 Your slot is reserved immediately. Bring <strong>LKR {pricing.total.toLocaleString()}</strong> cash on arrival.
+              </p>
+            )}
+          </div>
+        )}
+
         <Button
           onClick={handleBooking}
           disabled={submitting || selectedSlots.length === 0}
-          className={`w-full py-4 text-sm font-bold transition-all border ${selectedSlots.length > 0
-            ? "bg-emerald-500 hover:bg-emerald-400 text-black border-emerald-500"
-            : "bg-surface-overlay hover:bg-surface-overlay text-primary border-subtle"
-            } disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center`}
+          className={`w-full py-4 text-sm font-bold transition-all border ${
+            selectedSlots.length > 0
+              ? paymentMethod === "cash"
+                ? "bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 border-yellow-500/40"
+                : "bg-emerald-500 hover:bg-emerald-400 text-black border-emerald-500"
+              : "bg-surface-overlay hover:bg-surface-overlay text-primary border-subtle"
+          } disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2`}
         >
-          {submitting ? <CircleNotch size={20} weight="bold" className="animate-spin" /> : (selectedSlots.length > 0 ? "Proceed to Pay" : "Select Slots")}
+          {submitting
+            ? <CircleNotch size={20} weight="bold" className="animate-spin" />
+            : selectedSlots.length > 0
+              ? paymentMethod === "cash"
+                ? <><HandCoins size={16} weight="bold" /> Reserve — Pay at Venue</>
+                : "Proceed to Pay"
+              : "Select Slots"
+          }
         </Button>
       </div>
 

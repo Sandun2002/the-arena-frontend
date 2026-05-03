@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { fmtTime, fmtMonthAbbr, fmtDayNum } from "@/lib/utils";
-import { CalendarBlank, Clock, MapPin, CaretRight, Faders, MagnifyingGlass } from "@phosphor-icons/react";
+import { CalendarBlank, Clock, MapPin, CaretRight, Faders, MagnifyingGlass, Money, HandCoins } from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
 import { useToast } from "@/components/ui/Toast";
@@ -18,7 +18,7 @@ export default function BookingsPage() {
     const { user } = useAuth();
     const isAuthPending = useRequireAuth();
     const [bookings, setBookings] = useState<Booking[]>([]);
-    const [filter, setFilter] = useState<"upcoming" | "past" | "cancelled">("upcoming");
+    const [filter, setFilter] = useState<"upcoming" | "past" | "cancelled" | "cash_pending">("upcoming");
     const [isLoading, setIsLoading] = useState(true);
     const [selectedBookingForReview, setSelectedBookingForReview] = useState<Booking | null>(null);
 
@@ -56,6 +56,7 @@ export default function BookingsPage() {
     const filteredBookings = bookings.filter((b) => {
         if (filter === "cancelled") return b.status === "cancelled" || b.status === "rejected";
         if (filter === "past") return b.status === "completed";
+        if (filter === "cash_pending") return !!b.is_cash_booking && !!b.is_cash_unpaid && b.status === "confirmed";
         return isLiveUpcoming(b);
     });
 
@@ -69,6 +70,7 @@ export default function BookingsPage() {
                 {/* Tabs */}
                 <div className="flex items-center gap-1 mb-8 overflow-x-auto pb-2 scrollbar-hide">
                     <TabButton active={filter === "upcoming"} onClick={() => setFilter("upcoming")} label="Upcoming" count={bookings.filter(isLiveUpcoming).length} />
+                    <TabButton active={filter === "cash_pending"} onClick={() => setFilter("cash_pending")} label="💵 Pay at Venue" count={bookings.filter(b => !!b.is_cash_booking && !!b.is_cash_unpaid && b.status === "confirmed").length} />
                     <TabButton active={filter === "past"} onClick={() => setFilter("past")} label="History" />
                     <TabButton active={filter === "cancelled"} onClick={() => setFilter("cancelled")} label="Cancelled / Rejected" />
                 </div>
@@ -164,10 +166,20 @@ function BookingCard({ booking, onReviewClick }: { booking: Booking, onReviewCli
 
                 {/* Info */}
                 <div className="flex-grow">
-                    <div className="flex items-center gap-3 mb-2">
+                    <div className="flex items-center gap-3 mb-2 flex-wrap">
                         <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border ${status.bg} ${status.color} ${status.border}`}>
                             {status.label}
                         </span>
+                        {booking.is_cash_booking && (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 flex items-center gap-1">
+                                <Money size={9} weight="fill" /> Cash
+                            </span>
+                        )}
+                        {booking.is_cash_unpaid && (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-yellow-500/10 text-yellow-400 border border-yellow-500/30 flex items-center gap-1">
+                                <HandCoins size={9} weight="fill" /> Awaiting Collection
+                            </span>
+                        )}
                         <span className="text-xs font-mono text-faint uppercase">
                             REF: {booking.booking_reference}
                         </span>
@@ -193,9 +205,13 @@ function BookingCard({ booking, onReviewClick }: { booking: Booking, onReviewCli
                 <div className="flex items-center gap-6 ml-auto">
                     <div className="text-right">
                         <div className="text-sm font-bold text-primary">LKR {booking.total_price.toLocaleString()}</div>
-                        {booking.payment_status === "paid" && (
+                        {booking.is_cash_booking && booking.is_cash_unpaid ? (
+                            <div className="flex items-center gap-1 text-[10px] font-bold text-yellow-400 uppercase mt-0.5">
+                                <Money size={10} weight="fill" /> Pay at Venue
+                            </div>
+                        ) : booking.payment_status === "paid" ? (
                             <div className="text-[10px] font-bold text-emerald-500 uppercase">Paid</div>
-                        )}
+                        ) : null}
                     </div>
 
                     {/* Leave Review Button */}

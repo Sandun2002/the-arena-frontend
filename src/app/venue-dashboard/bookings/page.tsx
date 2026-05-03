@@ -4,7 +4,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { format, isSameDay, isValid } from "date-fns";
 import { fmtTime, fmtDateShort } from "@/lib/utils";
-import { MagnifyingGlass, CheckCircle, XCircle, CurrencyDollar, UserMinus, WarningCircle, Calendar as CalendarIcon, CaretLeft, CaretRight, Globe, UserPlus, Hammer, ArrowsClockwise } from "@phosphor-icons/react";
+import { MagnifyingGlass, CheckCircle, XCircle, CurrencyDollar, UserMinus, WarningCircle, Calendar as CalendarIcon, CaretLeft, CaretRight, Globe, UserPlus, Hammer, ArrowsClockwise, Money, HandCoins, Prohibit } from "@phosphor-icons/react";
 import { PaymentStatus } from "@/types";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
@@ -33,7 +33,7 @@ export default function BookingsPage() {
     const [statusFilter, setStatusFilter] = useState<
         "all" | "payment_pending" | "confirmed" | "completed" | "cancelled" | "rejected"
     >("all");
-    const [sourceFilter, setSourceFilter] = useState<"all" | "platform" | "walkin" | "blocked">("all");
+    const [sourceFilter, setSourceFilter] = useState<"all" | "platform" | "walkin" | "blocked" | "cash">("all");
     const [searchQuery, setSearchQuery] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
 
@@ -76,11 +76,10 @@ export default function BookingsPage() {
         loadBookings();
     }, [loadBookings]);
 
-    const getBookingSource = (b: Booking): "platform" | "walkin" | "blocked" => {
-        // Maintenance/blocked is encoded via the is_blocked boolean,
-        // not via BookingStatus. Walk-in is is_manual.
+    const getBookingSource = (b: Booking): "platform" | "walkin" | "blocked" | "cash" => {
         if (b.is_blocked) return "blocked";
         if (b.is_manual) return "walkin";
+        if (b.is_cash_booking) return "cash";
         return "platform";
     };
 
@@ -104,6 +103,8 @@ export default function BookingsPage() {
             if (action === "cancel") await centerService.cancelBooking(id, "Cancelled by venue");
             if (action === "pay") await centerService.markBookingPaid(id);
             if (action === "noshow") await centerService.toggleNoShow(id);
+            if (action === "collect") await centerService.markCashCollected(id);
+            if (action === "cash-noshow") await centerService.markCashNoShow(id);
             addToast("Status updated successfully", "success");
             loadBookings();
         } catch (error) {
@@ -205,7 +206,7 @@ export default function BookingsPage() {
 
                     {/* Source Filter */}
                     <div className="flex bg-surface-raised p-1 rounded-xl border border-default">
-                        {(["all", "platform", "walkin", "blocked"] as const).map((s) => (
+                        {(["all", "platform", "cash", "walkin", "blocked"] as const).map((s) => (
                             <button
                                 key={s}
                                 onClick={() => setSourceFilter(s)}
@@ -214,7 +215,7 @@ export default function BookingsPage() {
                                     : "text-muted hover:text-secondary"
                                     }`}
                             >
-                                {s === "walkin" ? "Walk-in" : s === "all" ? "All Sources" : s === "blocked" ? "Maintenance" : s.charAt(0).toUpperCase() + s.slice(1)}
+                                {s === "walkin" ? "Walk-in" : s === "all" ? "All Sources" : s === "blocked" ? "Maintenance" : s === "cash" ? "💵 Cash" : s.charAt(0).toUpperCase() + s.slice(1)}
                             </button>
                         ))}
                     </div>
@@ -278,17 +279,45 @@ export default function BookingsPage() {
                                         </td>
                                         <td className="p-5 text-right">
                                             <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                {booking.status === "payment_pending" && (
-                                                    <Button size="sm" onClick={() => handleAction("confirm", booking.id)} className="h-8 bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-bold">
-                                                        Confirm
-                                                    </Button>
+                                                {/* Cash booking reconciliation actions */}
+                                                {booking.is_cash_booking && booking.is_cash_unpaid && booking.status !== "cancelled" && (
+                                                    <>
+                                                        <Button
+                                                            size="sm"
+                                                            onClick={() => handleAction("collect", booking.id)}
+                                                            className="h-8 bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-bold flex items-center gap-1"
+                                                            title="Mark cash collected"
+                                                        >
+                                                            <HandCoins size={13} weight="fill" /> Collected
+                                                        </Button>
+                                                        <Button
+                                                            size="sm"
+                                                            variant="outline"
+                                                            onClick={() => handleAction("cash-noshow", booking.id)}
+                                                            className="h-8 border-red-500/30 text-red-400 hover:bg-red-500/10 text-xs font-bold flex items-center gap-1"
+                                                            title="Mark as no-show"
+                                                        >
+                                                            <Prohibit size={13} weight="bold" /> No-Show
+                                                        </Button>
+                                                    </>
                                                 )}
-                                                {booking.payment_status !== "paid" && booking.status !== "cancelled" && (
-                                                    <Button size="sm" variant="outline" onClick={() => handleAction("pay", booking.id)} className="h-8 border-subtle text-emerald-500 hover:bg-emerald-500/10 hover:text-emerald-400" title="Mark as paid">
-                                                        <CurrencyDollar size={12} weight="bold" />
-                                                    </Button>
+                                                {/* Standard actions (non-cash or collected cash) */}
+                                                {!booking.is_cash_booking && (
+                                                    <>
+                                                        {booking.status === "payment_pending" && (
+                                                            <Button size="sm" onClick={() => handleAction("confirm", booking.id)} className="h-8 bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-bold">
+                                                                Confirm
+                                                            </Button>
+                                                        )}
+                                                        {booking.payment_status !== "paid" && booking.status !== "cancelled" && (
+                                                            <Button size="sm" variant="outline" onClick={() => handleAction("pay", booking.id)} className="h-8 border-subtle text-emerald-500 hover:bg-emerald-500/10 hover:text-emerald-400" title="Mark as paid">
+                                                                <CurrencyDollar size={12} weight="bold" />
+                                                            </Button>
+                                                        )}
+                                                    </>
                                                 )}
-                                                {booking.status !== "cancelled" && (
+                                                {/* Shared actions */}
+                                                {booking.status !== "cancelled" && !booking.is_cash_booking && (
                                                     <>
                                                         <Button size="sm" variant="outline" onClick={() => handleAction("noshow", booking.id)} className={`h-8 border-subtle ${booking.is_no_show ? "bg-red-500/20 text-red-500 border-red-500/20" : "text-secondary hover:text-red-400 hover:bg-red-500/10"}`} title="Toggle no-show">
                                                             <UserMinus size={12} weight="bold" />
@@ -297,6 +326,12 @@ export default function BookingsPage() {
                                                             <XCircle size={12} weight="bold" />
                                                         </Button>
                                                     </>
+                                                )}
+                                                {/* Allow cancel for unpaid cash (results in no-show if after start) */}
+                                                {booking.is_cash_booking && booking.status !== "cancelled" && (
+                                                    <Button size="sm" variant="outline" onClick={() => handleAction("cancel", booking.id)} className="h-8 border-subtle text-secondary hover:text-red-400 hover:bg-red-500/10" title="Cancel booking">
+                                                        <XCircle size={12} weight="bold" />
+                                                    </Button>
                                                 )}
                                             </div>
                                         </td>
@@ -440,6 +475,13 @@ function SourceBadge({ booking }: { booking: Booking }) {
         return (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded border bg-orange-500/10 text-orange-400 border-orange-500/30 text-[10px] font-bold uppercase tracking-wider">
                 <UserPlus size={12} weight="fill" /> Walk-in
+            </span>
+        );
+    }
+    if (booking.is_cash_booking) {
+        return (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded border bg-yellow-500/10 text-yellow-400 border-yellow-500/30 text-[10px] font-bold uppercase tracking-wider">
+                <Money size={12} weight="fill" /> Cash
             </span>
         );
     }

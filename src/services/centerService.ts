@@ -346,4 +346,20 @@ export const centerService = {
         const response = await apiClient.put('/center/peak-hours', payload, { params });
         return response.data;
     },
+
+    // === Cash Booking Reconciliation ===
+    getPendingCashBookings: async (venueId: string): Promise<Booking[]> => {
+        const response = await apiClient.get<any[]>(`/cash-bookings/venue/${venueId}/pending`);
+        return (response.data || []).map(normalizeBooking);
+    },
+
+    markCashCollected: async (bookingId: string): Promise<Booking> => {
+        const response = await apiClient.post<any>(`/cash-bookings/${bookingId}/collect`);
+        return normalizeBooking(response.data);
+    },
+
+    markCashNoShow: async (bookingId: string): Promise<Booking> => {
+        const response = await apiClient.post<any>(`/cash-bookings/${bookingId}/no-show`);
+        return normalizeBooking(response.data);
+    },
 };
