@@ -8,20 +8,26 @@ import { useAuth } from "@/services/authContext";
 const DISMISSED_KEY = "arena_push_prompt_dismissed";
 
 export function PushPromptBanner() {
-  const { pushSupported, pushEnabled, requestPushPermission } = useNotifications();
+  const { pushSupported, pushAvailable, pushEnabled, requestPushPermission } = useNotifications();
   const { isLoggedIn } = useAuth();
   const [visible, setVisible] = useState(false);
   const [requesting, setRequesting] = useState(false);
 
+  // Clear stale dismissed flag when VAPID becomes available so users who
+  // dismissed the banner before push was configured on the server get re-prompted.
   useEffect(() => {
-    if (!isLoggedIn || !pushSupported || pushEnabled) return;
+    if (pushAvailable) localStorage.removeItem(DISMISSED_KEY);
+  }, [pushAvailable]);
+
+  useEffect(() => {
+    if (!isLoggedIn || !pushSupported || !pushAvailable || pushEnabled) return;
     if (typeof window === "undefined") return;
     const dismissed = localStorage.getItem(DISMISSED_KEY);
     if (dismissed) return;
     // Delay a bit so it doesn't flash immediately on load
     const timer = setTimeout(() => setVisible(true), 4000);
     return () => clearTimeout(timer);
-  }, [isLoggedIn, pushSupported, pushEnabled]);
+  }, [isLoggedIn, pushSupported, pushAvailable, pushEnabled]);
 
   const handleEnable = async () => {
     setRequesting(true);
