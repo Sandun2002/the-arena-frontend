@@ -157,23 +157,41 @@ export default function FeesAnalyticsPage() {
                             <h4 className="text-primary font-bold mb-4 flex items-center gap-2">
                                 <Receipt size={20} weight="bold" className="text-muted" /> Booking Breakdown
                             </h4>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                {/* Card (online) bookings */}
                                 <div className="bg-surface-base/30 p-4 rounded-2xl border border-default/50">
                                     <div className="flex justify-between items-center mb-1">
-                                        <span className="text-sm font-medium text-primary">Online Bookings</span>
+                                        <span className="text-sm font-medium text-primary">Card Bookings</span>
                                         <span className="text-xs font-bold text-emerald-500">
-                                            {data?.breakdown?.platform_bookings?.count || 0} Bookings
+                                            {data?.breakdown?.card_bookings?.count || 0} Bookings
                                         </span>
                                     </div>
-                                    <p className="text-xs text-muted mb-2">Booked via player app/website (card payment)</p>
+                                    <p className="text-xs text-muted mb-2">Online bookings paid by card through the player app</p>
                                     <div className="flex justify-between text-xs text-secondary mb-1">
-                                        <span>Arena Commission: LKR {(data?.venue_commission || 0).toLocaleString()}</span>
-                                        <span>Net Payout: LKR {(data?.breakdown?.platform_bookings?.venue_payout || 0).toLocaleString()}</span>
+                                        <span>Commission: LKR {(data?.breakdown?.card_bookings?.venue_commission || 0).toLocaleString()}</span>
+                                        <span>Net Payout: LKR {(data?.breakdown?.card_bookings?.venue_payout || 0).toLocaleString()}</span>
                                     </div>
                                 </div>
+
+                                {/* Cash (Pay at Venue) bookings */}
+                                <div className="bg-surface-base/30 p-4 rounded-2xl border border-yellow-500/20">
+                                    <div className="flex justify-between items-center mb-1">
+                                        <span className="text-sm font-medium text-primary">Pay at Venue</span>
+                                        <span className="text-xs font-bold text-yellow-400">
+                                            {data?.breakdown?.cash_bookings?.count || 0} Bookings
+                                        </span>
+                                    </div>
+                                    <p className="text-xs text-muted mb-2">Cash reservations — commission deducted from next card payout</p>
+                                    <div className="flex justify-between text-xs text-secondary">
+                                        <span>Collected: {data?.breakdown?.cash_bookings?.collected_count || 0} / {data?.breakdown?.cash_bookings?.count || 0}</span>
+                                        <span className="text-yellow-400">LKR {(data?.breakdown?.cash_bookings?.collected_revenue || 0).toLocaleString()} in</span>
+                                    </div>
+                                </div>
+
+                                {/* Manual (walk-in) bookings */}
                                 <div className="bg-surface-base/30 p-4 rounded-2xl border border-default/50">
                                     <div className="flex justify-between items-center mb-1">
-                                        <span className="text-sm font-medium text-primary">Cash Walk-ins</span>
+                                        <span className="text-sm font-medium text-primary">Walk-in Bookings</span>
                                         <span className="text-xs font-bold text-blue-500">
                                             {data?.breakdown?.manual_bookings?.count || 0} Bookings
                                         </span>
@@ -186,6 +204,7 @@ export default function FeesAnalyticsPage() {
                                 </div>
                             </div>
                         </div>
+
 
                     </div>
                 )}
