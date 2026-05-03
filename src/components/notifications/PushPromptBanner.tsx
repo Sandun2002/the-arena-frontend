@@ -8,7 +8,7 @@ import { useAuth } from "@/services/authContext";
 const DISMISSED_KEY = "arena_push_prompt_dismissed";
 
 export function PushPromptBanner() {
-  const { pushSupported, pushAvailable, pushEnabled, requestPushPermission } = useNotifications();
+  const { pushSupported, pushAvailable, pushEnabled, pushPermission, requestPushPermission } = useNotifications();
   const { isLoggedIn } = useAuth();
   const [visible, setVisible] = useState(false);
   const [requesting, setRequesting] = useState(false);
@@ -20,14 +20,14 @@ export function PushPromptBanner() {
   }, [pushAvailable]);
 
   useEffect(() => {
-    if (!isLoggedIn || !pushSupported || !pushAvailable || pushEnabled) return;
+    if (!isLoggedIn || !pushSupported || !pushAvailable || pushEnabled || pushPermission === "denied") return;
     if (typeof window === "undefined") return;
     const dismissed = localStorage.getItem(DISMISSED_KEY);
     if (dismissed) return;
     // Delay a bit so it doesn't flash immediately on load
     const timer = setTimeout(() => setVisible(true), 4000);
     return () => clearTimeout(timer);
-  }, [isLoggedIn, pushSupported, pushAvailable, pushEnabled]);
+  }, [isLoggedIn, pushSupported, pushAvailable, pushEnabled, pushPermission]);
 
   const handleEnable = async () => {
     setRequesting(true);

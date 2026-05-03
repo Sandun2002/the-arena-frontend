@@ -159,16 +159,20 @@ export const NotificationProvider: FunctionComponent<{
 
   // ── Push subscription ────────────────────────────────────────────────────────
   const requestPushPermission = useCallback(async (): Promise<boolean> => {
+    console.log("[push] requestPushPermission called — pushSupport:", pushSupport, "Notification.permission:", typeof Notification !== "undefined" ? Notification.permission : "N/A");
     if (!pushSupport) {
+      console.warn("[push] Push not supported in this browser");
       setPushPermission("unsupported");
       return false;
     }
     try {
       const permission = await Notification.requestPermission();
+      console.log("[push] Notification.requestPermission() →", permission);
       setPushPermission(permission as PushPermission);
       if (permission !== "granted") return false;
 
       const { vapid_public_key, enabled } = await getCachedVapidKey();
+      console.log("[push] VAPID key fetch → enabled:", enabled, "key present:", !!vapid_public_key);
       if (!enabled || !vapid_public_key) {
         setPushAvailable(false);
         return false;
@@ -177,8 +181,10 @@ export const NotificationProvider: FunctionComponent<{
 
       const reg = swRegRef.current || await navigator.serviceWorker.ready;
       swRegRef.current = reg;
+      console.log("[push] SW registration obtained:", reg.scope);
 
       const existing = await reg.pushManager.getSubscription();
+      console.log("[push] Existing subscription:", existing ? existing.endpoint : "none");
       if (existing) {
         await notificationService.subscribePush(existing);
         setPushEnabled(true);
@@ -189,12 +195,14 @@ export const NotificationProvider: FunctionComponent<{
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(vapid_public_key) as unknown as ArrayBuffer,
       });
+      console.log("[push] New subscription created:", sub.endpoint);
 
       await notificationService.subscribePush(sub, navigator.userAgent.slice(0, 100));
+      console.log("[push] Subscription saved to backend ✓");
       setPushEnabled(true);
       return true;
     } catch (e) {
-      console.error("Push subscription failed:", e);
+      console.error("[push] Push subscription failed:", e);
       return false;
     }
   }, [pushSupport]);
