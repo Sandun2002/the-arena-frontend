@@ -4,7 +4,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { format, isSameDay, isValid } from "date-fns";
 import { fmtTime, fmtDateShort } from "@/lib/utils";
-import { MagnifyingGlass, CheckCircle, XCircle, CurrencyDollar, UserMinus, WarningCircle, Calendar as CalendarIcon, CaretLeft, CaretRight, Globe, UserPlus, Hammer, ArrowsClockwise, Money, HandCoins, Prohibit } from "@phosphor-icons/react";
+import { MagnifyingGlass, CheckCircle, XCircle, CurrencyDollar, UserMinus, WarningCircle, Calendar as CalendarIcon, CaretLeft, CaretRight, Globe, UserPlus, Hammer, ArrowsClockwise, Money, HandCoins, Prohibit, CreditCard } from "@phosphor-icons/react";
 import { PaymentStatus } from "@/types";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
@@ -496,9 +496,22 @@ function SourceBadge({ booking }: { booking: Booking }) {
             </span>
         );
     }
+    // Platform booking — show card or cash-on-arrival payment method indicator
+    const isCashOnArrival = booking.payment_method === "cash";
     return (
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded border bg-blue-500/10 text-blue-400 border-blue-500/30 text-[10px] font-bold uppercase tracking-wider">
-            <Globe size={12} weight="fill" /> Platform
-        </span>
+        <div className="flex flex-col gap-1">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded border bg-blue-500/10 text-blue-400 border-blue-500/30 text-[10px] font-bold uppercase tracking-wider">
+                <Globe size={12} weight="fill" /> Platform
+            </span>
+            {isCashOnArrival ? (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded border bg-yellow-500/10 text-yellow-400 border-yellow-500/20 text-[10px] font-medium">
+                    <Money size={10} weight="fill" /> Cash on Arrival
+                </span>
+            ) : (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded border bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px] font-medium">
+                    <CreditCard size={10} weight="fill" /> Card
+                </span>
+            )}
+        </div>
     );
 }
