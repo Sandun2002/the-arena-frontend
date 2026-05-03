@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { Bell, BellSlash, DeviceMobile, Monitor, Check, WarningCircle, CircleNotch } from "@phosphor-icons/react";
+import { Bell, BellSlash, DeviceMobile, Monitor, Check, WarningCircle, CircleNotch, PaperPlaneTilt } from "@phosphor-icons/react";
 import { useNotifications } from "@/contexts/NotificationContext";
 import { useAuth } from "@/services/authContext";
 import { NotificationPreferenceItem } from "@/services/notificationService";
+import apiClient from "@/services/apiClient";
 import { cn } from "@/lib/utils";
 
 type Audience = "player" | "business" | "system";
@@ -365,6 +366,25 @@ function DevicePushCard({
   onDisable: () => Promise<void>;
 }) {
   const [busy, setBusy] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [testResult, setTestResult] = useState<"success" | "error" | null>(null);
+
+  const handleTest = async () => {
+    if (testing) return;
+    setTesting(true);
+    setTestResult(null);
+    try {
+      const { data } = await apiClient.post('/notifications/push/test');
+      setTestResult(data.sent > 0 ? "success" : "error");
+      console.log('[push] Test result:', data);
+    } catch (e) {
+      console.error('[push] Test failed:', e);
+      setTestResult("error");
+    } finally {
+      setTesting(false);
+      setTimeout(() => setTestResult(null), 5000);
+    }
+  };
 
   // Permission denied at the browser level — we cannot re-prompt programmatically.
   if (permission === "denied") {
@@ -410,21 +430,45 @@ function DevicePushCard({
             </p>
           </div>
         </div>
-        <button
-          type="button"
-          onClick={handleClick}
-          disabled={busy}
-          className={cn(
-            "shrink-0 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors",
-            pushEnabled
-              ? "bg-surface-sunken hover:bg-surface-overlay text-primary border border-default"
-              : "bg-emerald-600 hover:bg-emerald-500 text-white",
-            busy && "opacity-60 cursor-wait"
+        <div className="flex items-center gap-2 shrink-0">
+          {pushEnabled && (
+            <button
+              type="button"
+              onClick={handleTest}
+              disabled={testing}
+              title="Send a test push notification to verify delivery"
+              className={cn(
+                "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors border",
+                testResult === "success" && "border-emerald-500/50 text-emerald-400 bg-emerald-950/30",
+                testResult === "error" && "border-red-500/50 text-red-400 bg-red-950/30",
+                testResult === null && "border-default bg-surface-sunken hover:bg-surface-overlay text-secondary",
+                testing && "opacity-60 cursor-wait"
+              )}
+            >
+              {testing
+                ? <CircleNotch size={12} weight="bold" className="animate-spin" />
+                : testResult === "success"
+                ? <Check size={12} weight="bold" />
+                : <PaperPlaneTilt size={12} weight="bold" />}
+              {testing ? "Sending..." : testResult === "success" ? "Sent!" : testResult === "error" ? "Failed" : "Test"}
+            </button>
           )}
-        >
-          {busy && <CircleNotch size={12} weight="bold" className="animate-spin" />}
-          {pushEnabled ? "Disable on This Device" : "Enable Push"}
-        </button>
+          <button
+            type="button"
+            onClick={handleClick}
+            disabled={busy}
+            className={cn(
+              "shrink-0 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors",
+              pushEnabled
+                ? "bg-surface-sunken hover:bg-surface-overlay text-primary border border-default"
+                : "bg-emerald-600 hover:bg-emerald-500 text-white",
+              busy && "opacity-60 cursor-wait"
+            )}
+          >
+            {busy && <CircleNotch size={12} weight="bold" className="animate-spin" />}
+            {pushEnabled ? "Disable on This Device" : "Enable Push"}
+          </button>
+        </div>
       </div>
     </div>
   );
