@@ -88,11 +88,6 @@ class BookingService {
         }
     }
 
-    async confirmPayment(bookingId: string, data: any): Promise<Booking> {
-        const response = await apiClient.post<Booking>(`/bookings/${bookingId}/confirm-payment`, data);
-        return response.data;
-    }
-
     async cancelBooking(bookingId: string, reason: string): Promise<boolean> {
         await apiClient.post(`/bookings/${bookingId}/cancel`, { reason });
         return true;

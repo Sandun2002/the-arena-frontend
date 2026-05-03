@@ -346,13 +346,21 @@ export default function CheckoutPage() {
                 )}
               </div>
 
-              {/* Trust note */}
-              <div className="bg-amber-900/10 border border-amber-800/30 rounded-xl px-4 py-3">
-                <p className="text-xs text-amber-400 leading-relaxed">
-                  <strong>Sandbox Mode:</strong> Use PayHere's test card numbers to complete the payment.
-                  No real money is charged.
-                </p>
-              </div>
+              {/* Trust note — sandbox warning only shown in sandbox/dev environments */}
+              {process.env.NEXT_PUBLIC_PAYHERE_SANDBOX === "true" ? (
+                <div className="bg-amber-900/10 border border-amber-800/30 rounded-xl px-4 py-3">
+                  <p className="text-xs text-amber-400 leading-relaxed">
+                    <strong>Sandbox Mode:</strong> Use PayHere&apos;s test card numbers to complete the payment.
+                    No real money is charged.
+                  </p>
+                </div>
+              ) : (
+                <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl px-4 py-3">
+                  <p className="text-xs text-slate-400 leading-relaxed">
+                    🔒 Payments are secured and processed by PayHere.
+                  </p>
+                </div>
+              )}
             </div>
 
           </div>

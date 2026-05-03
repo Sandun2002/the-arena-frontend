@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { Warning, CircleNotch } from "@phosphor-icons/react";
+import { Warning, CircleNotch, WarningDiamond } from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import { Booking } from "@/types";
 import { playerService } from "@/services/playerService";
@@ -18,6 +18,8 @@ export default function CancelBookingModal({ booking, onClose, onSuccess }: Canc
     const [reason, setReason] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { addToast } = useToast();
+
+    const isLateCancelCash = booking.is_cash_booking && booking.can_free_cancel === false;
 
     const handleConfirm = async () => {
         if (!reason) {
@@ -40,16 +42,30 @@ export default function CancelBookingModal({ booking, onClose, onSuccess }: Canc
 
     return (
         <div className="space-y-6">
-            <div className="flex items-start gap-4 p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
-                <Warning size={24} weight="duotone" className="text-red-500 flex-shrink-0 mt-0.5" />
-                <div>
-                    <h3 className="text-sm font-bold text-red-500 mb-1">Cancellation Policy</h3>
-                    <p className="text-xs text-red-200/70 leading-relaxed">
-                        Cancellations made less than 24 hours before the booking time may not be eligible for a full refund.
-                        Please check the venue&apos;s policy for more details.
-                    </p>
+            {isLateCancelCash ? (
+                <div className="flex items-start gap-4 p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl">
+                    <WarningDiamond size={24} weight="fill" className="text-amber-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                        <h3 className="text-sm font-bold text-amber-400 mb-1">Late Cancellation — Penalty Applies</h3>
+                        <p className="text-xs text-amber-200/70 leading-relaxed">
+                            You are cancelling a <strong>cash booking within 1 hour of the start time</strong>.
+                            This counts as a late cancellation and will be recorded against your cash booking history.
+                            Repeated late cancellations may result in a temporary cooldown or restriction on future cash bookings.
+                        </p>
+                    </div>
                 </div>
-            </div>
+            ) : (
+                <div className="flex items-start gap-4 p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
+                    <Warning size={24} weight="duotone" className="text-red-500 flex-shrink-0 mt-0.5" />
+                    <div>
+                        <h3 className="text-sm font-bold text-red-500 mb-1">Cancellation Policy</h3>
+                        <p className="text-xs text-red-200/70 leading-relaxed">
+                            Cancellations made less than 24 hours before the booking time may not be eligible for a full refund.
+                            Please check the venue&apos;s policy for more details.
+                        </p>
+                    </div>
+                </div>
+            )}
 
             <div className="space-y-3">
                 <label className="text-xs font-bold text-secondary uppercase">Reason for Cancellation</label>
