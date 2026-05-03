@@ -241,7 +241,12 @@ export const NotificationProvider: FunctionComponent<{
       .then(async (reg) => {
         swRegRef.current = reg;
         const sub = await reg.pushManager.getSubscription();
-        setPushEnabled(!!sub);
+        if (!sub) { setPushEnabled(false); return; }
+        setPushEnabled(true);
+        // Silently re-register with the backend on every login / session restore.
+        // This keeps the backend record in sync after a page refresh, token
+        // expiry, or any other event that temporarily cleared isLoggedIn.
+        notificationService.subscribePush(sub).catch(() => {});
       })
       .catch(() => {});
   }, [pushSupport, isLoggedIn]);
