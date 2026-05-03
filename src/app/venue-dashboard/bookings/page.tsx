@@ -15,6 +15,16 @@ import { useVenue } from "@/components/venue/VenueContext";
 
 const PAGE_SIZE = 20;
 
+// Helper functions for booking state checks
+const isPastEndTime = (b: Booking) => new Date(b.end_time) <= new Date();
+const isPastStartTime = (b: Booking) => new Date(b.start_time) <= new Date();
+
+// Bookings that need owner action: cash unpaid OR walk-in unpaid, regardless of end_time
+const needsReconciliation = (b: Booking) =>
+  b.status !== "cancelled" &&
+  b.payment_status !== "paid" &&
+  (b.is_cash_booking || (b.is_manual && !b.is_blocked));
+
 export default function BookingsPage() {
     const { user } = useAuth();
     const { currentVenue } = useVenue();
@@ -131,7 +141,15 @@ export default function BookingsPage() {
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-black text-primary uppercase tracking-tight mb-2">Bookings</h1>
+                    <div className="flex items-center gap-3 mb-2">
+                        <h1 className="text-3xl font-black text-primary uppercase tracking-tight">Bookings</h1>
+                        {bookings.filter(needsReconciliation).length > 0 && (
+                            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-red-500/10 text-red-500 border border-red-500/20 text-sm font-bold">
+                                <WarningCircle size={14} weight="fill" />
+                                {bookings.filter(needsReconciliation).length} need{bookings.filter(needsReconciliation).length === 1 ? "s" : ""} reconciliation
+                            </span>
+                        )}
+                    </div>
                     <p className="text-secondary">Manage {currentVenue.name} reservations.</p>
                 </div>
 
@@ -241,7 +259,7 @@ export default function BookingsPage() {
                                 <tr><td colSpan={7} className="p-12 text-center text-muted animate-pulse">Loading bookings...</td></tr>
                             ) : bookings.length > 0 ? (
                                 bookings.map((booking) => (
-                                    <tr key={booking.id} className="hover:bg-surface-overlay/30 transition-colors group">
+                                    <tr key={booking.id} className={`hover:bg-surface-overlay/30 transition-colors group ${needsReconciliation(booking) ? "border-l-4 border-red-500 bg-red-500/5" : ""}`}>
                                         <td className="p-5">
                                             <span className="block font-mono text-[10px] text-muted mb-1">{booking.booking_reference}</span>
                                             <span className="block text-primary font-bold text-sm mb-0.5">{fmtDateShort(booking.start_time)}</span>
@@ -264,7 +282,14 @@ export default function BookingsPage() {
                                             <span className="block text-muted text-xs capitalize">{booking.court?.sport_type?.name || ""}</span>
                                         </td>
                                         <td className="p-5">
-                                            <SourceBadge booking={booking} />
+                                            <div className="flex flex-col gap-1">
+                                                <SourceBadge booking={booking} />
+                                                {needsReconciliation(booking) && (
+                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-red-500/10 text-red-500 border border-red-500/20 text-[10px] font-bold uppercase tracking-wider">
+                                                        <WarningCircle size={10} weight="fill" /> Action Required
+                                                    </span>
+                                                )}
+                                            </div>
                                         </td>
                                         <td className="p-5">
                                             <StatusBadge status={booking.status} />
@@ -279,70 +304,128 @@ export default function BookingsPage() {
                                         </td>
                                         <td className="p-5 text-right">
                                             <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                {/* Cash booking reconciliation actions */}
-                                                {booking.is_cash_booking && booking.is_cash_unpaid && booking.status !== "cancelled" && (
+                                                {/* Maintenance Block */}
+                                                {booking.is_blocked && (
                                                     <>
-                                                        <Button
-                                                            size="sm"
-                                                            onClick={() => handleAction("collect", booking.id)}
-                                                            className="h-8 bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-bold flex items-center gap-1"
-                                                            title="Mark cash collected"
-                                                        >
-                                                            <HandCoins size={13} weight="fill" /> Collected
-                                                        </Button>
-                                                        <Button
-                                                            size="sm"
-                                                            variant="outline"
-                                                            onClick={() => handleAction("cash-noshow", booking.id)}
-                                                            className="h-8 border-red-500/30 text-red-400 hover:bg-red-500/10 text-xs font-bold flex items-center gap-1"
-                                                            title="Mark as no-show"
-                                                        >
-                                                            <Prohibit size={13} weight="bold" /> No-Show
-                                                        </Button>
-                                                    </>
-                                                )}
-                                                {/* Standard actions (non-cash) */}
-                                                {!booking.is_cash_booking && (
-                                                    <>
-                                                        {/* Walk-in PAYMENT_PENDING: Confirm (sets CONFIRMED+PAID in one step) */}
-                                                        {booking.is_manual && booking.status === "payment_pending" && (
-                                                            <Button size="sm" onClick={() => handleAction("confirm", booking.id)} className="h-8 bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-bold">
-                                                                Confirm
-                                                            </Button>
-                                                        )}
-                                                        {/* Walk-in already CONFIRMED but unpaid: Mark as Paid only */}
-                                                        {booking.is_manual && booking.status === "confirmed" && booking.payment_status !== "paid" && (
-                                                            <Button size="sm" variant="outline" onClick={() => handleAction("pay", booking.id)} className="h-8 border-emerald-500/40 text-emerald-500 hover:bg-emerald-500/10 hover:text-emerald-400 text-xs font-bold flex items-center gap-1" title="Mark as paid">
-                                                                <CurrencyDollar size={12} weight="bold" /> Paid
-                                                            </Button>
-                                                        )}
-                                                        {/* Platform card booking PAYMENT_PENDING (hold not yet confirmed by webhook): allow manual confirm */}
-                                                        {!booking.is_manual && booking.status === "payment_pending" && (
-                                                            <Button size="sm" onClick={() => handleAction("confirm", booking.id)} className="h-8 bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-bold">
-                                                                Confirm
+                                                        {!isPastEndTime(booking) && (
+                                                            <Button size="sm" variant="outline" onClick={() => handleAction("cancel", booking.id)} className="h-8 border-subtle text-secondary hover:text-red-400 hover:bg-red-500/10" title="Cancel maintenance block">
+                                                                <XCircle size={12} weight="bold" />
                                                             </Button>
                                                         )}
                                                     </>
                                                 )}
-                                                {/* No-show toggle: only for non-cash, non-cancelled bookings that have ended */}
-                                                {booking.status !== "cancelled" && !booking.is_cash_booking && new Date(booking.end_time) <= new Date() && (
+
+                                                {/* Walk-in / Manual */}
+                                                {booking.is_manual && !booking.is_blocked && (
                                                     <>
-                                                        <Button size="sm" variant="outline" onClick={() => handleAction("noshow", booking.id)} className={`h-8 border-subtle ${booking.is_no_show ? "bg-red-500/20 text-red-500 border-red-500/20" : "text-secondary hover:text-red-400 hover:bg-red-500/10"}`} title="Toggle no-show">
-                                                            <UserMinus size={12} weight="bold" />
-                                                        </Button>
+                                                        {/* PAYMENT_PENDING: Confirm + (Cancel if upcoming) + (No-Show if past) */}
+                                                        {booking.status === "payment_pending" && (
+                                                            <>
+                                                                <Button size="sm" onClick={() => handleAction("confirm", booking.id)} className="h-8 bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-bold">
+                                                                    Confirm
+                                                                </Button>
+                                                                {!isPastEndTime(booking) && (
+                                                                    <Button size="sm" variant="outline" onClick={() => handleAction("cancel", booking.id)} className="h-8 border-subtle text-secondary hover:text-red-400 hover:bg-red-500/10" title="Cancel booking">
+                                                                        <XCircle size={12} weight="bold" />
+                                                                    </Button>
+                                                                )}
+                                                                {isPastEndTime(booking) && (
+                                                                    <Button size="sm" variant="outline" onClick={() => handleAction("noshow", booking.id)} className={`h-8 border-subtle ${booking.is_no_show ? "bg-red-500/20 text-red-500 border-red-500/20" : "text-secondary hover:text-red-400 hover:bg-red-500/10"}`} title="Toggle no-show">
+                                                                        <UserMinus size={12} weight="bold" />
+                                                                    </Button>
+                                                                )}
+                                                            </>
+                                                        )}
+                                                        {/* CONFIRMED + unpaid: Mark Paid + (Cancel if upcoming) + (No-Show if past) */}
+                                                        {booking.status === "confirmed" && booking.payment_status !== "paid" && (
+                                                            <>
+                                                                <Button size="sm" variant="outline" onClick={() => handleAction("pay", booking.id)} className="h-8 border-emerald-500/40 text-emerald-500 hover:bg-emerald-500/10 hover:text-emerald-400 text-xs font-bold flex items-center gap-1" title="Mark as paid">
+                                                                    <CurrencyDollar size={12} weight="bold" /> Paid
+                                                                </Button>
+                                                                {!isPastEndTime(booking) && (
+                                                                    <Button size="sm" variant="outline" onClick={() => handleAction("cancel", booking.id)} className="h-8 border-subtle text-secondary hover:text-red-400 hover:bg-red-500/10" title="Cancel booking">
+                                                                        <XCircle size={12} weight="bold" />
+                                                                    </Button>
+                                                                )}
+                                                                {isPastEndTime(booking) && (
+                                                                    <Button size="sm" variant="outline" onClick={() => handleAction("noshow", booking.id)} className={`h-8 border-subtle ${booking.is_no_show ? "bg-red-500/20 text-red-500 border-red-500/20" : "text-secondary hover:text-red-400 hover:bg-red-500/10"}`} title="Toggle no-show">
+                                                                        <UserMinus size={12} weight="bold" />
+                                                                    </Button>
+                                                                )}
+                                                            </>
+                                                        )}
+                                                        {/* CONFIRMED + paid + upcoming: Cancel only */}
+                                                        {booking.status === "confirmed" && booking.payment_status === "paid" && !isPastEndTime(booking) && (
+                                                            <Button size="sm" variant="outline" onClick={() => handleAction("cancel", booking.id)} className="h-8 border-subtle text-secondary hover:text-red-400 hover:bg-red-500/10" title="Cancel booking">
+                                                                <XCircle size={12} weight="bold" />
+                                                            </Button>
+                                                        )}
+                                                        {/* Past and paid: read-only */}
                                                     </>
                                                 )}
-                                                {/* Cancel: non-cash */}
-                                                {booking.status !== "cancelled" && !booking.is_cash_booking && (
-                                                    <Button size="sm" variant="outline" onClick={() => handleAction("cancel", booking.id)} className="h-8 border-subtle text-secondary hover:text-red-400 hover:bg-red-500/10" title="Cancel booking">
-                                                        <XCircle size={12} weight="bold" />
-                                                    </Button>
+
+                                                {/* Platform · Cash-on-Arrival */}
+                                                {booking.is_cash_booking && (
+                                                    <>
+                                                        {/* Unpaid before start: Cancel only */}
+                                                        {booking.is_cash_unpaid && !isPastStartTime(booking) && (
+                                                            <Button size="sm" variant="outline" onClick={() => handleAction("cancel", booking.id)} className="h-8 border-subtle text-secondary hover:text-red-400 hover:bg-red-500/10" title="Cancel booking">
+                                                                <XCircle size={12} weight="bold" />
+                                                            </Button>
+                                                        )}
+                                                        {/* Unpaid after start: Collected + No-Show (+ Cancel if not past end) */}
+                                                        {booking.is_cash_unpaid && isPastStartTime(booking) && (
+                                                            <>
+                                                                <Button
+                                                                    size="sm"
+                                                                    onClick={() => handleAction("collect", booking.id)}
+                                                                    className="h-8 bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-bold flex items-center gap-1"
+                                                                    title="Mark cash collected"
+                                                                >
+                                                                    <HandCoins size={13} weight="fill" /> Collected
+                                                                </Button>
+                                                                <Button
+                                                                    size="sm"
+                                                                    variant="outline"
+                                                                    onClick={() => handleAction("cash-noshow", booking.id)}
+                                                                    className="h-8 border-red-500/30 text-red-400 hover:bg-red-500/10 text-xs font-bold flex items-center gap-1"
+                                                                    title="Mark as no-show"
+                                                                >
+                                                                    <Prohibit size={13} weight="bold" /> No-Show
+                                                                </Button>
+                                                                {!isPastEndTime(booking) && (
+                                                                    <Button size="sm" variant="outline" onClick={() => handleAction("cancel", booking.id)} className="h-8 border-subtle text-secondary hover:text-red-400 hover:bg-red-500/10" title="Cancel booking">
+                                                                        <XCircle size={12} weight="bold" />
+                                                                    </Button>
+                                                                )}
+                                                            </>
+                                                        )}
+                                                        {/* Paid: read-only (session is final) */}
+                                                    </>
                                                 )}
-                                                {/* Allow cancel for unpaid cash (results in no-show if after start) */}
-                                                {booking.is_cash_booking && booking.status !== "cancelled" && (
-                                                    <Button size="sm" variant="outline" onClick={() => handleAction("cancel", booking.id)} className="h-8 border-subtle text-secondary hover:text-red-400 hover:bg-red-500/10" title="Cancel booking">
-                                                        <XCircle size={12} weight="bold" />
-                                                    </Button>
+
+                                                {/* Platform · Card (default case) */}
+                                                {!booking.is_manual && !booking.is_cash_booking && !booking.is_blocked && (
+                                                    <>
+                                                        {/* PAYMENT_PENDING: Confirm + Cancel */}
+                                                        {booking.status === "payment_pending" && (
+                                                            <>
+                                                                <Button size="sm" onClick={() => handleAction("confirm", booking.id)} className="h-8 bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-bold">
+                                                                    Confirm
+                                                                </Button>
+                                                                <Button size="sm" variant="outline" onClick={() => handleAction("cancel", booking.id)} className="h-8 border-subtle text-secondary hover:text-red-400 hover:bg-red-500/10" title="Cancel booking">
+                                                                    <XCircle size={12} weight="bold" />
+                                                                </Button>
+                                                            </>
+                                                        )}
+                                                        {/* CONFIRMED + upcoming: Cancel only */}
+                                                        {booking.status === "confirmed" && !isPastEndTime(booking) && (
+                                                            <Button size="sm" variant="outline" onClick={() => handleAction("cancel", booking.id)} className="h-8 border-subtle text-secondary hover:text-red-400 hover:bg-red-500/10" title="Cancel booking">
+                                                                <XCircle size={12} weight="bold" />
+                                                            </Button>
+                                                        )}
+                                                        {/* Past and paid: read-only (no no-show toggle per Q3) */}
+                                                    </>
                                                 )}
                                             </div>
                                         </td>
