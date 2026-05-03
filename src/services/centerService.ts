@@ -354,12 +354,12 @@ export const centerService = {
     },
 
     markCashCollected: async (bookingId: string): Promise<Booking> => {
-        const response = await apiClient.post<any>(`/cash-bookings/${bookingId}/collect`);
+        const response = await apiClient.post<any>(`/cash-bookings/${bookingId}/mark-collected`);
         return normalizeBooking(response.data);
     },
 
     markCashNoShow: async (bookingId: string): Promise<Booking> => {
-        const response = await apiClient.post<any>(`/cash-bookings/${bookingId}/no-show`);
+        const response = await apiClient.post<any>(`/cash-bookings/${bookingId}/mark-no-show`);
         return normalizeBooking(response.data);
     },
 };
