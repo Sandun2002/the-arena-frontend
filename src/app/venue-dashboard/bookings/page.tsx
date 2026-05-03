@@ -301,31 +301,42 @@ export default function BookingsPage() {
                                                         </Button>
                                                     </>
                                                 )}
-                                                {/* Standard actions (non-cash or collected cash) */}
+                                                {/* Standard actions (non-cash) */}
                                                 {!booking.is_cash_booking && (
                                                     <>
-                                                        {booking.status === "payment_pending" && (
+                                                        {/* Walk-in PAYMENT_PENDING: Confirm (sets CONFIRMED+PAID in one step) */}
+                                                        {booking.is_manual && booking.status === "payment_pending" && (
                                                             <Button size="sm" onClick={() => handleAction("confirm", booking.id)} className="h-8 bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-bold">
                                                                 Confirm
                                                             </Button>
                                                         )}
-                                                        {booking.payment_status !== "paid" && booking.status !== "cancelled" && (
-                                                            <Button size="sm" variant="outline" onClick={() => handleAction("pay", booking.id)} className="h-8 border-subtle text-emerald-500 hover:bg-emerald-500/10 hover:text-emerald-400" title="Mark as paid">
-                                                                <CurrencyDollar size={12} weight="bold" />
+                                                        {/* Walk-in already CONFIRMED but unpaid: Mark as Paid only */}
+                                                        {booking.is_manual && booking.status === "confirmed" && booking.payment_status !== "paid" && booking.status !== "cancelled" && (
+                                                            <Button size="sm" variant="outline" onClick={() => handleAction("pay", booking.id)} className="h-8 border-emerald-500/40 text-emerald-500 hover:bg-emerald-500/10 hover:text-emerald-400 text-xs font-bold flex items-center gap-1" title="Mark as paid">
+                                                                <CurrencyDollar size={12} weight="bold" /> Paid
+                                                            </Button>
+                                                        )}
+                                                        {/* Platform card booking PAYMENT_PENDING (hold not yet confirmed by webhook): allow manual confirm */}
+                                                        {!booking.is_manual && booking.status === "payment_pending" && (
+                                                            <Button size="sm" onClick={() => handleAction("confirm", booking.id)} className="h-8 bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-bold">
+                                                                Confirm
                                                             </Button>
                                                         )}
                                                     </>
                                                 )}
-                                                {/* Shared actions */}
-                                                {booking.status !== "cancelled" && !booking.is_cash_booking && (
+                                                {/* No-show toggle: only for non-cash, non-cancelled bookings that have ended */}
+                                                {booking.status !== "cancelled" && !booking.is_cash_booking && new Date(booking.end_time) <= new Date() && (
                                                     <>
                                                         <Button size="sm" variant="outline" onClick={() => handleAction("noshow", booking.id)} className={`h-8 border-subtle ${booking.is_no_show ? "bg-red-500/20 text-red-500 border-red-500/20" : "text-secondary hover:text-red-400 hover:bg-red-500/10"}`} title="Toggle no-show">
                                                             <UserMinus size={12} weight="bold" />
                                                         </Button>
-                                                        <Button size="sm" variant="outline" onClick={() => handleAction("cancel", booking.id)} className="h-8 border-subtle text-secondary hover:text-red-400 hover:bg-red-500/10" title="Cancel booking">
-                                                            <XCircle size={12} weight="bold" />
-                                                        </Button>
                                                     </>
+                                                )}
+                                                {/* Cancel: non-cash */}
+                                                {booking.status !== "cancelled" && !booking.is_cash_booking && (
+                                                    <Button size="sm" variant="outline" onClick={() => handleAction("cancel", booking.id)} className="h-8 border-subtle text-secondary hover:text-red-400 hover:bg-red-500/10" title="Cancel booking">
+                                                        <XCircle size={12} weight="bold" />
+                                                    </Button>
                                                 )}
                                                 {/* Allow cancel for unpaid cash (results in no-show if after start) */}
                                                 {booking.is_cash_booking && booking.status !== "cancelled" && (
