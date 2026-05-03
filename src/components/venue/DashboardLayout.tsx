@@ -137,7 +137,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <aside
                 data-lenis-prevent
                 className={`
-                    fixed lg:sticky lg:self-start lg:top-20 top-0 z-[60] lg:z-40
+                    fixed lg:top-20 top-0 left-0 z-[60] lg:z-40
                     lg:h-[calc(100vh-5rem)] h-[100dvh] w-72
                     bg-surface-raised/60 border-r border-default/60 backdrop-blur-xl
                     transition-transform duration-300 ease-in-out
@@ -286,7 +286,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
             {/* Main Content Area */}
             {/* lg: push right by sidebar width. Mobile: add top padding for mobile top bar */}
-            <div className="flex-1 flex flex-col min-h-screen w-full relative z-10 pt-12 lg:pt-0">
+            <div className="flex-1 flex flex-col min-h-screen w-full relative z-10 lg:pl-72 pt-12 lg:pt-0">
                 <main ref={contentRef} className="flex-1 w-full max-w-7xl mx-auto p-4 md:p-8 lg:p-10">
                     {children}
                 </main>
