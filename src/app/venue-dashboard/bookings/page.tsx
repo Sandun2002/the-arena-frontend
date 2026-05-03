@@ -311,7 +311,7 @@ export default function BookingsPage() {
                                                             </Button>
                                                         )}
                                                         {/* Walk-in already CONFIRMED but unpaid: Mark as Paid only */}
-                                                        {booking.is_manual && booking.status === "confirmed" && booking.payment_status !== "paid" && booking.status !== "cancelled" && (
+                                                        {booking.is_manual && booking.status === "confirmed" && booking.payment_status !== "paid" && (
                                                             <Button size="sm" variant="outline" onClick={() => handleAction("pay", booking.id)} className="h-8 border-emerald-500/40 text-emerald-500 hover:bg-emerald-500/10 hover:text-emerald-400 text-xs font-bold flex items-center gap-1" title="Mark as paid">
                                                                 <CurrencyDollar size={12} weight="bold" /> Paid
                                                             </Button>
