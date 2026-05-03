@@ -143,12 +143,6 @@ export default function BookingsPage() {
                 <div>
                     <div className="flex items-center gap-3 mb-2">
                         <h1 className="text-3xl font-black text-primary uppercase tracking-tight">Bookings</h1>
-                        {bookings.filter(needsReconciliation).length > 0 && (
-                            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-red-500/10 text-red-500 border border-red-500/20 text-sm font-bold">
-                                <WarningCircle size={14} weight="fill" />
-                                {bookings.filter(needsReconciliation).length} need{bookings.filter(needsReconciliation).length === 1 ? "s" : ""} reconciliation
-                            </span>
-                        )}
                     </div>
                     <p className="text-secondary">Manage {currentVenue.name} reservations.</p>
                 </div>
