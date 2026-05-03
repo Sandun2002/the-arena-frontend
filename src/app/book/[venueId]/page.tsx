@@ -146,8 +146,17 @@ export default function BookingPage() {
             });
             addToast("Booking created! Redirecting to payment...", "info");
             router.push(`/checkout/${booking.id}`);
-        } catch (error) {
-            addToast("Booking failed. Please try again.", "error");
+        } catch (error: any) {
+            if (error?.response?.status === 409) {
+                addToast("This slot was just booked by someone else. Please choose another.", "error");
+                setAvailability(prev => prev.map(s =>
+                    s.start === selectedSlot.start ? { ...s, status: "booked" } : s
+                ));
+                setSelectedSlot(null);
+                setPricing(null);
+            } else {
+                addToast("Booking failed. Please try again.", "error");
+            }
         } finally {
             setSubmitting(false);
         }

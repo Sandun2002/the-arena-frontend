@@ -44,6 +44,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
   const [slotsError, setSlotsError] = useState(false);
   const [pricing, setPricing] = useState<any>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [pricingError, setPricingError] = useState<string | null>(null);
 
   const [showSuccess, setShowSuccess] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
@@ -143,16 +144,17 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
   // Calculate Price
   useEffect(() => {
     if (selectedCourtId && selectedSlots.length > 0) {
+      setPricingError(null);
       // Sort slots by start time to ensure contiguous sequence 
       const sortedSlots = [...selectedSlots].sort((a, b) => a.start.localeCompare(b.start));
       const timeSlotsFormatted = sortedSlots.map(s => s.start.slice(11, 16));
 
       bookingService.calculatePrice(selectedCourtId, date, timeSlotsFormatted)
-        .then(setPricing)
+        .then(p => { setPricing(p); setPricingError(null); })
         .catch((error: any) => {
           setPricing(null);
           if (error.response?.status === 409) {
-            addToast("Selected slot(s) are no longer available.", "error");
+            setPricingError("One or more of these slots was just booked by someone else.");
             setCourtsData(prev => prev.map(c => {
                if (c.court.id === selectedCourtId) {
                  return {
@@ -167,10 +169,13 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
                return c;
             }));
             setSelectedSlots([]);
+          } else if (error.response?.status === 400) {
+            setPricingError("Please select consecutive time slots only — gaps are not allowed.");
           }
         });
     } else {
       setPricing(null);
+      setPricingError(null);
     }
   }, [selectedCourtId, selectedSlots, date]);
 
@@ -181,9 +186,22 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
     const isSelected = selectedSlots.some(s => s.start === slot.start);
     if (isSelected) {
       setSelectedSlots(selectedSlots.filter((s) => s.start !== slot.start));
-    } else {
-      setSelectedSlots([...selectedSlots, slot]);
+      return;
     }
+    // Enforce contiguous selection: new slot must be adjacent to existing selection
+    if (selectedSlots.length > 0 && timeSlots.length > 0) {
+      const sorted = [...selectedSlots].sort((a, b) => a.start.localeCompare(b.start));
+      const firstIdx = timeSlots.findIndex((s: any) => s.start === sorted[0].start);
+      const lastIdx = timeSlots.findIndex((s: any) => s.start === sorted[sorted.length - 1].start);
+      const newIdx = timeSlots.findIndex((s: any) => s.start === slot.start);
+      const isAdjacentBefore = newIdx === firstIdx - 1;
+      const isAdjacentAfter = newIdx === lastIdx + 1;
+      if (!isAdjacentBefore && !isAdjacentAfter) {
+        addToast("Please select consecutive slots only — tap an adjacent slot to extend.", "error");
+        return;
+      }
+    }
+    setSelectedSlots([...selectedSlots, slot]);
   };
 
   const handleBooking = async () => {
@@ -508,6 +526,14 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
         </div>
       )}
 
+      {/* Pricing Error Banner */}
+      {pricingError && selectedSlots.length === 0 && (
+        <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/30 flex items-start gap-2 animate-in fade-in slide-in-from-bottom-2">
+          <WarningCircle size={16} weight="fill" className="text-red-400 mt-0.5 shrink-0" />
+          <p className="text-xs text-red-400 leading-relaxed">{pricingError}</p>
+        </div>
+      )}
+
       {/* Warning Box */}
       {!isVenueClosed && pricing && selectedSlots.length > 0 && (
         <div className="mb-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 animate-in fade-in slide-in-from-bottom-2">
@@ -569,7 +595,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
 
         <Button
           onClick={handleBooking}
-          disabled={submitting || selectedSlots.length === 0}
+          disabled={submitting || selectedSlots.length === 0 || !pricing}
           className={`w-full py-4 text-sm font-bold transition-all border ${
             selectedSlots.length > 0
               ? paymentMethod === "cash"
