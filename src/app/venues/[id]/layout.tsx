@@ -49,7 +49,7 @@ export async function generateMetadata({ params }: VenueLayoutProps): Promise<Me
         title: `${venue.name} - ${sports} in ${venue.city}`,
         description,
         url: `https://thearena.lk/venues/${venue.id}`,
-        type: "place",
+        type: "article",
         locale: "en_US",
         images
       },
