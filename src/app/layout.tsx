@@ -65,6 +65,18 @@ export default function RootLayout({
         {/* Bootstrap MUST be the first child of <head> so it executes
             before any paint and before any other script touches the DOM. */}
         <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
+        {/* Google tag (gtag.js) */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-7B9Q46QJR5" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-7B9Q46QJR5');
+            `,
+          }}
+        />
         {/* theme-color meta: rendered dark by default; bootstrap script
             updates `content` to #ffffff when light mode is resolved.
             suppressHydrationWarning silences the attribute mismatch React
