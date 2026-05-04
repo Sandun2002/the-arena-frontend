@@ -25,11 +25,11 @@ const securityHeaders = [
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://www.payhere.lk https://sandbox.payhere.lk",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://www.payhere.lk https://sandbox.payhere.lk https://www.googletagmanager.com https://www.google-analytics.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: blob: https:",
-      "connect-src 'self' https://api.thearena.lk http://localhost:8000 https://accounts.google.com https://www.googleapis.com https://www.payhere.lk https://sandbox.payhere.lk",
+      "connect-src 'self' https://api.thearena.lk http://localhost:8000 https://accounts.google.com https://www.googleapis.com https://www.payhere.lk https://sandbox.payhere.lk https://www.google-analytics.com https://www.googletagmanager.com",
       "worker-src 'self'",
       "frame-src https://accounts.google.com https://www.payhere.lk https://sandbox.payhere.lk https://maps.google.com https://www.google.com",
       "frame-ancestors 'none'",

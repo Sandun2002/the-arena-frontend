@@ -15,4 +15,4 @@ Disallow: /check-email
 Disallow: /forgot-password
 Allow: /
 
-Sitemap: https://www.thearena.lk/sitemap.xml
+Sitemap: https://thearena.lk/sitemap.xml

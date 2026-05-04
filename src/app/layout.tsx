@@ -31,8 +31,43 @@ const syne = Syne({
 });
 
 export const metadata: Metadata = {
-  title: "The Arena | Premium Sports Booking",
-  description: "Book high-end sports venues with ease.",
+  title: "The Arena | Book Premium Sports Venues in Sri Lanka",
+  description: "Discover and book top-rated sports venues across Sri Lanka. Cricket grounds, futsal courts, basketball courts, badminton courts & more. Instant booking confirmation with secure payments.",
+  keywords: "book sports venue sri lanka, cricket ground booking, futsal court colombo, basketball court rental, badminton court, sports facility booking, the arena",
+  openGraph: {
+    title: "The Arena | Book Premium Sports Venues in Sri Lanka",
+    description: "Discover and book top-rated sports venues across Sri Lanka. Instant booking with secure payments.",
+    url: "https://thearena.lk",
+    type: "website",
+    locale: "en_LK",
+    siteName: "The Arena",
+    images: [{
+      url: "https://thearena.lk/logo-full.png",
+      width: 1200,
+      height: 630,
+      alt: "The Arena - Premium Sports Venue Booking Platform"
+    }]
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "The Arena | Book Premium Sports Venues",
+    description: "Discover and book top-rated sports venues across Sri Lanka.",
+    images: ["https://thearena.lk/logo-full.png"]
+  },
+  alternates: {
+    canonical: "https://thearena.lk"
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1
+    }
+  },
 };
 
 export const viewport = {
@@ -98,6 +133,45 @@ export default function RootLayout({
         className={`${jakartaSans.variable} ${syne.variable} antialiased bg-background text-foreground flex flex-col min-h-screen`}
         suppressHydrationWarning
       >
+        {/* Website Schema Markup */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "The Arena",
+              url: "https://thearena.lk",
+              potentialAction: {
+                "@type": "SearchAction",
+                target: {
+                  "@type": "EntryPoint",
+                  urlTemplate: "https://thearena.lk/venues?sport_type={sport_type}&city={city}"
+                },
+                "query-input": "required name=sport_type required name=city"
+              }
+            })
+          }}
+        />
+        {/* Organization Schema */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "The Arena",
+              url: "https://thearena.lk",
+              logo: "https://thearena.lk/logo-full.png",
+              sameAs: [],
+              contactPoint: {
+                "@type": "ContactPoint",
+                contactType: "customer support",
+                url: "https://thearena.lk/contact"
+              }
+            })
+          }}
+        />
         <Providers>
           <SmoothScrolling>
             <Header />
