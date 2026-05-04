@@ -54,9 +54,11 @@ export default function VenueSchema({ venue }: VenueSchemaProps) {
       ? `LKR ${venue.min_hourly_rate.toLocaleString()} - ${(venue.min_hourly_rate * 2).toLocaleString()}` 
       : "Contact for pricing",
     openingHours: venue.operating_hours?.length > 0
-      ? venue.operating_hours.map(h => 
-          `${h.day_of_week.slice(0, 2).toUpperCase()} ${h.open_time}-${h.close_time}`
-        )
+      ? venue.operating_hours.map(h => {
+          const days = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+          const dayAbbr = days[h.day_of_week % 7] || "Mo";
+          return `${dayAbbr} ${h.open_time || "06:00"}-${h.close_time || "22:00"}`;
+        })
       : ["Mo-Su 06:00-22:00"],
     isAccessibleForFree: false,
     publicAccess: true
