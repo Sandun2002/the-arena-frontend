@@ -1,6 +1,6 @@
 import apiClient from "./apiClient";
 
-export type RemittanceStatus = "open" | "submitted" | "confirmed" | "rejected";
+export type RemittanceStatus = "open" | "submitted" | "confirmed" | "rejected" | "settled_via_card";
 
 export interface CashRemittance {
   id: string;
