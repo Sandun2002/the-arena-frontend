@@ -36,6 +36,7 @@ function StatusBadge({ status }: { status: CashRemittance["status"] }) {
     submitted: { label: "Submitted", cls: "bg-yellow-500/15 text-yellow-400" },
     confirmed: { label: "Confirmed", cls: "bg-green-500/15 text-green-400" },
     rejected: { label: "Rejected", cls: "bg-red-500/15 text-red-400" },
+    settled_via_card: { label: "Auto-Settled", cls: "bg-purple-500/15 text-purple-400" },
   };
   const { label, cls } = map[status] ?? map.open;
   return (
