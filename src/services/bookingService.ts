@@ -41,11 +41,12 @@ export interface PayHereCheckoutData {
 }
 
 class BookingService {
-    async calculatePrice(courtId: string, date: string, timeSlots: string[]): Promise<PriceCalculation> {
+    async calculatePrice(courtId: string, date: string, timeSlots: string[], paymentMethod: string = "card"): Promise<PriceCalculation> {
         const response = await apiClient.post<PriceCalculation>('/pricing/calculate', {
             court_id: courtId,
             date: date,
-            time_slots: timeSlots
+            time_slots: timeSlots,
+            payment_method: paymentMethod,
         });
         return response.data;
     }

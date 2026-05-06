@@ -149,7 +149,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
       const sortedSlots = [...selectedSlots].sort((a, b) => a.start.localeCompare(b.start));
       const timeSlotsFormatted = sortedSlots.map(s => s.start.slice(11, 16));
 
-      bookingService.calculatePrice(selectedCourtId, date, timeSlotsFormatted)
+      bookingService.calculatePrice(selectedCourtId, date, timeSlotsFormatted, paymentMethod)
         .then(p => { setPricing(p); setPricingError(null); })
         .catch((error: any) => {
           setPricing(null);
@@ -177,7 +177,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
       setPricing(null);
       setPricingError(null);
     }
-  }, [selectedCourtId, selectedSlots, date]);
+  }, [selectedCourtId, selectedSlots, date, paymentMethod]);
 
   const currentCourtData = courtsData.find(c => c.court.id === selectedCourtId);
   const timeSlots = currentCourtData ? currentCourtData.slots : [];

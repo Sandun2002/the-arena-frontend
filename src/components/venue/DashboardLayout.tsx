@@ -8,7 +8,7 @@ import {
     SquaresFour, Calendar, CalendarCheck, Users, GearSix,
     SignOut, List, X, Buildings, Image as ImageIcon,
     Hammer, ArrowsClockwise, CaretRight, ChartBar, CurrencyDollar,
-    ChartPieSlice, Pulse, Clock, XCircle
+    ChartPieSlice, Pulse, Clock, XCircle, Money
 } from "@phosphor-icons/react";
 import { useAuth } from "@/services/authContext";
 import { useVenue } from "./VenueContext";
@@ -79,6 +79,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         { name: "Recurring", path: "/venue-dashboard/recurring", icon: ArrowsClockwise, verifiedOnly: true },
         { name: "Closures", path: "/venue-dashboard/closures", icon: Hammer, verifiedOnly: true },
         { name: "Gallery", path: "/venue-dashboard/gallery", icon: ImageIcon, verifiedOnly: true },
+        { name: "Cash Payouts", path: "/venue-dashboard/remittances", icon: Money, ownerOnly: true, verifiedOnly: true },
         { name: "Settings", path: "/venue-dashboard/settings", icon: GearSix, verifiedOnly: true },
     ];
 
@@ -164,6 +165,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         <p className="px-4 text-xs font-bold text-muted uppercase tracking-widest mb-3">Menu</p>
 
                         {routes.map((route) => {
+                            if (isVenueManager && (route as any).ownerOnly) return null;
                             const isActive = pathname === route.path;
                             const isDisabled = route.verifiedOnly && currentVenue && !currentVenue.is_verified;
                             return (
