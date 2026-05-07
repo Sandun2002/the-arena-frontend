@@ -1,21 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const PROTECTED_PATHS = [
-  "/dashboard",
-  "/bookings",
-  "/profile",
-  "/settings",
-  "/challenges",
-  "/reviews",
-  "/venue-dashboard",
-  "/checkout",
-];
-
-function isProtected(pathname: string): boolean {
-  return PROTECTED_PATHS.some((p) => pathname.startsWith(p));
-}
-
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -32,16 +17,6 @@ export function proxy(request: NextRequest) {
     return NextResponse.rewrite(url, {
       request: { headers: requestHeaders },
     });
-  }
-
-  if (isProtected(pathname)) {
-    const refreshCookie = request.cookies.get("arena_refresh");
-
-    if (!refreshCookie?.value) {
-      const loginUrl = new URL("/login", request.url);
-      loginUrl.searchParams.set("redirect", pathname);
-      return NextResponse.redirect(loginUrl);
-    }
   }
 
   return NextResponse.next({
