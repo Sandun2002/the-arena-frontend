@@ -206,7 +206,7 @@ export const normalizeVenueManager = (raw: any): VenueManager => ({
   name: raw.full_name,
   email: raw.email,
   avatar: raw.profile_image ?? null,
-  role: raw.roles?.map((role: any) => role.slug ?? role.name).join(", ") || "venue_manager",
+  role: "venue_manager",
   joined_at: raw.created_at,
 });
 
