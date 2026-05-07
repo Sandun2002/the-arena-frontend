@@ -1,29 +1,29 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-/**
- * Next.js Proxy (formerly Middleware):
- * 1. Always attaches the request pathname as `x-pathname` header so that
- *    server components (e.g. the root layout) can conditionally render chrome.
- * 2. When MAINTENANCE_MODE=true, rewrites all non-maintenance requests to
- *    /maintenance. Static assets and Next internals are excluded via the
- *    matcher config below.
- *
- * To toggle on Vercel:
- *   Project Settings -> Environment Variables -> add MAINTENANCE_MODE=true
- *   Then redeploy. Remove the variable (or set to false) and redeploy to
- *   resume normal operation.
- */
+const PROTECTED_PATHS = [
+  "/dashboard",
+  "/bookings",
+  "/profile",
+  "/settings",
+  "/challenges",
+  "/reviews",
+  "/venue-dashboard",
+  "/checkout",
+];
+
+function isProtected(pathname: string): boolean {
+  return PROTECTED_PATHS.some((p) => pathname.startsWith(p));
+}
+
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Forward pathname to server components
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-pathname", pathname);
 
   const maintenanceMode = process.env.MAINTENANCE_MODE === "true";
 
-  // Let the maintenance page itself render without rewrite loops
   const isMaintenancePath = pathname === "/maintenance";
 
   if (maintenanceMode && !isMaintenancePath) {
@@ -32,6 +32,16 @@ export function proxy(request: NextRequest) {
     return NextResponse.rewrite(url, {
       request: { headers: requestHeaders },
     });
+  }
+
+  if (isProtected(pathname)) {
+    const refreshCookie = request.cookies.get("arena_refresh");
+
+    if (!refreshCookie?.value) {
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("redirect", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
   }
 
   return NextResponse.next({
