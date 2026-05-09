@@ -6,7 +6,6 @@ import SportExplorer from "@/components/home/SportExplorer";
 import FeaturedVenues from "@/components/home/FeaturedVenues";
 import ReviewsTeaser from "@/components/home/ReviewsTeaser";
 import GamificationTeaser from "@/components/home/GamificationTeaser";
-import PWAInstallGuide from "@/components/home/PWAInstallGuide";
 import PartnerCTA from "@/components/home/PartnerCTA";
 import Link from "next/link";
 import { PhoneDisconnect, Lock, GameController, CaretRight } from "@phosphor-icons/react";
@@ -95,9 +94,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* 7. PWA Install Guide */}
-      <PWAInstallGuide />
 
       {/* 8. Partner CTA (hidden by default) */}
       <PartnerCTA />

@@ -22,6 +22,10 @@ const tocItems = [
   { id: "contact", label: "18. Contact Us" },
 ];
 
+const contactEmails = ["admin@thearena.lk", "support@thearena.lk", "info@thearena.lk"];
+const contactAddress = "26/12b Station Road, Dehiwala, Sri Lanka";
+const primaryContactEmail = "support@thearena.lk";
+
 function Section({
   id,
   number,
@@ -37,7 +41,7 @@ function Section({
     <section id={id} className="scroll-mt-24 md:scroll-mt-28 border-b border-default pb-8 md:pb-10 mb-8 md:mb-10">
       <p className="text-xs font-bold tracking-[0.18em] uppercase text-emerald-400 mb-2">Section {number}</p>
       <h2 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-primary mb-4 md:mb-5">{title}</h2>
-      <div className="space-y-4 text-secondary leading-7 md:leading-8 text-[14px] md:text-[15px]">{children}</div>
+      <div className="space-y-4 text-secondary leading-7 md:leading-8 text-[14px] md:text-[15px] break-words">{children}</div>
     </section>
   );
 }
@@ -61,7 +65,7 @@ function RightCard({ title, description }: { title: string; description: string 
 
 export default function PrivacyPage() {
   return (
-    <main className="min-h-screen bg-surface-base text-secondary pt-24 md:pt-28 pb-14 md:pb-20 relative">
+    <main className="min-h-screen bg-surface-base text-secondary pt-24 md:pt-28 pb-14 md:pb-20 relative overflow-x-hidden">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 right-0 w-[420px] h-[420px] bg-emerald-500/10 rounded-full blur-[120px]" />
         <div className="absolute bottom-0 left-0 w-[420px] h-[420px] bg-emerald-500/5 rounded-full blur-[120px]" />
@@ -84,7 +88,7 @@ export default function PrivacyPage() {
             </nav>
           </aside>
 
-          <div>
+          <div className="min-w-0">
             <header className="mb-8 md:mb-12 border-b border-default pb-8 md:pb-10">
               <span className="inline-flex px-3 py-1 rounded-full bg-surface-raised border border-default text-[11px] font-bold uppercase tracking-wider text-emerald-400">
                 Legal Document
@@ -94,8 +98,8 @@ export default function PrivacyPage() {
               </h1>
               <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-1 text-sm text-secondary">
                 <span>Operated by <span className="text-primary font-semibold">Astryx Global (Pvt) Ltd</span></span>
-                <span>Effective: <span className="text-primary font-semibold">[INSERT DATE]</span></span>
-                <span>Last Updated: <span className="text-primary font-semibold">[INSERT DATE]</span></span>
+                <span>Effective: <span className="text-primary font-semibold">9 May 2026</span></span>
+                <span>Last Updated: <span className="text-primary font-semibold">9 May 2026</span></span>
               </div>
               <p className="mt-6 border-l-[3px] border-l-emerald-500/50 bg-surface-raised/60 pl-5 pr-4 py-4 leading-7 md:leading-8 text-[14px] md:text-[15px] rounded-r-lg">
                 This Privacy Policy explains how The Arena collects, uses, stores, and protects your personal data. It is prepared
@@ -108,7 +112,7 @@ export default function PrivacyPage() {
             <details className="lg:hidden mb-8 rounded-xl border border-default bg-surface-raised/50">
               <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-primary flex items-center justify-between">
                 Jump to Section
-                <span className="text-xs uppercase tracking-wider text-muted">18 items</span>
+                <span className="text-xs uppercase tracking-wider text-muted">{tocItems.length} items</span>
               </summary>
               <nav data-lenis-prevent className="px-4 pb-4 pt-1 space-y-1 max-h-64 overflow-y-auto border-t border-default">
                 {tocItems.map((item) => (
@@ -148,10 +152,8 @@ export default function PrivacyPage() {
               </p>
               <div className="rounded-2xl border border-default bg-surface-raised/50 p-6 space-y-2">
                 <p className="text-primary font-bold">Astryx Global (Pvt) Ltd</p>
-                <p><strong>Address:</strong> [Registered Address Placeholder]</p>
-                <p><strong>Reg. No.:</strong> [Company Registration No. Placeholder]</p>
-                <p><strong>DPO Email:</strong> [privacy@placeholder.com]</p>
-                <p><strong>DPO Name:</strong> [Name Placeholder]</p>
+                <p><strong>Address:</strong> {contactAddress}</p>
+                <p><strong>Email:</strong> {primaryContactEmail}</p>
               </div>
             </Section>
 
@@ -178,7 +180,7 @@ export default function PrivacyPage() {
                 We do not knowingly collect, process, or store personal data from individuals under the age of 18. If we become
                 aware that personal data has been provided by a minor, we will take immediate steps to delete such data from our
                 records. If you believe a minor has registered on the Platform, please contact us immediately at
-                [privacy@placeholder.com].
+                <strong>{primaryContactEmail}</strong>.
               </p>
             </Section>
 
@@ -462,7 +464,7 @@ export default function PrivacyPage() {
             <Section id="rights" number="13" title="Your Rights Under the PDPA">
               <p>
                 Under the Personal Data Protection Act No. 9 of 2022, you have the following rights. To exercise any of these
-                rights, submit a written request to <strong>[privacy@placeholder.com]</strong>.
+                rights, submit a written request to <strong>{primaryContactEmail}</strong>.
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 mt-2">
                 <RightCard
@@ -504,11 +506,11 @@ export default function PrivacyPage() {
               <p>You may request deletion of your account and associated personal data at any time by:</p>
               <BulletList>
                 <li>Submitting a deletion request through the <strong>account settings</strong> section of the Platform; or</li>
-                <li>Sending a written request to <strong>[privacy@placeholder.com]</strong> from your registered email address.</li>
+                <li>Sending a written request to <strong>{primaryContactEmail}</strong> from your registered email address.</li>
               </BulletList>
               <p>
-                Upon receipt of a valid deletion request, we will acknowledge within [X] business days, process the deletion within
-                [X] business days of identity verification, retain your personal data for 90 days as described in Section 11, and
+                Upon receipt of a valid deletion request, we will acknowledge within 3 business days, process the deletion within
+                3 business days of identity verification, retain your personal data for 90 days as described in Section 11, and
                 then permanently delete it.
               </p>
               <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4">
@@ -573,12 +575,11 @@ export default function PrivacyPage() {
               </p>
               <div className="rounded-2xl border border-default bg-surface-raised/50 p-6 space-y-2">
                 <p className="text-primary font-bold">Data Protection Officer — Astryx Global (Pvt) Ltd</p>
-                <p><strong>Address:</strong> [Full Registered Address Placeholder]</p>
-                <p><strong>Email:</strong> [privacy@placeholder.com]</p>
-                <p><strong>Phone:</strong> [+94 XX XXX XXXX]</p>
+                <p><strong>Address:</strong> {contactAddress}</p>
+                <p><strong>Email:</strong> {contactEmails.join(" / ")}</p>
               </div>
               <p>
-                We will acknowledge your inquiry within [X] business days and aim to resolve it within <strong>30 days</strong>, or
+                We will acknowledge your inquiry within 3 business days and aim to resolve it within <strong>30 days</strong>, or
                 within such other period as required by the PDPA. If you are not satisfied with our response, you have the right to
                 lodge a complaint with the relevant data protection authority in Sri Lanka.
               </p>

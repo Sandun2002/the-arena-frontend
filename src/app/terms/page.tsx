@@ -27,6 +27,10 @@ const tocItems = [
   { id: "contact", label: "23. Contact Us" },
 ];
 
+const contactEmails = ["admin@thearena.lk", "support@thearena.lk", "info@thearena.lk"];
+const contactAddress = "26/12b Station Road, Dehiwala, Sri Lanka";
+const primaryContactEmail = "support@thearena.lk";
+
 function Section({
   id,
   number,
@@ -42,7 +46,7 @@ function Section({
     <section id={id} className="scroll-mt-24 md:scroll-mt-28 border-b border-default pb-8 md:pb-10 mb-8 md:mb-10">
       <p className="text-xs font-bold tracking-[0.18em] uppercase text-emerald-400 mb-2">Section {number}</p>
       <h2 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-primary mb-4 md:mb-5">{title}</h2>
-      <div className="space-y-4 text-secondary leading-7 md:leading-8 text-[14px] md:text-[15px]">{children}</div>
+      <div className="space-y-4 text-secondary leading-7 md:leading-8 text-[14px] md:text-[15px] break-words">{children}</div>
     </section>
   );
 }
@@ -57,7 +61,7 @@ function BulletList({ children }: { children: React.ReactNode }) {
 
 export default function TermsPage() {
   return (
-    <main className="min-h-screen bg-surface-base text-secondary pt-24 md:pt-28 pb-14 md:pb-20 relative">
+    <main className="min-h-screen bg-surface-base text-secondary pt-24 md:pt-28 pb-14 md:pb-20 relative overflow-x-hidden">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 right-0 w-[420px] h-[420px] bg-emerald-500/10 rounded-full blur-[120px]" />
         <div className="absolute bottom-0 left-0 w-[420px] h-[420px] bg-emerald-500/5 rounded-full blur-[120px]" />
@@ -80,7 +84,7 @@ export default function TermsPage() {
             </nav>
           </aside>
 
-          <div>
+          <div className="min-w-0">
             <header className="mb-8 md:mb-12 border-b border-default pb-8 md:pb-10">
               <span className="inline-flex px-3 py-1 rounded-full bg-surface-raised border border-default text-[11px] font-bold uppercase tracking-wider text-emerald-400">
                 Legal Document
@@ -90,8 +94,8 @@ export default function TermsPage() {
               </h1>
               <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-1 text-sm text-secondary">
                 <span>Operated by <span className="text-primary font-semibold">Astryx Global (Pvt) Ltd</span></span>
-                <span>Effective: <span className="text-primary font-semibold">[INSERT DATE]</span></span>
-                <span>Last Updated: <span className="text-primary font-semibold">[INSERT DATE]</span></span>
+                <span>Effective: <span className="text-primary font-semibold">9 May 2026</span></span>
+                <span>Last Updated: <span className="text-primary font-semibold">9 May 2026</span></span>
               </div>
               <p className="mt-6 border-l-[3px] border-l-emerald-500/50 bg-surface-raised/60 pl-5 pr-4 py-4 leading-7 md:leading-8 text-[14px] md:text-[15px] rounded-r-lg">
                 Please read these Terms of Service carefully before using The Arena platform. By accessing or using the Platform —
@@ -103,7 +107,7 @@ export default function TermsPage() {
             <details className="lg:hidden mb-8 rounded-xl border border-default bg-surface-raised/50">
               <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-primary flex items-center justify-between">
                 Jump to Section
-                <span className="text-xs uppercase tracking-wider text-muted">18 items</span>
+                <span className="text-xs uppercase tracking-wider text-muted">{tocItems.length} items</span>
               </summary>
               <nav data-lenis-prevent className="px-4 pb-4 pt-1 space-y-1 max-h-64 overflow-y-auto border-t border-default">
                 {tocItems.map((item) => (
@@ -260,7 +264,7 @@ export default function TermsPage() {
                 <li>Not disclose your password or Account details to any third party;</li>
                 <li>Not permit any other person to access or use your Account;</li>
                 <li>Log out of your Account at the end of each session on shared or public devices;</li>
-                <li>Notify The Arena immediately at <strong>[contact@placeholder.com]</strong> if you become aware of any unauthorised access to or use of your Account.</li>
+                <li>Notify The Arena immediately at <strong>{primaryContactEmail}</strong> if you become aware of any unauthorised access to or use of your Account.</li>
               </BulletList>
               <p>
                 You accept full responsibility for all activities, bookings, transactions, and conduct that occur through your
@@ -360,7 +364,7 @@ export default function TermsPage() {
               <SubHeading>8.4 Refund Disputes</SubHeading>
               <p>
                 In the event that a Player is unable to obtain a refund from a Vendor following a Vendor cancellation, the Player
-                may report the matter to The Arena at <strong>[contact@placeholder.com]</strong>. The Arena may, at its sole
+                may report the matter to The Arena at <strong>{primaryContactEmail}</strong>. The Arena may, at its sole
                 discretion and without obligation, investigate the matter and take appropriate action against the Vendor in
                 accordance with Section 9. The Arena assumes no financial liability in connection with any such dispute and shall
                 not be required to compensate the Player for any unrecovered facility price.
@@ -581,7 +585,7 @@ export default function TermsPage() {
               <SubHeading>16.2 Termination by You</SubHeading>
               <p>
                 You may terminate your Account at any time by submitting a deletion request through your Account settings or by
-                contacting The Arena at <strong>[contact@placeholder.com]</strong>. Account deletion is subject to the data retention
+                contacting The Arena at <strong>{primaryContactEmail}</strong>. Account deletion is subject to the data retention
                 provisions set out in The Arena's Privacy Policy.
               </p>
               <SubHeading>16.3 Effect of Termination</SubHeading>
@@ -647,7 +651,7 @@ export default function TermsPage() {
               </p>
               <SubHeading>20.2 Disputes Between Users and The Arena</SubHeading>
               <BulletList>
-                <li><strong>Step 1 — Good Faith Resolution:</strong> The disputing party shall first submit a written notice of the dispute to The Arena at <strong>[contact@placeholder.com]</strong>, describing the nature of the dispute and the relief sought.</li>
+                <li><strong>Step 1 — Good Faith Resolution:</strong> The disputing party shall first submit a written notice of the dispute to The Arena at <strong>{primaryContactEmail}</strong>, describing the nature of the dispute and the relief sought.</li>
                 <li><strong>Step 2 — Litigation:</strong> If the dispute remains unresolved after a 30-day good faith resolution period, either party may commence proceedings before the courts of competent jurisdiction in Sri Lanka.</li>
               </BulletList>
             </Section>
@@ -687,7 +691,7 @@ export default function TermsPage() {
               <SubHeading>22.6 Notices</SubHeading>
               <p>
                 All notices, requests, or communications under these Terms shall be in writing. Notices to The Arena shall be sent
-                to <strong>[contact@placeholder.com]</strong> or to The Arena's registered address. Notices to you shall be sent to
+                to <strong>{primaryContactEmail}</strong> or to The Arena's registered address. Notices to you shall be sent to
                 the email address registered with your Account and shall be deemed received upon transmission.
               </p>
             </Section>
@@ -699,13 +703,12 @@ export default function TermsPage() {
               </p>
               <div className="rounded-2xl border border-default bg-surface-raised/50 p-6 space-y-2">
                 <p className="text-primary font-bold">Astryx Global (Pvt) Ltd — The Arena</p>
-                <p><strong>Address:</strong> [Full Registered Address Placeholder]</p>
-                <p><strong>Email:</strong> [contact@placeholder.com]</p>
-                <p><strong>Phone:</strong> [+94 XX XXX XXXX]</p>
+                <p><strong>Address:</strong> {contactAddress}</p>
+                <p><strong>Email:</strong> {contactEmails.join(" / ")}</p>
               </div>
-              <p>We aim to respond to all enquiries within [X] business days.</p>
+              <p>We aim to respond to all enquiries within 3 business days.</p>
               <p className="text-xs text-muted pt-3">
-                Looking for account support? Visit our <Link href="/help" className="text-emerald-400 hover:text-emerald-300">Help Center</Link>.
+                Looking for account support? Visit our <Link href="/contact" className="text-emerald-400 hover:text-emerald-300">Contact page</Link>.
               </p>
             </Section>
           </div>
