@@ -1,5 +1,8 @@
 /* eslint-disable react/no-unescaped-entities */
+"use client";
+import { useState } from "react";
 import Link from "next/link";
+import { List, X } from "@phosphor-icons/react";
 
 const tocItems = [
   { id: "intro", label: "1. Introduction" },
@@ -64,6 +67,8 @@ function RightCard({ title, description }: { title: string; description: string 
 }
 
 export default function PrivacyPage() {
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
   return (
     <main className="min-h-screen bg-surface-base text-secondary pt-24 md:pt-28 pb-14 md:pb-20 relative overflow-x-hidden">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -109,23 +114,40 @@ export default function PrivacyPage() {
               </p>
             </header>
 
-            <details className="lg:hidden mb-8 rounded-xl border border-default bg-surface-raised/50">
-              <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-primary flex items-center justify-between">
-                Jump to Section
-                <span className="text-xs uppercase tracking-wider text-muted">{tocItems.length} items</span>
-              </summary>
-              <nav data-lenis-prevent className="px-4 pb-4 pt-1 space-y-1 max-h-64 overflow-y-auto border-t border-default">
-                {tocItems.map((item) => (
-                  <a
-                    key={`mobile-${item.id}`}
-                    href={`#${item.id}`}
-                    className="block text-sm text-secondary hover:text-emerald-400 transition-colors"
-                  >
-                    {item.label}
-                  </a>
-                ))}
-              </nav>
-            </details>
+            {/* Mobile: floating TOC button */}
+            <button
+              onClick={() => setDrawerOpen(true)}
+              className="lg:hidden fixed bottom-6 right-6 z-40 w-14 h-14 rounded-2xl bg-emerald-500 text-black shadow-lg shadow-emerald-500/30 flex items-center justify-center hover:bg-emerald-400 transition-colors active:scale-95"
+              aria-label="Open table of contents"
+            >
+              <List size={24} weight="bold" />
+            </button>
+
+            {/* Mobile: slide-out TOC drawer */}
+            {drawerOpen && (
+              <div className="lg:hidden fixed inset-0 z-[100]">
+                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setDrawerOpen(false)} />
+                <div className="absolute right-0 top-0 bottom-0 w-80 max-w-[85vw] bg-surface-base border-l border-default shadow-2xl flex flex-col">
+                  <div className="flex items-center justify-between px-5 py-4 border-b border-default">
+                    <p className="text-sm font-bold text-primary">Contents</p>
+                    <button onClick={() => setDrawerOpen(false)} className="p-1.5 rounded-lg text-muted hover:text-primary hover:bg-surface-raised transition-colors" aria-label="Close">
+                      <X size={20} weight="bold" />
+                    </button>
+                  </div>
+                  <nav className="flex-1 overflow-y-auto px-5 py-4 space-y-1">
+                    {tocItems.map((item) => (
+                      <button
+                        key={`drawer-${item.id}`}
+                        onClick={() => { setDrawerOpen(false); document.getElementById(item.id)?.scrollIntoView({ behavior: "smooth" }); }}
+                        className="block w-full text-left text-sm text-secondary hover:text-emerald-400 transition-colors py-1.5"
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </nav>
+                </div>
+              </div>
+            )}
 
             <Section id="intro" number="01" title="Introduction">
               <p>
