@@ -70,7 +70,7 @@ export default function PrivacyPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   return (
-    <main className="min-h-screen bg-surface-base text-secondary pt-24 md:pt-28 pb-14 md:pb-20 relative overflow-x-hidden">
+    <main className="min-h-screen bg-surface-base text-secondary pt-24 md:pt-28 pb-14 md:pb-20 relative">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 right-0 w-[420px] h-[420px] bg-emerald-500/10 rounded-full blur-[120px]" />
         <div className="absolute bottom-0 left-0 w-[420px] h-[420px] bg-emerald-500/5 rounded-full blur-[120px]" />
