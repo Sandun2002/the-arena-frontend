@@ -48,7 +48,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
 
   const [showSuccess, setShowSuccess] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<"card" | "cash">("card");
+  const [paymentMethod, setPaymentMethod] = useState<"card" | "cash">("cash");
   const [cashBookingRef, setCashBookingRef] = useState<string | null>(null);
   const [cashBookingAmount, setCashBookingAmount] = useState<number>(0);
   const [cashBookingTime, setCashBookingTime] = useState<string>("");
@@ -566,19 +566,20 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
             <div className="flex bg-surface-sunken p-1 rounded-xl border border-default gap-1">
               <button
                 onClick={() => setPaymentMethod("card")}
+                disabled={true}
                 className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition-all ${
                   paymentMethod === "card"
-                    ? "bg-emerald-500 text-black shadow"
-                    : "text-muted hover:text-secondary"
+                    ? "bg-surface-overlay text-muted cursor-not-allowed opacity-50"
+                    : "text-muted cursor-not-allowed opacity-50"
                 }`}
               >
-                <CreditCard size={14} weight="bold" /> Pay by Card
+                <CreditCard size={14} weight="bold" /> Pay by Card (Coming Soon)
               </button>
               <button
                 onClick={() => setPaymentMethod("cash")}
                 className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition-all ${
                   paymentMethod === "cash"
-                    ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/40 shadow"
+                    ? "bg-emerald-500 text-black shadow"
                     : "text-muted hover:text-secondary"
                 }`}
               >
@@ -586,7 +587,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
               </button>
             </div>
             {paymentMethod === "cash" && (
-              <p className="mt-2 text-[11px] text-yellow-400/80 leading-snug">
+              <p className="mt-2 text-[11px] text-emerald-400/80 leading-snug">
                 💡 Your slot is reserved immediately. Bring <strong>LKR {pricing.total.toLocaleString()}</strong> cash on arrival.
               </p>
             )}
@@ -599,8 +600,8 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
           className={`w-full py-4 text-sm font-bold transition-all border ${
             selectedSlots.length > 0
               ? paymentMethod === "cash"
-                ? "bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 border-yellow-500/40"
-                : "bg-emerald-500 hover:bg-emerald-400 text-black border-emerald-500"
+                ? "bg-emerald-500 hover:bg-emerald-400 text-black border-emerald-500"
+                : "bg-surface-overlay hover:bg-surface-overlay text-primary border-subtle"
               : "bg-surface-overlay hover:bg-surface-overlay text-primary border-subtle"
           } disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2`}
         >
@@ -609,7 +610,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
             : selectedSlots.length > 0
               ? paymentMethod === "cash"
                 ? <><HandCoins size={16} weight="bold" /> Reserve — Pay at Venue</>
-                : "Proceed to Pay"
+                : "Coming Soon"
               : "Select Slots"
           }
         </Button>
