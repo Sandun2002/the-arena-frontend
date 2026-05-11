@@ -34,6 +34,10 @@ export default function VenueSettingsPage() {
     const [mounted, setMounted] = useState(false);
     const amenitiesList = ["Parking", "A/C", "Showers", "Equipment Rental", "Cafe", "WiFi", "Lockers", "First Aid"];
 
+    // Payment acceptance state
+    const [paymentAcceptance, setPaymentAcceptance] = useState<"card_only" | "cash_only" | "both">("both");
+    const [paymentSaving, setPaymentSaving] = useState(false);
+
     // Peak hours state
     const [peakHours, setPeakHours] = useState<{
         peak_start_time: string | null;
@@ -111,6 +115,7 @@ export default function VenueSettingsPage() {
             
             setGeoLat(currentVenue.geo_lat);
             setGeoLng(currentVenue.geo_lng);
+            setPaymentAcceptance(currentVenue.accepted_payment_methods || "both");
 
             // Fetch detailed profile for schedule
             loadProfile();
@@ -230,6 +235,23 @@ export default function VenueSettingsPage() {
             addToast(e?.message || "Failed to clear peak hours", "error");
         } finally {
             setPeakSaving(false);
+        }
+    };
+
+    const savePaymentAcceptance = async (value: "card_only" | "cash_only" | "both") => {
+        if (!currentVenue) return;
+        const previous = paymentAcceptance;
+        setPaymentAcceptance(value);
+        setPaymentSaving(true);
+        try {
+            await venueApiService.updateVenue(currentVenue.id, { accepted_payment_methods: value } as any);
+            addToast("Payment methods updated", "success");
+            refreshVenues();
+        } catch (e: any) {
+            setPaymentAcceptance(previous);
+            addToast(e?.message || "Failed to update payment methods", "error");
+        } finally {
+            setPaymentSaving(false);
         }
     };
 
@@ -682,6 +704,51 @@ export default function VenueSettingsPage() {
                                 </button>
                             </div>
                         )}
+                    </div>
+
+                    {/* Payment Methods */}
+                    <div className="bg-surface-raised/40 border border-default rounded-3xl p-8 backdrop-blur-sm">
+                        <div className="flex items-center justify-between border-b border-default pb-2 mb-6">
+                            <h2 className="text-lg font-bold text-primary flex items-center gap-2">
+                                <Shield size={20} weight="bold" className="text-emerald-500" /> Accepted Payment Methods
+                            </h2>
+                            {paymentSaving && <CircleNotch size={16} weight="bold" className="animate-spin text-emerald-500" />}
+                        </div>
+
+                        <p className="text-sm text-secondary mb-6">
+                            Choose how players can pay you for bookings at this venue. Players will only see options you accept.
+                        </p>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            {[
+                                { value: "both" as const, title: "Card & Cash", desc: "Players choose either method." },
+                                { value: "card_only" as const, title: "Card only", desc: "Players pay online by card." },
+                                { value: "cash_only" as const, title: "Cash only", desc: "Players pay in cash on arrival." },
+                            ].map((opt) => {
+                                const selected = paymentAcceptance === opt.value;
+                                return (
+                                    <button
+                                        key={opt.value}
+                                        type="button"
+                                        disabled={paymentSaving}
+                                        onClick={() => !selected && savePaymentAcceptance(opt.value)}
+                                        className={`text-left p-5 rounded-2xl border transition-all ${
+                                            selected
+                                                ? "bg-emerald-500/10 border-emerald-500 shadow-[0_0_18px_rgba(16,185,129,0.15)]"
+                                                : "bg-surface-base/40 border-default hover:border-subtle hover:bg-surface-raised"
+                                        } disabled:opacity-60 disabled:cursor-not-allowed`}
+                                    >
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${selected ? "border-emerald-500" : "border-subtle"}`}>
+                                                {selected && <div className="w-2 h-2 rounded-full bg-emerald-500" />}
+                                            </div>
+                                            <span className="font-bold text-primary text-sm">{opt.title}</span>
+                                        </div>
+                                        <p className="text-xs text-secondary leading-snug">{opt.desc}</p>
+                                    </button>
+                                );
+                            })}
+                        </div>
                     </div>
 
                     {/* Weekly Schedule */}

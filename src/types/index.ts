@@ -97,6 +97,7 @@ export interface Venue {
   updated_at?: string | null;
   // Cash booking settings
   max_unpaid_cash_bookings?: number;
+  accepted_payment_methods?: VenuePaymentAcceptance;
 }
 
 export interface Court {
@@ -152,6 +153,7 @@ export interface ManagerInvitation {
 export type BookingStatus = "payment_pending" | "confirmed" | "completed" | "cancelled" | "rejected";
 export type PaymentStatus = "pending" | "paid" | "refunded" | "failed";
 export type PaymentMethod = "card" | "cash" | "bank_transfer";
+export type VenuePaymentAcceptance = "card_only" | "cash_only" | "both";
 
 export interface Booking {
   id: string;

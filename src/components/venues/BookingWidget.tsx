@@ -48,7 +48,14 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
 
   const [showSuccess, setShowSuccess] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<"card" | "cash">("cash");
+
+  const acceptance = venue.accepted_payment_methods || "both";
+  const allowCard = acceptance === "card_only" || acceptance === "both";
+  const allowCash = acceptance === "cash_only" || acceptance === "both";
+
+  const [paymentMethod, setPaymentMethod] = useState<"card" | "cash">(
+    allowCash ? "cash" : "card"
+  );
   const [cashBookingRef, setCashBookingRef] = useState<string | null>(null);
   const [cashBookingAmount, setCashBookingAmount] = useState<number>(0);
   const [cashBookingTime, setCashBookingTime] = useState<string>("");
@@ -565,30 +572,45 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
             <label className="mb-2 block text-xs font-bold text-muted uppercase tracking-wider">How will you pay?</label>
             <div className="flex bg-surface-sunken p-1 rounded-xl border border-default gap-1">
               <button
-                onClick={() => setPaymentMethod("card")}
-                disabled={true}
+                onClick={() => allowCard && setPaymentMethod("card")}
+                disabled={!allowCard}
                 className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition-all ${
-                  paymentMethod === "card"
-                    ? "bg-surface-overlay text-muted cursor-not-allowed opacity-50"
-                    : "text-muted cursor-not-allowed opacity-50"
+                  !allowCard
+                    ? "bg-surface-overlay/30 text-muted cursor-not-allowed opacity-40"
+                    : paymentMethod === "card"
+                      ? "bg-surface-overlay text-primary shadow"
+                      : "text-secondary hover:text-primary"
                 }`}
               >
-                <CreditCard size={14} weight="bold" /> Pay by Card (Coming Soon)
+                <CreditCard size={14} weight="bold" /> Pay by Card
               </button>
               <button
-                onClick={() => setPaymentMethod("cash")}
+                onClick={() => allowCash && setPaymentMethod("cash")}
+                disabled={!allowCash}
                 className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition-all ${
-                  paymentMethod === "cash"
-                    ? "bg-emerald-500 text-black shadow"
-                    : "text-muted hover:text-secondary"
+                  !allowCash
+                    ? "bg-surface-overlay/30 text-muted cursor-not-allowed opacity-40"
+                    : paymentMethod === "cash"
+                      ? "bg-emerald-500 text-black shadow"
+                      : "text-secondary hover:text-primary"
                 }`}
               >
                 <Money size={14} weight="bold" /> Pay at Venue
               </button>
             </div>
-            {paymentMethod === "cash" && (
+            {!allowCard && (
+              <p className="mt-2 text-[11px] text-muted leading-snug">
+                This venue does not accept card payments.
+              </p>
+            )}
+            {!allowCash && (
+              <p className="mt-2 text-[11px] text-muted leading-snug">
+                This venue does not accept cash payments.
+              </p>
+            )}
+            {allowCash && paymentMethod === "cash" && (
               <p className="mt-2 text-[11px] text-emerald-400/80 leading-snug">
-                💡 Your slot is reserved immediately. Bring <strong>LKR {pricing.total.toLocaleString()}</strong> cash on arrival.
+                Your slot is reserved immediately. Bring <strong>LKR {pricing.total.toLocaleString()}</strong> cash on arrival.
               </p>
             )}
           </div>
@@ -610,7 +632,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
             : selectedSlots.length > 0
               ? paymentMethod === "cash"
                 ? <><HandCoins size={16} weight="bold" /> Reserve — Pay at Venue</>
-                : "Coming Soon"
+                : "Pay by Card"
               : "Select Slots"
           }
         </Button>

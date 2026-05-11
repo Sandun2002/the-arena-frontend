@@ -57,6 +57,15 @@ export default function BookingManagerPage() {
     const activeCourt = courts.find(c => c.id === activeCourtId);
     const totalPrice = activeCourt ? activeCourt.hourly_rate * duration : 0;
 
+    const venueAcceptance = currentVenue?.accepted_payment_methods || "both";
+    const allowCard = venueAcceptance === "card_only" || venueAcceptance === "both";
+    const allowCash = venueAcceptance === "cash_only" || venueAcceptance === "both";
+
+    useEffect(() => {
+        if (paymentMethod === "cash" && !allowCash) setValue("payment_method", "card");
+        else if (paymentMethod === "card" && !allowCard) setValue("payment_method", "cash");
+    }, [allowCard, allowCash, paymentMethod, setValue]);
+
     useEffect(() => {
         if (currentVenue) {
             loadSchedule();
@@ -516,24 +525,32 @@ export default function BookingManagerPage() {
                         <label className="text-xs font-bold text-muted uppercase tracking-wider">Payment Method</label>
                         <div className="grid grid-cols-2 gap-3">
                             <label className={`
-                                border rounded-xl p-4 flex items-center gap-3 cursor-pointer transition-all
-                                ${paymentMethod === "cash" ? "bg-emerald-500/10 border-emerald-500" : "bg-surface-base/40 border-default hover:border-subtle"}
+                                border rounded-xl p-4 flex items-center gap-3 transition-all
+                                ${!allowCash
+                                    ? "bg-surface-base/20 border-default/30 cursor-not-allowed opacity-40"
+                                    : paymentMethod === "cash"
+                                        ? "bg-emerald-500/10 border-emerald-500 cursor-pointer"
+                                        : "bg-surface-base/40 border-default hover:border-subtle cursor-pointer"}
                             `}>
-                                <input type="radio" value="cash" {...register("payment_method")} className="hidden" />
+                                <input type="radio" value="cash" {...register("payment_method")} className="hidden" disabled={!allowCash} />
                                 <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${paymentMethod === "cash" ? "border-emerald-500" : "border-subtle"}`}>
                                     {paymentMethod === "cash" && <div className="w-2 h-2 rounded-full bg-emerald-500" />}
                                 </div>
-                                <span className="font-bold text-primary text-sm">Cash</span>
+                                <span className="font-bold text-primary text-sm">{allowCash ? "Cash" : "Cash — not accepted"}</span>
                             </label>
                             <label className={`
-                                border rounded-xl p-4 flex items-center gap-3 cursor-pointer transition-all
-                                ${paymentMethod === "card" ? "bg-emerald-500/10 border-emerald-500" : "bg-surface-base/40 border-default hover:border-subtle"}
+                                border rounded-xl p-4 flex items-center gap-3 transition-all
+                                ${!allowCard
+                                    ? "bg-surface-base/20 border-default/30 cursor-not-allowed opacity-40"
+                                    : paymentMethod === "card"
+                                        ? "bg-emerald-500/10 border-emerald-500 cursor-pointer"
+                                        : "bg-surface-base/40 border-default hover:border-subtle cursor-pointer"}
                             `}>
-                                <input type="radio" value="card" {...register("payment_method")} className="hidden" />
+                                <input type="radio" value="card" {...register("payment_method")} className="hidden" disabled={!allowCard} />
                                 <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${paymentMethod === "card" ? "border-emerald-500" : "border-subtle"}`}>
                                     {paymentMethod === "card" && <div className="w-2 h-2 rounded-full bg-emerald-500" />}
                                 </div>
-                                <span className="font-bold text-primary text-sm">Card</span>
+                                <span className="font-bold text-primary text-sm">{allowCard ? "Card" : "Card — not accepted"}</span>
                             </label>
                         </div>
                     </div>
