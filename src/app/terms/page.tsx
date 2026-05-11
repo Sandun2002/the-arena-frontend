@@ -1,8 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 "use client";
-import { useState } from "react";
 import Link from "next/link";
-import { List, X } from "@phosphor-icons/react";
+import LegalTOC from "@/components/ui/LegalTOC";
 
 const tocItems = [
   { id: "acceptance", label: "1. Acceptance of Terms" },
@@ -63,7 +62,6 @@ function BulletList({ children }: { children: React.ReactNode }) {
 }
 
 export default function TermsPage() {
-  const [drawerOpen, setDrawerOpen] = useState(false);
 
   return (
     <main className="min-h-screen bg-surface-base text-secondary pt-24 md:pt-28 pb-14 md:pb-20 relative">
@@ -74,20 +72,7 @@ export default function TermsPage() {
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-[260px,1fr] gap-6 md:gap-10">
-          <aside data-lenis-prevent className="hidden lg:block sticky top-28 h-fit max-h-[calc(100vh-8rem)] overflow-y-auto pr-2">
-            <p className="text-xs text-muted uppercase tracking-[0.18em] font-bold border-b border-default pb-3 mb-4">Contents</p>
-            <nav className="space-y-1">
-              {tocItems.map((item) => (
-                <a
-                  key={item.id}
-                  href={`#${item.id}`}
-                  className="block text-sm text-muted hover:text-emerald-400 transition-colors"
-                >
-                  {item.label}
-                </a>
-              ))}
-            </nav>
-          </aside>
+          <LegalTOC items={tocItems} />
 
           <div className="min-w-0">
             <header className="mb-8 md:mb-12 border-b border-default pb-8 md:pb-10">
@@ -103,46 +88,11 @@ export default function TermsPage() {
                 <span>Last Updated: <span className="text-primary font-semibold">9 May 2026</span></span>
               </div>
               <p className="mt-6 border-l-[3px] border-l-emerald-500/50 bg-surface-raised/60 pl-5 pr-4 py-4 leading-7 md:leading-8 text-[14px] md:text-[15px] rounded-r-lg">
-                Please read these Terms of Service carefully before using The Arena platform. By accessing or using the Platform —
-                whether as a Player or a Vendor — you agree to be legally bound by these Terms. If you do not agree, you must
+                Please read these Terms of Service carefully before using The Arena platform. By accessing or using the Platform &mdash;
+                whether as a Player or a Vendor &mdash; you agree to be legally bound by these Terms. If you do not agree, you must
                 not use the Platform.
               </p>
             </header>
-
-            {/* Mobile: floating TOC button */}
-            <button
-              onClick={() => setDrawerOpen(true)}
-              className="lg:hidden fixed bottom-6 right-6 z-40 w-14 h-14 rounded-2xl bg-emerald-500 text-black shadow-lg shadow-emerald-500/30 flex items-center justify-center hover:bg-emerald-400 transition-colors active:scale-95"
-              aria-label="Open table of contents"
-            >
-              <List size={24} weight="bold" />
-            </button>
-
-            {/* Mobile: slide-out TOC drawer */}
-            {drawerOpen && (
-              <div className="lg:hidden fixed inset-0 z-[100]">
-                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setDrawerOpen(false)} />
-                <div className="absolute right-0 top-0 bottom-0 w-80 max-w-[85vw] bg-surface-base border-l border-default shadow-2xl flex flex-col">
-                  <div className="flex items-center justify-between px-5 py-4 border-b border-default">
-                    <p className="text-sm font-bold text-primary">Contents</p>
-                    <button onClick={() => setDrawerOpen(false)} className="p-1.5 rounded-lg text-muted hover:text-primary hover:bg-surface-raised transition-colors" aria-label="Close">
-                      <X size={20} weight="bold" />
-                    </button>
-                  </div>
-                  <nav className="flex-1 overflow-y-auto px-5 py-4 space-y-1">
-                    {tocItems.map((item) => (
-                      <button
-                        key={`drawer-${item.id}`}
-                        onClick={() => { setDrawerOpen(false); document.getElementById(item.id)?.scrollIntoView({ behavior: "smooth" }); }}
-                        className="block w-full text-left text-sm text-secondary hover:text-emerald-400 transition-colors py-1.5"
-                      >
-                        {item.label}
-                      </button>
-                    ))}
-                  </nav>
-                </div>
-              </div>
-            )}
 
             <Section id="acceptance" number="01" title="Acceptance of Terms">
               <p>
