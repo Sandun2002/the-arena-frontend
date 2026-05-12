@@ -117,6 +117,7 @@ export const normalizeVenue = (raw: any): Venue => {
     deleted_at: raw.deleted_at ?? null,
     created_at: raw.created_at,
     updated_at: raw.updated_at ?? null,
+    accepted_payment_methods: raw.accepted_payment_methods ?? "both",
   };
 };
 
