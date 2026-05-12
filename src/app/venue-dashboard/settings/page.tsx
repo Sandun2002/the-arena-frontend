@@ -246,6 +246,7 @@ export default function VenueSettingsPage() {
         try {
             await venueApiService.updateVenue(currentVenue.id, { accepted_payment_methods: value } as any);
             addToast("Payment methods updated", "success");
+            await refreshVenues();
         } catch (e: any) {
             setPaymentAcceptance(previous);
             addToast(e?.message || "Failed to update payment methods", "error");
