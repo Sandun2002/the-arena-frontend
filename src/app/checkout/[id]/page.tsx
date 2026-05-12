@@ -93,18 +93,26 @@ export default function CheckoutPage() {
       ? new Date(booking.hold_expires_at).getTime()
       : new Date(booking.created_at).getTime() + 5 * 60 * 1000;
 
-    const tick = () => {
-      const remaining = Math.floor((expiryMs - Date.now()) / 1000);
+    // Capture initial remaining once — decouples from client clock manipulation
+    const nowMs = Date.now();
+    let remaining = Math.max(0, Math.floor((expiryMs - nowMs) / 1000));
+    setCountdown(remaining);
+
+    if (remaining <= 0) {
+      setError("Your payment hold has expired. The slot has been released.");
+      return;
+    }
+
+    const timer = setInterval(() => {
+      remaining -= 1;
       if (remaining <= 0) {
         setCountdown(0);
         setError("Your payment hold has expired. The slot has been released.");
+        clearInterval(timer);
       } else {
         setCountdown(remaining);
       }
-    };
-
-    tick();
-    const timer = setInterval(tick, 1000);
+    }, 1000);
     return () => clearInterval(timer);
   }, [booking]);
 
