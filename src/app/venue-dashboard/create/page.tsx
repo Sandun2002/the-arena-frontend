@@ -159,6 +159,13 @@ export default function CreateVenuePage() {
             const brDocumentUrl = uploadRes.url;
 
             // 2. Create the venue with the returned document URL
+            // Normalize amenities: react-hook-form checkbox register() returns
+            // `false` when none are checked, or a bare string when only one is
+            // checked. The backend expects a string array (List[str]).
+            const amenities = Array.isArray(data.amenities)
+                ? data.amenities
+                : data.amenities ? [data.amenities] : [];
+
             await venueApiService.createVenue({
                 name: data.name,
                 description: data.description,
@@ -167,7 +174,7 @@ export default function CreateVenuePage() {
                 phone_contact: data.contact_number,
                 city: data.city,
                 address: data.address,
-                amenities: data.amenities,
+                amenities,
                 br_document_url: brDocumentUrl,
                 geo_lat: geoLat,
                 geo_lng: geoLng
