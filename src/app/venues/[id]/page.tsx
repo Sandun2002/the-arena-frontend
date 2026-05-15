@@ -8,9 +8,10 @@ import { formatDistanceToNow } from "date-fns";
 import { api } from "@/services/api";
 import { Review, Venue } from "@/types";
 import BookingWidget from "@/components/venues/BookingWidget";
-import { CheckCircle, MapPin, Star, Trophy } from "@phosphor-icons/react";
+import { CheckCircle, Images, MapPin, Star, Trophy } from "@phosphor-icons/react";
 
 import TierFrame from "@/components/ui/TierFrame";
+import Modal from "@/components/ui/Modal";
 import { getTierFromXp } from "@/lib/tierUtils";
 
 export default function VenueDetailsPage() {
@@ -18,6 +19,7 @@ export default function VenueDetailsPage() {
   const [venue, setVenue] = useState<Venue | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
 
   useEffect(() => {
     const loadVenue = async () => {
@@ -35,11 +37,12 @@ export default function VenueDetailsPage() {
     loadVenue();
   }, [params.id]);
 
-  const gallery = useMemo(() => {
+  const fullGallery = useMemo(() => {
     if (!venue) return [];
-    const images = venue.gallery_images.length > 0 ? venue.gallery_images : venue.cover_image ? [{ id: "cover", url: venue.cover_image, is_cover: true, display_order: 0 }] : [];
-    return images.slice(0, 3);
+    return venue.gallery_images.length > 0 ? venue.gallery_images : venue.cover_image ? [{ id: "cover", url: venue.cover_image, is_cover: true, display_order: 0 }] : [];
   }, [venue]);
+
+  const displayGallery = fullGallery.slice(0, 3);
 
   if (loading) {
     return (
@@ -121,17 +124,45 @@ export default function VenueDetailsPage() {
 
       <div className="container mx-auto px-4 mb-12 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 h-[400px] md:h-[500px]">
-          <div className="md:col-span-3 relative rounded-[2rem] overflow-hidden border border-default group cursor-pointer bg-surface-raised">
-            {gallery[0] ? <Image src={gallery[0].url} alt={venue.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" priority unoptimized /> : <div className="h-full w-full bg-surface-raised" />}
+          <div 
+            className="md:col-span-3 relative rounded-[2rem] overflow-hidden border border-default group cursor-pointer bg-surface-raised"
+            onClick={() => setIsGalleryOpen(true)}
+          >
+            {displayGallery[0] ? <Image src={displayGallery[0].url} alt={venue.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" priority unoptimized /> : <div className="h-full w-full bg-surface-raised" />}
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            
+            {/* Mobile View All Photos Button */}
+            {fullGallery.length > 1 && (
+              <div className="absolute bottom-4 right-4 md:hidden">
+                <button className="flex items-center gap-2 bg-black/70 backdrop-blur-sm text-white px-4 py-2.5 rounded-xl text-sm font-bold border border-white/20 hover:bg-black/90 transition-colors">
+                  <Images size={18} weight="bold" />
+                  View All {fullGallery.length} Photos
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="hidden md:flex flex-col gap-4">
-            {gallery.slice(1, 3).map((image) => (
-              <div key={image.id} className="relative flex-1 rounded-[2rem] overflow-hidden border border-default group cursor-pointer">
-                <Image src={image.url} alt={venue.name} fill className="object-cover transition-transform duration-700 group-hover:scale-110" unoptimized />
-              </div>
-            ))}
+            {displayGallery.slice(1, 3).map((image, idx) => {
+              const isLast = idx === 1;
+              const hasMore = isLast && fullGallery.length > 3;
+
+              return (
+                <div 
+                  key={image.id} 
+                  className="relative flex-1 rounded-[2rem] overflow-hidden border border-default group cursor-pointer"
+                  onClick={() => setIsGalleryOpen(true)}
+                >
+                  <Image src={image.url} alt={venue.name} fill className="object-cover transition-transform duration-700 group-hover:scale-110" unoptimized />
+                  {hasMore && (
+                    <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center transition-opacity group-hover:bg-black/60 backdrop-blur-[2px]">
+                      <Images size={32} weight="duotone" className="text-white mb-2" />
+                      <span className="text-white font-bold text-lg">+{fullGallery.length - 3} Photos</span>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -235,6 +266,15 @@ export default function VenueDetailsPage() {
           </div>
         </div>
       </div>
+      <Modal isOpen={isGalleryOpen} onClose={() => setIsGalleryOpen(false)} title="Venue Gallery" size="xl">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {fullGallery.map((image, idx) => (
+            <div key={image.id || idx} className="relative h-64 rounded-xl overflow-hidden border border-default bg-surface-base group">
+              <Image src={image.url} alt={`${venue.name} photo ${idx + 1}`} fill className="object-cover transition-transform duration-500 group-hover:scale-105" unoptimized />
+            </div>
+          ))}
+        </div>
+      </Modal>
     </main>
 
   );
