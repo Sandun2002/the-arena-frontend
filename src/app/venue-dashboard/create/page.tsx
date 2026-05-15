@@ -34,7 +34,7 @@ export default function CreateVenuePage() {
     const [isLoadingCities, setIsLoadingCities] = useState(false);
     const [mounted, setMounted] = useState(false);
 
-    const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm({
+    const { register, handleSubmit, setValue, watch, trigger, formState: { errors } } = useForm({
         defaultValues: {
             name: "",
             description: "",
@@ -287,7 +287,14 @@ export default function CreateVenuePage() {
                                     )}
                                 </div>
 
-                                <Button type="button" onClick={() => setStep("location")} className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-12 text-lg shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+                                <Button
+                                    type="button"
+                                    onClick={async () => {
+                                        const valid = await trigger(["name", "contact_number", "contact_email"]);
+                                        if (valid) setStep("location");
+                                    }}
+                                    className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-12 text-lg shadow-[0_0_20px_rgba(16,185,129,0.2)]"
+                                >
                                     Next: Location <ArrowRight size={20} weight="bold" className="ml-2" />
                                 </Button>
                             </div>
@@ -384,12 +391,13 @@ export default function CreateVenuePage() {
                                     <Button
                                         type="button"
                                         disabled={isResolvingMapLink}
-                                        onClick={() => {
+                                        onClick={async () => {
                                             if (!geoLat || !geoLng) {
                                                 setMapsLinkError("Please paste a valid Google Maps link to set your venue location.");
                                                 return;
                                             }
-                                            setStep("amenities");
+                                            const valid = await trigger(["city", "address"]);
+                                            if (valid) setStep("amenities");
                                         }}
                                         className="flex-[2] bg-emerald-500 hover:bg-emerald-400 text-black font-bold h-12 text-lg shadow-[0_0_20px_rgba(16,185,129,0.2)] disabled:opacity-50 disabled:shadow-none"
                                     >
