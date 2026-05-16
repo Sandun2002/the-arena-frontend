@@ -186,9 +186,10 @@ export default function CreateVenuePage() {
 
             // Redirect to dashboard
             setTimeout(() => router.push("/venue-dashboard"), 1000);
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            addToast("Failed to create venue", "error");
+            const detail = error?.response?.data?.detail;
+            addToast(detail || "Failed to create venue. Please try again.", "error");
             setIsSubmitting(false);
         }
     };

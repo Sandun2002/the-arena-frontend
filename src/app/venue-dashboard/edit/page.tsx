@@ -70,9 +70,10 @@ export default function EditVenuePage() {
             addToast("Venue updated successfully!", "success");
             await refreshVenues();
             setTimeout(() => router.push("/venue-dashboard"), 1000);
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            addToast("Failed to update venue", "error");
+            const detail = error?.response?.data?.detail;
+            addToast(detail || "Failed to update venue. Please try again.", "error");
             setIsSubmitting(false);
         }
     };
