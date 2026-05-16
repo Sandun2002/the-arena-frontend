@@ -34,7 +34,7 @@ export default function CreateVenuePage() {
     const [isLoadingCities, setIsLoadingCities] = useState(false);
     const [mounted, setMounted] = useState(false);
 
-    const { register, handleSubmit, setValue, watch, trigger, formState: { errors } } = useForm({
+    const { register, handleSubmit, setValue, watch, trigger, setError, formState: { errors } } = useForm({
         defaultValues: {
             name: "",
             description: "",
@@ -189,7 +189,16 @@ export default function CreateVenuePage() {
         } catch (error: any) {
             console.error(error);
             const detail = error?.response?.data?.detail;
-            addToast(detail || "Failed to create venue. Please try again.", "error");
+
+            // If venue name already exists, jump back to step 1 and show inline error
+            if (detail && /already exists/i.test(detail)) {
+                setStep("details");
+                setError("name", { type: "manual", message: "This venue name is already taken. Please choose a different name." });
+                addToast("A venue with this name already exists.", "error");
+            } else {
+                addToast(detail || "Failed to create venue. Please try again.", "error");
+            }
+
             setIsSubmitting(false);
         }
     };
