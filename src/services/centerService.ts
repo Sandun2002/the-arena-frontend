@@ -4,7 +4,7 @@ import {
     DashboardStats, Booking, VenueProfile, RecurringBooking,
     UpcomingBooking, Court, Closure, GalleryImage,
     AnalyticsRevenue, AnalyticsUtilization, AnalyticsFees, AnalyticsCancellations,
-    RecurringBlock, ScheduleData
+    RecurringBlock, ScheduleData, BankDetailsResponse, BankDetailsUpdate
 } from "@/types";
 import { normalizeBooking, normalizeVenue, normalizeCourt, normalizeGalleryImage, normalizeRecurringBooking } from "./normalizers";
 
@@ -49,6 +49,18 @@ export const centerService = {
                 })
                 : [],
         } as VenueProfile;
+    },
+
+    getBankDetails: async (venueId?: string) => {
+        const params = venueId ? { venue_id: venueId } : {};
+        const response = await apiClient.get<BankDetailsResponse>('/center/bank-details', { params });
+        return response.data;
+    },
+
+    updateBankDetails: async (data: BankDetailsUpdate, venueId?: string) => {
+        const params = venueId ? { venue_id: venueId } : {};
+        const response = await apiClient.put<BankDetailsResponse>('/center/bank-details', data, { params });
+        return response.data;
     },
 
     updateSchedule: async (venueId: string, hours: VenueProfile['operating_schedule']) => {

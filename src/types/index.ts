@@ -445,6 +445,23 @@ export interface VenueProfile extends Venue {
   }[];
 }
 
+export interface BankDetailsUpdate {
+  bank_account_holder_name: string;
+  bank_name: string;
+  bank_branch_name: string;
+  bank_account_number: string;
+  bank_account_type: "savings" | "current";
+}
+
+export interface BankDetailsResponse {
+  bank_account_holder_name: string | null;
+  bank_name: string | null;
+  bank_branch_name: string | null;
+  bank_account_number_masked: string | null;
+  bank_account_type: "savings" | "current" | null;
+  has_bank_details: boolean;
+}
+
 export interface UpcomingBooking {
   id: string;
   court_name: string;

@@ -3,7 +3,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
-import { FloppyDisk, CircleNotch, MapPin, Phone, Clock, FileText, Calendar, Globe, WarningCircle, CheckCircle, MagnifyingGlass, Shield, Sun, Lightning } from "@phosphor-icons/react";
+import { FloppyDisk, CircleNotch, MapPin, Phone, Clock, FileText, Calendar, Globe, WarningCircle, CheckCircle, MagnifyingGlass, Shield, Sun, Lightning, Bank } from "@phosphor-icons/react";
 import Script from "next/script";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
@@ -50,6 +50,24 @@ export default function VenueSettingsPage() {
     const [peakSaving, setPeakSaving] = useState(false);
     const [peakLoading, setPeakLoading] = useState(false);
     const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+    // Bank Details state
+    const [bankDetails, setBankDetails] = useState<{
+        bank_account_holder_name: string | null;
+        bank_name: string | null;
+        bank_branch_name: string | null;
+        bank_account_number_masked: string | null;
+        bank_account_type: "savings" | "current" | null;
+        has_bank_details: boolean;
+    } | null>(null);
+    const [bankDetailsLoading, setBankDetailsLoading] = useState(false);
+    const [bankDetailsEdit, setBankDetailsEdit] = useState(false);
+    const [bankDetailsSaving, setBankDetailsSaving] = useState(false);
+    const BANK_OPTIONS = [
+        "Bank of Ceylon", "People's Bank", "Commercial Bank", "Sampath Bank", 
+        "HNB", "NDB", "NSB", "Seylan Bank", "DFCC Bank", "Pan Asia Bank", 
+        "Union Bank", "Amana Bank", "Cargills Bank", "Nations Trust Bank"
+    ];
 
     const { register, handleSubmit, setValue, watch, control, formState: { errors } } = useForm({
         defaultValues: {
@@ -120,6 +138,7 @@ export default function VenueSettingsPage() {
             // Fetch detailed profile for schedule
             loadProfile();
             loadPeakHours();
+            loadBankDetails();
         }
     }, [currentVenue, setValue]);
 
@@ -189,6 +208,22 @@ export default function VenueSettingsPage() {
         }
     };
 
+    const loadBankDetails = async () => {
+        if (!currentVenue) return;
+        setBankDetailsLoading(true);
+        try {
+            const data = await centerService.getBankDetails(currentVenue.id);
+            setBankDetails(data);
+            if (!data.has_bank_details) {
+                setBankDetailsEdit(true);
+            }
+        } catch (error) {
+            console.error("Failed to load bank details", error);
+        } finally {
+            setBankDetailsLoading(false);
+        }
+    };
+
     const openPeakEdit = () => {
         setPeakForm({
             start: peakHours.peak_start_time || "",
@@ -235,6 +270,37 @@ export default function VenueSettingsPage() {
             addToast(e?.message || "Failed to clear peak hours", "error");
         } finally {
             setPeakSaving(false);
+        }
+    };
+
+    const saveBankDetails = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (!currentVenue) return;
+        
+        const formData = new FormData(e.currentTarget);
+        const payload = {
+            bank_account_holder_name: formData.get("bank_account_holder_name") as string,
+            bank_name: formData.get("bank_name") as string,
+            bank_branch_name: formData.get("bank_branch_name") as string,
+            bank_account_number: formData.get("bank_account_number") as string,
+            bank_account_type: formData.get("bank_account_type") as "savings" | "current",
+        };
+
+        if (!payload.bank_account_holder_name || !payload.bank_name || !payload.bank_branch_name || !payload.bank_account_number || !payload.bank_account_type) {
+            addToast("All bank details fields are required", "error");
+            return;
+        }
+
+        setBankDetailsSaving(true);
+        try {
+            const res = await centerService.updateBankDetails(payload, currentVenue.id);
+            setBankDetails(res);
+            setBankDetailsEdit(false);
+            addToast("Bank details saved successfully", "success");
+        } catch (err: any) {
+            addToast(err?.message || "Failed to save bank details", "error");
+        } finally {
+            setBankDetailsSaving(false);
         }
     };
 
@@ -749,6 +815,152 @@ export default function VenueSettingsPage() {
                                 );
                             })}
                         </div>
+                    </div>
+
+                    {/* Bank Details for Payouts */}
+                    <div className="bg-surface-raised/40 border border-default rounded-3xl p-8 backdrop-blur-sm">
+                        <div className="flex items-center justify-between border-b border-default pb-2 mb-6">
+                            <h2 className="text-lg font-bold text-primary flex items-center gap-2">
+                                <Bank size={20} weight="bold" className="text-blue-500" /> Bank Details for Payouts
+                            </h2>
+                            {bankDetailsLoading && <CircleNotch size={16} weight="bold" className="animate-spin text-blue-500" />}
+                        </div>
+
+                        <p className="text-sm text-secondary mb-6">
+                            These details are used to transfer your venue earnings. Ensure they match your bank records exactly.
+                        </p>
+
+                        {!bankDetailsEdit && bankDetails?.has_bank_details ? (
+                            <div className="space-y-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="p-4 rounded-2xl bg-surface-base/40 border border-default">
+                                        <p className="text-xs text-muted uppercase tracking-wider font-bold mb-1">Account Holder</p>
+                                        <p className="text-sm text-primary font-medium">{bankDetails.bank_account_holder_name}</p>
+                                    </div>
+                                    <div className="p-4 rounded-2xl bg-surface-base/40 border border-default">
+                                        <p className="text-xs text-muted uppercase tracking-wider font-bold mb-1">Bank & Branch</p>
+                                        <p className="text-sm text-primary font-medium">{bankDetails.bank_name} - {bankDetails.bank_branch_name}</p>
+                                    </div>
+                                    <div className="p-4 rounded-2xl bg-surface-base/40 border border-default">
+                                        <p className="text-xs text-muted uppercase tracking-wider font-bold mb-1">Account Number</p>
+                                        <p className="text-sm text-primary font-mono font-medium">{bankDetails.bank_account_number_masked}</p>
+                                    </div>
+                                    <div className="p-4 rounded-2xl bg-surface-base/40 border border-default flex items-center justify-between">
+                                        <div>
+                                            <p className="text-xs text-muted uppercase tracking-wider font-bold mb-1">Account Type</p>
+                                            <p className="text-sm text-primary font-medium capitalize">{bankDetails.bank_account_type}</p>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => setBankDetailsEdit(true)}
+                                            className="text-xs font-bold bg-blue-500/10 hover:bg-blue-500 text-blue-400 hover:text-black px-4 py-2 rounded-lg transition-all border border-blue-500/20"
+                                        >
+                                            Edit Details
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2 mt-4 p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
+                                    <Shield size={16} weight="fill" className="text-blue-400 flex-shrink-0" />
+                                    <p className="text-xs text-blue-100/70">
+                                        Your bank details are encrypted and only visible to The Arena admin team during payout processing.
+                                    </p>
+                                </div>
+                            </div>
+                        ) : (
+                            <form onSubmit={saveBankDetails} className="space-y-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-muted uppercase tracking-wider">Account Holder Name</label>
+                                        <input
+                                            name="bank_account_holder_name"
+                                            defaultValue={bankDetails?.bank_account_holder_name || ""}
+                                            required
+                                            className="w-full bg-surface-base/50 border border-subtle rounded-xl px-4 py-3 text-primary focus:border-blue-500 focus:outline-none transition-colors"
+                                            placeholder="As registered with the bank"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-muted uppercase tracking-wider">Bank Name</label>
+                                        <select
+                                            name="bank_name"
+                                            defaultValue={bankDetails?.bank_name || ""}
+                                            required
+                                            className="w-full bg-surface-base/50 border border-subtle rounded-xl px-4 py-3 text-primary focus:border-blue-500 focus:outline-none transition-colors appearance-none cursor-pointer"
+                                        >
+                                            <option value="" disabled>Select Bank</option>
+                                            {BANK_OPTIONS.map(bank => (
+                                                <option key={bank} value={bank}>{bank}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-muted uppercase tracking-wider">Branch Name</label>
+                                        <input
+                                            name="bank_branch_name"
+                                            defaultValue={bankDetails?.bank_branch_name || ""}
+                                            required
+                                            className="w-full bg-surface-base/50 border border-subtle rounded-xl px-4 py-3 text-primary focus:border-blue-500 focus:outline-none transition-colors"
+                                            placeholder="e.g. Colombo 07"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-muted uppercase tracking-wider">Account Number</label>
+                                        <input
+                                            name="bank_account_number"
+                                            required
+                                            className="w-full bg-surface-base/50 border border-subtle rounded-xl px-4 py-3 text-primary focus:border-blue-500 focus:outline-none transition-colors"
+                                            placeholder="Full account number"
+                                            // Don't show masked number in edit form to force re-entry if changing
+                                            defaultValue=""
+                                        />
+                                    </div>
+                                    <div className="space-y-2 md:col-span-2">
+                                        <label className="text-xs font-bold text-muted uppercase tracking-wider">Account Type</label>
+                                        <div className="flex gap-4">
+                                            <label className="flex items-center gap-2 cursor-pointer group">
+                                                <input
+                                                    type="radio"
+                                                    name="bank_account_type"
+                                                    value="savings"
+                                                    defaultChecked={bankDetails?.bank_account_type === "savings" || !bankDetails?.bank_account_type}
+                                                    className="text-blue-500 focus:ring-blue-500 bg-surface-base border-subtle"
+                                                />
+                                                <span className="text-sm text-secondary group-hover:text-primary transition-colors">Savings</span>
+                                            </label>
+                                            <label className="flex items-center gap-2 cursor-pointer group">
+                                                <input
+                                                    type="radio"
+                                                    name="bank_account_type"
+                                                    value="current"
+                                                    defaultChecked={bankDetails?.bank_account_type === "current"}
+                                                    className="text-blue-500 focus:ring-blue-500 bg-surface-base border-subtle"
+                                                />
+                                                <span className="text-sm text-secondary group-hover:text-primary transition-colors">Current</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-default">
+                                    {bankDetails?.has_bank_details && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setBankDetailsEdit(false)}
+                                            className="px-5 py-2.5 rounded-xl text-sm font-bold text-secondary hover:text-primary hover:bg-surface-raised transition-all"
+                                        >
+                                            Cancel
+                                        </button>
+                                    )}
+                                    <Button
+                                        type="submit"
+                                        disabled={bankDetailsSaving}
+                                        className="bg-blue-500 hover:bg-blue-400 text-black font-bold px-6 py-2.5 rounded-xl shadow-[0_0_15px_rgba(59,130,246,0.2)]"
+                                    >
+                                        {bankDetailsSaving ? <CircleNotch size={16} weight="bold" className="animate-spin mr-2" /> : <FloppyDisk size={16} weight="bold" className="mr-2" />}
+                                        Save Bank Details
+                                    </Button>
+                                </div>
+                            </form>
+                        )}
                     </div>
 
                     {/* Weekly Schedule */}
