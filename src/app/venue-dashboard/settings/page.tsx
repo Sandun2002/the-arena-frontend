@@ -288,8 +288,8 @@ export default function VenueSettingsPage() {
         }
     };
 
-    const saveBankDetails = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const saveBankDetails = async (e?: React.MouseEvent | React.FormEvent) => {
+        if (e) e.preventDefault();
         if (!currentVenue) return;
 
         if (!bankForm.bank_account_holder_name || !bankForm.bank_name || !bankForm.bank_branch_name || !bankForm.bank_account_number || !bankForm.bank_account_type) {
@@ -873,7 +873,7 @@ export default function VenueSettingsPage() {
                                 </div>
                             </div>
                         ) : (
-                            <form onSubmit={saveBankDetails} className="space-y-4">
+                            <div className="space-y-4">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <label className="text-xs font-bold text-muted uppercase tracking-wider">Account Holder Name</label>
@@ -956,7 +956,8 @@ export default function VenueSettingsPage() {
                                         </button>
                                     )}
                                     <Button
-                                        type="submit"
+                                        type="button"
+                                        onClick={saveBankDetails}
                                         disabled={bankDetailsSaving}
                                         className="bg-blue-500 hover:bg-blue-400 text-black font-bold px-6 py-2.5 rounded-xl shadow-[0_0_15px_rgba(59,130,246,0.2)]"
                                     >
@@ -964,7 +965,7 @@ export default function VenueSettingsPage() {
                                         Save Bank Details
                                     </Button>
                                 </div>
-                            </form>
+                            </div>
                         )}
                     </div>
 
