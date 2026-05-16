@@ -391,6 +391,8 @@ export default function VenueSettingsPage() {
         );
     }
 
+    const isOwner = user.id === currentVenue.owner_id;
+
     return (
         <main className="min-h-screen bg-surface-base pt-24 pb-20 px-4 relative overflow-hidden">
             {/* Background Effects */}
@@ -824,8 +826,9 @@ export default function VenueSettingsPage() {
                     </div>
 
                     {/* Bank Details for Payouts */}
-                    <div className="bg-surface-raised/40 border border-default rounded-3xl p-8 backdrop-blur-sm">
-                        <div className="flex items-center justify-between border-b border-default pb-2 mb-6">
+                    {isOwner && (
+                        <div className="bg-surface-raised/40 border border-default rounded-3xl p-8 backdrop-blur-sm">
+                            <div className="flex items-center justify-between border-b border-default pb-2 mb-6">
                             <h2 className="text-lg font-bold text-primary flex items-center gap-2">
                                 <Bank size={20} weight="bold" className="text-blue-500" /> Bank Details for Payouts
                             </h2>
@@ -968,6 +971,7 @@ export default function VenueSettingsPage() {
                             </div>
                         )}
                     </div>
+                    )}
 
                     {/* Weekly Schedule */}
                     <div className="bg-surface-raised/40 border border-default rounded-3xl p-8 backdrop-blur-sm">
