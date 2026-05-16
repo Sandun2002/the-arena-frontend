@@ -60,6 +60,13 @@ export default function VenueSettingsPage() {
         bank_account_type: "savings" | "current" | null;
         has_bank_details: boolean;
     } | null>(null);
+    const [bankForm, setBankForm] = useState({
+        bank_account_holder_name: "",
+        bank_name: "",
+        bank_branch_name: "",
+        bank_account_number: "",
+        bank_account_type: "savings" as "savings" | "current",
+    });
     const [bankDetailsLoading, setBankDetailsLoading] = useState(false);
     const [bankDetailsEdit, setBankDetailsEdit] = useState(false);
     const [bankDetailsSaving, setBankDetailsSaving] = useState(false);
@@ -214,6 +221,14 @@ export default function VenueSettingsPage() {
         try {
             const data = await centerService.getBankDetails(currentVenue.id);
             setBankDetails(data);
+            // Pre-populate form with existing values (but clear account number for security)
+            setBankForm({
+                bank_account_holder_name: data.bank_account_holder_name || "",
+                bank_name: data.bank_name || "",
+                bank_branch_name: data.bank_branch_name || "",
+                bank_account_number: "", // always cleared for security
+                bank_account_type: data.bank_account_type || "savings",
+            });
             if (!data.has_bank_details) {
                 setBankDetailsEdit(true);
             }
@@ -273,27 +288,18 @@ export default function VenueSettingsPage() {
         }
     };
 
-    const saveBankDetails = async (e: React.FormEvent<HTMLFormElement>) => {
+    const saveBankDetails = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!currentVenue) return;
-        
-        const formData = new FormData(e.currentTarget);
-        const payload = {
-            bank_account_holder_name: formData.get("bank_account_holder_name") as string,
-            bank_name: formData.get("bank_name") as string,
-            bank_branch_name: formData.get("bank_branch_name") as string,
-            bank_account_number: formData.get("bank_account_number") as string,
-            bank_account_type: formData.get("bank_account_type") as "savings" | "current",
-        };
 
-        if (!payload.bank_account_holder_name || !payload.bank_name || !payload.bank_branch_name || !payload.bank_account_number || !payload.bank_account_type) {
+        if (!bankForm.bank_account_holder_name || !bankForm.bank_name || !bankForm.bank_branch_name || !bankForm.bank_account_number || !bankForm.bank_account_type) {
             addToast("All bank details fields are required", "error");
             return;
         }
 
         setBankDetailsSaving(true);
         try {
-            const res = await centerService.updateBankDetails(payload, currentVenue.id);
+            const res = await centerService.updateBankDetails(bankForm, currentVenue.id);
             setBankDetails(res);
             setBankDetailsEdit(false);
             addToast("Bank details saved successfully", "success");
@@ -872,8 +878,8 @@ export default function VenueSettingsPage() {
                                     <div className="space-y-2">
                                         <label className="text-xs font-bold text-muted uppercase tracking-wider">Account Holder Name</label>
                                         <input
-                                            name="bank_account_holder_name"
-                                            defaultValue={bankDetails?.bank_account_holder_name || ""}
+                                            value={bankForm.bank_account_holder_name}
+                                            onChange={e => setBankForm(prev => ({ ...prev, bank_account_holder_name: e.target.value }))}
                                             required
                                             className="w-full bg-surface-base/50 border border-subtle rounded-xl px-4 py-3 text-primary focus:border-blue-500 focus:outline-none transition-colors"
                                             placeholder="As registered with the bank"
@@ -882,8 +888,8 @@ export default function VenueSettingsPage() {
                                     <div className="space-y-2">
                                         <label className="text-xs font-bold text-muted uppercase tracking-wider">Bank Name</label>
                                         <select
-                                            name="bank_name"
-                                            defaultValue={bankDetails?.bank_name || ""}
+                                            value={bankForm.bank_name}
+                                            onChange={e => setBankForm(prev => ({ ...prev, bank_name: e.target.value }))}
                                             required
                                             className="w-full bg-surface-base/50 border border-subtle rounded-xl px-4 py-3 text-primary focus:border-blue-500 focus:outline-none transition-colors appearance-none cursor-pointer"
                                         >
@@ -896,8 +902,8 @@ export default function VenueSettingsPage() {
                                     <div className="space-y-2">
                                         <label className="text-xs font-bold text-muted uppercase tracking-wider">Branch Name</label>
                                         <input
-                                            name="bank_branch_name"
-                                            defaultValue={bankDetails?.bank_branch_name || ""}
+                                            value={bankForm.bank_branch_name}
+                                            onChange={e => setBankForm(prev => ({ ...prev, bank_branch_name: e.target.value }))}
                                             required
                                             className="w-full bg-surface-base/50 border border-subtle rounded-xl px-4 py-3 text-primary focus:border-blue-500 focus:outline-none transition-colors"
                                             placeholder="e.g. Colombo 07"
@@ -906,12 +912,11 @@ export default function VenueSettingsPage() {
                                     <div className="space-y-2">
                                         <label className="text-xs font-bold text-muted uppercase tracking-wider">Account Number</label>
                                         <input
-                                            name="bank_account_number"
+                                            value={bankForm.bank_account_number}
+                                            onChange={e => setBankForm(prev => ({ ...prev, bank_account_number: e.target.value }))}
                                             required
                                             className="w-full bg-surface-base/50 border border-subtle rounded-xl px-4 py-3 text-primary focus:border-blue-500 focus:outline-none transition-colors"
                                             placeholder="Full account number"
-                                            // Don't show masked number in edit form to force re-entry if changing
-                                            defaultValue=""
                                         />
                                     </div>
                                     <div className="space-y-2 md:col-span-2">
@@ -920,9 +925,9 @@ export default function VenueSettingsPage() {
                                             <label className="flex items-center gap-2 cursor-pointer group">
                                                 <input
                                                     type="radio"
-                                                    name="bank_account_type"
                                                     value="savings"
-                                                    defaultChecked={bankDetails?.bank_account_type === "savings" || !bankDetails?.bank_account_type}
+                                                    checked={bankForm.bank_account_type === "savings"}
+                                                    onChange={() => setBankForm(prev => ({ ...prev, bank_account_type: "savings" }))}
                                                     className="text-blue-500 focus:ring-blue-500 bg-surface-base border-subtle"
                                                 />
                                                 <span className="text-sm text-secondary group-hover:text-primary transition-colors">Savings</span>
@@ -930,9 +935,9 @@ export default function VenueSettingsPage() {
                                             <label className="flex items-center gap-2 cursor-pointer group">
                                                 <input
                                                     type="radio"
-                                                    name="bank_account_type"
                                                     value="current"
-                                                    defaultChecked={bankDetails?.bank_account_type === "current"}
+                                                    checked={bankForm.bank_account_type === "current"}
+                                                    onChange={() => setBankForm(prev => ({ ...prev, bank_account_type: "current" }))}
                                                     className="text-blue-500 focus:ring-blue-500 bg-surface-base border-subtle"
                                                 />
                                                 <span className="text-sm text-secondary group-hover:text-primary transition-colors">Current</span>
