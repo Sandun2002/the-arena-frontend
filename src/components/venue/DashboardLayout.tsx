@@ -79,7 +79,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         { name: "Recurring", path: "/venue-dashboard/recurring", icon: ArrowsClockwise, verifiedOnly: true },
         { name: "Closures", path: "/venue-dashboard/closures", icon: Hammer, verifiedOnly: true },
         { name: "Gallery", path: "/venue-dashboard/gallery", icon: ImageIcon, verifiedOnly: true },
-        { name: "Cash Payouts", path: "/venue-dashboard/remittances", icon: Money, ownerOnly: true, verifiedOnly: true },
         { name: "Settings", path: "/venue-dashboard/settings", icon: GearSix, verifiedOnly: true },
     ];
 
@@ -87,7 +86,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         { name: "Overview", path: "/venue-dashboard/analytics", icon: ChartBar, verifiedOnly: true },
         { name: "Revenue", path: "/venue-dashboard/analytics/revenue", icon: CurrencyDollar, ownerOnly: true, verifiedOnly: true },
         { name: "Utilization", path: "/venue-dashboard/analytics/utilization", icon: Pulse, verifiedOnly: true },
-        { name: "Fees", path: "/venue-dashboard/analytics/fees", icon: ChartPieSlice, ownerOnly: true, verifiedOnly: true },
+        { name: "Fees & Payouts", path: "/venue-dashboard/analytics/fees", icon: ChartPieSlice, ownerOnly: true, verifiedOnly: true },
         { name: "Cancellations", path: "/venue-dashboard/analytics/cancellations", icon: XCircle, verifiedOnly: true },
     ];
 
