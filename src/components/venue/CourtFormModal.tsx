@@ -123,11 +123,14 @@ export default function CourtFormModal({ venueId, existingCourt, onClose, onSucc
                                 className="w-full bg-surface-base/40 border border-subtle rounded-xl px-4 py-3 text-primary focus:border-emerald-500 focus:outline-none transition-colors appearance-none"
                             >
                                 <option value="">Select a sport...</option>
-                                {sports.map(s => (
-                                    <option key={s.id} value={s.id}>
-                                        {s.icon ? `${s.icon} ` : ""}{s.display_name}
-                                    </option>
-                                ))}
+                                {sports.map(s => {
+                                    const showIcon = s.icon && !s.icon.includes("/");
+                                    return (
+                                        <option key={s.id} value={s.id}>
+                                            {showIcon ? `${s.icon} ` : ""}{s.display_name}
+                                        </option>
+                                    );
+                                })}
                             </select>
                         )}
                         {!loadingSports && (
