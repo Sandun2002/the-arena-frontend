@@ -149,8 +149,7 @@ export default function BookingManagerPage() {
             const endDateTime = new Date(startDateTime);
             endDateTime.setHours(startDateTime.getHours() + data.duration);
 
-            const now = new Date();
-            const finalStartDateTime = startDateTime < now ? new Date(now.getTime() + 60000) : startDateTime;
+            const finalStartDateTime = startDateTime;
 
             await centerService.createManualBooking({
                 court_id: activeCourtId,
@@ -169,7 +168,7 @@ export default function BookingManagerPage() {
             loadSchedule();
         } catch (error: any) {
             console.error(error);
-            addToast(error.response?.data?.message || "Failed to record booking. Slot might be taken.", "error");
+            addToast(error.response?.data?.detail || error.response?.data?.message || "Failed to record booking. Slot might be taken.", "error");
         } finally {
             setIsSubmitting(false);
         }
@@ -390,7 +389,7 @@ export default function BookingManagerPage() {
 
                                 const booking = getBookingForSlot(activeCourtId, hour);
                                 const recurring = !booking ? getRecurringForSlot(activeCourtId, hour) : undefined;
-                                const isPast = slotStart < new Date();
+                                const isPast = slotEnd <= new Date();
                                 const isLive = slotStart <= new Date() && new Date() < slotEnd;
 
                                 return (
