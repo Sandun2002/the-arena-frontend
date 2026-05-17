@@ -306,10 +306,12 @@ export interface VenueSlotsResponse {
     closing: string | null;
   } | null;
   peak_hours?: {
+    has_peak_config: boolean;
+    today_windows: { start: string; end: string }[];
+    // Backward-compat keys
     peak_start_time: string | null;
     peak_end_time: string | null;
     peak_days: string | null;
-    has_peak_config: boolean;
   };
   courts: Array<{
     court_id: string;
@@ -460,6 +462,31 @@ export interface BankDetailsResponse {
   bank_account_number_masked: string | null;
   bank_account_type: "savings" | "current" | null;
   has_bank_details: boolean;
+}
+
+// === Peak Windows (multi-window per-day peak pricing) ===
+export interface PeakWindow {
+  id: string;
+  day_of_week: number; // 0=Mon … 6=Sun
+  start_time: string;  // "HH:MM"
+  end_time: string;    // "HH:MM" (== start_time means all-day)
+}
+
+export interface DayPeakSummary {
+  day_of_week: number;
+  day_label: string;   // "Monday", "Tuesday", …
+  windows: PeakWindow[];
+}
+
+export interface PeakWindowsResponse {
+  days: DayPeakSummary[]; // Always 7 items (Mon–Sun)
+  has_peak_config: boolean;
+}
+
+export interface PeakWindowInput {
+  day_of_week: number;
+  start_time: string;  // "HH:MM"
+  end_time: string;    // "HH:MM"
 }
 
 export interface UpcomingBooking {

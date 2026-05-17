@@ -34,10 +34,12 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
   const [maintenanceCourts, setMaintenanceCourts] = useState<any[]>([]);
   const [hasAutoSelected, setHasAutoSelected] = useState(false);
   const [peakConfig, setPeakConfig] = useState<{
-    peak_start_time: string | null;
-    peak_end_time: string | null;
-    peak_days: string | null;
     has_peak_config: boolean;
+    today_windows?: { start: string; end: string }[];
+    // Backward-compat keys
+    peak_start_time?: string | null;
+    peak_end_time?: string | null;
+    peak_days?: string | null;
   } | null>(null);
 
   const [loadingSlots, setLoadingSlots] = useState(false);
@@ -344,9 +346,15 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
         <div className="mb-4 p-3 rounded-xl bg-gradient-to-r from-amber-500/10 to-amber-500/5 border border-amber-500/20 flex items-center gap-2">
           <Lightning size={14} weight="fill" className="text-amber-400 flex-shrink-0" />
           <p className="text-[11px] text-amber-400/90 leading-snug">
-            <span className="font-bold">Peak hours {peakConfig.peak_start_time}&ndash;{peakConfig.peak_end_time}</span>
-            {peakConfig.peak_days ? ` on selected days` : ` (every day)`}
-            {` `}may cost more.
+            <span className="font-bold">Peak hours today: </span>
+            {peakConfig.today_windows && peakConfig.today_windows.length > 0
+              ? peakConfig.today_windows
+                  .map((w) => (w.start === "00:00" && w.end === "00:00" ? "All Day" : `${w.start}–${w.end}`))
+                  .join(", ")
+              : peakConfig.peak_start_time && peakConfig.peak_end_time
+              ? `${peakConfig.peak_start_time}–${peakConfig.peak_end_time}`
+              : "Active"}
+            {" "}may cost more.
           </p>
         </div>
       )}

@@ -331,29 +331,18 @@ export const centerService = {
         } satisfies AnalyticsCancellations;
     },
 
-    // --- Peak Hours ---
+    // --- Peak Hours (multi-window per-day system) ---
 
-    getPeakHours: async (venueId?: string): Promise<{
-        peak_start_time: string | null;
-        peak_end_time: string | null;
-        peak_days: string | null;
-        has_peak_config: boolean;
-    }> => {
+    getPeakHours: async (venueId?: string): Promise<import("@/types").PeakWindowsResponse> => {
         const params = venueId ? { venue_id: venueId } : {};
         const response = await apiClient.get('/center/peak-hours', { params });
         return response.data;
     },
 
-    updatePeakHours: async (payload: {
-        peak_start_time: string | null;
-        peak_end_time: string | null;
-        peak_days: string | null;
-    }, venueId?: string): Promise<{
-        peak_start_time: string | null;
-        peak_end_time: string | null;
-        peak_days: string | null;
-        has_peak_config: boolean;
-    }> => {
+    updatePeakHours: async (
+        payload: { windows: import("@/types").PeakWindowInput[] },
+        venueId?: string,
+    ): Promise<import("@/types").PeakWindowsResponse> => {
         const params = venueId ? { venue_id: venueId } : {};
         const response = await apiClient.put('/center/peak-hours', payload, { params });
         return response.data;
