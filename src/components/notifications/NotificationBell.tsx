@@ -9,11 +9,12 @@ interface NotificationBellProps {
 }
 
 export function NotificationBell({ className }: NotificationBellProps) {
-  const { unreadCount, openPanel, panelOpen } = useNotifications();
+  const { unreadCount, openPanel, closePanel, panelOpen } = useNotifications();
 
   return (
     <button
-      onClick={openPanel}
+      data-notification-bell
+      onClick={panelOpen ? closePanel : openPanel}
       aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ""}`}
       className={cn(
         "relative flex items-center justify-center w-9 h-9 rounded-xl transition-colors",

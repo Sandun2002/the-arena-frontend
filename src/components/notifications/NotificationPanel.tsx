@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import { X, Check, Checks, Trash, ArrowUpRight, Bell, BellSlash } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
@@ -9,6 +9,7 @@ import { useAuth } from "@/services/authContext";
 import { AppNotification } from "@/services/notificationService";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
+import { useOutsideClick } from "@/hooks/useOutsideClick";
 
 const TABS = [
   { key: "player" as const, label: "Player" },
@@ -109,6 +110,9 @@ export function NotificationPanel() {
     deleteNotification,
   } = useNotifications();
 
+  const desktopPanelRef = useRef<HTMLDivElement>(null);
+  useOutsideClick(desktopPanelRef, closePanel, "[data-notification-bell]");
+
   const { isVenueOwner, isVenueManager } = useAuth();
   const router = useRouter();
 
@@ -136,6 +140,7 @@ export function NotificationPanel() {
 
   const panelContent = (
     <div
+      data-lenis-prevent
       className={cn(
         "flex flex-col min-h-0",
         "bg-surface-raised border border-default shadow-2xl",
@@ -262,8 +267,10 @@ export function NotificationPanel() {
       {createPortal(mobileOverlay, document.body)}
 
       {/* Desktop: dropdown anchored to bell */}
-      <div className="hidden md:block absolute right-0 top-full mt-2 z-50 animate-in fade-in-0 slide-in-from-top-2 duration-150">
-        <div className="fixed inset-0 z-[-1]" onClick={closePanel} />
+      <div
+        ref={desktopPanelRef}
+        className="hidden md:block absolute right-0 top-full mt-2 z-50 animate-in fade-in-0 slide-in-from-top-2 duration-150"
+      >
         {panelContent}
       </div>
     </>

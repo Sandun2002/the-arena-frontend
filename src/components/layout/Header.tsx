@@ -4,7 +4,7 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Button from "../ui/Button";
 import { List, X, User, SignOut, CalendarBlank, Gear, Shield } from "@phosphor-icons/react";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
@@ -15,15 +15,19 @@ import TierFrame from "@/components/ui/TierFrame";
 import { getTierFromXp } from "@/lib/tierUtils";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useOutsideClick } from "@/hooks/useOutsideClick";
 
 export default function Header() {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  useOutsideClick(userMenuRef, () => setIsUserMenuOpen(false));
 
   const { resolvedTheme } = useTheme();
   const { isLoggedIn, user, logout, isVenueOwner, isVenueManager } = useAuth();
-
+  
   // Determine Context
   const isVenueContext = pathname?.startsWith("/venue-dashboard");
   const showVenueSwitcher = isVenueContext && (isVenueOwner || isVenueManager);
@@ -96,7 +100,7 @@ export default function Header() {
               )}
 
               {/* User Dropdown */}
-              <div className="relative">
+              <div className="relative" ref={userMenuRef}>
                 <button
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                   className="flex items-center gap-3 hover:bg-surface-overlay/30 pr-3 pl-2 py-1.5 rounded-full transition-colors border border-transparent hover:border-default"
@@ -112,37 +116,34 @@ export default function Header() {
                 </button>
 
                 {isUserMenuOpen && (
-                  <>
-                    <div className="fixed inset-0 z-30" onClick={() => setIsUserMenuOpen(false)} />
-                    <div className="absolute top-full right-0 mt-2 w-56 bg-surface-raised border border-default rounded-xl shadow-xl z-40 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                      <div className="p-3 border-b border-default">
-                        <p className="text-sm font-bold text-primary truncate">{user?.full_name}</p>
-                        <p className="text-xs text-muted truncate">{user?.email}</p>
-                      </div>
-                      <div className="p-2">
-                        <Link href="/profile" className="flex items-center gap-2 px-3 py-2 text-sm text-secondary hover:text-primary hover:bg-surface-overlay rounded-lg transition-colors">
-                          <User size={16} weight="duotone" /> My Profile
-                        </Link>
-                        <Link href="/bookings" className="flex items-center gap-2 px-3 py-2 text-sm text-secondary hover:text-primary hover:bg-surface-overlay rounded-lg transition-colors">
-                          <CalendarBlank size={16} weight="duotone" /> My Bookings
-                        </Link>
-                        <Link href="/settings/sessions" className="flex items-center gap-2 px-3 py-2 text-sm text-secondary hover:text-primary hover:bg-surface-overlay rounded-lg transition-colors">
-                          <Shield size={16} weight="duotone" /> Security
-                        </Link>
-                        <Link href="/settings/notifications" className="flex items-center gap-2 px-3 py-2 text-sm text-secondary hover:text-primary hover:bg-surface-overlay rounded-lg transition-colors">
-                          <Gear size={16} weight="duotone" /> Notifications
-                        </Link>
-                      </div>
-                      <div className="p-2 border-t border-default">
-                        <button
-                          onClick={logout}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors"
-                        >
-                          <SignOut size={16} weight="duotone" /> Log Out
-                        </button>
-                      </div>
+                  <div className="absolute top-full right-0 mt-2 w-56 bg-surface-raised border border-default rounded-xl shadow-xl z-40 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                    <div className="p-3 border-b border-default">
+                      <p className="text-sm font-bold text-primary truncate">{user?.full_name}</p>
+                      <p className="text-xs text-muted truncate">{user?.email}</p>
                     </div>
-                  </>
+                    <div className="p-2">
+                      <Link href="/profile" className="flex items-center gap-2 px-3 py-2 text-sm text-secondary hover:text-primary hover:bg-surface-overlay rounded-lg transition-colors">
+                        <User size={16} weight="duotone" /> My Profile
+                      </Link>
+                      <Link href="/bookings" className="flex items-center gap-2 px-3 py-2 text-sm text-secondary hover:text-primary hover:bg-surface-overlay rounded-lg transition-colors">
+                        <CalendarBlank size={16} weight="duotone" /> My Bookings
+                      </Link>
+                      <Link href="/settings/sessions" className="flex items-center gap-2 px-3 py-2 text-sm text-secondary hover:text-primary hover:bg-surface-overlay rounded-lg transition-colors">
+                        <Shield size={16} weight="duotone" /> Security
+                      </Link>
+                      <Link href="/settings/notifications" className="flex items-center gap-2 px-3 py-2 text-sm text-secondary hover:text-primary hover:bg-surface-overlay rounded-lg transition-colors">
+                        <Gear size={16} weight="duotone" /> Notifications
+                      </Link>
+                    </div>
+                    <div className="p-2 border-t border-default">
+                      <button
+                        onClick={logout}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors"
+                      >
+                        <SignOut size={16} weight="duotone" /> Log Out
+                      </button>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>

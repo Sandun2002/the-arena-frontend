@@ -1,14 +1,18 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { CaretDown, Check, Buildings, Plus } from "@phosphor-icons/react";
 import { useVenue } from "./VenueContext";
 import Link from "next/link";
+import { useOutsideClick } from "@/hooks/useOutsideClick";
 
 export default function VenueSwitcher({ hideCreateAction = false }: { hideCreateAction?: boolean }) {
     const { venues, currentVenue, selectVenue, isLoading } = useVenue();
     const [isOpen, setIsOpen] = useState(false);
+    const switcherRef = useRef<HTMLDivElement>(null);
+
+    useOutsideClick(switcherRef, () => setIsOpen(false));
 
     if (isLoading) return <div className="h-10 w-full bg-surface-overlay/50 animate-pulse rounded-lg" />;
 
@@ -30,7 +34,7 @@ export default function VenueSwitcher({ hideCreateAction = false }: { hideCreate
     }
 
     return (
-        <div className="relative">
+        <div className="relative" ref={switcherRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-surface-overlay transition-colors border border-default bg-surface-base/40 group"
@@ -48,40 +52,40 @@ export default function VenueSwitcher({ hideCreateAction = false }: { hideCreate
             </button>
 
             {isOpen && (
-                <>
-                    <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-                    <div className="absolute top-full left-0 mt-2 w-full min-w-[240px] bg-surface-raised border border-default rounded-xl shadow-2xl shadow-[var(--shadow-elevation)] z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                        <div className="max-h-60 overflow-y-auto custom-scrollbar p-2 space-y-1">
-                            {venues.map((venue) => (
-                                <button
-                                    key={venue.id}
-                                    onClick={() => {
-                                        selectVenue(venue.id);
-                                        setIsOpen(false);
-                                    }}
-                                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${currentVenue?.id === venue.id
-                                        ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
-                                        : "text-secondary hover:text-primary hover:bg-surface-overlay border border-transparent"
-                                        }`}
-                                >
-                                    <span className="truncate">{venue.name}</span>
-                                    {currentVenue?.id === venue.id && <Check size={16} weight="bold" />}
-                                </button>
-                            ))}
-                        </div>
-                        {!hideCreateAction && (
-                            <div className="border-t border-default p-2 bg-surface-raised/50">
-                                <Link
-                                    href="/venue-dashboard/create"
-                                    onClick={() => setIsOpen(false)}
-                                    className="flex items-center justify-center gap-2 w-full text-center text-xs font-bold text-secondary hover:text-primary hover:bg-surface-overlay py-2 rounded-lg transition-colors"
-                                >
-                                    <Plus size={12} weight="bold" /> Add New Venue
-                                </Link>
-                            </div>
-                        )}
+                <div
+                    data-lenis-prevent
+                    className="absolute top-full left-0 mt-2 w-full min-w-[240px] bg-surface-raised border border-default rounded-xl shadow-2xl shadow-[var(--shadow-elevation)] z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+                >
+                    <div className="max-h-60 overflow-y-auto custom-scrollbar p-2 space-y-1">
+                        {venues.map((venue) => (
+                            <button
+                                key={venue.id}
+                                onClick={() => {
+                                    selectVenue(venue.id);
+                                    setIsOpen(false);
+                                }}
+                                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${currentVenue?.id === venue.id
+                                    ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
+                                    : "text-secondary hover:text-primary hover:bg-surface-overlay border border-transparent"
+                                    }`}
+                            >
+                                <span className="truncate">{venue.name}</span>
+                                {currentVenue?.id === venue.id && <Check size={16} weight="bold" />}
+                            </button>
+                        ))}
                     </div>
-                </>
+                    {!hideCreateAction && (
+                        <div className="border-t border-default p-2 bg-surface-raised/50">
+                            <Link
+                                href="/venue-dashboard/create"
+                                onClick={() => setIsOpen(false)}
+                                className="flex items-center justify-center gap-2 w-full text-center text-xs font-bold text-secondary hover:text-primary hover:bg-surface-overlay py-2 rounded-lg transition-colors"
+                            >
+                                <Plus size={12} weight="bold" /> Add New Venue
+                            </Link>
+                        </div>
+                    )}
+                </div>
             )}
         </div>
     );
