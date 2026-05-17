@@ -168,7 +168,8 @@ export default function BookingManagerPage() {
             loadSchedule();
         } catch (error: any) {
             console.error(error);
-            addToast(error.response?.data?.detail || error.response?.data?.message || "Failed to record booking. Slot might be taken.", "error");
+            const errorMsg = error.response?.data?.error?.message || error.response?.data?.detail || error.response?.data?.message || "Failed to record booking. Slot might be taken.";
+            addToast(errorMsg, "error");
         } finally {
             setIsSubmitting(false);
         }
