@@ -111,7 +111,7 @@ export function NotificationPanel() {
   } = useNotifications();
 
   const desktopPanelRef = useRef<HTMLDivElement>(null);
-  useOutsideClick(desktopPanelRef, closePanel, "[data-notification-bell]");
+  useOutsideClick(desktopPanelRef, closePanel, "[data-notification-bell], [data-notification-panel]");
 
   const { isVenueOwner, isVenueManager } = useAuth();
   const router = useRouter();
@@ -141,6 +141,7 @@ export function NotificationPanel() {
   const panelContent = (
     <div
       data-lenis-prevent
+      data-notification-panel
       className={cn(
         "flex flex-col min-h-0",
         "bg-surface-raised border border-default shadow-2xl",
