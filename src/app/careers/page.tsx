@@ -54,19 +54,19 @@ export default function CareersPage() {
       {/* 1. Hero Section */}
       <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
         {/* Decorative background glows */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-emerald-500/10 rounded-full blur-[130px] pointer-events-none" />
-        <div className="absolute bottom-0 right-10 w-[400px] h-[400px] bg-emerald-500/5 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-emerald-500/5 dark:bg-emerald-500/10 rounded-full blur-[130px] pointer-events-none" />
+        <div className="absolute bottom-0 right-10 w-[400px] h-[400px] bg-emerald-500/3 dark:bg-emerald-500/5 rounded-full blur-[100px] pointer-events-none" />
 
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-4xl mx-auto">
-            <div className="careers-hero-anim inline-flex items-center gap-2 mb-6 px-4 py-1.5 rounded-full bg-surface-raised/80 border border-default text-emerald-400 text-xs font-bold tracking-widest uppercase">
-              <RocketLaunch size={14} weight="fill" className="animate-bounce" />
+            <div className="careers-hero-anim inline-flex items-center gap-2 mb-6 px-4 py-1.5 rounded-full bg-surface-raised border border-default text-emerald-600 dark:text-emerald-400 text-xs font-bold tracking-widest uppercase shadow-sm">
+              <RocketLaunch size={14} weight="fill" className="text-emerald-500 animate-bounce" />
               Careers at The Arena
             </div>
             
             <h1 className="careers-hero-anim text-5xl md:text-7xl font-black text-primary mb-8 tracking-tighter leading-[0.9] uppercase">
               Build the Future <br />
-              of <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-600">Sports Tech</span>
+              of <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-emerald-600 dark:from-emerald-400 dark:to-emerald-500">Sports Tech</span>
             </h1>
             
             <p className="careers-hero-anim text-lg md:text-xl text-secondary leading-relaxed max-w-2xl mx-auto">
@@ -79,10 +79,10 @@ export default function CareersPage() {
       </section>
 
       {/* 2. Culture & Values Section */}
-      <section className="py-24 bg-surface-raised/30 reveal-section">
+      <section className="py-24 bg-surface-raised/30 border-y border-default/50 reveal-section">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-sm font-bold text-emerald-500 uppercase tracking-widest mb-3">Our DNA</h2>
+            <h2 className="text-sm font-bold text-emerald-600 dark:text-emerald-500 uppercase tracking-widest mb-3">Our DNA</h2>
             <h3 className="text-4xl font-bold text-primary mb-6">What We Stand For</h3>
             <p className="text-lg text-secondary">
               We are a remote-friendly, high-performance team driven by speed, visual craftsmanship, and health.
@@ -91,9 +91,9 @@ export default function CareersPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {/* Value 1 */}
-            <div className="bg-surface-base border border-default p-8 rounded-3xl hover:border-emerald-500/30 transition-colors group">
+            <div className="bg-surface-base border border-default p-8 rounded-3xl hover:border-brand-accent/50 hover:shadow-lg transition-all duration-300 group">
               <div className="w-12 h-12 bg-surface-raised rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <Sparkle size={24} weight="fill" className="text-emerald-400" />
+                <Sparkle size={24} weight="fill" className="text-emerald-600 dark:text-emerald-400" />
               </div>
               <h4 className="text-xl font-bold text-primary mb-3">UX & Craftsmanship</h4>
               <p className="text-secondary text-sm leading-relaxed">
@@ -102,9 +102,9 @@ export default function CareersPage() {
             </div>
 
             {/* Value 2 */}
-            <div className="bg-surface-base border border-default p-8 rounded-3xl hover:border-emerald-500/30 transition-colors group">
+            <div className="bg-surface-base border border-default p-8 rounded-3xl hover:border-brand-accent/50 hover:shadow-lg transition-all duration-300 group">
               <div className="w-12 h-12 bg-surface-raised rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <Trophy size={24} weight="fill" className="text-emerald-400" />
+                <Trophy size={24} weight="fill" className="text-emerald-600 dark:text-emerald-400" />
               </div>
               <h4 className="text-xl font-bold text-primary mb-3">Autonomy & Speed</h4>
               <p className="text-secondary text-sm leading-relaxed">
@@ -113,9 +113,9 @@ export default function CareersPage() {
             </div>
 
             {/* Value 3 */}
-            <div className="bg-surface-base border border-default p-8 rounded-3xl hover:border-emerald-500/30 transition-colors group">
+            <div className="bg-surface-base border border-default p-8 rounded-3xl hover:border-brand-accent/50 hover:shadow-lg transition-all duration-300 group">
               <div className="w-12 h-12 bg-surface-raised rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <Briefcase size={24} weight="fill" className="text-emerald-400" />
+                <Briefcase size={24} weight="fill" className="text-emerald-600 dark:text-emerald-400" />
               </div>
               <h4 className="text-xl font-bold text-primary mb-3">Sports First</h4>
               <p className="text-secondary text-sm leading-relaxed">
@@ -129,10 +129,10 @@ export default function CareersPage() {
       {/* 3. Startup Status (Glowing Glassmorphic Card) */}
       <section className="py-20 reveal-section">
         <div className="container mx-auto px-4 max-w-4xl">
-          <div className="relative rounded-3xl bg-gradient-to-br from-surface-raised to-surface-base border border-default p-10 md:p-14 text-center overflow-hidden">
+          <div className="relative rounded-3xl bg-gradient-to-br from-surface-raised to-surface-base border border-default p-10 md:p-14 text-center overflow-hidden shadow-sm">
             {/* Neon Status Badge */}
-            <div className="absolute top-6 right-6 flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-wider animate-pulse">
-              <span className="w-2 h-2 rounded-full bg-emerald-400" />
+            <div className="absolute top-6 right-6 flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider animate-pulse">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400" />
               Heads-down building
             </div>
 
@@ -145,7 +145,7 @@ export default function CareersPage() {
               As a result, we do not have open roles right now. However, things change quickly in a startup!
             </p>
 
-            <div className="inline-block px-6 py-4 bg-surface-raised rounded-2xl border border-subtle/50 text-left max-w-lg mx-auto text-sm text-secondary">
+            <div className="inline-block px-6 py-4 bg-surface-base rounded-2xl border border-default text-left max-w-lg mx-auto text-sm text-secondary">
               <p className="font-bold text-primary mb-1">💡 What we look for in future teammates:</p>
               <ul className="list-disc pl-5 space-y-1">
                 <li>Full-Stack React / Next.js / Python Developers</li>
@@ -161,7 +161,7 @@ export default function CareersPage() {
       <section className="py-16 pb-32 reveal-section">
         <div className="container mx-auto px-4 text-center max-w-3xl">
           <div className="w-16 h-16 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <UserPlus size={32} weight="fill" className="text-emerald-400" />
+            <UserPlus size={32} weight="fill" className="text-emerald-600 dark:text-emerald-400" />
           </div>
 
           <h2 className="text-3xl md:text-5xl font-bold text-primary mb-4">
@@ -175,7 +175,7 @@ export default function CareersPage() {
 
           <Button 
             href="mailto:careers@thearena.lk?subject=Open%20Application%20-%20The%20Arena"
-            className="px-10 py-4 text-lg font-bold flex items-center gap-2 mx-auto hover:shadow-[0_0_30px_rgba(80,200,120,0.3)] transition-shadow"
+            className="px-10 py-4 text-lg font-bold flex items-center gap-2 mx-auto shadow-md dark:shadow-none hover:shadow-lg dark:hover:shadow-[0_0_30px_rgba(80,200,120,0.3)] transition-all"
           >
             <EnvelopeSimple size={20} weight="bold" />
             careers@thearena.lk
