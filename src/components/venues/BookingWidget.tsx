@@ -164,6 +164,10 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
       bookingService.calculatePrice(selectedCourtId, date, timeSlotsFormatted, paymentMethod)
         .then(p => { setPricing(p); setPricingError(null); })
         .catch((error: any) => {
+          console.error("calculatePrice error:", error);
+          if (error.response) {
+             console.error("Error response data:", error.response.data);
+          }
           setPricing(null);
           if (error.response?.status === 409) {
             setPricingError("One or more of these slots was just booked by someone else.");
@@ -183,6 +187,10 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
             setSelectedSlots([]);
           } else if (error.response?.status === 400) {
             setPricingError("Please select consecutive time slots only — gaps are not allowed.");
+          } else if (error.response?.status === 422) {
+             setPricingError("Validation error calculating price.");
+          } else {
+             setPricingError("Failed to calculate price.");
           }
         });
     } else {
@@ -545,7 +553,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
       )}
 
       {/* Pricing Error Banner */}
-      {pricingError && selectedSlots.length === 0 && (
+      {pricingError && (
         <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/30 flex items-start gap-2 animate-in fade-in slide-in-from-bottom-2">
           <WarningCircle size={16} weight="fill" className="text-red-400 mt-0.5 shrink-0" />
           <p className="text-xs text-red-400 leading-relaxed">{pricingError}</p>
