@@ -321,28 +321,36 @@ export default function CheckoutPage() {
                 </div>
 
                 {/* Pay Button */}
-                <button
-                  onClick={handlePay}
-                  disabled={paying || isExpired || !sdkReady}
-                  className={`w-full py-3.5 rounded-xl font-bold text-base transition-all flex items-center justify-center gap-2 ${
-                    paying || isExpired || !sdkReady
-                      ? "bg-surface-overlay text-muted cursor-not-allowed"
-                      : "bg-emerald-500 text-black hover:bg-emerald-400 shadow-lg shadow-emerald-500/20"
-                  }`}
-                >
-                  {paying ? (
-                    <>
-                      <ArrowsClockwise size={16} weight="bold" className="animate-spin" />
-                      Opening PayHere…
-                    </>
-                  ) : isExpired ? (
-                    "Hold Expired"
-                  ) : !sdkReady ? (
-                    "Loading…"
-                  ) : (
-                    "Pay Now with PayHere"
-                  )}
-                </button>
+                {(() => {
+                  const onlinePaymentsEnabled = false; // TEMPORARY OVERRIDE: Set to true to re-enable card payments
+                  
+                  return (
+                    <button
+                      onClick={handlePay}
+                      disabled={!onlinePaymentsEnabled || paying || isExpired || !sdkReady}
+                      className={`w-full py-3.5 rounded-xl font-bold text-base transition-all flex items-center justify-center gap-2 ${
+                        !onlinePaymentsEnabled || paying || isExpired || !sdkReady
+                          ? "bg-surface-overlay text-muted cursor-not-allowed"
+                          : "bg-emerald-500 text-black hover:bg-emerald-400 shadow-lg shadow-emerald-500/20"
+                      }`}
+                    >
+                      {!onlinePaymentsEnabled ? (
+                        "Online Payments Temporarily Disabled"
+                      ) : paying ? (
+                        <>
+                          <ArrowsClockwise size={16} weight="bold" className="animate-spin" />
+                          Opening PayHere…
+                        </>
+                      ) : isExpired ? (
+                        "Hold Expired"
+                      ) : !sdkReady ? (
+                        "Loading…"
+                      ) : (
+                        "Pay Now with PayHere"
+                      )}
+                    </button>
+                  );
+                })()}
 
                 {isExpired && (
                   <button

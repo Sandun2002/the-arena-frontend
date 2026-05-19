@@ -800,20 +800,22 @@ export default function VenueSettingsPage() {
 
                         <p className="text-sm text-secondary mb-6">
                             Choose how players can pay you for bookings at this venue. Players will only see options you accept.
+                            <br />
+                            <span className="text-xs text-amber-500 font-bold">⚠️ Online (Card) payments are temporarily disabled platform-wide.</span>
                         </p>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                             {[
-                                { value: "both" as const, title: "Card & Cash", desc: "Players choose either method." },
-                                { value: "card_only" as const, title: "Card only", desc: "Players pay online by card." },
-                                { value: "cash_only" as const, title: "Cash only", desc: "Players pay in cash on arrival." },
+                                { value: "both" as const, title: "Card & Cash", desc: "Players choose either method.", disabled: true },
+                                { value: "card_only" as const, title: "Card only", desc: "Players pay online by card.", disabled: true },
+                                { value: "cash_only" as const, title: "Cash only", desc: "Players pay in cash on arrival.", disabled: false },
                             ].map((opt) => {
                                 const selected = paymentAcceptance === opt.value;
                                 return (
                                     <button
                                         key={opt.value}
                                         type="button"
-                                        disabled={paymentSaving}
+                                        disabled={paymentSaving || opt.disabled}
                                         onClick={() => !selected && savePaymentAcceptance(opt.value)}
                                         className={`text-left p-5 rounded-2xl border transition-all ${
                                             selected
@@ -825,7 +827,9 @@ export default function VenueSettingsPage() {
                                             <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${selected ? "border-emerald-500" : "border-subtle"}`}>
                                                 {selected && <div className="w-2 h-2 rounded-full bg-emerald-500" />}
                                             </div>
-                                            <span className="font-bold text-primary text-sm">{opt.title}</span>
+                                            <span className="font-bold text-primary text-sm">
+                                                {opt.title} {opt.disabled && <span className="text-[10px] text-amber-500 font-normal ml-1">(Disabled)</span>}
+                                            </span>
                                         </div>
                                         <p className="text-xs text-secondary leading-snug">{opt.desc}</p>
                                     </button>

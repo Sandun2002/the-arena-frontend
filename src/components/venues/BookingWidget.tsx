@@ -52,12 +52,15 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   const acceptance = venue.accepted_payment_methods || "both";
-  const allowCard = acceptance === "card_only" || acceptance === "both";
-  const allowCash = acceptance === "cash_only" || acceptance === "both";
+  
+  // TEMPORARY OVERRIDE: Block card payments and force cash
+  // TODO: Re-enable when card payments are back online
+  // const allowCard = acceptance === "card_only" || acceptance === "both";
+  // const allowCash = acceptance === "cash_only" || acceptance === "both";
+  const allowCard = false;
+  const allowCash = true;
 
-  const [paymentMethod, setPaymentMethod] = useState<"card" | "cash">(
-    allowCash ? "cash" : "card"
-  );
+  const [paymentMethod, setPaymentMethod] = useState<"card" | "cash">("cash");
   const [cashBookingRef, setCashBookingRef] = useState<string | null>(null);
   const [cashBookingAmount, setCashBookingAmount] = useState<number>(0);
   const [cashBookingTime, setCashBookingTime] = useState<string>("");
@@ -607,8 +610,8 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
               </button>
             </div>
             {!allowCard && (
-              <p className="mt-2 text-[11px] text-muted leading-snug">
-                This venue does not accept card payments.
+              <p className="mt-2 text-[11px] text-amber-500/80 leading-snug">
+                Online payments are temporarily disabled. Please pay at the venue.
               </p>
             )}
             {!allowCash && (
