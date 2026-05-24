@@ -4,7 +4,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { format, isSameDay, isValid } from "date-fns";
 import { fmtTime, fmtDateShort } from "@/lib/utils";
-import { MagnifyingGlass, CheckCircle, XCircle, CurrencyDollar, UserMinus, WarningCircle, Calendar as CalendarIcon, CaretLeft, CaretRight, Globe, UserPlus, Hammer, ArrowsClockwise, Money, HandCoins, Prohibit, CreditCard, DotsThreeVertical } from "@phosphor-icons/react";
+import { MagnifyingGlass, CheckCircle, XCircle, CurrencyDollar, UserMinus, WarningCircle, Calendar as CalendarIcon, CaretLeft, CaretRight, Globe, UserPlus, Hammer, ArrowsClockwise, Money, HandCoins, Prohibit, CreditCard, DotsThreeVertical, Bank, Timer } from "@phosphor-icons/react";
 import { PaymentStatus } from "@/types";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/services/authContext";
@@ -12,6 +12,8 @@ import { centerService } from "@/services/centerService";
 import { Booking } from "@/types";
 import { useToast } from "@/components/ui/Toast";
 import { useVenue } from "@/components/venue/VenueContext";
+import Modal from "@/components/ui/Modal";
+import CheckInModal from "@/components/venue/CheckInModal";
 
 const PAGE_SIZE = 20;
 
@@ -41,12 +43,15 @@ export default function BookingsPage() {
     // Filters
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [statusFilter, setStatusFilter] = useState<
-        "all" | "payment_pending" | "confirmed" | "completed" | "cancelled" | "rejected"
+        "all" | "pending_approval" | "payment_pending" | "confirmed" | "completed" | "cancelled" | "rejected" | "expired"
     >("all");
-    const [sourceFilter, setSourceFilter] = useState<"all" | "platform" | "walkin" | "blocked" | "cash">("all");
+    const [sourceFilter, setSourceFilter] = useState<"all" | "platform" | "walkin" | "blocked" | "cash" | "bank_transfer">("all");
     const [searchQuery, setSearchQuery] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
     const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+
+    // Check-in modal state
+    const [isCheckInOpen, setIsCheckInOpen] = useState(false);
 
     const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
@@ -88,10 +93,11 @@ export default function BookingsPage() {
         loadBookings();
     }, [loadBookings]);
 
-    const getBookingSource = (b: Booking): "platform" | "walkin" | "blocked" | "cash" => {
+    const getBookingSource = (b: Booking): "platform" | "walkin" | "blocked" | "cash" | "bank_transfer" => {
         if (b.is_blocked) return "blocked";
         if (b.is_manual) return "walkin";
         if (b.is_cash_booking) return "cash";
+        if (b.payment_method === "bank_transfer") return "bank_transfer";
         return "platform";
     };
 
@@ -109,6 +115,29 @@ export default function BookingsPage() {
         });
 
     const handleAction = async (action: string, id: string) => {
+        if (action === "reject") {
+            const reason = prompt("Enter booking rejection reason:") || "Rejected by venue";
+            try {
+                await centerService.rejectBooking(id, reason);
+                addToast("Booking rejected successfully", "success");
+                loadBookings();
+            } catch (error) {
+                addToast("Failed to reject booking", "error");
+            }
+            return;
+        }
+        if (action === "reject-slip") {
+            const reason = prompt("Enter bank transfer slip rejection reason:") || "Invalid receipt image";
+            try {
+                await centerService.rejectBankSlip(id, reason);
+                addToast("Bank transfer slip rejected", "success");
+                loadBookings();
+            } catch (error) {
+                addToast("Failed to reject slip", "error");
+            }
+            return;
+        }
+
         if (!confirm(`Are you sure you want to ${action} this booking?`)) return;
         try {
             if (action === "confirm") await centerService.confirmBooking(id);
@@ -117,6 +146,8 @@ export default function BookingsPage() {
             if (action === "noshow") await centerService.toggleNoShow(id);
             if (action === "collect") await centerService.markCashCollected(id);
             if (action === "cash-noshow") await centerService.markCashNoShow(id);
+            if (action === "approve") await centerService.approveBooking(id);
+            if (action === "verify-slip") await centerService.verifyBankTransfer(id);
             addToast("Status updated successfully", "success");
             loadBookings();
         } catch (error) {
@@ -145,6 +176,13 @@ export default function BookingsPage() {
                 <div>
                     <div className="flex items-center gap-3 mb-2">
                         <h1 className="text-3xl font-black text-primary uppercase tracking-tight">Bookings</h1>
+                        <button
+                            onClick={() => setIsCheckInOpen(true)}
+                            className="bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-bold uppercase tracking-wider px-3.5 py-2.5 rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.25)] flex items-center gap-1.5 transition-all transform hover:scale-[1.02]"
+                        >
+                            <CheckCircle size={14} weight="bold" />
+                            Check In
+                        </button>
                     </div>
                     <p className="text-secondary">Manage {currentVenue.name} reservations.</p>
                 </div>
@@ -198,11 +236,12 @@ export default function BookingsPage() {
                         {(
                             [
                                 { v: "all", label: "All" },
+                                { v: "pending_approval", label: "⏳ Approvals" },
                                 { v: "payment_pending", label: "Pending" },
                                 { v: "confirmed", label: "Confirmed" },
                                 { v: "completed", label: "Completed" },
                                 { v: "cancelled", label: "Cancelled" },
-                                { v: "rejected", label: "Rejected" },
+                                { v: "expired", label: "Expired" },
                             ] as const
                         ).map(({ v, label }) => (
                             <button
@@ -220,7 +259,7 @@ export default function BookingsPage() {
 
                     {/* Source Filter */}
                     <div className="flex bg-surface-raised p-1 rounded-xl border border-default">
-                        {(["all", "platform", "cash", "walkin", "blocked"] as const).map((s) => (
+                        {(["all", "platform", "cash", "walkin", "blocked", "bank_transfer"] as const).map((s) => (
                             <button
                                 key={s}
                                 onClick={() => setSourceFilter(s)}
@@ -229,7 +268,7 @@ export default function BookingsPage() {
                                     : "text-muted hover:text-secondary"
                                     }`}
                             >
-                                {s === "walkin" ? "Walk-in" : s === "all" ? "All Sources" : s === "blocked" ? "Maintenance" : s === "cash" ? "💵 Cash" : s.charAt(0).toUpperCase() + s.slice(1)}
+                                {s === "walkin" ? "Walk-in" : s === "all" ? "All Sources" : s === "blocked" ? "Maintenance" : s === "cash" ? "💵 Cash" : s === "bank_transfer" ? "🏦 Bank" : s.charAt(0).toUpperCase() + s.slice(1)}
                             </button>
                         ))}
                     </div>
@@ -303,7 +342,19 @@ export default function BookingsPage() {
                                                 type MenuItem = { label: string; icon: React.ReactNode; action: string; style: "success" | "danger" | "default" };
                                                 const items: MenuItem[] = [];
 
-                                                if (booking.is_blocked) {
+                                                if (booking.status === "pending_approval") {
+                                                    if (booking.payment_method === "bank_transfer") {
+                                                        if (booking.payment_status === "awaiting_verification" || booking.bank_transfer_slip_url) {
+                                                            items.push({ label: "Verify Slip", icon: <CheckCircle size={14} />, action: "verify-slip", style: "success" });
+                                                            items.push({ label: "Reject Slip", icon: <XCircle size={14} />, action: "reject-slip", style: "danger" });
+                                                        } else {
+                                                            items.push({ label: "Reject Booking", icon: <XCircle size={14} />, action: "reject", style: "danger" });
+                                                        }
+                                                    } else if (booking.payment_method === "cash") {
+                                                        items.push({ label: "Approve Booking", icon: <CheckCircle size={14} />, action: "approve", style: "success" });
+                                                        items.push({ label: "Reject Booking", icon: <XCircle size={14} />, action: "reject", style: "danger" });
+                                                    }
+                                                } else if (booking.is_blocked) {
                                                     if (!isPastEndTime(booking)) items.push({ label: "Remove Block", icon: <XCircle size={14} />, action: "cancel", style: "danger" });
                                                 } else if (booking.is_manual) {
                                                     if (booking.status === "payment_pending") {
@@ -442,6 +493,15 @@ export default function BookingsPage() {
                     </div>
                 )}
             </div>
+            
+            {/* Check-In Modal */}
+            <Modal isOpen={isCheckInOpen} onClose={() => setIsCheckInOpen(false)} title="Player Check-In">
+                <CheckInModal
+                    venueId={currentVenue.id}
+                    onClose={() => setIsCheckInOpen(false)}
+                    onSuccess={() => loadBookings()}
+                />
+            </Modal>
         </div>
     );
 }
@@ -450,9 +510,11 @@ function StatusBadge({ status }: { status: string }) {
     const styles: Record<string, string> = {
         confirmed: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
         payment_pending: "bg-amber-500/10 text-amber-500 border-amber-500/20",
+        pending_approval: "bg-amber-500/10 text-amber-500 border-amber-500/20 shadow-[0_0_12px_rgba(245,158,11,0.1)]",
         cancelled: "bg-red-500/10 text-red-400 border-red-500/20",
         completed: "bg-blue-500/10 text-blue-500 border-blue-500/20",
         rejected: "bg-red-500/10 text-red-500 border-red-500/20",
+        expired: "bg-zinc-500/10 text-zinc-400 border-zinc-500/20",
     };
 
     return (
@@ -483,6 +545,13 @@ function PaymentStatusInline({ status }: { status: PaymentStatus | string }) {
                 <>
                     <XCircle size={12} weight="fill" className="text-red-500" />
                     <span className="text-[10px] font-bold text-red-500">FAILED</span>
+                </>
+            );
+        case "awaiting_verification":
+            return (
+                <>
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                    <span className="text-[10px] font-bold text-blue-400">AWAITING VERIFICATION</span>
                 </>
             );
         case "pending":
@@ -516,6 +585,18 @@ function SourceBadge({ booking }: { booking: Booking }) {
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded border bg-yellow-500/10 text-yellow-400 border-yellow-500/30 text-[10px] font-bold uppercase tracking-wider">
                 <Money size={12} weight="fill" /> Cash
             </span>
+        );
+    }
+    if (booking.payment_method === "bank_transfer") {
+        return (
+            <div className="flex flex-col gap-1">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded border bg-blue-500/10 text-blue-400 border-blue-500/30 text-[10px] font-bold uppercase tracking-wider">
+                    <Globe size={12} weight="fill" /> Platform
+                </span>
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded border bg-blue-500/10 text-blue-400 border-blue-500/20 text-[10px] font-medium">
+                    <Bank size={10} weight="fill" /> Bank Transfer
+                </span>
+            </div>
         );
     }
     // Platform booking — show card or cash-on-arrival payment method indicator

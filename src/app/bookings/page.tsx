@@ -150,6 +150,8 @@ function BookingCard({ booking, onReviewClick }: { booking: Booking, onReviewCli
         completed: { color: "text-blue-500", bg: "bg-blue-500/10", border: "border-blue-500/20", label: "Completed" },
         cancelled: { color: "text-red-500", bg: "bg-red-500/10", border: "border-red-500/20", label: "Cancelled" },
         rejected: { color: "text-red-500", bg: "bg-red-500/10", border: "border-red-500/20", label: "Rejected by Venue" },
+        expired: { color: "text-zinc-500", bg: "bg-zinc-500/10", border: "border-zinc-500/20", label: "Expired" },
+        pending_approval: { color: "text-amber-500", bg: "bg-amber-500/10", border: "border-amber-500/20", label: "Pending Approval" },
     };
 
     const status = statusConfig[booking.status] ?? statusConfig.cancelled;

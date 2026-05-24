@@ -1,14 +1,14 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { fmtTime, fmtDateShort, fmtDateTime } from "@/lib/utils";
-import { ArrowLeft, CalendarBlank, Clock, MapPin, Receipt, WarningCircle, CheckCircle, DownloadSimple, CreditCard, ArrowsClockwise, XCircle, Timer } from "@phosphor-icons/react";
+import { ArrowLeft, CalendarBlank, Clock, MapPin, Receipt, WarningCircle, CheckCircle, DownloadSimple, CreditCard, ArrowsClockwise, XCircle, Timer, Image as ImageIcon, CircleNotch } from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
 import CancelBookingModal from "@/components/bookings/CancelBookingModal";
+import BankTransferUpload from "@/components/booking/BankTransferUpload";
 import { useAuth } from "@/services/authContext";
 import { playerService } from "@/services/playerService";
 import { Booking } from "@/types";
@@ -24,27 +24,41 @@ export default function BookingDetailPage() {
     const [loading, setLoading] = useState(true);
     const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
-    useEffect(() => {
+    const loadBooking = () => {
         if (user && id) {
-            playerService.getBookingById(id as string).then((data) => {
-                setBooking(data);
-                setLoading(false);
-            });
+            playerService.getBookingById(id as string)
+                .then((data) => {
+                    setBooking(data);
+                    setLoading(false);
+                })
+                .catch((err) => {
+                    console.error(err);
+                    setLoading(false);
+                });
         }
+    };
+
+    useEffect(() => {
+        loadBooking();
     }, [user, id]);
 
     if (loading) return <div className="min-h-screen bg-surface-base flex items-center justify-center p-4"><div className="animate-spin w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full" /></div>;
     if (!booking) return <div className="min-h-screen bg-surface-base flex items-center justify-center p-4 text-primary">Booking not found</div>;
 
-    const isUpcoming = ["confirmed", "payment_pending"].includes(booking.status);
+    const isPendingApproval = booking.status === "pending_approval";
+    const isUpcoming = ["confirmed", "payment_pending", "pending_approval"].includes(booking.status);
     const isCancelled = booking.status === "cancelled";
     const isRejected = booking.status === "rejected";
+    const isExpired = booking.status === "expired";
     const isPaymentPending = booking.status === "payment_pending";
 
+    // Bank transfer variables
+    const isBankTransfer = booking.payment_method === "bank_transfer";
+    const needsSlipUpload = isBankTransfer && booking.payment_status === "pending" && isPendingApproval;
+    const isSlipAwaitingVerification = isBankTransfer && booking.payment_status === "awaiting_verification";
+
     return (
-        <main className="min-h-screen bg-surface-base pt-24 pb-12 px-4">
-            {/* Hold-expired banner */}
-            {/* HoldExpiredBanner is rendered inside PaymentStatusPanel for sidebar; here is a no-op */}
+        <main className="min-h-screen bg-surface-base pt-24 pb-12 px-4 selection:bg-emerald-500/30">
             <div className="container mx-auto max-w-3xl">
 
                 <Link href="/bookings" className="inline-flex items-center text-sm text-muted hover:text-primary mb-8 transition-colors">
@@ -56,32 +70,42 @@ export default function BookingDetailPage() {
                     {/* Main Content */}
                     <div className="flex-grow space-y-6">
 
-                        {/* Header */}
-                        <div className="bg-surface-raised/50 border border-default rounded-3xl p-8 backdrop-blur-sm">
-                            <div className="flex justify-between items-start mb-6">
-                                <div>
+                        {/* Header card */}
+                        <div className="bg-surface-raised/50 border border-default rounded-3xl p-8 backdrop-blur-sm shadow-xl">
+                            <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
+                                <div className="flex-1">
                                     <div className="flex items-center gap-3 mb-2 flex-wrap">
-                                        <span className="text-xs font-mono text-muted uppercase tracking-widest">
+                                        <span className="text-xs font-mono text-muted uppercase tracking-widest bg-surface-sunken px-2.5 py-1 rounded-md border border-default">
                                             {booking.booking_reference}
                                         </span>
-                                        {isCancelled && <span className="text-xs font-bold text-red-500 bg-red-500/10 px-2 py-0.5 rounded">CANCELLED</span>}
-                                        {isRejected && <span className="text-xs font-bold text-red-500 bg-red-500/10 px-2 py-0.5 rounded">REJECTED BY VENUE</span>}
-                                        {isPaymentPending && <span className="text-xs font-bold text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded animate-pulse">PAYMENT PENDING</span>}
-                                        {booking.status === "completed" && <span className="text-xs font-bold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded">COMPLETED</span>}
+                                        {isCancelled && <span className="text-xs font-bold text-red-500 bg-red-500/10 border border-red-500/25 px-2.5 py-1 rounded">CANCELLED</span>}
+                                        {isRejected && <span className="text-xs font-bold text-red-500 bg-red-500/10 border border-red-500/25 px-2.5 py-1 rounded">REJECTED BY VENUE</span>}
+                                        {isExpired && <span className="text-xs font-bold text-zinc-400 bg-zinc-500/10 border border-zinc-500/25 px-2.5 py-1 rounded">EXPIRED</span>}
+                                        {isPaymentPending && <span className="text-xs font-bold text-amber-500 bg-amber-500/10 border border-amber-500/25 px-2.5 py-1 rounded animate-pulse">PAYMENT PENDING</span>}
+                                        {isPendingApproval && <span className="text-xs font-bold text-yellow-500 bg-yellow-500/10 border border-yellow-500/25 px-2.5 py-1 rounded animate-pulse">AWAITING APPROVAL</span>}
+                                        {booking.status === "confirmed" && <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 px-2.5 py-1 rounded">CONFIRMED</span>}
+                                        {booking.status === "completed" && <span className="text-xs font-bold text-blue-400 bg-blue-500/10 border border-blue-500/25 px-2.5 py-1 rounded">COMPLETED</span>}
                                     </div>
-                                    <h1 className="text-3xl font-bold text-primary mb-1">
+                                    <h1 className="text-2xl md:text-3xl font-bold text-primary mb-1">
                                         {booking.court?.sport_type?.name || 'Sport'} at {booking.court?.venue_name}
                                     </h1>
                                     <p className="text-secondary font-medium">
                                         {booking.court?.name}
                                     </p>
                                 </div>
-                                {/* QR Code Placeholder */}
-                                <div className="w-16 h-16 bg-white rounded-lg p-1 hidden sm:block">
-                                    <div className="w-full h-full bg-surface-base/10 flex items-center justify-center text-[8px] text-center leading-none text-black">
-                                        QR CODE
+
+                                {/* Premium Check-in Code rendering */}
+                                {(booking.status === "confirmed" || isPendingApproval || booking.status === "completed") && booking.check_in_code ? (
+                                    <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-4 text-center min-w-[140px] select-all shadow-inner animate-in fade-in slide-in-from-right-4 duration-300">
+                                        <p className="text-[9px] font-black text-emerald-500 uppercase tracking-widest mb-1">Check-in Code</p>
+                                        <p className="text-2xl font-mono font-black text-emerald-400 tracking-[0.2em]">{booking.check_in_code}</p>
+                                        <p className="text-[8px] text-muted mt-1 leading-tight">Show code to venue</p>
                                     </div>
-                                </div>
+                                ) : (
+                                    <div className="w-16 h-16 bg-surface-sunken border border-default rounded-2xl flex items-center justify-center text-xs text-muted text-center font-bold">
+                                        🎫 Arena
+                                    </div>
+                                )}
                             </div>
 
                             <div className="grid grid-cols-2 gap-4 py-6 border-y border-default mb-6">
@@ -101,31 +125,45 @@ export default function BookingDetailPage() {
                                 </div>
                             </div>
 
+                            {/* Countdown Timers */}
                             {isPaymentPending && booking.hold_expires_at && (
-                                <div className="mb-4">
+                                <div className="mb-6">
                                     <HoldTimer
                                         expiresAt={booking.hold_expires_at}
-                                        onExpire={() => { playerService.getBookingById(id as string).then(setBooking); }}
+                                        onExpire={loadBooking}
+                                        label="Secure booking before timeout"
                                     />
                                 </div>
                             )}
 
+                            {isPendingApproval && booking.approval_expires_at && (
+                                <div className="mb-6">
+                                    <HoldTimer
+                                        expiresAt={booking.approval_expires_at}
+                                        onExpire={loadBooking}
+                                        label={isBankTransfer ? "Bank slip upload hold window" : "Cash approval hold window"}
+                                    />
+                                </div>
+                            )}
+
+                            {/* Booking page action buttons */}
                             {isUpcoming && (
                                 <div className="flex gap-3">
                                     {isPaymentPending ? (
                                         <Button
-                                            className="flex-1 bg-emerald-500 hover:bg-emerald-400 text-black font-bold"
+                                            className="flex-grow bg-emerald-500 hover:bg-emerald-400 text-black font-bold"
                                             onClick={() => router.push(`/checkout/${booking.id}`)}
                                         >
                                             <CreditCard size={16} weight="bold" className="mr-2" /> Complete Payment
                                         </Button>
                                     ) : (
-                                        <Button className="flex-1 bg-surface-overlay hover:bg-surface-overlay text-primary border-subtle" variant="outline">
+                                        <Button className="flex-grow bg-surface-overlay hover:bg-surface-overlay text-primary border-subtle" variant="outline">
                                             <DownloadSimple size={16} weight="bold" className="mr-2" /> Ticket
                                         </Button>
                                     )}
+                                    
                                     <Button
-                                        className="flex-1 border-red-900/30 text-red-500 hover:bg-red-900/10 hover:text-red-400"
+                                        className="flex-grow border-red-900/30 text-red-500 hover:bg-red-900/10 hover:text-red-400 font-bold"
                                         variant="outline"
                                         onClick={() => setIsCancelModalOpen(true)}
                                     >
@@ -135,8 +173,50 @@ export default function BookingDetailPage() {
                             )}
                         </div>
 
+                        {/* Slip Uploader and Slip Detail Views */}
+                        {needsSlipUpload && (
+                            <BankTransferUpload
+                                booking={booking}
+                                onUploadSuccess={(updated) => setBooking(updated)}
+                            />
+                        )}
+
+                        {isSlipAwaitingVerification && (
+                            <div className="bg-surface-raised/50 border border-blue-500/25 rounded-3xl p-6 md:p-8 backdrop-blur-sm space-y-4 shadow-xl">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-12 h-12 rounded-full bg-blue-500/10 border border-blue-500/25 flex items-center justify-center shrink-0">
+                                        <CircleNotch size={24} className="text-blue-400 animate-spin" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-base font-bold text-primary">Receipt Awaiting Verification</h3>
+                                        <p className="text-xs text-secondary leading-relaxed">
+                                            Your transfer slip is being reviewed by the venue staff. Keep this page open to check status.
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div className="bg-surface-sunken rounded-2xl p-4 space-y-2.5 border border-default text-xs">
+                                    <div className="flex justify-between text-secondary"><span className="text-muted">Uploaded Time</span><span className="font-semibold text-primary">{booking.bank_transfer_slip_uploaded_at ? fmtDateTime(booking.bank_transfer_slip_uploaded_at) : "N/A"}</span></div>
+                                    <div className="flex justify-between text-secondary"><span className="text-muted">Transaction Reference</span><span className="font-mono font-bold text-blue-400">{booking.bank_transfer_reference}</span></div>
+                                </div>
+                                
+                                {booking.bank_transfer_slip_url && (
+                                    <div className="pt-2">
+                                        <a 
+                                            href={booking.bank_transfer_slip_url} 
+                                            target="_blank" 
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-1.5 text-xs text-blue-400 hover:text-blue-300 font-bold hover:underline"
+                                        >
+                                            <ImageIcon size={16} /> View Uploaded Receipt Receipt
+                                        </a>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
                         {/* Timeline / Status */}
-                        <div className="bg-surface-raised/50 border border-default rounded-3xl p-8 backdrop-blur-sm">
+                        <div className="bg-surface-raised/50 border border-default rounded-3xl p-8 backdrop-blur-sm shadow-xl">
                             <h3 className="text-lg font-bold text-primary mb-6">Booking Timeline</h3>
                             <div className="relative pl-6 space-y-8 border-l border-default ml-3">
                                 {/* Created */}
@@ -145,6 +225,16 @@ export default function BookingDetailPage() {
                                     <p className="text-sm font-bold text-primary">Booking Created</p>
                                     <p className="text-xs text-muted">{fmtDateTime(booking.created_at)}</p>
                                 </div>
+
+                                {/* Slip uploaded */}
+                                {booking.bank_transfer_slip_uploaded_at && (
+                                    <div className="relative">
+                                        <div className="absolute -left-[31px] w-4 h-4 rounded-full bg-blue-500/20 border-2 border-blue-500"></div>
+                                        <p className="text-sm font-bold text-primary">Payment Receipt Uploaded</p>
+                                        <p className="text-xs text-muted">Reference: {booking.bank_transfer_reference}</p>
+                                        <p className="text-xs text-muted">{fmtDateTime(booking.bank_transfer_slip_uploaded_at)}</p>
+                                    </div>
+                                )}
 
                                 {/* Payment */}
                                 {booking.paid_at && (
@@ -160,7 +250,7 @@ export default function BookingDetailPage() {
                                     <div className="relative">
                                         <div className="absolute -left-[31px] w-4 h-4 rounded-full bg-red-500 border-2 border-black"></div>
                                         <p className="text-sm font-bold text-red-500">Cancelled</p>
-                                        <p className="text-xs text-muted">Reason: {booking.cancellation_reason}</p>
+                                        {booking.cancellation_reason && <p className="text-xs text-muted">Reason: {booking.cancellation_reason}</p>}
                                         <p className="text-xs text-muted">{fmtDateTime(booking.cancelled_at)}</p>
                                     </div>
                                 )}
@@ -170,8 +260,8 @@ export default function BookingDetailPage() {
                     </div>
 
                     {/* Sidebar: Payment Summary */}
-                    <div className="w-full md:w-80 space-y-6">
-                        <div className="bg-surface-raised/50 border border-default rounded-3xl p-6 backdrop-blur-sm sticky top-24">
+                    <div className="w-full md:w-80 space-y-6 shrink-0">
+                        <div className="bg-surface-raised/50 border border-default rounded-3xl p-6 backdrop-blur-sm sticky top-24 shadow-xl">
                             <h3 className="text-lg font-bold text-primary mb-6 flex items-center gap-2">
                                 <Receipt size={20} weight="fill" className="text-emerald-500" /> Payment Summary
                             </h3>
@@ -204,8 +294,7 @@ export default function BookingDetailPage() {
                     booking={booking}
                     onClose={() => setIsCancelModalOpen(false)}
                     onSuccess={() => {
-                        // Refresh data
-                        playerService.getBookingById(id as string).then(setBooking);
+                        loadBooking();
                     }}
                 />
             </Modal>
@@ -218,9 +307,11 @@ export default function BookingDetailPage() {
 function HoldTimer({
     expiresAt,
     onExpire,
+    label = "Complete payment within",
 }: {
     expiresAt: string;
     onExpire: () => void;
+    label?: string;
 }) {
     const router = useRouter();
     const [remainingMs, setRemainingMs] = useState<number>(() =>
@@ -252,9 +343,9 @@ function HoldTimer({
             <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-4 flex items-start gap-3">
                 <XCircle size={20} weight="fill" className="text-red-500 mt-0.5 flex-shrink-0" />
                 <div className="flex-1">
-                    <p className="text-sm font-bold text-red-400">Payment hold expired</p>
+                    <p className="text-sm font-bold text-red-400">Booking hold expired</p>
                     <p className="text-xs text-red-400/80 mt-0.5">
-                        Your slot was released. Please book again or refresh to see the latest status.
+                        Your slot hold has expired and the court has been released.
                     </p>
                 </div>
                 <button
@@ -278,11 +369,11 @@ function HoldTimer({
             <Timer size={20} weight="fill" className={`flex-shrink-0 ${isUrgent ? "text-red-400" : "text-amber-400"}`} />
             <div className="flex-1">
                 <p className={`text-sm font-bold ${isUrgent ? "text-red-300" : "text-amber-300"}`}>
-                    Complete payment within{" "}
+                    {label}:{" "}
                     <span className="font-mono tabular-nums">{formatted}</span>
                 </p>
                 <p className="text-[11px] text-secondary mt-0.5">
-                    Your slot is held — finish checkout before the timer ends or it will be released.
+                    Finish payment or upload your receipt before this timer reaches zero to secure your slot.
                 </p>
             </div>
         </div>
@@ -293,7 +384,7 @@ function PaymentStatusPanel({ booking }: { booking: Booking }) {
     const ps = booking.payment_status;
     const status = booking.status;
     const method = booking.payment_method || "card";
-    const methodLabel = method.charAt(0).toUpperCase() + method.slice(1);
+    const methodLabel = method === "card" ? "Card" : method === "bank_transfer" ? "Bank Transfer" : "Cash";
 
     if (ps === "paid") {
         return (
@@ -309,6 +400,22 @@ function PaymentStatusPanel({ booking }: { booking: Booking }) {
                         Paid on {fmtDateTime(booking.paid_at)}
                     </p>
                 )}
+            </div>
+        );
+    }
+
+    if (ps === "awaiting_verification") {
+        return (
+            <div className="bg-surface-base/40 rounded-xl p-4 border border-blue-500/20">
+                <div className="flex items-center gap-2 mb-1">
+                    <CircleNotch size={16} className="text-blue-400 animate-spin" />
+                    <span className="text-xs font-bold text-blue-400 uppercase">
+                        Awaiting Verification
+                    </span>
+                </div>
+                <p className="text-[10px] text-faint">
+                    Receipt uploaded. Waiting for review.
+                </p>
             </div>
         );
     }
@@ -341,16 +448,32 @@ function PaymentStatusPanel({ booking }: { booking: Booking }) {
         );
     }
 
-    // Pending
+    // Pending status checks
     if (status === "payment_pending") {
         return (
             <div className="bg-surface-base/40 rounded-xl p-4 border border-amber-500/20">
                 <div className="flex items-center gap-2 mb-1">
-                    <Timer size={16} weight="fill" className="text-amber-400" />
+                    <Timer size={16} weight="fill" className="text-amber-400 animate-pulse" />
                     <span className="text-xs font-bold text-amber-400 uppercase">Awaiting Payment</span>
                 </div>
                 <p className="text-[10px] text-faint">
                     Slot is held. Complete checkout to confirm.
+                </p>
+            </div>
+        );
+    }
+
+    if (status === "pending_approval") {
+        return (
+            <div className="bg-surface-base/40 rounded-xl p-4 border border-yellow-500/25">
+                <div className="flex items-center gap-2 mb-1">
+                    <Timer size={16} weight="fill" className="text-yellow-400 animate-pulse" />
+                    <span className="text-xs font-bold text-yellow-400 uppercase">Pending Approval</span>
+                </div>
+                <p className="text-[10px] text-faint">
+                    {method === "bank_transfer" 
+                        ? "Held. Upload transaction slip to secure slot."
+                        : "Held. Waiting for manager confirmation."}
                 </p>
             </div>
         );
@@ -363,7 +486,7 @@ function PaymentStatusPanel({ booking }: { booking: Booking }) {
                 <span className="text-xs font-bold text-muted uppercase">No Payment Recorded</span>
             </div>
             <p className="text-[10px] text-faint">
-                {status === "cancelled" || status === "rejected"
+                {status === "cancelled" || status === "rejected" || status === "expired"
                     ? "This booking was not paid."
                     : "Payment information unavailable."}
             </p>

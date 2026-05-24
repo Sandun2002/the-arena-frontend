@@ -363,4 +363,37 @@ export const centerService = {
         const response = await apiClient.post<any>(`/cash-bookings/${bookingId}/mark-no-show`);
         return normalizeBooking(response.data);
     },
+
+    // === Approvals & Check-In ===
+    approveBooking: async (bookingId: string): Promise<Booking> => {
+        const response = await apiClient.post<any>(`/booking-approvals/${bookingId}/approve`);
+        return normalizeBooking(response.data.booking);
+    },
+
+    rejectBooking: async (bookingId: string, reason: string): Promise<Booking> => {
+        const response = await apiClient.post<any>(`/booking-approvals/${bookingId}/reject`, { reason });
+        return normalizeBooking(response.data.booking);
+    },
+
+    verifyBankTransfer: async (bookingId: string): Promise<Booking> => {
+        const response = await apiClient.post<any>(`/bank-transfers/${bookingId}/verify`);
+        return normalizeBooking(response.data);
+    },
+
+    rejectBankSlip: async (bookingId: string, reason: string): Promise<Booking> => {
+        const formData = new FormData();
+        formData.append("reason", reason);
+        const response = await apiClient.post<any>(`/bank-transfers/${bookingId}/reject-slip`, formData);
+        return normalizeBooking(response.data);
+    },
+
+    checkInByCode: async (code: string, venueId: string): Promise<any> => {
+        const response = await apiClient.post<any>(`/check-in/verify`, { code, venue_id: venueId });
+        return {
+            booking: normalizeBooking(response.data.booking),
+            message: response.data.message,
+            checked_in_at: response.data.checked_in_at
+        };
+    },
 };
+

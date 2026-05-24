@@ -15,7 +15,7 @@ export interface CreateBookingRequest {
     court_id: string;
     start_time: string; // ISO string
     end_time: string;   // ISO string
-    payment_method: "card" | "cash";
+    payment_method: "card" | "cash" | "bank_transfer";
 }
 
 export interface PayHereCheckoutData {
@@ -108,6 +108,23 @@ class BookingService {
 
     async getBookingById(id: string): Promise<Booking> {
         const response = await apiClient.get<Booking>(`/bookings/${id}`);
+        return normalizeBooking(response.data as any);
+    }
+
+    async uploadBankTransferSlip(bookingId: string, file: File, referenceNumber: string): Promise<Booking> {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("reference_number", referenceNumber);
+        
+        const response = await apiClient.post<Booking>(
+            `/bank-transfers/${bookingId}/upload-slip`,
+            formData,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            }
+        );
         return normalizeBooking(response.data as any);
     }
 }

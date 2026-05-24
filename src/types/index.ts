@@ -98,6 +98,20 @@ export interface Venue {
   // Cash booking settings
   max_unpaid_cash_bookings?: number;
   accepted_payment_methods?: VenuePaymentAcceptance;
+  payment_config?: {
+    card: boolean;
+    cash: boolean;
+    bank_transfer: boolean;
+  };
+  cash_requires_approval?: boolean;
+  cash_approval_ttl_minutes?: number;
+  bank_transfer_ttl_minutes?: number;
+  has_bank_details?: boolean;
+  bank_account_holder_name?: string | null;
+  bank_name?: string | null;
+  bank_branch_name?: string | null;
+  bank_account_number_masked?: string | null;
+  bank_account_type?: string | null;
 }
 
 export interface Court {
@@ -148,12 +162,12 @@ export interface ManagerInvitation {
   created_at: string;
 }
 
-// === Booking ===
 // Backend BookingStatus enum (models/base.py). Keep this in sync exactly.
-export type BookingStatus = "payment_pending" | "confirmed" | "completed" | "cancelled" | "rejected";
-export type PaymentStatus = "pending" | "paid" | "refunded" | "failed";
+export type BookingStatus = "payment_pending" | "pending_approval" | "confirmed" | "completed" | "cancelled" | "rejected" | "expired";
+export type PaymentStatus = "pending" | "awaiting_verification" | "paid" | "refunded" | "failed";
 export type PaymentMethod = "card" | "cash" | "bank_transfer";
 export type VenuePaymentAcceptance = "card_only" | "cash_only" | "both";
+
 
 export interface Booking {
   id: string;
@@ -203,6 +217,15 @@ export interface Booking {
   review?: Review | null;
   // Cash booking fields
   is_cash_booking?: boolean;
+  check_in_code?: string;
+  checked_in_at?: string | null;
+  checked_in_by_id?: string | null;
+  approval_expires_at?: string | null;
+  approved_by_id?: string | null;
+  approved_at?: string | null;
+  bank_transfer_slip_url?: string | null;
+  bank_transfer_slip_uploaded_at?: string | null;
+  bank_transfer_reference?: string | null;
   is_cash_unpaid?: boolean;
   can_free_cancel?: boolean;
   total_platform_fees?: number;

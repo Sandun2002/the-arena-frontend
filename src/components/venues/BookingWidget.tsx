@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Venue } from "@/types";
+import { Venue, Booking } from "@/types";
 import Button from "@/components/ui/Button";
 import DatePicker from "@/components/ui/DatePicker";
-import { Check, SignIn, CircleNotch, CalendarBlank, Hammer, Lightning, WarningCircle, ArrowsClockwise, Money, CreditCard, HandCoins } from "@phosphor-icons/react";
+import { Check, SignIn, CircleNotch, CalendarBlank, Hammer, Lightning, WarningCircle, ArrowsClockwise, Money, CreditCard, HandCoins, Bank, Timer, Info } from "@phosphor-icons/react";
 import { useAuth } from "@/services/authContext";
 import { api } from "@/services/api";
 import { bookingService } from "@/services/bookingService";
@@ -51,16 +51,52 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
   const [showSuccess, setShowSuccess] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
-  const acceptance = venue.accepted_payment_methods || "both";
-  const allowCard = acceptance === "card_only" || acceptance === "both";
-  const allowCash = acceptance === "cash_only" || acceptance === "both";
+  const paymentConfig = venue.payment_config || {
+    card: venue.accepted_payment_methods === "card_only" || venue.accepted_payment_methods === "both",
+    cash: venue.accepted_payment_methods === "cash_only" || venue.accepted_payment_methods === "both",
+    bank_transfer: false
+  };
+  const allowCard = paymentConfig.card;
+  const allowCash = paymentConfig.cash;
+  const allowBankTransfer = !!paymentConfig.bank_transfer && !!venue.has_bank_details;
 
-  const [paymentMethod, setPaymentMethod] = useState<"card" | "cash">(
-    allowCash ? "cash" : "card"
+  const [paymentMethod, setPaymentMethod] = useState<"card" | "cash" | "bank_transfer">(
+    allowCard ? "card" : allowCash ? "cash" : "bank_transfer"
   );
+  
+  const [createdBooking, setCreatedBooking] = useState<Booking | null>(null);
   const [cashBookingRef, setCashBookingRef] = useState<string | null>(null);
   const [cashBookingAmount, setCashBookingAmount] = useState<number>(0);
   const [cashBookingTime, setCashBookingTime] = useState<string>("");
+
+  const [timeLeft, setTimeLeft] = useState<number>(0);
+
+  useEffect(() => {
+    if (!createdBooking?.approval_expires_at) return;
+    
+    const calculateTimeLeft = () => {
+      const difference = new Date(createdBooking.approval_expires_at!).getTime() - new Date().getTime();
+      return Math.max(0, Math.floor(difference / 1000));
+    };
+
+    setTimeLeft(calculateTimeLeft());
+
+    const timer = setInterval(() => {
+      const left = calculateTimeLeft();
+      setTimeLeft(left);
+      if (left <= 0) {
+        clearInterval(timer);
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [createdBooking]);
+
+  const formatTimeLeft = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
 
   useEffect(() => {
     if (!rqDate) {
@@ -235,11 +271,15 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
         payment_method: paymentMethod,
       });
 
+      setCreatedBooking(booking);
+
       if (paymentMethod === "cash") {
         // Cash booking: show confirmation panel — no redirect to PayHere
         setCashBookingRef(booking.booking_reference);
         setCashBookingAmount(booking.total_price);
         setCashBookingTime(format(new Date(startTime), "dd MMM yyyy, HH:mm"));
+        setShowSuccess(true);
+      } else if (paymentMethod === "bank_transfer") {
         setShowSuccess(true);
       } else {
         // Card booking: redirect to checkout
@@ -250,14 +290,14 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
          addToast("This time slot was just booked. Please select another.", "error");
          setCourtsData(prev => prev.map(c => {
             if (c.court.id === selectedCourtId) {
-              return {
-                ...c,
-                slots: c.slots.map((s: any) => 
-                  selectedSlots.some(sel => sel.start === s.start)
-                    ? { ...s, status: "booked" }
-                    : s
-                )
-              };
+               return {
+                 ...c,
+                 slots: c.slots.map((s: any) => 
+                   selectedSlots.some(sel => sel.start === s.start)
+                     ? { ...s, status: "booked" }
+                     : s
+                 )
+               };
             }
             return c;
          }));
@@ -271,23 +311,93 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
 
   // Cash booking success overlay
   if (showSuccess && paymentMethod === "cash") {
+    const isApprovalRequired = !!venue.cash_requires_approval;
+    
     return (
       <div className="w-full rounded-2xl bg-surface-raised/80 border border-yellow-500/40 p-8 backdrop-blur-md shadow-xl text-center">
-        <div className="w-16 h-16 rounded-full bg-yellow-500/20 border border-yellow-500/40 flex items-center justify-center mx-auto mb-4">
+        <div className="w-16 h-16 rounded-full bg-yellow-500/20 border border-yellow-500/40 flex items-center justify-center mx-auto mb-4 animate-bounce">
           <HandCoins size={32} weight="duotone" className="text-yellow-400" />
         </div>
-        <h3 className="text-xl font-bold text-primary mb-1">Reservation Confirmed!</h3>
-        <p className="text-secondary text-sm mb-4">Pay <span className="font-bold text-primary">LKR {cashBookingAmount.toLocaleString()}</span> at the venue on arrival.</p>
+        
+        {isApprovalRequired ? (
+          <>
+            <h3 className="text-xl font-bold text-primary mb-1">Hold Requested!</h3>
+            <p className="text-secondary text-sm mb-4 leading-relaxed">
+              Your cash booking is pending approval. Pay <span className="font-bold text-primary">LKR {cashBookingAmount.toLocaleString()}</span> on arrival.
+            </p>
+            
+            <div className="flex flex-col items-center justify-center p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl mb-5">
+              <div className="flex items-center gap-2 text-amber-500 font-bold text-base">
+                <Timer size={18} className="animate-pulse" />
+                <span>Expires in {formatTimeLeft(timeLeft)}</span>
+              </div>
+              <p className="text-[10px] text-amber-400/80 mt-1 text-center">
+                The manager must approve your slot within {venue.cash_approval_ttl_minutes ?? 10} minutes.
+              </p>
+            </div>
+          </>
+        ) : (
+          <>
+            <h3 className="text-xl font-bold text-primary mb-1">Reservation Confirmed!</h3>
+            <p className="text-secondary text-sm mb-4">Pay <span className="font-bold text-primary">LKR {cashBookingAmount.toLocaleString()}</span> at the venue on arrival.</p>
+          </>
+        )}
+
         <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4 mb-5 text-left space-y-1.5">
           <div className="flex justify-between text-xs"><span className="text-muted">Reference</span><span className="font-mono font-bold text-primary">{cashBookingRef}</span></div>
           <div className="flex justify-between text-xs"><span className="text-muted">Session</span><span className="text-secondary">{cashBookingTime}</span></div>
-          <div className="flex justify-between text-xs"><span className="text-muted">Payment</span><span className="font-bold text-yellow-400">Cash at Venue 💵</span></div>
+          <div className="flex justify-between text-xs"><span className="text-muted">Payment Method</span><span className="font-bold text-yellow-400">Cash {isApprovalRequired ? "(Pending)" : "on Arrival"} 💵</span></div>
         </div>
+        
         <button
-          onClick={() => router.push("/bookings")}
+          onClick={() => router.push(isApprovalRequired && createdBooking ? `/bookings/${createdBooking.id}` : "/bookings")}
           className="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-black rounded-xl font-bold text-sm transition-colors"
         >
-          View My Bookings
+          {isApprovalRequired ? "View Booking Details" : "View My Bookings"}
+        </button>
+      </div>
+    );
+  }
+
+  // Bank Transfer success overlay
+  if (showSuccess && paymentMethod === "bank_transfer") {
+    return (
+      <div className="w-full rounded-2xl bg-surface-raised/80 border border-blue-500/40 p-8 backdrop-blur-md shadow-xl text-center">
+        <div className="w-16 h-16 rounded-full bg-blue-500/20 border border-blue-500/40 flex items-center justify-center mx-auto mb-4 animate-bounce">
+          <Bank size={32} weight="duotone" className="text-blue-400" />
+        </div>
+        
+        <h3 className="text-xl font-bold text-primary mb-1">Transfer Initiated!</h3>
+        <p className="text-secondary text-sm mb-4 leading-relaxed">
+          Please transfer the amount and upload your payment slip to secure your booking.
+        </p>
+
+        <div className="flex flex-col items-center justify-center p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl mb-5">
+          <div className="flex items-center gap-2 text-blue-400 font-bold text-base">
+            <Timer size={18} className="animate-pulse" />
+            <span>Upload within {formatTimeLeft(timeLeft)}</span>
+          </div>
+          <p className="text-[10px] text-blue-300 mt-1">
+            Your slot is held for {venue.bank_transfer_ttl_minutes ?? 15} minutes.
+          </p>
+        </div>
+
+        <div className="bg-surface-base border border-default rounded-xl p-4 mb-5 text-left space-y-2 text-xs">
+          <div className="flex justify-between border-b border-default pb-1"><span className="text-muted">Bank Name</span><span className="font-bold text-primary">{venue.bank_name}</span></div>
+          {venue.bank_branch_name && <div className="flex justify-between border-b border-default pb-1"><span className="text-muted">Branch</span><span className="font-secondary">{venue.bank_branch_name}</span></div>}
+          <div className="flex justify-between border-b border-default pb-1"><span className="text-muted">Account Holder</span><span className="font-secondary">{venue.bank_account_holder_name}</span></div>
+          <div className="flex justify-between border-b border-default pb-1">
+            <span className="text-muted">Account Number</span>
+            <span className="font-mono font-bold text-blue-400 select-all text-sm">{venue.bank_account_number_masked}</span>
+          </div>
+          <div className="flex justify-between pt-1"><span className="text-muted">Transfer Amount</span><span className="font-bold text-emerald-400 text-sm">LKR {createdBooking?.total_price.toLocaleString()}</span></div>
+        </div>
+
+        <button
+          onClick={() => createdBooking && router.push(`/bookings/${createdBooking.id}`)}
+          className="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-black rounded-xl font-bold text-sm transition-colors flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20"
+        >
+          Go to Booking & Upload Slip
         </button>
       </div>
     );
@@ -297,7 +407,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
   if (showSuccess) {
     return (
       <div className="w-full rounded-2xl bg-surface-raised/80 border border-emerald-500 p-8 backdrop-blur-md shadow-xl text-center">
-        <div className="w-16 h-16 rounded-full bg-emerald-500 flex items-center justify-center mx-auto mb-4">
+        <div className="w-16 h-16 rounded-full bg-emerald-500 flex items-center justify-center mx-auto mb-4 font-bold">
           <Check size={32} weight="bold" className="text-black" />
         </div>
         <h3 className="text-xl font-bold text-primary mb-2">Booking Confirmed!</h3>
@@ -574,51 +684,96 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
           </span>
         </div>
 
-        {/* Payment Method Toggle */}
+        {/* Payment Method Selector */}
         {selectedSlots.length > 0 && pricing && (
           <div className="mb-4">
             <label className="mb-2 block text-xs font-bold text-muted uppercase tracking-wider">How will you pay?</label>
-            <div className="flex bg-surface-sunken p-1 rounded-xl border border-default gap-1">
+            <div className="grid grid-cols-3 bg-surface-sunken p-1 rounded-xl border border-default gap-1">
               <button
+                type="button"
                 onClick={() => allowCard && setPaymentMethod("card")}
                 disabled={!allowCard}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition-all ${
+                className={`flex flex-col md:flex-row items-center justify-center gap-1.5 py-2.5 rounded-lg text-xs font-bold transition-all ${
                   !allowCard
-                    ? "bg-surface-overlay/30 text-muted cursor-not-allowed opacity-40"
+                    ? "bg-surface-overlay/30 text-muted cursor-not-allowed opacity-45"
                     : paymentMethod === "card"
                       ? "bg-surface-overlay text-primary shadow"
-                      : "text-secondary hover:text-primary"
+                      : "text-secondary hover:text-primary hover:bg-surface-overlay/20"
                 }`}
               >
-                <CreditCard size={14} weight="bold" /> Pay by Card
+                <CreditCard size={14} weight="bold" /> <span className="text-[10px] md:text-xs">Card</span>
               </button>
+              
               <button
+                type="button"
                 onClick={() => allowCash && setPaymentMethod("cash")}
                 disabled={!allowCash}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition-all ${
+                className={`flex flex-col md:flex-row items-center justify-center gap-1.5 py-2.5 rounded-lg text-xs font-bold transition-all ${
                   !allowCash
-                    ? "bg-surface-overlay/30 text-muted cursor-not-allowed opacity-40"
+                    ? "bg-surface-overlay/30 text-muted cursor-not-allowed opacity-45"
                     : paymentMethod === "cash"
-                      ? "bg-emerald-500 text-black shadow"
-                      : "text-secondary hover:text-primary"
+                      ? venue.cash_requires_approval
+                        ? "bg-amber-500 text-black shadow font-black"
+                        : "bg-emerald-500 text-black shadow font-black"
+                      : "text-secondary hover:text-primary hover:bg-surface-overlay/20"
                 }`}
               >
-                <Money size={14} weight="bold" /> Pay at Venue
+                <Money size={14} weight="bold" /> <span className="text-[10px] md:text-xs">Cash</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => allowBankTransfer && setPaymentMethod("bank_transfer")}
+                disabled={!allowBankTransfer}
+                className={`flex flex-col md:flex-row items-center justify-center gap-1.5 py-2.5 rounded-lg text-xs font-bold transition-all ${
+                  !allowBankTransfer
+                    ? "bg-surface-overlay/30 text-muted cursor-not-allowed opacity-45"
+                    : paymentMethod === "bank_transfer"
+                      ? "bg-blue-500 text-white shadow font-black"
+                      : "text-secondary hover:text-primary hover:bg-surface-overlay/20"
+                }`}
+              >
+                <Bank size={14} weight="bold" /> <span className="text-[10px] md:text-xs">Bank Transfer</span>
               </button>
             </div>
-            {!allowCard && (
-              <p className="mt-2 text-[11px] text-muted leading-snug">
-                This venue does not accept card payments.
+
+            {/* Contextual description banners under selector */}
+            {!allowCard && !allowCash && !allowBankTransfer && (
+              <p className="mt-2 text-[11px] text-red-400 font-medium">
+                No active payment methods configured for this venue.
               </p>
             )}
-            {!allowCash && (
+            
+            {paymentMethod === "card" && (
               <p className="mt-2 text-[11px] text-muted leading-snug">
-                This venue does not accept cash payments.
+                Pay instantly online via debit/credit card to confirm your booking immediately.
               </p>
             )}
-            {allowCash && paymentMethod === "cash" && (
-              <p className="mt-2 text-[11px] text-emerald-400/80 leading-snug">
-                Your slot is reserved immediately. Bring <strong>LKR {pricing.total.toLocaleString()}</strong> cash on arrival.
+
+            {paymentMethod === "cash" && allowCash && (
+              venue.cash_requires_approval ? (
+                <p className="mt-2 text-[11px] text-amber-400/90 leading-snug flex items-start gap-1">
+                  <Info size={12} className="shrink-0 mt-0.5" />
+                  <span>
+                    Your slot will be held for <strong>{venue.cash_approval_ttl_minutes ?? 10} min</strong> while the venue reviews your request. Bring cash on arrival.
+                  </span>
+                </p>
+              ) : (
+                <p className="mt-2 text-[11px] text-emerald-400/90 leading-snug flex items-start gap-1">
+                  <Check size={12} className="shrink-0 mt-0.5" />
+                  <span>
+                    Reserved immediately. Bring <strong>LKR {pricing.total.toLocaleString()}</strong> cash on arrival.
+                  </span>
+                </p>
+              )
+            )}
+
+            {paymentMethod === "bank_transfer" && allowBankTransfer && (
+              <p className="mt-2 text-[11px] text-blue-400/90 leading-snug flex items-start gap-1">
+                <Info size={12} className="shrink-0 mt-0.5" />
+                <span>
+                  Held for <strong>{venue.bank_transfer_ttl_minutes ?? 15} min</strong>. Transfer funds and upload receipt on the next page to confirm.
+                </span>
               </p>
             )}
           </div>
@@ -630,19 +785,32 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
           className={`w-full py-4 text-sm font-bold transition-all border ${
             selectedSlots.length > 0
               ? paymentMethod === "cash"
-                ? "bg-emerald-500 hover:bg-emerald-400 text-black border-emerald-500"
-                : "bg-surface-overlay hover:bg-surface-overlay text-primary border-subtle"
+                ? venue.cash_requires_approval
+                  ? "bg-amber-500 hover:bg-amber-400 text-black border-amber-500 shadow-md shadow-amber-500/10"
+                  : "bg-emerald-500 hover:bg-emerald-400 text-black border-emerald-500 shadow-md shadow-emerald-500/10"
+                : paymentMethod === "bank_transfer"
+                  ? "bg-blue-500 hover:bg-blue-400 text-white border-blue-500 shadow-md shadow-blue-500/10"
+                  : "bg-surface-overlay hover:bg-surface-overlay/80 text-primary border-subtle"
               : "bg-surface-overlay hover:bg-surface-overlay text-primary border-subtle"
           } disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2`}
         >
-          {submitting
-            ? <CircleNotch size={20} weight="bold" className="animate-spin" />
-            : selectedSlots.length > 0
-              ? paymentMethod === "cash"
-                ? <><HandCoins size={16} weight="bold" /> Reserve — Pay at Venue</>
-                : "Pay by Card"
-              : "Select Slots"
-          }
+          {submitting ? (
+            <CircleNotch size={20} weight="bold" className="animate-spin" />
+          ) : selectedSlots.length > 0 ? (
+            paymentMethod === "cash" ? (
+              venue.cash_requires_approval ? (
+                <><Timer size={16} weight="bold" /> Request Cash Hold</>
+              ) : (
+                <><HandCoins size={16} weight="bold" /> Reserve — Pay at Venue</>
+              )
+            ) : paymentMethod === "bank_transfer" ? (
+              <><Bank size={16} weight="bold" /> Request Bank Transfer Hold</>
+            ) : (
+              <><CreditCard size={16} weight="bold" /> Pay by Card</>
+            )
+          ) : (
+            "Select Slots"
+          )}
         </Button>
       </div>
 

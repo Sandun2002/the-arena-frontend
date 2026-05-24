@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle, XCircle, CalendarBlank, MapPin, FileText, House, CreditCard } from "@phosphor-icons/react";
+import { CheckCircle, XCircle, CalendarBlank, MapPin, FileText, House, CreditCard, Timer } from "@phosphor-icons/react";
 import Button from "@/components/ui/Button";
 import { playerService } from "@/services/playerService";
 import { Booking } from "@/types";
@@ -34,6 +34,7 @@ export default function BookingConfirmationPage() {
 
     const isCancelled = booking.status === "cancelled" || booking.status === "rejected";
     const isConfirmed = booking.status === "confirmed" || booking.status === "completed";
+    const isPendingApproval = booking.status === "pending_approval";
 
     return (
         <main className="min-h-screen bg-surface-base pt-24 pb-12 px-4 selection:bg-emerald-500/30">
@@ -47,6 +48,14 @@ export default function BookingConfirmationPage() {
                             </div>
                             <h1 className="text-3xl md:text-5xl font-bold text-primary mb-2">Booking Cancelled</h1>
                             <p className="text-secondary">This booking has been cancelled or rejected.</p>
+                        </>
+                    ) : isPendingApproval ? (
+                        <>
+                            <div className="w-24 h-24 bg-amber-500/10 border border-amber-500/25 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_40px_rgba(245,158,11,0.2)] animate-pulse">
+                                <Timer size={48} weight="fill" className="text-amber-500" />
+                            </div>
+                            <h1 className="text-3xl md:text-5xl font-bold text-primary mb-2">Hold Requested</h1>
+                            <p className="text-secondary">Awaiting manager approval. We will notify you once confirmed.</p>
                         </>
                     ) : (
                         <>
@@ -71,9 +80,13 @@ export default function BookingConfirmationPage() {
                                 <div className="px-3 py-1 bg-red-500/10 border border-red-500/20 rounded-full text-red-400 text-xs font-bold uppercase">
                                     {booking.status === "rejected" ? "Rejected" : "Cancelled"}
                                 </div>
+                            ) : isPendingApproval ? (
+                                <div className="px-3 py-1 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-500 text-xs font-bold uppercase">
+                                    Awaiting Approval
+                                </div>
                             ) : (
                                 <div className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-emerald-500 text-xs font-bold uppercase">
-                                    Paid • Confirmed
+                                    {booking.payment_status === "paid" ? "Paid • Confirmed" : "Confirmed"}
                                 </div>
                             )}
                         </div>
@@ -121,15 +134,22 @@ export default function BookingConfirmationPage() {
 
                     </div>
                     <div className="bg-surface-base/40 p-4 flex justify-between items-center text-xs text-muted border-t border-default">
-                        <span>{isConfirmed ? `Paid with ${booking.payment_method === 'card' ? 'Credit Card' : 'Cash'}` : `Status: ${booking.status}`}</span>
+                        <span>
+                            {isConfirmed 
+                                ? `Paid with ${booking.payment_method === 'card' ? 'Credit Card' : booking.payment_method === 'bank_transfer' ? 'Bank Transfer' : 'Cash'}` 
+                                : isPendingApproval 
+                                    ? `Payment Pending via ${booking.payment_method === 'bank_transfer' ? 'Bank Transfer' : 'Cash'}`
+                                    : `Status: ${booking.status}`
+                            }
+                        </span>
                         <span>{fmtDateTime(booking.created_at)}</span>
                     </div>
                 </div>
 
                 <div className="flex flex-col md:flex-row gap-4 justify-center">
-                    <Link href="/bookings" className="w-full md:w-auto">
-                        <Button variant="outline" className="w-full text-secondary border-subtle hover:text-primary hover:border-subtle">
-                            View My Bookings
+                    <Link href={isPendingApproval ? `/bookings/${booking.id}` : "/bookings"} className="w-full md:w-auto">
+                        <Button variant={isPendingApproval ? "primary" : "outline"} className={`w-full font-bold ${isPendingApproval ? "bg-emerald-500 text-black border-emerald-500 hover:bg-emerald-400" : "text-secondary border-subtle hover:text-primary hover:border-subtle"}`}>
+                            {isPendingApproval ? "View Booking details & Upload slip" : "View My Bookings"}
                         </Button>
                     </Link>
                     {isCancelled ? (
@@ -140,7 +160,7 @@ export default function BookingConfirmationPage() {
                         </Link>
                     ) : (
                         <Link href="/" className="w-full md:w-auto">
-                            <Button className="w-full bg-primary text-inverted hover:opacity-90 font-bold">
+                            <Button variant={isPendingApproval ? "outline" : "primary"} className={`w-full font-bold ${isPendingApproval ? "text-secondary border-subtle hover:text-primary hover:border-subtle" : "bg-primary text-inverted hover:opacity-90"}`}>
                                 <House size={16} weight="bold" className="mr-2" /> Back to Home
                             </Button>
                         </Link>

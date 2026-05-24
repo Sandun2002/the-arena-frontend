@@ -34,8 +34,11 @@ export default function VenueSettingsPage() {
     const [mounted, setMounted] = useState(false);
     const amenitiesList = ["Parking", "A/C", "Showers", "Equipment Rental", "Cafe", "WiFi", "Lockers", "First Aid"];
 
-    // Payment acceptance state
-    const [paymentAcceptance, setPaymentAcceptance] = useState<"card_only" | "cash_only" | "both">("both");
+    // Granular Payment Configuration
+    const [payConfig, setPayConfig] = useState({ card: true, cash: true, bank_transfer: false });
+    const [cashRequiresApproval, setCashRequiresApproval] = useState(false);
+    const [cashApprovalTtl, setCashApprovalTtl] = useState(10);
+    const [bankTransferTtl, setBankTransferTtl] = useState(15);
     const [paymentSaving, setPaymentSaving] = useState(false);
 
     // Peak hours state — new multi-window per-day system
@@ -140,7 +143,26 @@ export default function VenueSettingsPage() {
             
             setGeoLat(currentVenue.geo_lat);
             setGeoLng(currentVenue.geo_lng);
-            setPaymentAcceptance(currentVenue.accepted_payment_methods || "both");
+
+            // Populate granular payment configs
+            let initialConfig = { card: true, cash: true, bank_transfer: false };
+            if (currentVenue.payment_config) {
+                initialConfig = {
+                    card: !!currentVenue.payment_config.card,
+                    cash: !!currentVenue.payment_config.cash,
+                    bank_transfer: !!currentVenue.payment_config.bank_transfer
+                };
+            } else if (currentVenue.accepted_payment_methods) {
+                if (currentVenue.accepted_payment_methods === "card_only") {
+                    initialConfig = { card: true, cash: false, bank_transfer: false };
+                } else if (currentVenue.accepted_payment_methods === "cash_only") {
+                    initialConfig = { card: false, cash: true, bank_transfer: false };
+                }
+            }
+            setPayConfig(initialConfig);
+            setCashRequiresApproval(currentVenue.cash_requires_approval ?? false);
+            setCashApprovalTtl(currentVenue.cash_approval_ttl_minutes ?? 10);
+            setBankTransferTtl(currentVenue.bank_transfer_ttl_minutes ?? 15);
 
             // Fetch detailed profile for schedule
             loadProfile();
@@ -342,18 +364,46 @@ export default function VenueSettingsPage() {
         }
     };
 
-    const savePaymentAcceptance = async (value: "card_only" | "cash_only" | "both") => {
+    const savePaymentConfig = async () => {
         if (!currentVenue) return;
-        const previous = paymentAcceptance;
-        setPaymentAcceptance(value);
+
+        // Validation 1: At least one payment method must be enabled.
+        if (!payConfig.card && !payConfig.cash && !payConfig.bank_transfer) {
+            addToast("At least one payment method must be enabled", "error");
+            return;
+        }
+
+        // Validation 2: bank_transfer requires bank details configured.
+        const hasBank = bankDetails?.has_bank_details || currentVenue.has_bank_details;
+        if (payConfig.bank_transfer && !hasBank) {
+            addToast("Cannot enable bank transfer payments without saving bank details first", "error");
+            return;
+        }
+
+        // Validation 3: Cash TTL range must be 5 to 60.
+        if (payConfig.cash && (cashApprovalTtl < 5 || cashApprovalTtl > 60)) {
+            addToast("Cash approval window must be between 5 and 60 minutes", "error");
+            return;
+        }
+
+        // Validation 4: Bank TTL range must be 5 to 1440.
+        if (payConfig.bank_transfer && (bankTransferTtl < 5 || bankTransferTtl > 1440)) {
+            addToast("Bank transfer payment window must be between 5 and 1440 minutes", "error");
+            return;
+        }
+
         setPaymentSaving(true);
         try {
-            await venueApiService.updateVenue(currentVenue.id, { accepted_payment_methods: value } as any);
-            addToast("Payment methods updated", "success");
+            await venueApiService.updateVenue(currentVenue.id, {
+                payment_config: payConfig,
+                cash_requires_approval: cashRequiresApproval,
+                cash_approval_ttl_minutes: Number(cashApprovalTtl),
+                bank_transfer_ttl_minutes: Number(bankTransferTtl)
+            } as any);
+            addToast("Payment settings updated successfully", "success");
             await refreshVenues();
         } catch (e: any) {
-            setPaymentAcceptance(previous);
-            addToast(e?.message || "Failed to update payment methods", "error");
+            addToast(e?.message || "Failed to update payment settings", "error");
         } finally {
             setPaymentSaving(false);
         }
@@ -800,37 +850,174 @@ export default function VenueSettingsPage() {
 
                         <p className="text-sm text-secondary mb-6">
                             Choose how players can pay you for bookings at this venue. Players will only see options you accept.
+                            At least one payment method must be enabled.
                         </p>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                            {[
-                                { value: "both" as const, title: "Card & Cash", desc: "Players choose either method." },
-                                { value: "card_only" as const, title: "Card only", desc: "Players pay online by card." },
-                                { value: "cash_only" as const, title: "Cash only", desc: "Players pay in cash on arrival." },
-                            ].map((opt) => {
-                                const selected = paymentAcceptance === opt.value;
-                                return (
-                                    <button
-                                        key={opt.value}
-                                        type="button"
-                                        disabled={paymentSaving}
-                                        onClick={() => !selected && savePaymentAcceptance(opt.value)}
-                                        className={`text-left p-5 rounded-2xl border transition-all ${
-                                            selected
-                                                ? "bg-emerald-500/10 border-emerald-500 shadow-[0_0_18px_rgba(16,185,129,0.15)]"
-                                                : "bg-surface-base/40 border-default hover:border-subtle hover:bg-surface-raised"
-                                        } disabled:opacity-60 disabled:cursor-not-allowed`}
-                                    >
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${selected ? "border-emerald-500" : "border-subtle"}`}>
-                                                {selected && <div className="w-2 h-2 rounded-full bg-emerald-500" />}
-                                            </div>
-                                            <span className="font-bold text-primary text-sm">{opt.title}</span>
+                        <div className="space-y-6">
+                            {/* Card Payments Option */}
+                            <div className="p-5 rounded-2xl border border-default bg-surface-base/20 transition-all hover:bg-surface-base/30">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-3 bg-emerald-500/10 rounded-xl text-emerald-500">
+                                            <Shield size={20} weight="bold" />
                                         </div>
-                                        <p className="text-xs text-secondary leading-snug">{opt.desc}</p>
-                                    </button>
-                                );
-                            })}
+                                        <div>
+                                            <h3 className="font-bold text-primary text-sm">💳 Accept Card Payments</h3>
+                                            <p className="text-xs text-secondary mt-0.5">Players pay securely online via PayHere gateway.</p>
+                                        </div>
+                                    </div>
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={payConfig.card}
+                                            onChange={(e) => setPayConfig(prev => ({ ...prev, card: e.target.checked }))}
+                                            className="sr-only peer"
+                                        />
+                                        <div className="w-11 h-6 bg-surface-overlay rounded-full peer peer-focus:ring-2 peer-focus:ring-emerald-500/30 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            {/* Cash Payments Option */}
+                            <div className={`p-5 rounded-2xl border transition-all ${payConfig.cash ? 'border-emerald-500/20 bg-emerald-500/5' : 'border-default bg-surface-base/20'}`}>
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-3 bg-emerald-500/10 rounded-xl text-emerald-500">
+                                            <span className="text-xl">💵</span>
+                                        </div>
+                                        <div>
+                                            <h3 className="font-bold text-primary text-sm">Accept Cash on Arrival</h3>
+                                            <p className="text-xs text-secondary mt-0.5">Players pay in cash directly at the venue.</p>
+                                        </div>
+                                    </div>
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={payConfig.cash}
+                                            onChange={(e) => setPayConfig(prev => ({ ...prev, cash: e.target.checked }))}
+                                            className="sr-only peer"
+                                        />
+                                        <div className="w-11 h-6 bg-surface-overlay rounded-full peer peer-focus:ring-2 peer-focus:ring-emerald-500/30 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                                    </label>
+                                </div>
+
+                                {payConfig.cash && (
+                                    <div className="pl-14 space-y-4 border-t border-emerald-500/10 pt-4 mt-2">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <h4 className="text-xs font-bold text-primary">Require Manager Approval</h4>
+                                                <p className="text-[10px] text-secondary mt-0.5">Instead of booking instantly, cash bookings must be approved by staff.</p>
+                                            </div>
+                                            <label className="relative inline-flex items-center cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={cashRequiresApproval}
+                                                    onChange={(e) => setCashRequiresApproval(e.target.checked)}
+                                                    className="sr-only peer"
+                                                />
+                                                <div className="w-9 h-5 bg-surface-overlay rounded-full peer peer-focus:ring-2 peer-focus:ring-emerald-500/20 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
+                                            </label>
+                                        </div>
+
+                                        {cashRequiresApproval && (
+                                            <div className="flex items-center gap-3 bg-surface-base/40 p-3 rounded-xl border border-default/50 max-w-sm">
+                                                <Clock size={16} className="text-amber-500 flex-shrink-0" />
+                                                <div className="flex-1 min-w-0">
+                                                    <label className="text-[10px] font-bold text-muted uppercase tracking-wider block">Approval Expiration Window</label>
+                                                    <span className="text-[10px] text-faint block mb-1">Time allowed for approval before auto-expiry (5-60 min).</span>
+                                                    <div className="flex items-center gap-2">
+                                                        <input
+                                                            type="number"
+                                                            min={5}
+                                                            max={60}
+                                                            value={cashApprovalTtl}
+                                                            onChange={(e) => setCashApprovalTtl(parseInt(e.target.value) || 10)}
+                                                            className="w-20 bg-surface-base border border-subtle rounded-lg px-2.5 py-1 text-xs text-primary font-mono text-center focus:border-emerald-500 focus:outline-none"
+                                                        />
+                                                        <span className="text-xs font-medium text-secondary">minutes</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Bank Transfer Payments Option */}
+                            <div className={`p-5 rounded-2xl border transition-all ${payConfig.bank_transfer ? 'border-blue-500/20 bg-blue-500/5' : 'border-default bg-surface-base/20'}`}>
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-3 bg-blue-500/10 rounded-xl text-blue-400">
+                                            <Bank size={20} weight="bold" />
+                                        </div>
+                                        <div>
+                                            <h3 className="font-bold text-primary text-sm">Accept Bank Transfer Payments</h3>
+                                            <p className="text-xs text-secondary mt-0.5">Players transfer to bank account and upload receipt slip.</p>
+                                        </div>
+                                    </div>
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={payConfig.bank_transfer}
+                                            onChange={(e) => {
+                                                const checked = e.target.checked;
+                                                const hasBank = bankDetails?.has_bank_details || currentVenue.has_bank_details;
+                                                if (checked && !hasBank) {
+                                                    addToast("Please configure and save your bank details in the section below first.", "warning");
+                                                    return;
+                                                }
+                                                setPayConfig(prev => ({ ...prev, bank_transfer: checked }));
+                                            }}
+                                            className="sr-only peer"
+                                        />
+                                        <div className="w-11 h-6 bg-surface-overlay rounded-full peer peer-focus:ring-2 peer-focus:ring-blue-500/30 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                                    </label>
+                                </div>
+
+                                {payConfig.bank_transfer && (
+                                    <div className="pl-14 space-y-4 border-t border-blue-500/10 pt-4 mt-2">
+                                        <div className="flex items-center gap-3 bg-surface-base/40 p-3 rounded-xl border border-default/50 max-w-sm">
+                                            <Clock size={16} className="text-blue-400 flex-shrink-0" />
+                                            <div className="flex-1 min-w-0">
+                                                <label className="text-[10px] font-bold text-muted uppercase tracking-wider block">Receipt Upload Expiration Window</label>
+                                                <span className="text-[10px] text-faint block mb-1">Time allowed to upload bank slip before auto-expiry (5-1440 min).</span>
+                                                <div className="flex items-center gap-2">
+                                                    <input
+                                                        type="number"
+                                                        min={5}
+                                                        max={1440}
+                                                        value={bankTransferTtl}
+                                                        onChange={(e) => setBankTransferTtl(parseInt(e.target.value) || 15)}
+                                                        className="w-20 bg-surface-base border border-subtle rounded-lg px-2.5 py-1 text-xs text-primary font-mono text-center focus:border-blue-500 focus:outline-none"
+                                                    />
+                                                    <span className="text-xs font-medium text-secondary">minutes</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {!(bankDetails?.has_bank_details || currentVenue.has_bank_details) && (
+                                    <div className="mt-3 flex items-start gap-2 bg-amber-500/10 border border-amber-500/20 p-3 rounded-xl">
+                                        <WarningCircle size={16} className="text-amber-500 flex-shrink-0 mt-0.5" />
+                                        <p className="text-xs text-amber-200/70">
+                                            To enable Bank Transfer, you must first add and save your bank details in the **Bank Details for Payouts** section below.
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Save Payment Config button */}
+                        <div className="flex items-center justify-end pt-6 mt-6 border-t border-default">
+                            <Button
+                                type="button"
+                                onClick={() => savePaymentConfig()}
+                                disabled={paymentSaving}
+                                className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold px-6 h-11 rounded-xl disabled:opacity-50"
+                            >
+                                {paymentSaving ? <CircleNotch size={16} weight="bold" className="animate-spin" /> : 'Save Payment Settings'}
+                            </Button>
                         </div>
                     </div>
 

@@ -118,6 +118,16 @@ export const normalizeVenue = (raw: any): Venue => {
     created_at: raw.created_at,
     updated_at: raw.updated_at ?? null,
     accepted_payment_methods: raw.accepted_payment_methods ?? "both",
+    payment_config: raw.payment_config ?? { card: true, cash: true, bank_transfer: false },
+    cash_requires_approval: Boolean(raw.cash_requires_approval ?? false),
+    cash_approval_ttl_minutes: Number(raw.cash_approval_ttl_minutes ?? 10),
+    bank_transfer_ttl_minutes: Number(raw.bank_transfer_ttl_minutes ?? 15),
+    has_bank_details: Boolean(raw.has_bank_details ?? false),
+    bank_account_holder_name: raw.bank_account_holder_name ?? null,
+    bank_name: raw.bank_name ?? null,
+    bank_branch_name: raw.bank_branch_name ?? null,
+    bank_account_number_masked: raw.bank_account_number_masked ?? null,
+    bank_account_type: raw.bank_account_type ?? null,
   };
 };
 
@@ -168,6 +178,15 @@ export const normalizeBooking = (raw: any): Booking => ({
   cancellation_reason: raw.cancellation_reason ?? null,
   paid_at: raw.paid_at ?? null,
   notes: raw.notes,
+  check_in_code: raw.check_in_code ?? null,
+  checked_in_at: raw.checked_in_at ?? null,
+  checked_in_by_id: raw.checked_in_by_id ?? null,
+  approval_expires_at: raw.approval_expires_at ?? null,
+  approved_by_id: raw.approved_by_id ?? null,
+  approved_at: raw.approved_at ?? null,
+  bank_transfer_slip_url: raw.bank_transfer_slip_url ?? null,
+  bank_transfer_slip_uploaded_at: raw.bank_transfer_slip_uploaded_at ?? null,
+  bank_transfer_reference: raw.bank_transfer_reference ?? null,
   court: raw.court
     ? {
         id: String(raw.court.id),
