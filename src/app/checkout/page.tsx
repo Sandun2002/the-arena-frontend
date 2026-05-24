@@ -71,9 +71,11 @@ function CheckoutContent() {
                 court_id: courtId,
                 start_time: new Date(`${date}T${startTime}:00`).toISOString(),
                 end_time: new Date(`${date}T${endTime}:00`).toISOString(),
-                payment_method: "card",
+                payment_method: "cash",
             });
-            router.push(`/checkout/${booking.id}`);
+            // TEMPORARY: Redirect to bookings instead of checkout because card payments are disabled
+            // router.push(`/checkout/${booking.id}`);
+            router.push(`/bookings`);
         } catch {
             addToast("Failed to create booking", "error");
         } finally {

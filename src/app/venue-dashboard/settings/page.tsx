@@ -864,6 +864,7 @@ export default function VenueSettingsPage() {
                                         <div>
                                             <h3 className="font-bold text-primary text-sm">💳 Accept Card Payments</h3>
                                             <p className="text-xs text-secondary mt-0.5">Players pay securely online via PayHere gateway.</p>
+                                            <p className="text-[10px] text-amber-500 font-bold mt-1">⚠️ Online (Card) payments are temporarily disabled platform-wide.</p>
                                         </div>
                                     </div>
                                     <label className="relative inline-flex items-center cursor-pointer">

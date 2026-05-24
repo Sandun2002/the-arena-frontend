@@ -56,12 +56,13 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
     cash: venue.accepted_payment_methods === "cash_only" || venue.accepted_payment_methods === "both",
     bank_transfer: false
   };
-  const allowCard = paymentConfig.card;
+  // TEMPORARY OVERRIDE: Block card payments platform-wide
+  const allowCard = false;
   const allowCash = paymentConfig.cash;
   const allowBankTransfer = !!paymentConfig.bank_transfer && !!venue.has_bank_details;
 
   const [paymentMethod, setPaymentMethod] = useState<"card" | "cash" | "bank_transfer">(
-    allowCard ? "card" : allowCash ? "cash" : "bank_transfer"
+    allowCash ? "cash" : allowBankTransfer ? "bank_transfer" : "cash"
   );
   
   const [createdBooking, setCreatedBooking] = useState<Booking | null>(null);
@@ -197,6 +198,10 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
       bookingService.calculatePrice(selectedCourtId, date, timeSlotsFormatted, paymentMethod)
         .then(p => { setPricing(p); setPricingError(null); })
         .catch((error: any) => {
+          console.error("calculatePrice error:", error);
+          if (error.response) {
+             console.error("Error response data:", error.response.data);
+          }
           setPricing(null);
           if (error.response?.status === 409) {
             setPricingError("One or more of these slots was just booked by someone else.");
@@ -216,6 +221,10 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
             setSelectedSlots([]);
           } else if (error.response?.status === 400) {
             setPricingError("Please select consecutive time slots only — gaps are not allowed.");
+          } else if (error.response?.status === 422) {
+             setPricingError("Validation error calculating price.");
+          } else {
+             setPricingError("Failed to calculate price.");
           }
         });
     } else {
@@ -652,7 +661,7 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
       )}
 
       {/* Pricing Error Banner */}
-      {pricingError && selectedSlots.length === 0 && (
+      {pricingError && (
         <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/30 flex items-start gap-2 animate-in fade-in slide-in-from-bottom-2">
           <WarningCircle size={16} weight="fill" className="text-red-400 mt-0.5 shrink-0" />
           <p className="text-xs text-red-400 leading-relaxed">{pricingError}</p>
@@ -736,8 +745,12 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
                 <Bank size={14} weight="bold" /> <span className="text-[10px] md:text-xs">Bank Transfer</span>
               </button>
             </div>
+            {!allowCard && (
+              <p className="mt-2 text-[11px] text-amber-500/80 leading-snug">
+                Online card payments are temporarily disabled. Please pay at the venue or via Bank Transfer.
+              </p>
+            )}
 
-            {/* Contextual description banners under selector */}
             {!allowCard && !allowCash && !allowBankTransfer && (
               <p className="mt-2 text-[11px] text-red-400 font-medium">
                 No active payment methods configured for this venue.
