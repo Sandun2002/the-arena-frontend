@@ -18,12 +18,41 @@ import { useRouter } from "next/navigation";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 
+type DashboardRoute = {
+    name: string;
+    path: string;
+    icon: typeof SquaresFour;
+    ownerOnly?: boolean;
+    verifiedOnly?: boolean;
+};
+
+const routes: DashboardRoute[] = [
+    { name: "Dashboard", path: "/venue-dashboard", icon: SquaresFour },
+    { name: "Booking Manager", path: "/venue-dashboard/booking-manager", icon: Calendar, verifiedOnly: true },
+    { name: "Bookings", path: "/venue-dashboard/bookings", icon: CalendarCheck, verifiedOnly: true },
+    { name: "Courts", path: "/venue-dashboard/courts", icon: Buildings, verifiedOnly: true },
+    { name: "Recurring", path: "/venue-dashboard/recurring", icon: ArrowsClockwise, verifiedOnly: true },
+    { name: "Closures", path: "/venue-dashboard/closures", icon: Hammer, verifiedOnly: true },
+    { name: "Gallery", path: "/venue-dashboard/gallery", icon: ImageIcon, verifiedOnly: true },
+    { name: "Subscription", path: "/venue-dashboard/subscription", icon: Money, ownerOnly: true, verifiedOnly: true },
+    { name: "Settings", path: "/venue-dashboard/settings", icon: GearSix, verifiedOnly: true },
+];
+
+const analyticsRoutes: DashboardRoute[] = [
+    { name: "Overview", path: "/venue-dashboard/analytics", icon: ChartBar, verifiedOnly: true },
+    { name: "Revenue", path: "/venue-dashboard/analytics/revenue", icon: CurrencyDollar, ownerOnly: true, verifiedOnly: true },
+    { name: "Utilization", path: "/venue-dashboard/analytics/utilization", icon: Pulse, verifiedOnly: true },
+    { name: "Fees & Payouts", path: "/venue-dashboard/analytics/fees", icon: ChartPieSlice, ownerOnly: true, verifiedOnly: true },
+    { name: "Cancellations", path: "/venue-dashboard/analytics/cancellations", icon: XCircle, verifiedOnly: true },
+];
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const router = useRouter();
     const { user, logout, isVenueManager, isLoggedIn, loading } = useAuth();
     const { currentVenue } = useVenue();
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [sidebarOpenPathname, setSidebarOpenPathname] = useState<string | null>(null);
+    const isSidebarOpen = sidebarOpenPathname === pathname;
 
     // Auth Guard
     useEffect(() => {
@@ -42,11 +71,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             }
         }
     }, [currentVenue, pathname, loading, isLoggedIn, router]);
-
-    // Close sidebar on route change (mobile)
-    useEffect(() => {
-        setIsSidebarOpen(false);
-    }, [pathname]);
 
     // Lock body scroll on mobile when sidebar open
     useEffect(() => {
@@ -71,25 +95,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         });
     }, []);
 
-    const routes = [
-        { name: "Dashboard", path: "/venue-dashboard", icon: SquaresFour },
-        { name: "Booking Manager", path: "/venue-dashboard/booking-manager", icon: Calendar, verifiedOnly: true },
-        { name: "Bookings", path: "/venue-dashboard/bookings", icon: CalendarCheck, verifiedOnly: true },
-        { name: "Courts", path: "/venue-dashboard/courts", icon: Buildings, verifiedOnly: true },
-        { name: "Recurring", path: "/venue-dashboard/recurring", icon: ArrowsClockwise, verifiedOnly: true },
-        { name: "Closures", path: "/venue-dashboard/closures", icon: Hammer, verifiedOnly: true },
-        { name: "Gallery", path: "/venue-dashboard/gallery", icon: ImageIcon, verifiedOnly: true },
-        { name: "Settings", path: "/venue-dashboard/settings", icon: GearSix, verifiedOnly: true },
-    ];
-
-    const analyticsRoutes = [
-        { name: "Overview", path: "/venue-dashboard/analytics", icon: ChartBar, verifiedOnly: true },
-        { name: "Revenue", path: "/venue-dashboard/analytics/revenue", icon: CurrencyDollar, ownerOnly: true, verifiedOnly: true },
-        { name: "Utilization", path: "/venue-dashboard/analytics/utilization", icon: Pulse, verifiedOnly: true },
-        { name: "Fees & Payouts", path: "/venue-dashboard/analytics/fees", icon: ChartPieSlice, ownerOnly: true, verifiedOnly: true },
-        { name: "Cancellations", path: "/venue-dashboard/analytics/cancellations", icon: XCircle, verifiedOnly: true },
-    ];
-
     if (loading || !isLoggedIn) {
         return <FullScreenSpinner />;
     }
@@ -113,7 +118,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 data-lenis-prevent
             >
                 <button
-                    onClick={() => setIsSidebarOpen(true)}
+                    onClick={() => setSidebarOpenPathname(pathname)}
                     className="p-2 rounded-lg bg-surface-overlay text-secondary hover:text-primary hover:bg-surface-overlay transition-colors"
                     aria-label="Open sidebar"
                 >
@@ -129,7 +134,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {isSidebarOpen && (
                 <div
                     className="fixed inset-0 bg-surface-base/80 backdrop-blur-sm z-[55] lg:hidden cursor-pointer"
-                    onClick={() => setIsSidebarOpen(false)}
+                    onClick={() => setSidebarOpenPathname(null)}
                 />
             )}
 
@@ -153,7 +158,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         </div>
                         <button
                             className="lg:hidden p-2 text-secondary hover:text-primary bg-surface-base/40 rounded-xl"
-                            onClick={() => setIsSidebarOpen(false)}
+                            onClick={() => setSidebarOpenPathname(null)}
                         >
                             <X size={20} weight="bold" />
                         </button>
@@ -164,7 +169,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         <p className="px-4 text-xs font-bold text-muted uppercase tracking-widest mb-3">Menu</p>
 
                         {routes.map((route) => {
-                            if (isVenueManager && (route as any).ownerOnly) return null;
+                            if (isVenueManager && route.ownerOnly) return null;
                             const isActive = pathname === route.path;
                             const isDisabled = route.verifiedOnly && currentVenue && !currentVenue.is_verified;
                             return (
@@ -173,7 +178,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                     href={isDisabled ? "#" : route.path}
                                     onClick={(e) => {
                                         if (isDisabled) { e.preventDefault(); return; }
-                                        setIsSidebarOpen(false);
+                                        setSidebarOpenPathname(null);
                                     }}
                                     className={`
                                         flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden
@@ -209,7 +214,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                         href={isDisabled ? "#" : route.path}
                                         onClick={(e) => {
                                             if (isDisabled) { e.preventDefault(); return; }
-                                            setIsSidebarOpen(false);
+                                            setSidebarOpenPathname(null);
                                         }}
                                         className={`
                                             flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden
@@ -236,7 +241,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             <div className="pt-2">
                                 <Link
                                     href="/venue-dashboard/managers"
-                                    onClick={() => setIsSidebarOpen(false)}
+                                    onClick={() => setSidebarOpenPathname(null)}
                                     className={`
                                         flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden
                                         ${pathname === "/venue-dashboard/managers"

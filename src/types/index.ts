@@ -112,6 +112,7 @@ export interface Venue {
   bank_branch_name?: string | null;
   bank_account_number_masked?: string | null;
   bank_account_type?: string | null;
+  subscription?: VenueSubscription | null;
 }
 
 export interface Court {
@@ -168,6 +169,36 @@ export type PaymentStatus = "pending" | "awaiting_verification" | "paid" | "refu
 export type PaymentMethod = "card" | "cash" | "bank_transfer";
 export type VenuePaymentAcceptance = "card_only" | "cash_only" | "both";
 
+export type SubscriptionPlanCode = "standard" | "premium";
+export type SubscriptionStatus = "active" | "past_due" | "cancelled" | "expired" | "pending_payment" | "failed";
+
+export interface VenueSubscription {
+  id: string | null;
+  venue_id: string;
+  plan_code: SubscriptionPlanCode;
+  status: SubscriptionStatus;
+  current_period_start: string | null;
+  current_period_end: string | null;
+  cancel_at_period_end: boolean;
+  activated_at: string | null;
+  cancelled_at: string | null;
+  payhere_order_id: string | null;
+  last_payment_amount: number | null;
+  last_payment_currency: string;
+  last_payment_status: string | null;
+  is_premium: boolean;
+  is_active: boolean;
+}
+
+export interface SubscriptionPlan {
+  code: SubscriptionPlanCode;
+  name: string;
+  monthly_price_lkr: number;
+  venue_commission_percentage: number;
+  features: string[];
+  recommended: boolean;
+}
+
 
 export interface Booking {
   id: string;
@@ -181,6 +212,8 @@ export interface Booking {
   platform_fee: number;
   venue_commission: number;
   venue_payout: number;
+  venue_subscription_plan?: SubscriptionPlanCode;
+  venue_subscription_id?: string | null;
   status: BookingStatus;
   payment_status: PaymentStatus;
   payment_method: PaymentMethod;

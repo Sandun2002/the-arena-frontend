@@ -128,6 +128,7 @@ export const normalizeVenue = (raw: any): Venue => {
     bank_branch_name: raw.bank_branch_name ?? null,
     bank_account_number_masked: raw.bank_account_number_masked ?? null,
     bank_account_type: raw.bank_account_type ?? null,
+    subscription: raw.subscription ?? null,
   };
 };
 
@@ -157,6 +158,8 @@ export const normalizeBooking = (raw: any): Booking => ({
   platform_fee: Number(raw.platform_fee ?? raw.service_fee ?? 0),
   venue_commission: Number(raw.venue_commission ?? 0),
   venue_payout: Number(raw.venue_payout ?? 0),
+  venue_subscription_plan: raw.venue_subscription_plan ?? "standard",
+  venue_subscription_id: raw.venue_subscription_id ? String(raw.venue_subscription_id) : null,
   status: raw.status,
   payment_status: raw.payment_status,
   payment_method: raw.payment_method,
