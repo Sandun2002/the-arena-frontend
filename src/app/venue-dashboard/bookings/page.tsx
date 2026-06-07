@@ -49,6 +49,7 @@ export default function BookingsPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
     const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+    const [sortOrder, setSortOrder] = useState<"upcoming" | "latest">("upcoming");
 
     // Check-in modal state
     const [isCheckInOpen, setIsCheckInOpen] = useState(false);
@@ -65,7 +66,7 @@ export default function BookingsPage() {
     // Reset to page 1 when filters change
     useEffect(() => {
         setCurrentPage(1);
-    }, [statusFilter, sourceFilter, debouncedSearch, selectedDate, currentVenue]);
+    }, [statusFilter, sourceFilter, debouncedSearch, selectedDate, sortOrder, currentVenue]);
 
     const loadBookings = useCallback(async () => {
         if (!currentVenue) return;
@@ -101,7 +102,7 @@ export default function BookingsPage() {
         return "platform";
     };
 
-    // Client-side date + source filtering (backend doesn't support these params)
+    // Client-side date + source filtering + sorting (backend doesn't support these params)
     const bookings = allBookings
         .filter((b) => {
             if (selectedDate) {
@@ -112,6 +113,14 @@ export default function BookingsPage() {
             }
             if (sourceFilter !== "all" && getBookingSource(b) !== sourceFilter) return false;
             return true;
+        })
+        .sort((a, b) => {
+            if (sortOrder === "latest") {
+                const aTime = a.created_at ? new Date(a.created_at).getTime() : 0;
+                const bTime = b.created_at ? new Date(b.created_at).getTime() : 0;
+                return bTime - aTime;
+            }
+            return new Date(a.start_time).getTime() - new Date(b.start_time).getTime();
         });
 
     const handleAction = async (action: string, id: string) => {
@@ -272,6 +281,25 @@ export default function BookingsPage() {
                             </button>
                         ))}
                     </div>
+
+                    {/* Sort Order */}
+                    <div className="flex bg-surface-raised p-1 rounded-xl border border-default">
+                        {([
+                            { v: "upcoming" as const, label: "Upcoming" },
+                            { v: "latest" as const, label: "Latest" },
+                        ]).map(({ v, label }) => (
+                            <button
+                                key={v}
+                                onClick={() => setSortOrder(v)}
+                                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${sortOrder === v
+                                    ? "bg-surface-overlay text-primary shadow-sm"
+                                    : "text-muted hover:text-secondary"
+                                    }`}
+                            >
+                                {label}
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </div>
 
@@ -369,6 +397,9 @@ export default function BookingsPage() {
                                                         items.push({ label: "Cancel", icon: <XCircle size={14} />, action: "cancel", style: "danger" });
                                                     }
                                                 } else if (booking.is_cash_booking) {
+                                                    if (booking.status === "confirmed" && booking.payment_status !== "paid") {
+                                                        items.push({ label: "Mark as Paid", icon: <CurrencyDollar size={14} />, action: "pay", style: "success" });
+                                                    }
                                                     if (booking.is_cash_unpaid && !isPastStartTime(booking)) {
                                                         items.push({ label: "Cancel", icon: <XCircle size={14} />, action: "cancel", style: "danger" });
                                                     } else if (booking.is_cash_unpaid && isPastStartTime(booking)) {
@@ -379,6 +410,9 @@ export default function BookingsPage() {
                                                     if (booking.status === "payment_pending") {
                                                         items.push({ label: "Confirm", icon: <CheckCircle size={14} />, action: "confirm", style: "success" });
                                                         items.push({ label: "Cancel", icon: <XCircle size={14} />, action: "cancel", style: "danger" });
+                                                    } else if (booking.status === "confirmed" && booking.payment_status !== "paid") {
+                                                        items.push({ label: "Mark as Paid", icon: <CurrencyDollar size={14} />, action: "pay", style: "success" });
+                                                        if (!isPastEndTime(booking)) items.push({ label: "Cancel", icon: <XCircle size={14} />, action: "cancel", style: "danger" });
                                                     } else if (booking.status === "confirmed" && !isPastEndTime(booking)) {
                                                         items.push({ label: "Cancel", icon: <XCircle size={14} />, action: "cancel", style: "danger" });
                                                     }

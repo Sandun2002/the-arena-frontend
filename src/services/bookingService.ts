@@ -8,6 +8,13 @@ export interface PriceCalculation {
     service_fee: number;
     duration_hours: number;
     currency: string;
+    slots?: Array<{
+        start_time: string;
+        end_time: string;
+        is_peak: boolean;
+        hourly_rate: number;
+        amount: number;
+    }>;
 }
 
 export interface CreateBookingRequest {

@@ -272,7 +272,7 @@ export default function VenueSubscriptionPage() {
                 <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl" />
                 <div className="relative flex items-center justify-between mb-5">
                   <h3 className="text-2xl font-black text-primary">{premiumPlan.name}</h3>
-                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-300">Recommended</span>
+                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-300">Best Value</span>
                 </div>
                 <p className="relative text-4xl font-black text-primary mb-2">{formatCurrency(premiumPlan.monthly_price_lkr)}</p>
                 <p className="relative text-secondary mb-6">Per venue, per month. Zero platform commission.</p>

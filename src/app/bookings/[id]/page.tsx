@@ -51,11 +51,57 @@ export default function BookingDetailPage() {
     const isRejected = booking.status === "rejected";
     const isExpired = booking.status === "expired";
     const isPaymentPending = booking.status === "payment_pending";
+    const isCompleted = booking.status === "completed";
 
     // Bank transfer variables
     const isBankTransfer = booking.payment_method === "bank_transfer";
     const needsSlipUpload = isBankTransfer && booking.payment_status === "pending" && isPendingApproval;
     const isSlipAwaitingVerification = isBankTransfer && booking.payment_status === "awaiting_verification";
+
+    const handleDownloadTicket = () => {
+        const ticketHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Booking Ticket - ${booking.booking_reference}</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; background: #0a0a0a; color: #e4e4e7; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+    .ticket { background: #141414; border: 2px dashed #10b981; border-radius: 24px; padding: 40px; width: 360px; text-align: center; }
+    .logo { font-size: 24px; font-weight: 900; color: #10b981; margin-bottom: 8px; }
+    .ref { font-family: monospace; font-size: 12px; color: #71717a; margin-bottom: 24px; }
+    .divider { border-top: 1px dashed #27272a; margin: 20px 0; }
+    .row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; }
+    .label { color: #71717a; }
+    .value { color: #ffffff; font-weight: 600; }
+    .total { font-size: 20px; font-weight: 900; color: #10b981; margin-top: 8px; }
+    .checkin { background: #064e3b; color: #34d399; padding: 12px; border-radius: 12px; font-family: monospace; font-size: 22px; font-weight: 900; letter-spacing: 4px; margin-top: 16px; }
+    .qr-note { font-size: 11px; color: #52525b; margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <div class="ticket">
+    <div class="logo">THE ARENA</div>
+    <div class="ref">${booking.booking_reference}</div>
+    <div class="divider"></div>
+    <div class="row"><span class="label">Venue</span><span class="value">${booking.court?.venue_name || "Arena Venue"}</span></div>
+    <div class="row"><span class="label">Court</span><span class="value">${booking.court?.name || "Court"}</span></div>
+    <div class="row"><span class="label">Date</span><span class="value">${fmtDateShort(booking.start_time)}</span></div>
+    <div class="row"><span class="label">Time</span><span class="value">${fmtTime(booking.start_time)} - ${fmtTime(booking.end_time)}</span></div>
+    <div class="row"><span class="label">Sport</span><span class="value">${booking.court?.sport_type?.name || "Sport"}</span></div>
+    <div class="divider"></div>
+    <div class="row total"><span>Total Paid</span><span>LKR ${booking.total_price.toLocaleString()}</span></div>
+    ${booking.check_in_code ? `<div class="checkin">${booking.check_in_code}</div><div class="qr-note">Show this code at the venue</div>` : ""}
+  </div>
+</body>
+</html>`;
+        const printWindow = window.open("", "_blank");
+        if (printWindow) {
+            printWindow.document.write(ticketHtml);
+            printWindow.document.close();
+            setTimeout(() => printWindow.print(), 300);
+        }
+    };
 
     return (
         <main className="min-h-screen bg-surface-base pt-24 pb-12 px-4 selection:bg-emerald-500/30">
@@ -147,7 +193,7 @@ export default function BookingDetailPage() {
                             )}
 
                             {/* Booking page action buttons */}
-                            {isUpcoming && (
+                            {(isUpcoming || isCompleted) && (
                                 <div className="flex gap-3">
                                     {isPaymentPending ? (
                                         <Button
@@ -157,18 +203,24 @@ export default function BookingDetailPage() {
                                             <CreditCard size={16} weight="bold" className="mr-2" /> Complete Payment
                                         </Button>
                                     ) : (
-                                        <Button className="flex-grow bg-surface-overlay hover:bg-surface-overlay text-primary border-subtle" variant="outline">
+                                        <Button
+                                            className="flex-grow bg-surface-overlay hover:bg-surface-overlay text-primary border-subtle"
+                                            variant="outline"
+                                            onClick={handleDownloadTicket}
+                                        >
                                             <DownloadSimple size={16} weight="bold" className="mr-2" /> Ticket
                                         </Button>
                                     )}
-                                    
-                                    <Button
-                                        className="flex-grow border-red-900/30 text-red-500 hover:bg-red-900/10 hover:text-red-400 font-bold"
-                                        variant="outline"
-                                        onClick={() => setIsCancelModalOpen(true)}
-                                    >
-                                        Cancel Booking
-                                    </Button>
+
+                                    {isUpcoming && (
+                                        <Button
+                                            className="flex-grow border-red-900/30 text-red-500 hover:bg-red-900/10 hover:text-red-400 font-bold"
+                                            variant="outline"
+                                            onClick={() => setIsCancelModalOpen(true)}
+                                        >
+                                            Cancel Booking
+                                        </Button>
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -208,7 +260,7 @@ export default function BookingDetailPage() {
                                             rel="noopener noreferrer"
                                             className="inline-flex items-center gap-1.5 text-xs text-blue-400 hover:text-blue-300 font-bold hover:underline"
                                         >
-                                            <ImageIcon size={16} /> View Uploaded Receipt Receipt
+                                            <ImageIcon size={16} /> View Uploaded Receipt
                                         </a>
                                     </div>
                                 )}
@@ -259,30 +311,43 @@ export default function BookingDetailPage() {
 
                     </div>
 
-                    {/* Sidebar: Payment Summary */}
+                    {/* Sidebar: Payment Summary or Unconfirmed Message */}
                     <div className="w-full md:w-80 space-y-6 shrink-0">
-                        <div className="bg-surface-raised/50 border border-default rounded-3xl p-6 backdrop-blur-sm sticky top-24 shadow-xl">
-                            <h3 className="text-lg font-bold text-primary mb-6 flex items-center gap-2">
-                                <Receipt size={20} weight="fill" className="text-emerald-500" /> Payment Summary
-                            </h3>
-
-                            <div className="space-y-3 mb-6">
-                                <div className="flex justify-between text-sm text-secondary">
-                                    <span>Rate ({booking.duration_hours}h)</span>
-                                    <span>LKR {(booking.hourly_rate * booking.duration_hours).toLocaleString()}</span>
-                                </div>
-                                <div className="flex justify-between text-sm text-secondary">
-                                    <span>Platform Fee</span>
-                                    <span>LKR {booking.platform_fee.toLocaleString()}</span>
-                                </div>
-                                <div className="flex justify-between text-base font-bold text-primary pt-3 border-t border-default">
-                                    <span>Total</span>
-                                    <span>LKR {booking.total_price.toLocaleString()}</span>
-                                </div>
+                        {(isExpired || isRejected || isCancelled) ? (
+                            <div className="bg-surface-raised/50 border border-default rounded-3xl p-6 backdrop-blur-sm sticky top-24 shadow-xl text-center">
+                                <XCircle size={48} weight="fill" className="text-red-500 mx-auto mb-4" />
+                                <h3 className="text-lg font-bold text-primary mb-2">Sorry, your booking wasn't confirmed.</h3>
+                                <p className="text-sm text-secondary mb-4">This time slot has been released and is now available for others to book.</p>
+                                <Link href="/venues">
+                                    <Button className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold">
+                                        Find Another Slot
+                                    </Button>
+                                </Link>
                             </div>
+                        ) : (
+                            <div className="bg-surface-raised/50 border border-default rounded-3xl p-6 backdrop-blur-sm sticky top-24 shadow-xl">
+                                <h3 className="text-lg font-bold text-primary mb-6 flex items-center gap-2">
+                                    <Receipt size={20} weight="fill" className="text-emerald-500" /> Payment Summary
+                                </h3>
 
-                            <PaymentStatusPanel booking={booking} />
-                        </div>
+                                <div className="space-y-3 mb-6">
+                                    <div className="flex justify-between text-sm text-secondary">
+                                        <span>Rate ({booking.duration_hours}h)</span>
+                                        <span>LKR {(booking.hourly_rate * booking.duration_hours).toLocaleString()}</span>
+                                    </div>
+                                    <div className="flex justify-between text-sm text-secondary">
+                                        <span>Platform Fee</span>
+                                        <span>LKR {booking.platform_fee.toLocaleString()}</span>
+                                    </div>
+                                    <div className="flex justify-between text-base font-bold text-primary pt-3 border-t border-default">
+                                        <span>Total</span>
+                                        <span>LKR {booking.total_price.toLocaleString()}</span>
+                                    </div>
+                                </div>
+
+                                <PaymentStatusPanel booking={booking} />
+                            </div>
+                        )}
                     </div>
 
                 </div>
@@ -349,10 +414,10 @@ function HoldTimer({
                     </p>
                 </div>
                 <button
-                    onClick={() => router.refresh()}
+                    onClick={() => router.push("/bookings")}
                     className="text-xs font-bold text-red-300 hover:text-red-200 flex items-center gap-1 flex-shrink-0"
                 >
-                    <ArrowsClockwise size={14} weight="bold" /> Refresh
+                    <ArrowsClockwise size={14} weight="bold" /> View Bookings
                 </button>
             </div>
         );
@@ -478,7 +543,19 @@ function PaymentStatusPanel({ booking }: { booking: Booking }) {
             </div>
         );
     }
-
+    if (status === "confirmed" && ps === "pending") {
+        return (
+            <div className="bg-surface-base/40 rounded-xl p-4 border border-emerald-500/20">
+                <div className="flex items-center gap-2 mb-1">
+                    <CheckCircle size={16} weight="fill" className="text-emerald-500" />
+                    <span className="text-xs font-bold text-emerald-500 uppercase">Pay at Venue</span>
+                </div>
+                <p className="text-[10px] text-faint">
+                    {method === "bank_transfer" ? "Upload receipt to confirm." : "Bring cash on arrival."}
+                </p>
+            </div>
+        );
+    }
     return (
         <div className="bg-surface-base/40 rounded-xl p-4 border border-default/50">
             <div className="flex items-center gap-2 mb-1">

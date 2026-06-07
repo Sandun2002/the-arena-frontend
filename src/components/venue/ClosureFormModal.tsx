@@ -77,8 +77,10 @@ export default function ClosureFormModal({ venueId, courts, onClose, onSuccess }
                 }
 
                 // Create blocks sequentially to surface the first exact slot failure.
+                // Explicitly use Asia/Colombo (+05:30) so times are correct regardless of browser timezone.
+                const VENUE_TZ = "+05:30";
                 for (const hour of selectedSlots) {
-                    const start = new Date(`${data.date}T${hour.toString().padStart(2, '0')}:00:00`);
+                    const start = new Date(`${data.date}T${hour.toString().padStart(2, '0')}:00:00${VENUE_TZ}`);
                     const end = new Date(start);
                     end.setHours(start.getHours() + 1);
 
@@ -193,8 +195,9 @@ export default function ClosureFormModal({ venueId, courts, onClose, onSuccess }
                             <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 max-h-48 overflow-y-auto custom-scrollbar p-1">
                                 {hours.map(hour => {
                                     const now = new Date();
+                                    const venueNow = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Colombo" }));
                                     const isTodaySelected = watch("date") === today;
-                                    const isPastHour = isTodaySelected && hour <= now.getHours();
+                                    const isPastHour = isTodaySelected && hour <= venueNow.getHours();
                                     const isSelected = selectedSlots.includes(hour);
                                     const timeStr = format(new Date().setHours(hour, 0, 0, 0), "h a");
                                     return (

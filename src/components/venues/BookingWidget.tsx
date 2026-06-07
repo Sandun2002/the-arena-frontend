@@ -359,10 +359,10 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
         </div>
         
         <button
-          onClick={() => router.push(isApprovalRequired && createdBooking ? `/bookings/${createdBooking.id}` : "/bookings")}
+          onClick={() => router.push(createdBooking ? `/bookings/${createdBooking.id}` : "/bookings")}
           className="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-black rounded-xl font-bold text-sm transition-colors"
         >
-          {isApprovalRequired ? "View Booking Details" : "View My Bookings"}
+          {createdBooking ? "View Booking Details" : "View My Bookings"}
         </button>
       </div>
     );
@@ -684,14 +684,53 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
         </div>
       )}
 
-      {/* Total & Action */}
+      {/* Pricing Breakdown */}
       <div className="border-t border-default pt-4">
-        <div className="flex justify-between items-center mb-4">
-          <span className="text-sm text-secondary">Total:</span>
-          <span className="text-2xl font-bold text-primary">
-            {pricing ? `LKR ${pricing.total.toLocaleString()}` : "LKR 0"}
-          </span>
-        </div>
+        {pricing && selectedSlots.length > 0 && (
+          <div className="mb-4 space-y-2">
+            {pricing.slots && pricing.slots.length > 0 && (
+              <div className="space-y-1 mb-3">
+                {pricing.slots.map((slot: any, i: number) => (
+                  <div key={i} className="flex justify-between items-center text-xs">
+                    <span className="text-secondary flex items-center gap-1.5">
+                      {slot.start_time}–{slot.end_time}
+                      {slot.is_peak && (
+                        <span className="px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-400 font-bold text-[10px]">PEAK</span>
+                      )}
+                    </span>
+                    <span className="text-primary font-medium">LKR {Math.round(slot.amount).toLocaleString()}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-secondary">Subtotal</span>
+              <span className="text-primary font-medium">LKR {Math.round(pricing.subtotal).toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-secondary">Platform fee</span>
+              <span className={paymentMethod !== "card" ? "text-emerald-400 font-medium" : "text-primary font-medium"}>
+                {paymentMethod !== "card" ? "LKR 0" : `LKR ${Math.round(pricing.service_fee).toLocaleString()}`}
+              </span>
+            </div>
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-secondary">Payment processing fee</span>
+              <span className={paymentMethod !== "card" ? "text-emerald-400 font-medium" : "text-primary font-medium"}>
+                {paymentMethod !== "card" ? "LKR 0" : "Included above"}
+              </span>
+            </div>
+            <div className="border-t border-default/50 pt-2 flex justify-between items-center">
+              <span className="text-sm font-bold text-primary">Total</span>
+              <span className="text-xl font-bold text-primary">LKR {Math.round(pricing.total).toLocaleString()}</span>
+            </div>
+          </div>
+        )}
+        {(!pricing || selectedSlots.length === 0) && (
+          <div className="flex justify-between items-center mb-4">
+            <span className="text-sm text-secondary">Total:</span>
+            <span className="text-2xl font-bold text-primary">LKR 0</span>
+          </div>
+        )}
 
         {/* Payment Method Selector */}
         {selectedSlots.length > 0 && pricing && (
