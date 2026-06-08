@@ -32,6 +32,11 @@ export default function BookingsPage() {
     const { currentVenue } = useVenue();
     const { addToast } = useToast();
 
+    // Slip Review State
+    const [reviewingBooking, setReviewingBooking] = useState<Booking | null>(null);
+    const [rejectReason, setRejectReason] = useState("");
+    const [isSubmittingSlipAction, setIsSubmittingSlipAction] = useState(false);
+
     // All loaded bookings from current page (possibly filtered client-side by date)
     const [allBookings, setAllBookings] = useState<Booking[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -124,6 +129,13 @@ export default function BookingsPage() {
         });
 
     const handleAction = async (action: string, id: string) => {
+        if (action === "review-slip") {
+            const bookingObj = bookings.find(b => b.id === id);
+            if (bookingObj) {
+                setReviewingBooking(bookingObj);
+            }
+            return;
+        }
         if (action === "reject") {
             const reason = prompt("Enter booking rejection reason:") || "Rejected by venue";
             try {
@@ -373,8 +385,7 @@ export default function BookingsPage() {
                                                 if (booking.status === "pending_approval") {
                                                     if (booking.payment_method === "bank_transfer") {
                                                         if (booking.payment_status === "awaiting_verification" || booking.bank_transfer_slip_url) {
-                                                            items.push({ label: "Verify Slip", icon: <CheckCircle size={14} />, action: "verify-slip", style: "success" });
-                                                            items.push({ label: "Reject Slip", icon: <XCircle size={14} />, action: "reject-slip", style: "danger" });
+                                                            items.push({ label: "Review Bank Slip", icon: <Bank size={14} />, action: "review-slip", style: "default" });
                                                         } else {
                                                             items.push({ label: "Reject Booking", icon: <XCircle size={14} />, action: "reject", style: "danger" });
                                                         }
@@ -535,6 +546,136 @@ export default function BookingsPage() {
                     onClose={() => setIsCheckInOpen(false)}
                     onSuccess={() => loadBookings()}
                 />
+            </Modal>
+
+            {/* Review Bank Slip Modal */}
+            <Modal isOpen={!!reviewingBooking} onClose={() => { setReviewingBooking(null); setRejectReason(""); }} title="Review Bank Transfer Slip">
+                {reviewingBooking && (
+                    <div className="space-y-6">
+                        <div className="bg-surface-raised p-4 border border-default rounded-2xl space-y-3">
+                            <div className="grid grid-cols-2 gap-4 text-xs">
+                                <div>
+                                    <span className="block text-muted mb-0.5">Booking Ref</span>
+                                    <span className="font-mono font-bold text-primary">{reviewingBooking.booking_reference}</span>
+                                </div>
+                                <div>
+                                    <span className="block text-muted mb-0.5">Total Amount</span>
+                                    <span className="font-bold text-emerald-500">LKR {reviewingBooking.total_price.toLocaleString()}</span>
+                                </div>
+                                <div>
+                                    <span className="block text-muted mb-0.5">Customer</span>
+                                    <span className="font-bold text-primary">{reviewingBooking.user?.full_name || reviewingBooking.customer_name || "Guest"}</span>
+                                </div>
+                                <div>
+                                    <span className="block text-muted mb-0.5">Court</span>
+                                    <span className="font-bold text-primary">{reviewingBooking.court?.name || "—"}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {reviewingBooking.bank_transfer_slip_url ? (
+                            <div className="space-y-4">
+                                <div className="relative overflow-hidden rounded-2xl border border-default bg-[#0a0a0a] aspect-[4/3] flex items-center justify-center group">
+                                    <img 
+                                        src={reviewingBooking.bank_transfer_slip_url} 
+                                        alt="Bank Transfer Slip" 
+                                        className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
+                                    />
+                                    <a 
+                                        href={reviewingBooking.bank_transfer_slip_url} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center text-sm font-semibold text-white transition-opacity duration-200"
+                                    >
+                                        View Full Image
+                                    </a>
+                                </div>
+                                
+                                <div className="space-y-2 bg-surface-raised p-4 border border-default rounded-2xl text-xs">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-muted">Reference Number:</span>
+                                        <span className="font-mono font-bold text-primary">{reviewingBooking.bank_transfer_reference || "N/A"}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-muted">Uploaded At:</span>
+                                        <span className="font-medium text-primary">
+                                            {reviewingBooking.bank_transfer_slip_uploaded_at 
+                                                ? format(new Date(reviewingBooking.bank_transfer_slip_uploaded_at), "MMM dd, yyyy · hh:mm a") 
+                                                : "N/A"}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="text-center py-8 border border-dashed border-default rounded-2xl">
+                                <p className="text-sm text-muted">No transfer slip image found</p>
+                            </div>
+                        )}
+
+                        <div className="space-y-4 pt-4 border-t border-default">
+                            <div>
+                                <label className="block text-xs font-bold text-muted uppercase tracking-wider mb-2">
+                                    Rejection Reason (Required only if rejecting)
+                                </label>
+                                <textarea
+                                    value={rejectReason}
+                                    onChange={(e) => setRejectReason(e.target.value)}
+                                    placeholder="Please explain why the slip is being rejected..."
+                                    className="w-full h-20 bg-surface-raised border border-default rounded-xl p-3 text-sm text-primary focus:border-emerald-500 focus:outline-none resize-none"
+                                />
+                            </div>
+
+                            <div className="flex justify-end gap-3">
+                                <button
+                                    type="button"
+                                    disabled={isSubmittingSlipAction}
+                                    onClick={async () => {
+                                        if (!rejectReason.trim()) {
+                                            addToast("Please enter a rejection reason", "error");
+                                            return;
+                                        }
+                                        setIsSubmittingSlipAction(true);
+                                        try {
+                                            await centerService.rejectBankSlip(reviewingBooking.id, rejectReason);
+                                            addToast("Bank transfer slip rejected successfully", "success");
+                                            setReviewingBooking(null);
+                                            setRejectReason("");
+                                            loadBookings();
+                                        } catch (error) {
+                                            addToast("Failed to reject bank slip", "error");
+                                        } finally {
+                                            setIsSubmittingSlipAction(false);
+                                        }
+                                    }}
+                                    className="px-4 py-2.5 bg-red-500/10 border border-red-500/20 hover:bg-red-500 hover:text-white hover:border-red-500 text-red-400 rounded-xl text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-50"
+                                >
+                                    Reject Slip
+                                </button>
+                                <button
+                                    type="button"
+                                    disabled={isSubmittingSlipAction}
+                                    onClick={async () => {
+                                        setIsSubmittingSlipAction(true);
+                                        try {
+                                            await centerService.verifyBankTransfer(reviewingBooking.id);
+                                            addToast("Bank transfer slip verified successfully", "success");
+                                            setReviewingBooking(null);
+                                            setRejectReason("");
+                                            loadBookings();
+                                        } catch (error) {
+                                            addToast("Failed to verify bank slip", "error");
+                                        } finally {
+                                            setIsSubmittingSlipAction(false);
+                                        }
+                                    }}
+                                    className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-black rounded-xl text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-50"
+                                >
+                                    Approve & Confirm
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </Modal>
         </div>
     );
