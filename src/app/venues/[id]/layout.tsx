@@ -3,6 +3,9 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import VenueSchema from "@/components/seo/VenueSchema";
 
+export const dynamic = "force-dynamic";
+
+
 interface VenueLayoutProps {
   params: Promise<{ id: string }>;
   children: React.ReactNode;

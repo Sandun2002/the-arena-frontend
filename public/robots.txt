@@ -5,6 +5,7 @@
 User-agent: *
 Disallow: /api/
 Disallow: /bookings
+Disallow: /book/
 Disallow: /checkout
 Disallow: /profile
 Disallow: /settings
