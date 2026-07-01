@@ -28,7 +28,7 @@ export default function Footer() {
             <h4 className="mb-4 font-semibold text-primary">Company</h4>
             <ul className="space-y-2 text-sm">
               <li><Link href="/about" className="hover:text-brand-accent-hover">About Us</Link></li>
-              <li><Link href="/partner" className="hover:text-brand-accent-hover">Partner</Link></li>
+              <li><a href={`https://${process.env.NEXT_PUBLIC_VENUE_DOMAIN || 'centers.thearena.lk'}`} className="hover:text-brand-accent-hover">List Your Venue</a></li>
               <li><Link href="/careers" className="hover:text-brand-accent-hover">Careers</Link></li>
             </ul>
           </div>

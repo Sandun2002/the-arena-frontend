@@ -80,6 +80,18 @@ export default function Button({
   );
 
   if (href) {
+    const isExternal = href.startsWith("http") || href.startsWith("//");
+    if (isExternal) {
+      return (
+        <a
+          href={href}
+          ref={buttonRef as React.RefObject<HTMLAnchorElement>}
+          className={cn(baseStyles, variants[variant], className)}
+        >
+          {spanContent}
+        </a>
+      );
+    }
     return (
       <Link
         href={href}

@@ -37,7 +37,7 @@ const FAQS: FAQItem[] = [
   {
     category: "venues",
     question: "How do I list my sports venue on your platform?",
-    answer: "We make facility onboarding seamless! Navigate to our 'Partner' page, fill out the basic venue details form, and our onboarding squad will review your center to verify and publish it in no time."
+    answer: "We make facility onboarding seamless! Visit centers.thearena.lk to register your venue. Fill out the basic venue details form, and our onboarding squad will review your center to verify and publish it in no time."
   },
   {
     category: "venues",

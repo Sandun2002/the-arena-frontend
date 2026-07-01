@@ -185,7 +185,7 @@ export default function ProfilePage() {
                         {/* Menu */}
                         <div className="bg-surface-raised dark:bg-surface-raised/50 border border-default rounded-3xl p-2 backdrop-blur-sm">
                             {(isVenueOwner || isVenueManager) && (
-                                <MenuLink href="/venue-dashboard" icon={<SquaresFour size={16} weight="bold" />} label="Manager Dashboard" />
+                                <MenuLink href={`https://${process.env.NEXT_PUBLIC_VENUE_DOMAIN || 'centers.thearena.lk'}/venue-dashboard`} icon={<SquaresFour size={16} weight="bold" />} label="Manager Dashboard" />
                             )}
                             <MenuLink href="/profile/settings" icon={<PencilSimple size={16} weight="bold" />} label="Edit Profile" />
                             <MenuLink href="/settings/sessions" icon={<Shield size={16} weight="bold" />} label="Security & Sessions" />
@@ -356,13 +356,30 @@ function StatsCard({ icon, label, value, subtext, fullWidth }: any) {
 }
 
 function MenuLink({ href, icon, label }: any) {
-    return (
-        <Link href={href} className="flex items-center justify-between p-4 rounded-2xl hover:bg-tint-hover text-secondary hover:text-primary transition-colors group">
+    const isExternal = href.startsWith("http") || href.startsWith("//");
+    const content = (
+        <>
             <span className="flex items-center gap-3 font-medium">
                 <span className="group-hover:text-emerald-500 transition-colors">{icon}</span>
                 {label}
             </span>
             <CaretRight size={16} weight="bold" className="opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
+        </>
+    );
+
+    const className = "flex items-center justify-between p-4 rounded-2xl hover:bg-tint-hover text-secondary hover:text-primary transition-colors group";
+
+    if (isExternal) {
+        return (
+            <a href={href} className={className}>
+                {content}
+            </a>
+        );
+    }
+
+    return (
+        <Link href={href} className={className}>
+            {content}
         </Link>
     )
 }

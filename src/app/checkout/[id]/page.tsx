@@ -221,7 +221,16 @@ export default function CheckoutPage() {
 
           {/* Back */}
           <button
-            onClick={() => router.back()}
+            onClick={async () => {
+              try {
+                if (booking) {
+                  await bookingService.cancelBooking(booking.id, "User abandoned checkout");
+                }
+              } catch (err) {
+                console.error("Failed to cancel booking on back navigation:", err);
+              }
+              router.back();
+            }}
             className="inline-flex items-center text-sm text-muted hover:text-primary mb-8 transition-colors"
           >
             <ArrowLeft size={16} weight="bold" className="mr-2" /> Back

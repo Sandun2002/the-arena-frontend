@@ -80,8 +80,8 @@ export default function VenueSignupPage() {
   return (
     <main className="min-h-screen bg-surface-base flex flex-col items-center justify-start pt-24 pb-12 px-4">
       <div className="w-full max-w-md">
-        <Link href="/signup" className="mb-8 inline-flex items-center text-sm text-muted hover:text-primary transition-colors">
-          <ArrowLeft size={16} weight="bold" className="mr-2" /> Back to Selection
+        <Link href="/" className="mb-8 inline-flex items-center text-sm text-muted hover:text-primary transition-colors">
+          <ArrowLeft size={16} weight="bold" className="mr-2" /> Back
         </Link>
 
         <div className="rounded-3xl border border-default bg-surface-raised/50 p-8 backdrop-blur-xl shadow-blue-900/10 shadow-2xl">

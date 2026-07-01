@@ -89,14 +89,14 @@ export default function Header() {
 
               {/* Context Switcher Link */}
               {!isVenueContext && (isVenueOwner || isVenueManager) && (
-                <Link href="/venue-dashboard">
+                <a href={`https://${process.env.NEXT_PUBLIC_VENUE_DOMAIN || 'centers.thearena.lk'}/venue-dashboard`}>
                   <span className="text-xs font-bold text-muted hover:text-primary transition-colors cursor-pointer mr-2 uppercase tracking-wide">Manager View</span>
-                </Link>
+                </a>
               )}
               {isVenueContext && (
-                <Link href="/">
+                <a href={`https://${process.env.NEXT_PUBLIC_MAIN_DOMAIN || 'thearena.lk'}`}>
                   <span className="text-xs font-bold text-muted hover:text-primary transition-colors cursor-pointer mr-2 uppercase tracking-wide">Player View</span>
-                </Link>
+                </a>
               )}
 
               {/* User Dropdown */}

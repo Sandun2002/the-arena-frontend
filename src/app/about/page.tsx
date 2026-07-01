@@ -140,7 +140,7 @@ export default function AboutPage() {
                             <Button href="/venues" className="w-full sm:w-auto px-10 py-4 text-lg font-bold">
                                 Explore Venues
                             </Button>
-                            <Button href="/partner" className="w-full sm:w-auto px-10 py-4 text-lg font-bold bg-transparent border border-subtle hover:bg-surface-overlay text-primary">
+                            <Button href={`https://${process.env.NEXT_PUBLIC_VENUE_DOMAIN || 'centers.thearena.lk'}`} className="w-full sm:w-auto px-10 py-4 text-lg font-bold bg-transparent border border-subtle hover:bg-surface-overlay text-primary">
                                 List Your Venue
                             </Button>
                         </div>

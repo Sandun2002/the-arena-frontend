@@ -65,7 +65,7 @@ export default function SignupSelectionPage() {
         </Link>
 
         {/* Venue Card */}
-        <Link href="/signup/venue" className="role-card group">
+        <a href={`https://${process.env.NEXT_PUBLIC_VENUE_DOMAIN || 'centers.thearena.lk'}/signup`} className="role-card group">
           <div className="h-full bg-surface-raised/50 border border-default rounded-3xl p-8 backdrop-blur-sm hover:bg-surface-raised hover:border-blue-500/50 transition-all duration-300 relative overflow-hidden">
             <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
               <Buildings size={128} weight="duotone" className="text-blue-500 transform -rotate-12 group-hover:scale-110 transition-transform duration-500" />
@@ -84,7 +84,7 @@ export default function SignupSelectionPage() {
               </div>
             </div>
           </div>
-        </Link>
+        </a>
 
       </div>
 

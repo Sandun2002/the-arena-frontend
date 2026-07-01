@@ -5,7 +5,6 @@ import Hero from "@/components/home/Hero";
 import SportExplorer from "@/components/home/SportExplorer";
 import FeaturedVenues from "@/components/home/FeaturedVenues";
 import ReviewsTeaser from "@/components/home/ReviewsTeaser";
-import GamificationTeaser from "@/components/home/GamificationTeaser";
 import PartnerCTA from "@/components/home/PartnerCTA";
 import Link from "next/link";
 import { PhoneDisconnect, Lock, GameController, CaretRight } from "@phosphor-icons/react";
@@ -45,9 +44,6 @@ export default function Home() {
 
       {/* 4. Reviews Trust Section */}
       <ReviewsTeaser />
-
-      {/* 5. Gamification Teaser */}
-      <GamificationTeaser />
 
       {/* 6. How it Works - Rewritten */}
       <section className="py-24 relative bg-surface-raised/20 border-y border-default/50">

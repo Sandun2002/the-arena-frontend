@@ -9,7 +9,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/venues`, lastModified: new Date(), priority: 0.9, changeFrequency: "daily" },
     { url: `${baseUrl}/about`, lastModified: new Date(), priority: 0.7, changeFrequency: "monthly" },
     { url: `${baseUrl}/contact`, lastModified: new Date(), priority: 0.7, changeFrequency: "monthly" },
-    { url: `${baseUrl}/partner`, lastModified: new Date(), priority: 0.6, changeFrequency: "monthly" },
+    { url: `https://${process.env.NEXT_PUBLIC_VENUE_DOMAIN || 'centers.thearena.lk'}`, lastModified: new Date(), priority: 0.6, changeFrequency: "monthly" },
     { url: `${baseUrl}/privacy`, lastModified: new Date(), priority: 0.4, changeFrequency: "yearly" },
     { url: `${baseUrl}/security`, lastModified: new Date(), priority: 0.4, changeFrequency: "yearly" },
   ];

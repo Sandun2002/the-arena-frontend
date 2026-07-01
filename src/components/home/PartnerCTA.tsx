@@ -72,13 +72,13 @@ export default function PartnerCTA() {
 
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link
-              href="/partner"
+            <a
+              href={`https://${process.env.NEXT_PUBLIC_VENUE_DOMAIN || 'centers.thearena.lk'}`}
               className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-black font-bold hover:shadow-[0_0_30px_rgba(80,200,120,0.4)] hover:scale-105 transition-all duration-300 group"
             >
               List Your Venue
               <ArrowRight size={16} weight="bold" className="group-hover:translate-x-1 transition-transform" />
-            </Link>
+            </a>
             <Link
               href="/contact"
               className="inline-flex items-center gap-2 px-8 py-4 rounded-full border border-subtle text-primary font-bold hover:bg-surface-overlay hover:border-secondary transition-all duration-300"
