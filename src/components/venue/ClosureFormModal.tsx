@@ -77,12 +77,13 @@ export default function ClosureFormModal({ venueId, courts, onClose, onSuccess }
                 }
 
                 // Create blocks sequentially to surface the first exact slot failure.
-                // Explicitly use Asia/Colombo (+05:30) so times are correct regardless of browser timezone.
-                const VENUE_TZ = "+05:30";
+                // Build Colombo wall-clock times as absolute instants. Do NOT use
+                // Date#setHours (browser-local) — that truncates :30 offsets and
+                // can produce wrong windows / false booking conflicts.
+                const pad = (n: number) => n.toString().padStart(2, "0");
                 for (const hour of selectedSlots) {
-                    const start = new Date(`${data.date}T${hour.toString().padStart(2, '0')}:00:00${VENUE_TZ}`);
-                    const end = new Date(start);
-                    end.setHours(start.getHours() + 1);
+                    const start = new Date(`${data.date}T${pad(hour)}:00:00+05:30`);
+                    const end = new Date(start.getTime() + 60 * 60 * 1000);
 
                     await centerService.createManualBooking({
                         court_id: data.court_id,

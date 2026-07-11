@@ -66,6 +66,8 @@ function LoginContent() {
       const detail = error?.response?.data?.detail || error?.message || "";
       if (detail === "email_not_verified") {
         setEmailNotVerified(true);
+      } else if (!error.response) {
+        addToast("Network error. Could not connect to the server.", "error");
       } else {
         addToast("Invalid email or password", "error");
       }

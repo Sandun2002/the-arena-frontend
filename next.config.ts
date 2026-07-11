@@ -28,7 +28,7 @@ const securityHeaders = [
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://www.payhere.lk https://sandbox.payhere.lk https://www.googletagmanager.com https://www.google-analytics.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
-      "img-src 'self' data: blob: https:",
+      "img-src 'self' data: blob: https: http://localhost:8000",
       "connect-src 'self' https://api.thearena.lk https://centers.thearena.lk http://localhost:8000 https://accounts.google.com https://www.googleapis.com https://www.payhere.lk https://sandbox.payhere.lk https://www.google-analytics.com https://www.googletagmanager.com",
       "worker-src 'self'",
       "frame-src https://accounts.google.com https://www.payhere.lk https://sandbox.payhere.lk https://maps.google.com https://www.google.com",

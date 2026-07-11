@@ -506,7 +506,15 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
                   : "text-secondary hover:text-primary"
                   }`}
               >
-                {cData.court.name} <span className="opacity-60 font-normal">({cData.court.sport})</span>
+                <span className="block">{cData.court.name} <span className="opacity-60 font-normal">({cData.court.sport})</span></span>
+                <span className="block text-[10px] font-semibold opacity-80 mt-0.5">
+                  LKR {Number(cData.court.hourly_rate || 0).toLocaleString()}/hr
+                  {cData.court.peak_hourly_rate != null && Number(cData.court.peak_hourly_rate) > 0 && (
+                    <span className={selectedCourtId === cData.court.id ? "text-black/70" : "text-amber-400"}>
+                      {" "}· peak {Number(cData.court.peak_hourly_rate).toLocaleString()}
+                    </span>
+                  )}
+                </span>
               </button>
             ))}
             {loadingSlots && courtsData.length === 0 && (
@@ -698,7 +706,10 @@ export default function BookingWidget({ venue }: BookingWidgetProps) {
                         <span className="px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-400 font-bold text-[10px]">PEAK</span>
                       )}
                     </span>
-                    <span className="text-primary font-medium">LKR {Math.round(slot.amount).toLocaleString()}</span>
+                    <span className="text-primary font-medium">
+                      LKR {Math.round(Number(slot.amount ?? slot.hourly_rate ?? 0)).toLocaleString()}
+                      <span className="text-muted font-normal">/hr</span>
+                    </span>
                   </div>
                 ))}
               </div>

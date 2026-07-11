@@ -34,6 +34,14 @@ export default function BookingsPage() {
 
         fetchBookings();
 
+        // Poll while any booking is waiting on venue action so status updates
+        // (approved / rejected / slip verified) appear without a hard refresh.
+        const pollId = setInterval(() => {
+            playerService.getBookings().then((data) => {
+                setBookings(data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()));
+            }).catch(() => {});
+        }, 15000);
+
         // Re-fetch when the user returns to this tab/window (e.g. after completing payment).
         const handleVisibility = () => { if (document.visibilityState === "visible") fetchBookings(); };
         const handleFocus = () => fetchBookings();
@@ -41,6 +49,7 @@ export default function BookingsPage() {
         document.addEventListener("visibilitychange", handleVisibility);
         window.addEventListener("focus", handleFocus);
         return () => {
+            clearInterval(pollId);
             document.removeEventListener("visibilitychange", handleVisibility);
             window.removeEventListener("focus", handleFocus);
         };
@@ -48,6 +57,9 @@ export default function BookingsPage() {
 
     const isLiveUpcoming = (b: Booking): boolean => {
         if (b.status === "confirmed") return true;
+        // Cash / bank-transfer holds awaiting venue approval must stay visible
+        // so the player sees the status flip to confirmed after manager action.
+        if (b.status === "pending_approval") return true;
         if (b.status !== "payment_pending") return false;
         if (!b.hold_expires_at) return true;
         return new Date(b.hold_expires_at) > new Date();

@@ -264,7 +264,15 @@ export default function BookingPage() {
                                         >
                                             <h3 className={`font-bold ${selectedCourt === court.id ? 'text-emerald-500' : 'text-primary'}`}>{court.name}</h3>
                                             <p className="text-xs text-muted mt-1">{court.is_indoor ? 'Indoor' : 'Outdoor'}</p>
-                                            <p className="text-sm font-bold text-primary mt-3">LKR {court.hourly_rate}/hr</p>
+                                            <p className="text-sm font-bold text-primary mt-3">
+                                                LKR {Number(court.hourly_rate).toLocaleString()}/hr
+                                            </p>
+                                            {court.peak_hourly_rate != null && Number(court.peak_hourly_rate) > 0 && (
+                                                <p className="text-[11px] font-semibold text-amber-400 mt-0.5 flex items-center gap-1">
+                                                    <Lightning size={11} weight="fill" />
+                                                    Peak LKR {Number(court.peak_hourly_rate).toLocaleString()}/hr
+                                                </p>
+                                            )}
                                         </button>
                                     ))
                             ) : (

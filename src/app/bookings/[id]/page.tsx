@@ -42,6 +42,24 @@ export default function BookingDetailPage() {
         loadBooking();
     }, [user, id]);
 
+    // Poll while awaiting manager approval / bank-slip verification so the
+    // player UI flips to confirmed (or rejected) without a manual refresh.
+    useEffect(() => {
+        if (!user || !id || !booking) return;
+        const shouldPoll =
+            booking.status === "pending_approval" ||
+            booking.payment_status === "awaiting_verification";
+        if (!shouldPoll) return;
+
+        const intervalId = setInterval(() => {
+            playerService.getBookingById(id as string)
+                .then((data) => setBooking(data))
+                .catch(() => { /* keep last known state */ });
+        }, 8000);
+
+        return () => clearInterval(intervalId);
+    }, [user, id, booking?.status, booking?.payment_status]);
+
     if (loading) return <div className="min-h-screen bg-surface-base flex items-center justify-center p-4"><div className="animate-spin w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full" /></div>;
     if (!booking) return <div className="min-h-screen bg-surface-base flex items-center justify-center p-4 text-primary">Booking not found</div>;
 
@@ -140,8 +158,8 @@ export default function BookingDetailPage() {
                                     </p>
                                 </div>
 
-                                {/* Premium Check-in Code rendering */}
-                                {(booking.status === "confirmed" || isPendingApproval || booking.status === "completed") && booking.check_in_code ? (
+                                {/* Check-in code only after venue has approved / confirmed */}
+                                {(booking.status === "confirmed" || booking.status === "completed") && booking.check_in_code ? (
                                     <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-4 text-center min-w-[140px] select-all shadow-inner animate-in fade-in slide-in-from-right-4 duration-300">
                                         <p className="text-[9px] font-black text-emerald-500 uppercase tracking-widest mb-1">Check-in Code</p>
                                         <p className="text-2xl font-mono font-black text-emerald-400 tracking-[0.2em]">{booking.check_in_code}</p>
@@ -202,7 +220,7 @@ export default function BookingDetailPage() {
                                         >
                                             <CreditCard size={16} weight="bold" className="mr-2" /> Complete Payment
                                         </Button>
-                                    ) : (
+                                    ) : (booking.status === "confirmed" || isCompleted) ? (
                                         <Button
                                             className="flex-grow bg-surface-overlay hover:bg-surface-overlay text-primary border-subtle"
                                             variant="outline"
@@ -210,7 +228,11 @@ export default function BookingDetailPage() {
                                         >
                                             <DownloadSimple size={16} weight="bold" className="mr-2" /> Ticket
                                         </Button>
-                                    )}
+                                    ) : isPendingApproval ? (
+                                        <div className="flex-grow flex items-center justify-center px-4 py-2.5 rounded-xl border border-amber-500/25 bg-amber-500/5 text-xs font-bold text-amber-400 text-center">
+                                            Ticket available after venue approval
+                                        </div>
+                                    ) : null}
 
                                     {isUpcoming && (
                                         <Button
@@ -253,7 +275,16 @@ export default function BookingDetailPage() {
                                 </div>
                                 
                                 {booking.bank_transfer_slip_url && (
-                                    <div className="pt-2">
+                                    <div className="pt-2 space-y-3">
+                                        {!/\.pdf($|\?)/i.test(booking.bank_transfer_slip_url) && (
+                                            <div className="rounded-2xl border border-default bg-surface-sunken overflow-hidden max-h-64 flex items-center justify-center">
+                                                <img
+                                                    src={booking.bank_transfer_slip_url}
+                                                    alt="Uploaded bank transfer receipt"
+                                                    className="max-h-64 max-w-full object-contain"
+                                                />
+                                            </div>
+                                        )}
                                         <a 
                                             href={booking.bank_transfer_slip_url} 
                                             target="_blank" 
@@ -285,6 +316,23 @@ export default function BookingDetailPage() {
                                         <p className="text-sm font-bold text-primary">Payment Receipt Uploaded</p>
                                         <p className="text-xs text-muted">Reference: {booking.bank_transfer_reference}</p>
                                         <p className="text-xs text-muted">{fmtDateTime(booking.bank_transfer_slip_uploaded_at)}</p>
+                                    </div>
+                                )}
+
+                                {/* Venue approved */}
+                                {booking.approved_at && (
+                                    <div className="relative">
+                                        <div className="absolute -left-[31px] w-4 h-4 rounded-full bg-emerald-500/20 border-2 border-emerald-500"></div>
+                                        <p className="text-sm font-bold text-primary">Approved by Venue</p>
+                                        <p className="text-xs text-muted">{fmtDateTime(booking.approved_at)}</p>
+                                    </div>
+                                )}
+
+                                {/* Confirmed status (when no separate paid_at / approved_at) */}
+                                {booking.status === "confirmed" && !booking.approved_at && !booking.paid_at && (
+                                    <div className="relative">
+                                        <div className="absolute -left-[31px] w-4 h-4 rounded-full bg-emerald-500 border-2 border-black"></div>
+                                        <p className="text-sm font-bold text-primary">Booking Confirmed</p>
                                     </div>
                                 )}
 
@@ -332,8 +380,8 @@ export default function BookingDetailPage() {
 
                                 <div className="space-y-3 mb-6">
                                     <div className="flex justify-between text-sm text-secondary">
-                                        <span>Rate ({booking.duration_hours}h)</span>
-                                        <span>LKR {(booking.hourly_rate * booking.duration_hours).toLocaleString()}</span>
+                                        <span>Court fee ({booking.duration_hours}h{booking.hourly_rate ? ` · base LKR ${booking.hourly_rate.toLocaleString()}/hr` : ""})</span>
+                                        <span>LKR {(booking.subtotal ?? booking.hourly_rate * booking.duration_hours).toLocaleString()}</span>
                                     </div>
                                     <div className="flex justify-between text-sm text-secondary">
                                         <span>Platform Fee</span>

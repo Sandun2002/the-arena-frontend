@@ -576,11 +576,36 @@ export default function BookingsPage() {
                         {reviewingBooking.bank_transfer_slip_url ? (
                             <div className="space-y-4">
                                 <div className="relative overflow-hidden rounded-2xl border border-default bg-[#0a0a0a] aspect-[4/3] flex items-center justify-center group">
-                                    <img 
-                                        src={reviewingBooking.bank_transfer_slip_url} 
-                                        alt="Bank Transfer Slip" 
-                                        className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
-                                    />
+                                    {/\.pdf($|\?)/i.test(reviewingBooking.bank_transfer_slip_url) ? (
+                                        <iframe
+                                            src={reviewingBooking.bank_transfer_slip_url}
+                                            title="Bank Transfer Slip PDF"
+                                            className="w-full h-full min-h-[280px] border-0"
+                                        />
+                                    ) : (
+                                        <img 
+                                            src={reviewingBooking.bank_transfer_slip_url} 
+                                            alt="Bank Transfer Slip" 
+                                            className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
+                                            onError={(e) => {
+                                                const el = e.currentTarget;
+                                                el.style.display = "none";
+                                                const fallback = el.nextElementSibling as HTMLElement | null;
+                                                if (fallback) fallback.classList.remove("hidden");
+                                            }}
+                                        />
+                                    )}
+                                    <div className="hidden text-center p-6 space-y-2">
+                                        <p className="text-sm text-muted">Could not preview the slip in-page.</p>
+                                        <a
+                                            href={reviewingBooking.bank_transfer_slip_url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-sm font-bold text-emerald-400 hover:underline"
+                                        >
+                                            Open slip in new tab
+                                        </a>
+                                    </div>
                                     <a 
                                         href={reviewingBooking.bank_transfer_slip_url} 
                                         target="_blank" 

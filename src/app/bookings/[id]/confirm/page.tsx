@@ -118,8 +118,8 @@ export default function BookingConfirmationPage() {
                             </h3>
                             <div className="space-y-2">
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-muted">Hourly Rate</span>
-                                    <span className="text-secondary">LKR {booking.hourly_rate} x {booking.duration_hours} hrs</span>
+                                    <span className="text-muted">Court fee ({booking.duration_hours}h)</span>
+                                    <span className="text-secondary">LKR {(booking.subtotal ?? booking.hourly_rate * booking.duration_hours).toLocaleString()}</span>
                                 </div>
                                 <div className="flex justify-between text-sm">
                                     <span className="text-muted">Platform Fee</span>
