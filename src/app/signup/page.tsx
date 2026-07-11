@@ -4,8 +4,7 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import gsap from "gsap";
-import { User, Buildings, ArrowRight } from "@phosphor-icons/react";
-import Button from "@/components/ui/Button";
+import { User, ArrowRight } from "@phosphor-icons/react";
 import { useTheme } from "@/contexts/ThemeContext";
 
 export default function SignupSelectionPage() {
@@ -16,7 +15,7 @@ export default function SignupSelectionPage() {
     const ctx = gsap.context(() => {
       gsap.fromTo(".role-card",
         { y: 30, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.8, stagger: 0.1, ease: "power2.out" }
+        { y: 0, opacity: 1, duration: 0.8, ease: "power2.out" }
       );
     }, containerRef);
     return () => ctx.revert();
@@ -36,14 +35,14 @@ export default function SignupSelectionPage() {
           Join The <span className="text-emerald-500">Revolution</span>
         </h1>
         <p className="text-secondary max-w-md mx-auto">
-          Choose how you want to use TheArena.lk. Are you here to play, or here to host?
+          Create your player account to start booking courts, joining open games, and tracking stats.
         </p>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-6 max-w-4xl w-full relative z-10 px-4">
+      <div className="max-w-md w-full relative z-10 px-4">
 
         {/* Player Card */}
-        <Link href="/signup/player" className="role-card group">
+        <Link href="/signup/player" className="role-card group block">
           <div className="h-full bg-surface-raised/50 border border-default rounded-3xl p-8 backdrop-blur-sm hover:bg-surface-raised hover:border-emerald-500/50 transition-all duration-300 relative overflow-hidden">
             <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
               <User size={128} weight="duotone" className="text-emerald-500 transform rotate-12 group-hover:scale-110 transition-transform duration-500" />
@@ -64,28 +63,6 @@ export default function SignupSelectionPage() {
           </div>
         </Link>
 
-        {/* Venue Card */}
-        <a href={`https://${process.env.NEXT_PUBLIC_VENUE_DOMAIN || 'centers.thearena.lk'}/signup`} className="role-card group">
-          <div className="h-full bg-surface-raised/50 border border-default rounded-3xl p-8 backdrop-blur-sm hover:bg-surface-raised hover:border-blue-500/50 transition-all duration-300 relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
-              <Buildings size={128} weight="duotone" className="text-blue-500 transform -rotate-12 group-hover:scale-110 transition-transform duration-500" />
-            </div>
-
-            <div className="relative z-10 flex flex-col h-full">
-              <div className="w-14 h-14 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <Buildings size={28} weight="duotone" className="text-blue-500" />
-              </div>
-              <h2 className="text-2xl font-bold text-primary mb-2">I&apos;m a Venue Owner</h2>
-              <p className="text-secondary text-sm mb-8 flex-grow">
-                Manage bookings, optimize revenue, and grow your sports business.
-              </p>
-              <div className="flex items-center text-blue-500 font-bold group-hover:translate-x-2 transition-transform">
-                Register Venue <ArrowRight size={16} weight="bold" className="ml-2" />
-              </div>
-            </div>
-          </div>
-        </a>
-
       </div>
 
       <div className="mt-12 text-muted text-sm">
@@ -96,4 +73,4 @@ export default function SignupSelectionPage() {
       </div>
     </main>
   );
-}
+}
